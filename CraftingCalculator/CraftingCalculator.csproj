@@ -188,6 +188,7 @@
     <Compile Include="Recipes\Consumbable\UnstablePlasma.cs" />
     <Compile Include="Recipes\Consumbable\WarpCell.cs" />
     <Compile Include="Utilities\IngredientUtil.cs" />
+    <Compile Include="Utilities\RecipeUtil.cs" />
     <Page Include="CraftingCalculatorMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
