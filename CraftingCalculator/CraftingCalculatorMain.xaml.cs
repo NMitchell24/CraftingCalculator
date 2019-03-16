@@ -29,15 +29,15 @@ namespace CraftingCalculator
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
- //      For Testing Recipe Calculations with nested complex recipes.           
- //           MindArc mindArc = new MindArc();
- //           StringBuilder sb = new StringBuilder();
- //           foreach (KeyValuePair<IngredientType, int> ingredient in mindArc.GetIngredients())
- //           {
- //              sb.AppendLine(ingredient.Key.GetDisplayName() + ": " + ingredient.Value.ToString());
- //          }
- //
- //           MessageBox.Show(sb.ToString());
+            // For Testing Recipe Calculations with nested complex recipes.           
+            HeartOfTheSun heartOfTheSun = new HeartOfTheSun();
+            StringBuilder sb = new StringBuilder();
+            foreach (KeyValuePair<IngredientType, int> ingredient in heartOfTheSun.GetIngredients())
+            {
+               sb.AppendLine(ingredient.Key.GetDisplayName() + ": " + ingredient.Value.ToString());
+           }
+ 
+            MessageBox.Show(sb.ToString());
         }
     }
 }

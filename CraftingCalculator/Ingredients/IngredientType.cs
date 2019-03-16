@@ -89,7 +89,8 @@ namespace CraftingCalculator.Ingredients
         [IngredientAttr("Viscious Fluids")]     VISCIOUS_FLUIDS,
         [IngredientAttr("Technology Module")]   TECHNOLOGY_MODULE,
         [IngredientAttr("Quad Servo")]          QUAD_SERVO,
-        [IngredientAttr("Walker Brain")]        WALKER_BRAIN
+        [IngredientAttr("Walker Brain")]        WALKER_BRAIN,
+        [IngredientAttr("NipNip Buds")]         NIPNIP_BUDS
     }
 
 }
