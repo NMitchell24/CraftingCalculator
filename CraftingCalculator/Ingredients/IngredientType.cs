@@ -90,7 +90,9 @@ namespace CraftingCalculator.Ingredients
         [IngredientAttr("Technology Module")]   TECHNOLOGY_MODULE,
         [IngredientAttr("Quad Servo")]          QUAD_SERVO,
         [IngredientAttr("Walker Brain")]        WALKER_BRAIN,
-        [IngredientAttr("NipNip Buds")]         NIPNIP_BUDS
+        [IngredientAttr("NipNip Buds")]         NIPNIP_BUDS,
+        [IngredientAttr("Crystal Sulphide")]    CRYSTAL_SULPHIDE,
+        [IngredientAttr("Living Pearl")]        LIVING_PEARL
     }
 
 }

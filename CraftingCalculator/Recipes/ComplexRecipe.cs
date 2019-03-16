@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using CraftingCalculator.Ingredients;
+using CraftingCalculator.Utilities;
 
 namespace CraftingCalculator.Recipes
 {
-    abstract class ComplexRecipe : Recipe
+    public abstract class ComplexRecipe : Recipe
     {
         protected IDictionary<Recipe, int> ChildRecipes = new Dictionary<Recipe, int>();
 
@@ -15,17 +16,8 @@ namespace CraftingCalculator.Recipes
             foreach (KeyValuePair<Recipe, int> Recipe in ChildRecipes)
             {
                 IDictionary<IngredientType, int> RecipeIngredients = Recipe.Key.GetIngredients();
-                foreach ( KeyValuePair<IngredientType, int> Ingredient in RecipeIngredients){
-                    if (NewIngredients.ContainsKey(Ingredient.Key))
-                    {
-                        NewIngredients[Ingredient.Key] = NewIngredients[Ingredient.Key]
-                            + (Ingredient.Value * Recipe.Value);
-                    }
-                    else
-                    {
-                        NewIngredients.Add(Ingredient.Key, (Ingredient.Value * Recipe.Value));
-                    }
-                }
+
+                NewIngredients = IngredientUtil.CombineIngredients(RecipeIngredients, NewIngredients, Recipe.Value);
             }
 
             return NewIngredients;

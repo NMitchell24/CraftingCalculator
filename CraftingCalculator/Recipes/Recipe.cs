@@ -3,7 +3,7 @@ using CraftingCalculator.Ingredients;
 
 namespace CraftingCalculator.Recipes
 {
-    abstract class Recipe
+    public abstract class Recipe
     {
         protected IDictionary<IngredientType, int> Ingredients = new Dictionary<IngredientType, int>();
         public string Name { get; protected set; }
