@@ -55,7 +55,45 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Ingredients\IngredientType.cs" />
+    <Compile Include="Recipes\AdvancedIonBattery.cs" />
+    <Compile Include="Recipes\Antimatter.cs" />
+    <Compile Include="Recipes\AntimatterHousing.cs" />
+    <Compile Include="Recipes\AtlasPass1.cs" />
+    <Compile Include="Recipes\AtlasPass2.cs" />
+    <Compile Include="Recipes\AtlasPass3.cs" />
+    <Compile Include="Recipes\CarbonNanotubes.cs" />
+    <Compile Include="Recipes\CobaltMirror.cs" />
+    <Compile Include="Recipes\ComplexRecipe.cs" />
+    <Compile Include="Recipes\DihydrogenJelly.cs" />
+    <Compile Include="Recipes\ExplosiveDrones.cs" />
+    <Compile Include="Recipes\FrigateFuel100.cs" />
+    <Compile Include="Recipes\FrigateFuel200.cs" />
+    <Compile Include="Recipes\FrigateFuel50.cs" />
+    <Compile Include="Recipes\FuelOxidiser.cs" />
+    <Compile Include="Recipes\Glass.cs" />
+    <Compile Include="Recipes\HermeticSeal.cs" />
+    <Compile Include="Recipes\HolographicAnalyser.cs" />
+    <Compile Include="Recipes\HydrothermalFuelCell.cs" />
+    <Compile Include="Recipes\IonBattery.cs" />
+    <Compile Include="Recipes\LifeSupportGel.cs" />
+    <Compile Include="Recipes\LivingGlass.cs" />
+    <Compile Include="Recipes\Lubricant.cs" />
+    <Compile Include="Recipes\MetalPlating.cs" />
+    <Compile Include="Recipes\Microprocessor.cs" />
+    <Compile Include="Recipes\MindArc.cs" />
+    <Compile Include="Recipes\MindControlDevice.cs" />
+    <Compile Include="Recipes\MineralCompressor.cs" />
+    <Compile Include="Recipes\OxygenCapsule.cs" />
+    <Compile Include="Recipes\OxygenFilter.cs" />
+    <Compile Include="Recipes\ProjectileAmmunition.cs" />
+    <Compile Include="Recipes\Recipe.cs" />
+    <Compile Include="Recipes\SaltRefractor.cs" />
+    <Compile Include="Recipes\SodiumDiode.cs" />
+    <Compile Include="Recipes\StarshipLaunchFuel.cs" />
+    <Compile Include="Recipes\UnstablePlasma.cs" />
+    <Compile Include="Recipes\WarpDrive.cs" />
+    <Page Include="CraftingCalculatorMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -63,8 +101,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="CraftingCalculatorMain.xaml.cs">
+      <DependentUpon>CraftingCalculatorMain.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

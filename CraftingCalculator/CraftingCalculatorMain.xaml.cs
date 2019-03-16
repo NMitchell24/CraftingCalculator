@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CraftingCalculator.Recipes;
+using CraftingCalculator.Ingredients;
 
 namespace CraftingCalculator
 {
@@ -23,6 +25,19 @@ namespace CraftingCalculator
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+ //      For Testing Recipe Calculations with nested complex recipes.           
+ //           MindArc mindArc = new MindArc();
+ //           StringBuilder sb = new StringBuilder();
+ //           foreach (KeyValuePair<IngredientType, int> ingredient in mindArc.GetIngredients())
+ //           {
+ //              sb.AppendLine(ingredient.Key.GetDisplayName() + ": " + ingredient.Value.ToString());
+ //          }
+ //
+ //           MessageBox.Show(sb.ToString());
         }
     }
 }
