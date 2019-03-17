@@ -4,6 +4,10 @@ using CraftingCalculator.Utilities;
 
 namespace CraftingCalculator.Recipes
 {
+    /// <summary>
+    /// Abstract Implementation for more complex recipes that include other recipes as ingredients.
+    /// When Adding new Recipes they should also be added into the appropriate Get function in RecipeUtil
+    /// </summary>
     public abstract class ComplexRecipe : Recipe
     {
         protected IDictionary<Recipe, int> ChildRecipes = new Dictionary<Recipe, int>();

@@ -3,6 +3,10 @@ using CraftingCalculator.Ingredients;
 
 namespace CraftingCalculator.Recipes
 {
+    /// <summary>
+    /// Abstract Recipe Implementation for recipes that contain only basic Elements as ingredients.
+    /// When Adding new Recipes they should also be added into the appropriate Get function in RecipeUtil
+    /// </summary>
     public abstract class Recipe
     {
         protected IDictionary<IngredientType, int> Ingredients = new Dictionary<IngredientType, int>();

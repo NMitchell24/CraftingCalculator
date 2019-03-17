@@ -32,6 +32,14 @@ using CraftingCalculator.Recipes.StarshipTechnology;
 
 namespace CraftingCalculator.Utilities
 {
+    /// <summary>
+    /// For looking up lists of recipes.  
+    /// Separate Functions are provided to get lists for UI Filters.
+    /// New Recipes should be added into the appropriate Get function 
+    /// so that they are displayed in the proper filter.
+    /// If a new Get is added for a new filter, then it should also be added 
+    /// into the GetAll function so that the new recipes are included in the 'All' filter.
+    /// </summary>
     public static class RecipeUtil
     {
         public static List<Recipe> GetAccessCardRecipes()
