@@ -137,22 +137,68 @@
     <Compile Include="Recipes\BaseBasicComponentsWood\WoodenWindowPanel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\WoodFloorPanel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\WoodFramedGlassPanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\Bed.cs" />
+    <Compile Include="Recipes\BaseDecoration\CanisterRack.cs" />
     <Compile Include="Recipes\BaseDecoration\CeilingLight.cs" />
+    <Compile Include="Recipes\BaseDecoration\CeilingPanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\Chair.cs" />
     <Compile Include="Recipes\BaseDecoration\ColouredLight.cs" />
+    <Compile Include="Recipes\BaseDecoration\CornerSofa.cs" />
     <Compile Include="Recipes\BaseDecoration\Cube.cs" />
     <Compile Include="Recipes\BaseDecoration\CuboidRoofCap.cs" />
+    <Compile Include="Recipes\BaseDecoration\CurvedDesk.cs" />
     <Compile Include="Recipes\BaseDecoration\CurvedPipe.cs" />
     <Compile Include="Recipes\BaseDecoration\Cylinder.cs" />
+    <Compile Include="Recipes\BaseDecoration\Decal.cs" />
+    <Compile Include="Recipes\BaseDecoration\Drawers.cs" />
     <Compile Include="Recipes\BaseDecoration\Flag.cs" />
+    <Compile Include="Recipes\BaseDecoration\FlatPanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\FloorMat.cs" />
     <Compile Include="Recipes\BaseDecoration\LabLamp.cs" />
+    <Compile Include="Recipes\BaseDecoration\LargeMonitorStation.cs" />
     <Compile Include="Recipes\BaseDecoration\LargeWedge.cs" />
+    <Compile Include="Recipes\BaseDecoration\LightTable.cs" />
+    <Compile Include="Recipes\BaseDecoration\Locker.cs" />
+    <Compile Include="Recipes\BaseDecoration\MonitorStation.cs" />
+    <Compile Include="Recipes\BaseDecoration\OctaCabinet.cs" />
+    <Compile Include="Recipes\BaseDecoration\Oscilloscope.cs" />
     <Compile Include="Recipes\BaseDecoration\PavingDecoration.cs" />
     <Compile Include="Recipes\BaseDecoration\Pipe.cs" />
     <Compile Include="Recipes\BaseDecoration\Pyramid.cs" />
+    <Compile Include="Recipes\BaseDecoration\RoboticArm.cs" />
+    <Compile Include="Recipes\BaseDecoration\Server.cs" />
+    <Compile Include="Recipes\BaseDecoration\ShelfPanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\SidePanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\SimpleDesk.cs" />
     <Compile Include="Recipes\BaseDecoration\SmallLanternLight.cs" />
     <Compile Include="Recipes\BaseDecoration\SmallWedge.cs" />
+    <Compile Include="Recipes\BaseDecoration\Sofa.cs" />
     <Compile Include="Recipes\BaseDecoration\Sphere.cs" />
     <Compile Include="Recipes\BaseDecoration\StandingLight.cs" />
+    <Compile Include="Recipes\BaseDecoration\StoragePanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\SweptSofa.cs" />
+    <Compile Include="Recipes\BaseDecoration\Table.cs" />
+    <Compile Include="Recipes\BaseDecoration\TallCabinet.cs" />
+    <Compile Include="Recipes\BaseDecoration\TechPanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\WallFan.cs" />
+    <Compile Include="Recipes\BaseDecoration\ColouredWallScreen.cs" />
+    <Compile Include="Recipes\BaseDecoration\WallFlag.cs" />
+    <Compile Include="Recipes\BaseDecoration\WallScreen.cs" />
+    <Compile Include="Recipes\BaseDecoration\WallUnit.cs" />
+    <Compile Include="Recipes\BaseDecoration\WeaponRack.cs" />
+    <Compile Include="Recipes\BaseDecoration\Worktop.cs" />
+    <Compile Include="Recipes\BaseEquipment\BaseSalvageCapsule.cs" />
+    <Compile Include="Recipes\BaseEquipment\BaseTeleportModule.cs" />
+    <Compile Include="Recipes\BaseEquipment\GalacticTradeTerminal.cs" />
+    <Compile Include="Recipes\BaseEquipment\HazardProtectionUnit.cs" />
+    <Compile Include="Recipes\BaseEquipment\HealthStation.cs" />
+    <Compile Include="Recipes\BaseEquipment\LandingPad.cs" />
+    <Compile Include="Recipes\BaseEquipment\LargeRefiner.cs" />
+    <Compile Include="Recipes\BaseStorage\BarrelFabricator.cs" />
+    <Compile Include="Recipes\BaseStorage\CrateFabricator.cs" />
+    <Compile Include="Recipes\BaseStorage\LockedCrate.cs" />
+    <Compile Include="Recipes\BaseStorage\SmallCrate.cs" />
+    <Compile Include="Recipes\BaseStorage\StorageContainer.cs" />
     <Compile Include="Recipes\BaseStructures\AccessRamp.cs" />
     <Compile Include="Recipes\BaseStructures\BaseLargeGlassPanel.cs" />
     <Compile Include="Recipes\BaseStructures\BaseWindowLargeSquare.cs" />
@@ -188,6 +234,9 @@
     <Compile Include="Recipes\BaseStructures\TShapedCorridor.cs" />
     <Compile Include="Recipes\BaseStructures\ViewingSphere.cs" />
     <Compile Include="Recipes\BaseStructures\XShapedCorridor.cs" />
+    <Compile Include="Recipes\BaseTerminals\AgriculturalTerminal.cs" />
+    <Compile Include="Recipes\BaseTerminals\ConstructionTerminal.cs" />
+    <Compile Include="Recipes\BaseTerminals\ExocraftTerminal.cs" />
     <Compile Include="Recipes\BaseTerminals\ScienceTerminal.cs" />
     <Compile Include="Recipes\BaseTerminals\WeaponsTerminal.cs" />
     <Compile Include="Recipes\Consumbable\AdvancedIonBattery.cs" />
@@ -243,6 +292,15 @@
     <Compile Include="Recipes\ExocraftTechnology\ExocraftMountedCannon.cs" />
     <Compile Include="Recipes\ExocraftTechnology\ExocraftSignalBoosterSigma.cs" />
     <Compile Include="Recipes\ExocraftTechnology\ExocraftSignalBoosterTau.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\ColossusGeobay.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\ExocraftSummoningStation.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\NautilonChamber.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\NomadGeobay.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\PilgrimGeobay.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\RaceForceAmplifier.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\RaceInitiator.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\RaceObstacle.cs" />
+    <Compile Include="Recipes\ExocraftTerminal\RoamerGeobay.cs" />
     <Compile Include="Recipes\Farming\AlbumenPearlOrb.cs" />
     <Compile Include="Recipes\Farming\CopriteFlower.cs" />
     <Compile Include="Recipes\Farming\Echinocactus.cs" />
@@ -377,8 +435,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Recipes\BaseEquipment\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

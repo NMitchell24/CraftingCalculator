@@ -92,7 +92,8 @@ namespace CraftingCalculator.Ingredients
         [IngredientAttr("Walker Brain")]        WALKER_BRAIN,
         [IngredientAttr("NipNip Buds")]         NIPNIP_BUDS,
         [IngredientAttr("Crystal Sulphide")]    CRYSTAL_SULPHIDE,
-        [IngredientAttr("Living Pearl")]        LIVING_PEARL
+        [IngredientAttr("Living Pearl")]        LIVING_PEARL,
+        [IngredientAttr("Star Silk")]           STAR_SILK
     }
 
 }

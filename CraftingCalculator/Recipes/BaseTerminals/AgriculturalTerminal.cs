@@ -2,14 +2,14 @@
 
 namespace CraftingCalculator.Recipes.BaseTerminals
 {
-    class WeaponsTerminal : Recipe
+    class AgriculturalTerminal : Recipe
     {
-        public WeaponsTerminal()
+        public AgriculturalTerminal()
         {
-            Name = "Weapons Terminal";
+            Name = "Agricultural Terminal";
             Type = "Base Terminal";
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 40);
-            Ingredients.Add(IngredientType.PUGNEUM, 25);
+            Ingredients.Add(IngredientType.CONDENSED_CARBON, 25);
         }
     }
 }
