@@ -2,9 +2,9 @@
 
 namespace CraftingCalculator.Recipes.BaseStructures
 {
-    class CurvedCooridor : Recipe
+    class CurvedCorridor : Recipe
     {
-        public CurvedCooridor()
+        public CurvedCorridor()
         {
             Name = "Curved Cooridor";
             Type = "Base Building";
