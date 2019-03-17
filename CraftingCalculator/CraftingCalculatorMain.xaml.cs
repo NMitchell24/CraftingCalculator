@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CraftingCalculator.Recipes;
+using CraftingCalculator.Recipes.AdvancedCraftedProduct;
 using CraftingCalculator.Ingredients;
 
 namespace CraftingCalculator
