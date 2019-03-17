@@ -71,6 +71,15 @@
     <Compile Include="Recipes\AlloyMetal\Herox.cs" />
     <Compile Include="Recipes\AlloyMetal\Lemmium.cs" />
     <Compile Include="Recipes\AlloyMetal\MagnoGold.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\DeepwaterChamber.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\GlassTunnel.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\LShapedGlassTunnel.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\MoonpoolFloor.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\SquareDeepwaterChamber.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\TShapedGlassTunnel.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\VerticalGlassTunnel.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\WatertightDoor.cs" />
+    <Compile Include="Recipes\BaseAquaticConstruction\XShapedGlassTunnel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsConcrete\ConcreteArch.cs" />
     <Compile Include="Recipes\BaseBasicComponentsConcrete\ConcreteDoorFrame.cs" />
     <Compile Include="Recipes\BaseBasicComponentsConcrete\ConcreteDoorway.cs" />
@@ -90,6 +99,25 @@
     <Compile Include="Recipes\BaseBasicComponentsConcrete\SmallConcretePanel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsConcrete\SmallConcreteWall.cs" />
     <Compile Include="Recipes\BaseBasicComponentsConcrete\ThinConcreteWall.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalArch.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalDoorFrame.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalDoorPanel.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalDoorway.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalFramedGlassPanel.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalFrontage.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalHalfArch.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalHalfRamp.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalRamp.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalRoof.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalRoofCorner.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalRoofPanel.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalWall.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\MetalWindowPanel.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\ShortMetalWall.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\SlopingMetalPanel.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\SmallMetalPanel.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\SmallMetalWall.cs" />
+    <Compile Include="Recipes\BaseBasicComponentsMetal\ThinMetalWall.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\ShortWoodenWall.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\SlopingWoodPanel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\SmallWoodenWall.cs" />
@@ -109,6 +137,22 @@
     <Compile Include="Recipes\BaseBasicComponentsWood\WoodenWindowPanel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\WoodFloorPanel.cs" />
     <Compile Include="Recipes\BaseBasicComponentsWood\WoodFramedGlassPanel.cs" />
+    <Compile Include="Recipes\BaseDecoration\CeilingLight.cs" />
+    <Compile Include="Recipes\BaseDecoration\ColouredLight.cs" />
+    <Compile Include="Recipes\BaseDecoration\Cube.cs" />
+    <Compile Include="Recipes\BaseDecoration\CuboidRoofCap.cs" />
+    <Compile Include="Recipes\BaseDecoration\CurvedPipe.cs" />
+    <Compile Include="Recipes\BaseDecoration\Cylinder.cs" />
+    <Compile Include="Recipes\BaseDecoration\Flag.cs" />
+    <Compile Include="Recipes\BaseDecoration\LabLamp.cs" />
+    <Compile Include="Recipes\BaseDecoration\LargeWedge.cs" />
+    <Compile Include="Recipes\BaseDecoration\PavingDecoration.cs" />
+    <Compile Include="Recipes\BaseDecoration\Pipe.cs" />
+    <Compile Include="Recipes\BaseDecoration\Pyramid.cs" />
+    <Compile Include="Recipes\BaseDecoration\SmallLanternLight.cs" />
+    <Compile Include="Recipes\BaseDecoration\SmallWedge.cs" />
+    <Compile Include="Recipes\BaseDecoration\Sphere.cs" />
+    <Compile Include="Recipes\BaseDecoration\StandingLight.cs" />
     <Compile Include="Recipes\BaseStructures\AccessRamp.cs" />
     <Compile Include="Recipes\BaseStructures\BaseLargeGlassPanel.cs" />
     <Compile Include="Recipes\BaseStructures\BaseWindowLargeSquare.cs" />
@@ -334,9 +378,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Recipes\BaseAquaticConstruction\" />
-    <Folder Include="Recipes\BaseBasicComponentsMetal\" />
-    <Folder Include="Recipes\BaseDecoration\" />
     <Folder Include="Recipes\BaseEquipment\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
