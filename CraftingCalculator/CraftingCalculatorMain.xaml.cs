@@ -12,8 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CraftingCalculator.Recipes.AdvancedCraftedProduct;
-using CraftingCalculator.Ingredients;
+using CraftingCalculator.Model.Recipes.AdvancedCraftedProduct;
+using CraftingCalculator.Model.Ingredients;
 
 namespace CraftingCalculator
 {
