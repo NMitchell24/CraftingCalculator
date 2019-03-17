@@ -1,2 +1,2 @@
-# CraftingCalculator
-Simple Crafting Calculator for Survival Crafting Games
+# No Man's Sky CraftingCalculator
+Simple Crafting Calculator for No Man's Sky
