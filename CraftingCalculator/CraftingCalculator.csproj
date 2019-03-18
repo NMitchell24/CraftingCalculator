@@ -349,6 +349,7 @@
     <Compile Include="Model\Recipes\PortableTechnology\SavePoint.cs" />
     <Compile Include="Model\Recipes\PortableTechnology\SignalBooster.cs" />
     <Compile Include="Model\Recipes\RecipeFilter.cs" />
+    <Compile Include="Model\Recipes\RecipeMultiplier.cs" />
     <Compile Include="Model\Recipes\RecipeType.cs" />
     <Compile Include="Model\Recipes\StarshipTechnology\AblativeArmour.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnology\AdvancedMiningLaser.cs" />

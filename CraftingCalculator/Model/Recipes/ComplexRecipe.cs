@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using CraftingCalculator.Model.Ingredients;
 using CraftingCalculator.Utilities;
+using System.Text;
+using System;
 
 namespace CraftingCalculator.Model.Recipes
 {
@@ -11,6 +13,27 @@ namespace CraftingCalculator.Model.Recipes
     public abstract class ComplexRecipe : Recipe
     {
         protected IDictionary<Recipe, int> ChildRecipes = new Dictionary<Recipe, int>();
+        public new string Tooltip
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine(Name + " Ingredients:");
+                sb.Append(Environment.NewLine);
+                foreach (KeyValuePair<IngredientType, int> ingredient in Ingredients)
+                {
+                    sb.AppendLine(ingredient.Key.GetDisplayName() + " x" + ingredient.Value);
+                }
+
+                foreach(KeyValuePair<Recipe, int> recipe in ChildRecipes)
+                {
+                    sb.AppendLine(recipe.Key.Name + " x" + recipe.Value);
+                }
+
+                return sb.ToString();
+            }
+            protected set { Tooltip = value; }
+        }
 
         override 
         public IDictionary<IngredientType, int> GetIngredients()

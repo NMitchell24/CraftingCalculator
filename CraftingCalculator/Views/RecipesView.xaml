@@ -8,21 +8,29 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="10,0,0,-428">
         <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList}" 
-                 HorizontalAlignment="Left" Height="849" Margin="263,10,0,0" VerticalAlignment="Top" Width="320">
+                 HorizontalAlignment="Left" Height="822" Margin="10,37,0,0" VerticalAlignment="Top" Width="320">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Path = Name}" />
+                    <TextBlock Text="{Binding Path = Name}" 
+                        ToolTipService.ToolTip="{Binding Path = Tooltip}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <ComboBox x:Name ="recipeFilters" ItemsSource="{Binding Path = RecipeFilters}" SelectedItem="{Binding SelectedFilter}"
-                  HorizontalAlignment="Left" Margin="83,10,0,0" VerticalAlignment="Top" Width="175" >
+                  HorizontalAlignment="Left" Margin="155,10,0,0" VerticalAlignment="Top" Width="175" >
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path = Name}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        <TextBlock HorizontalAlignment="Left" 
+                   Margin="10,10,0,0" 
+                   TextWrapping="Wrap" 
+                   Text="Filter Recipes By" 
+                   VerticalAlignment="Top"
+                   FontWeight="Bold"
+                   Height="22" Width="140"/>
 
     </Grid>
 </UserControl>
