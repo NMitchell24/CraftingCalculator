@@ -348,6 +348,8 @@
     <Compile Include="Model\Recipes\PortableTechnology\PortableRefiner.cs" />
     <Compile Include="Model\Recipes\PortableTechnology\SavePoint.cs" />
     <Compile Include="Model\Recipes\PortableTechnology\SignalBooster.cs" />
+    <Compile Include="Model\Recipes\RecipeFilter.cs" />
+    <Compile Include="Model\Recipes\RecipeType.cs" />
     <Compile Include="Model\Recipes\StarshipTechnology\AblativeArmour.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnology\AdvancedMiningLaser.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnology\AmplifiedCartridges.cs" />
@@ -396,6 +398,10 @@
     <Compile Include="Model\Recipes\StarshipTechnology\TeleportReceiver.cs" />
     <Compile Include="Utilities\IngredientUtil.cs" />
     <Compile Include="Utilities\RecipeUtil.cs" />
+    <Compile Include="ViewModel\RecipesViewModel.cs" />
+    <Compile Include="Views\RecipesView.xaml.cs">
+      <DependentUpon>RecipesView.xaml</DependentUpon>
+    </Compile>
     <Page Include="CraftingCalculatorMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -408,6 +414,10 @@
       <DependentUpon>CraftingCalculatorMain.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\RecipesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

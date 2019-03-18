@@ -42,7 +42,131 @@ namespace CraftingCalculator.Utilities
     /// </summary>
     public static class RecipeUtil
     {
-        public static List<Recipe> GetAccessCardRecipes()
+        /// <summary>
+        /// Get a list of RecipeFilters
+        /// </summary>
+        /// <returns></returns>
+        public static List<RecipeFilter> GetRecipeFilters()
+        {
+            List<RecipeFilter> ret = new List<RecipeFilter>
+            {
+                new RecipeFilter("All", RecipeType.ALL),
+                new RecipeFilter("Access Card", RecipeType.ACCESS_CARD),
+                new RecipeFilter("Advanced Agricultural Product", RecipeType.ADVANCED_AGRICULTURAL_PRODUCT),
+                new RecipeFilter("Advanced Crafted Product", RecipeType.ADVANCED_CRAFTED_PRODUCT),
+                new RecipeFilter("Alloy Metal", RecipeType.ALLOY_METAL),
+                new RecipeFilter("Atlas Seed", RecipeType.ATLAS_SEED),
+                new RecipeFilter("Base Aquatic Construction", RecipeType.BASE_AQUATIC_CONSTRUCTION),
+                new RecipeFilter("Base Components (Concrete)", RecipeType.BASE_COMPONENT_CONCRETE),
+                new RecipeFilter("Base Components (Metal)", RecipeType.BASE_COMPONENT_METAL),
+                new RecipeFilter("Base Components (Wood)", RecipeType.BASE_COMPONENT_WOOD),
+                new RecipeFilter("Base Decorations", RecipeType.BASE_DECORATION),
+                new RecipeFilter("Base Equipment", RecipeType.BASE_EQUIPMENT),
+                new RecipeFilter("Base Structures", RecipeType.BASE_STRUCTURE),
+                new RecipeFilter("Base Terminals", RecipeType.BASE_TERMINAL),
+                new RecipeFilter("Concentrated Deposits", RecipeType.CONCENTRATED_DEPOSIT),
+                new RecipeFilter("Consumables", RecipeType.CONSUMABLE),
+                new RecipeFilter("Crafting Components", RecipeType.CRAFTING_COMPONENT),
+                new RecipeFilter("Enhanced Gas Products", RecipeType.ENHANCED_GAS_PRODUCT),
+                new RecipeFilter("Enriched Alloy Metals", RecipeType.ENRICHED_ALLOY_METAL),
+                new RecipeFilter("Exocraft Technology", RecipeType.EXOCRAFT_TECHNOLOGY),
+                new RecipeFilter("Exocraft Terminals", RecipeType.EXOCRAFT_TERMINAL),
+                new RecipeFilter("Exosuit Technology", RecipeType.EXOSUIT_TECHNOLOGY),
+                new RecipeFilter("Farming", RecipeType.FARMING),
+                new RecipeFilter("Freighter Technology", RecipeType.FREIGHTER_TECHNOLOGY),
+                new RecipeFilter("Highly Refined Technology", RecipeType.HIGHLY_REFINED_TECHNOLOGY),
+                new RecipeFilter("Manufactured Gas Products", RecipeType.MANUFACTURED_GAS_PRODUCT),
+                new RecipeFilter("Multi-tool Technology", RecipeType.MULTITOOL_TECHNOLOGY),
+                new RecipeFilter("Portable Technology", RecipeType.PORTABLE_TECHNOLOGY),
+                new RecipeFilter("Starship Technology", RecipeType.STARSHIP_TECHNOLOGY)
+            };
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Return a list of Recipes for a given RecipeFilter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static List<Recipe> GetRecipesByFilter(RecipeFilter filter)
+        {
+            return GetRecipesByType(filter.Type);
+        }
+
+        /// <summary>
+        /// Get a list of Recipes for a specified RecipeType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static List<Recipe> GetRecipesByType(RecipeType type)
+        {
+            switch (type)
+            {
+                case RecipeType.ALL:
+                    return GetAllRecipes();
+                case RecipeType.ACCESS_CARD:
+                    return GetAccessCardRecipes();
+                case RecipeType.ADVANCED_AGRICULTURAL_PRODUCT:
+                    return GetAdvancedAgriculturalProductRecipes();
+                case RecipeType.ADVANCED_CRAFTED_PRODUCT:
+                    return GetAdvancedCraftedProductRecipes();
+                case RecipeType.ALLOY_METAL:
+                    return GetAlloyMetalRecipes();
+                case RecipeType.ATLAS_SEED:
+                    return GetAtlasSeedRecipes();
+                case RecipeType.BASE_AQUATIC_CONSTRUCTION:
+                    return GetBaseAquaticConstructionRecipes();
+                case RecipeType.BASE_COMPONENT_CONCRETE:
+                    return GetBaseConcreteComponenetsRecipes();
+                case RecipeType.BASE_COMPONENT_METAL:
+                    return GetBaseMetalComponentRecipes();
+                case RecipeType.BASE_COMPONENT_WOOD:
+                    return GetBaseWoodComponentRecipes();
+                case RecipeType.BASE_DECORATION:
+                    return GetBaseDecorationRecipes();
+                case RecipeType.BASE_EQUIPMENT:
+                    return GetBaseEquipmentRecipes();
+                case RecipeType.BASE_STRUCTURE:
+                    return GetBaseStructureRecipes();
+                case RecipeType.BASE_TERMINAL:
+                    return GetBaseTerminalRecipes();
+                case RecipeType.CONCENTRATED_DEPOSIT:
+                    return GetConcentratedDepositRecipes();
+                case RecipeType.CONSUMABLE:
+                    return GetConsumableRecipes();
+                case RecipeType.CRAFTING_COMPONENT:
+                    return GetCraftingComponentRecipes();
+                case RecipeType.ENHANCED_GAS_PRODUCT:
+                    return GetEnhancedGasProductRecipes();
+                case RecipeType.ENRICHED_ALLOY_METAL:
+                    return GetEnrichedAlloyMetalRecipes();
+                case RecipeType.EXOCRAFT_TECHNOLOGY:
+                    return GetExocraftTechnologyRecipes();
+                case RecipeType.EXOCRAFT_TERMINAL:
+                    return GetExocraftTerminalRecipes();
+                case RecipeType.EXOSUIT_TECHNOLOGY:
+                    return GetExosuitTechnologyRecipes();
+                case RecipeType.FARMING:
+                    return GetFarmingRecipes();
+                case RecipeType.FREIGHTER_TECHNOLOGY:
+                    return GetFreighterTechnologyRecipes();
+                case RecipeType.HIGHLY_REFINED_TECHNOLOGY:
+                    return GetHighlyRefinedTechnologyRecipes();
+                case RecipeType.MANUFACTURED_GAS_PRODUCT:
+                    return GetManufacturedGasProductRecipes();
+                case RecipeType.MULTITOOL_TECHNOLOGY:
+                    return GetMultitoolTechnologyRecipes();
+                case RecipeType.PORTABLE_TECHNOLOGY:
+                    return GetPortableTechnologyRecipes();
+                case RecipeType.STARSHIP_TECHNOLOGY:
+                    return GetStarshipTechnologyRecipes();
+                default:
+                    return GetAllRecipes();
+            }
+        }
+
+        private static List<Recipe> GetAccessCardRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -53,7 +177,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetAdvancedAgriculturalProductRecipes()
+        private static List<Recipe> GetAdvancedAgriculturalProductRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -70,7 +194,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetAdvancedCraftedProductRecipes()
+        private static List<Recipe> GetAdvancedCraftedProductRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -82,7 +206,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetAlloyMetalRecipes()
+        private static List<Recipe> GetAlloyMetalRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -96,7 +220,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetAtlasSeedRecipes()
+        private static List<Recipe> GetAtlasSeedRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -114,7 +238,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseAquaticConstructionRecipes()
+        private static List<Recipe> GetBaseAquaticConstructionRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -131,7 +255,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseConcreteComponenetsRecipes()
+        private static List<Recipe> GetBaseConcreteComponenetsRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -159,7 +283,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseMetalComponentRecipes()
+        private static List<Recipe> GetBaseMetalComponentRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -186,7 +310,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseWoodComponentRecipes()
+        private static List<Recipe> GetBaseWoodComponentRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -213,7 +337,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseDecorationRecipes()
+        private static List<Recipe> GetBaseDecorationRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -271,7 +395,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseEquipmentRecipes()
+        private static List<Recipe> GetBaseEquipmentRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -286,7 +410,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseStorageRecipes()
+        private static List<Recipe> GetBaseStorageRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -299,7 +423,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseStructureRecipes()
+        private static List<Recipe> GetBaseStructureRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -342,7 +466,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetBaseTerminalRecipes()
+        private static List<Recipe> GetBaseTerminalRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -355,7 +479,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetConcentratedDepositRecipes()
+        private static List<Recipe> GetConcentratedDepositRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -369,7 +493,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetConsumableRecipes()
+        private static List<Recipe> GetConsumableRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -394,7 +518,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetCraftingComponentRecipes()
+        private static List<Recipe> GetCraftingComponentRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -413,7 +537,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetEnhancedGasProductRecipes()
+        private static List<Recipe> GetEnhancedGasProductRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -424,7 +548,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetEnrichedAlloyMetalRecipes()
+        private static List<Recipe> GetEnrichedAlloyMetalRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -434,7 +558,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetExocraftTechnologyRecipes()
+        private static List<Recipe> GetExocraftTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -448,7 +572,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetExocraftTerminalRecipes()
+        private static List<Recipe> GetExocraftTerminalRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -465,7 +589,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetExosuitTechnologyRecipes()
+        private static List<Recipe> GetExosuitTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -480,7 +604,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetFarmingRecipes()
+        private static List<Recipe> GetFarmingRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -504,7 +628,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetFreighterTechnologyRecipes()
+        private static List<Recipe> GetFreighterTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -515,7 +639,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetHighlyRefinedTechnologyRecipes()
+        private static List<Recipe> GetHighlyRefinedTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -525,7 +649,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetManufacturedGasProductRecipes()
+        private static List<Recipe> GetManufacturedGasProductRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -539,7 +663,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetMultitoolTechnologyRecipes()
+        private static List<Recipe> GetMultitoolTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -566,7 +690,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetPortableTechnologyRecipes()
+        private static List<Recipe> GetPortableTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -584,7 +708,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetStarshipTechnologyRecipes()
+        private static List<Recipe> GetStarshipTechnologyRecipes()
         {
             List<Recipe> ret = new List<Recipe>
             {
@@ -611,7 +735,7 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
-        public static List<Recipe> GetAllRecipes()
+        private static List<Recipe> GetAllRecipes()
         {
             List<Recipe> ret = new List<Recipe>();
 
