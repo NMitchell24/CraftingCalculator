@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CraftingCalculator.Model.Recipes;
 using CraftingCalculator.Model.Recipes.AccessCard;
 using CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct;
@@ -104,65 +105,65 @@ namespace CraftingCalculator.Utilities
             switch (type)
             {
                 case RecipeType.ALL:
-                    return GetAllRecipes();
+                    return SortRecipes(GetAllRecipes());
                 case RecipeType.ACCESS_CARD:
-                    return GetAccessCardRecipes();
+                    return SortRecipes(GetAccessCardRecipes());
                 case RecipeType.ADVANCED_AGRICULTURAL_PRODUCT:
-                    return GetAdvancedAgriculturalProductRecipes();
+                    return SortRecipes(GetAdvancedAgriculturalProductRecipes());
                 case RecipeType.ADVANCED_CRAFTED_PRODUCT:
-                    return GetAdvancedCraftedProductRecipes();
+                    return SortRecipes(GetAdvancedCraftedProductRecipes());
                 case RecipeType.ALLOY_METAL:
-                    return GetAlloyMetalRecipes();
+                    return SortRecipes(GetAlloyMetalRecipes());
                 case RecipeType.ATLAS_SEED:
-                    return GetAtlasSeedRecipes();
+                    return SortRecipes(GetAtlasSeedRecipes());
                 case RecipeType.BASE_AQUATIC_CONSTRUCTION:
-                    return GetBaseAquaticConstructionRecipes();
+                    return SortRecipes(GetBaseAquaticConstructionRecipes());
                 case RecipeType.BASE_COMPONENT_CONCRETE:
-                    return GetBaseConcreteComponenetsRecipes();
+                    return SortRecipes(GetBaseConcreteComponenetsRecipes());
                 case RecipeType.BASE_COMPONENT_METAL:
-                    return GetBaseMetalComponentRecipes();
+                    return SortRecipes(GetBaseMetalComponentRecipes());
                 case RecipeType.BASE_COMPONENT_WOOD:
-                    return GetBaseWoodComponentRecipes();
+                    return SortRecipes(GetBaseWoodComponentRecipes());
                 case RecipeType.BASE_DECORATION:
-                    return GetBaseDecorationRecipes();
+                    return SortRecipes(GetBaseDecorationRecipes());
                 case RecipeType.BASE_EQUIPMENT:
-                    return GetBaseEquipmentRecipes();
+                    return SortRecipes(GetBaseEquipmentRecipes());
                 case RecipeType.BASE_STRUCTURE:
-                    return GetBaseStructureRecipes();
+                    return SortRecipes(GetBaseStructureRecipes());
                 case RecipeType.BASE_TERMINAL:
-                    return GetBaseTerminalRecipes();
+                    return SortRecipes(GetBaseTerminalRecipes());
                 case RecipeType.CONCENTRATED_DEPOSIT:
-                    return GetConcentratedDepositRecipes();
+                    return SortRecipes(GetConcentratedDepositRecipes());
                 case RecipeType.CONSUMABLE:
-                    return GetConsumableRecipes();
+                    return SortRecipes(GetConsumableRecipes());
                 case RecipeType.CRAFTING_COMPONENT:
-                    return GetCraftingComponentRecipes();
+                    return SortRecipes(GetCraftingComponentRecipes());
                 case RecipeType.ENHANCED_GAS_PRODUCT:
-                    return GetEnhancedGasProductRecipes();
+                    return SortRecipes(GetEnhancedGasProductRecipes());
                 case RecipeType.ENRICHED_ALLOY_METAL:
-                    return GetEnrichedAlloyMetalRecipes();
+                    return SortRecipes(GetEnrichedAlloyMetalRecipes());
                 case RecipeType.EXOCRAFT_TECHNOLOGY:
-                    return GetExocraftTechnologyRecipes();
+                    return SortRecipes(GetExocraftTechnologyRecipes());
                 case RecipeType.EXOCRAFT_TERMINAL:
-                    return GetExocraftTerminalRecipes();
+                    return SortRecipes(GetExocraftTerminalRecipes());
                 case RecipeType.EXOSUIT_TECHNOLOGY:
-                    return GetExosuitTechnologyRecipes();
+                    return SortRecipes(GetExosuitTechnologyRecipes());
                 case RecipeType.FARMING:
-                    return GetFarmingRecipes();
+                    return SortRecipes(GetFarmingRecipes());
                 case RecipeType.FREIGHTER_TECHNOLOGY:
-                    return GetFreighterTechnologyRecipes();
+                    return SortRecipes(GetFreighterTechnologyRecipes());
                 case RecipeType.HIGHLY_REFINED_TECHNOLOGY:
-                    return GetHighlyRefinedTechnologyRecipes();
+                    return SortRecipes(GetHighlyRefinedTechnologyRecipes());
                 case RecipeType.MANUFACTURED_GAS_PRODUCT:
-                    return GetManufacturedGasProductRecipes();
+                    return SortRecipes(GetManufacturedGasProductRecipes());
                 case RecipeType.MULTITOOL_TECHNOLOGY:
-                    return GetMultitoolTechnologyRecipes();
+                    return SortRecipes(GetMultitoolTechnologyRecipes());
                 case RecipeType.PORTABLE_TECHNOLOGY:
-                    return GetPortableTechnologyRecipes();
+                    return SortRecipes(GetPortableTechnologyRecipes());
                 case RecipeType.STARSHIP_TECHNOLOGY:
-                    return GetStarshipTechnologyRecipes();
+                    return SortRecipes(GetStarshipTechnologyRecipes());
                 default:
-                    return GetAllRecipes();
+                    return SortRecipes(GetAllRecipes());
             }
         }
 
@@ -770,6 +771,11 @@ namespace CraftingCalculator.Utilities
             ret.AddRange(GetStarshipTechnologyRecipes());
 
             return ret;
+        }
+
+        private static List<Recipe> SortRecipes(List<Recipe> recipes)
+        {
+            return recipes.OrderBy(o => o.Name).ToList();
         }
     }
 }

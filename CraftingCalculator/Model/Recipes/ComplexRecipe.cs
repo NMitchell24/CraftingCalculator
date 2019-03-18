@@ -18,8 +18,10 @@ namespace CraftingCalculator.Model.Recipes
             get
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine(Name + " Ingredients:");
+                sb.AppendLine(Name);
+                sb.AppendLine(Type);
                 sb.Append(Environment.NewLine);
+                sb.AppendLine("Ingredients:");
                 foreach (KeyValuePair<IngredientType, int> ingredient in Ingredients)
                 {
                     sb.AppendLine(ingredient.Key.GetDisplayName() + " x" + ingredient.Value);
