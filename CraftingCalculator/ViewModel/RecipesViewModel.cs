@@ -6,7 +6,7 @@ using CraftingCalculator.Model.Recipes;
 
 namespace CraftingCalculator.ViewModel
 {
-    class RecipesViewModel : INotifyPropertyChanged
+    public class RecipesViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<Recipe> RecipesList { get; set; }
@@ -15,7 +15,7 @@ namespace CraftingCalculator.ViewModel
         private RecipeFilter _selectedFilter;
         public RecipeFilter SelectedFilter
         {
-            get { return _selectedFilter; }
+            get => _selectedFilter;
             set
             {
                 if (_selectedFilter == value)

@@ -15,6 +15,10 @@ namespace CraftingCalculator.Utilities
     /// </summary>
     public static class RecipeUtil
     {
+        // I'm using Reflection and Assembly.GetTypes to build these.  Don't want to rebuild every time, so store them
+        // in a Dictionary once they've been built and read from the Dictionary first if it exists.
+        private static IDictionary<RecipeType, List<Recipe>> recipeCache = new Dictionary<RecipeType, List<Recipe>>();
+        
         /// <summary>
         /// Get a list of RecipeFilters
         /// </summary>
@@ -23,36 +27,36 @@ namespace CraftingCalculator.Utilities
         {
             List<RecipeFilter> ret = new List<RecipeFilter>
             {
-                new RecipeFilter("All", RecipeType.ALL),
-                new RecipeFilter("Access Card", RecipeType.ACCESS_CARD),
-                new RecipeFilter("Advanced Agricultural Product", RecipeType.ADVANCED_AGRICULTURAL_PRODUCT),
-                new RecipeFilter("Advanced Crafted Product", RecipeType.ADVANCED_CRAFTED_PRODUCT),
-                new RecipeFilter("Alloy Metal", RecipeType.ALLOY_METAL),
-                new RecipeFilter("Atlas Seed", RecipeType.ATLAS_SEED),
-                new RecipeFilter("Base Aquatic Construction", RecipeType.BASE_AQUATIC_CONSTRUCTION),
-                new RecipeFilter("Base Components (Concrete)", RecipeType.BASE_COMPONENT_CONCRETE),
-                new RecipeFilter("Base Components (Metal)", RecipeType.BASE_COMPONENT_METAL),
-                new RecipeFilter("Base Components (Wood)", RecipeType.BASE_COMPONENT_WOOD),
-                new RecipeFilter("Base Decorations", RecipeType.BASE_DECORATION),
-                new RecipeFilter("Base Equipment", RecipeType.BASE_EQUIPMENT),
-                new RecipeFilter("Base Storage", RecipeType.BASE_STORAGE),
-                new RecipeFilter("Base Structures", RecipeType.BASE_STRUCTURE),
-                new RecipeFilter("Base Terminals", RecipeType.BASE_TERMINAL),
-                new RecipeFilter("Concentrated Deposits", RecipeType.CONCENTRATED_DEPOSIT),
-                new RecipeFilter("Consumables", RecipeType.CONSUMABLE),
-                new RecipeFilter("Crafting Components", RecipeType.CRAFTING_COMPONENT),
-                new RecipeFilter("Enhanced Gas Products", RecipeType.ENHANCED_GAS_PRODUCT),
-                new RecipeFilter("Enriched Alloy Metals", RecipeType.ENRICHED_ALLOY_METAL),
-                new RecipeFilter("Exocraft Technology", RecipeType.EXOCRAFT_TECHNOLOGY),
-                new RecipeFilter("Exocraft Terminals", RecipeType.EXOCRAFT_TERMINAL),
-                new RecipeFilter("Exosuit Technology", RecipeType.EXOSUIT_TECHNOLOGY),
-                new RecipeFilter("Farming", RecipeType.FARMING),
-                new RecipeFilter("Freighter Technology", RecipeType.FREIGHTER_TECHNOLOGY),
-                new RecipeFilter("Highly Refined Technology", RecipeType.HIGHLY_REFINED_TECHNOLOGY),
-                new RecipeFilter("Manufactured Gas Products", RecipeType.MANUFACTURED_GAS_PRODUCT),
-                new RecipeFilter("Multi-tool Technology", RecipeType.MULTITOOL_TECHNOLOGY),
-                new RecipeFilter("Portable Technology", RecipeType.PORTABLE_TECHNOLOGY),
-                new RecipeFilter("Starship Technology", RecipeType.STARSHIP_TECHNOLOGY)
+                new RecipeFilter(RecipeFilterLabels.All, RecipeType.ALL),
+                new RecipeFilter(RecipeFilterLabels.AccessCard, RecipeType.ACCESS_CARD),
+                new RecipeFilter(RecipeFilterLabels.AdvancedAgriculturalProduct, RecipeType.ADVANCED_AGRICULTURAL_PRODUCT),
+                new RecipeFilter(RecipeFilterLabels.AdvancedCraftedProduct, RecipeType.ADVANCED_CRAFTED_PRODUCT),
+                new RecipeFilter(RecipeFilterLabels.AlloyMetal, RecipeType.ALLOY_METAL),
+                new RecipeFilter(RecipeFilterLabels.AtlasSeed, RecipeType.ATLAS_SEED),
+                new RecipeFilter(RecipeFilterLabels.BaseAquaticConstruction, RecipeType.BASE_AQUATIC_CONSTRUCTION),
+                new RecipeFilter(RecipeFilterLabels.BaseComponentsConcrete, RecipeType.BASE_COMPONENT_CONCRETE),
+                new RecipeFilter(RecipeFilterLabels.BaseComponentsMetal, RecipeType.BASE_COMPONENT_METAL),
+                new RecipeFilter(RecipeFilterLabels.BaseComponentsWood, RecipeType.BASE_COMPONENT_WOOD),
+                new RecipeFilter(RecipeFilterLabels.BaseDecorations, RecipeType.BASE_DECORATION),
+                new RecipeFilter(RecipeFilterLabels.BaseEquipment, RecipeType.BASE_EQUIPMENT),
+                new RecipeFilter(RecipeFilterLabels.BaseStorage, RecipeType.BASE_STORAGE),
+                new RecipeFilter(RecipeFilterLabels.BaseStructures, RecipeType.BASE_STRUCTURE),
+                new RecipeFilter(RecipeFilterLabels.BaseTerminals, RecipeType.BASE_TERMINAL),
+                new RecipeFilter(RecipeFilterLabels.ConcentratedDeposits, RecipeType.CONCENTRATED_DEPOSIT),
+                new RecipeFilter(RecipeFilterLabels.Consumables, RecipeType.CONSUMABLE),
+                new RecipeFilter(RecipeFilterLabels.CraftingComponents, RecipeType.CRAFTING_COMPONENT),
+                new RecipeFilter(RecipeFilterLabels.EnhancedGasProduct, RecipeType.ENHANCED_GAS_PRODUCT),
+                new RecipeFilter(RecipeFilterLabels.EnrichedAlloyMetals, RecipeType.ENRICHED_ALLOY_METAL),
+                new RecipeFilter(RecipeFilterLabels.ExocraftTech, RecipeType.EXOCRAFT_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.ExocraftTerminals, RecipeType.EXOCRAFT_TERMINAL),
+                new RecipeFilter(RecipeFilterLabels.ExosuitTech, RecipeType.EXOSUIT_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.Farming, RecipeType.FARMING),
+                new RecipeFilter(RecipeFilterLabels.FreighterTech, RecipeType.FREIGHTER_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.HighlyRefinedTech, RecipeType.HIGHLY_REFINED_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.ManufacturedGasProducts, RecipeType.MANUFACTURED_GAS_PRODUCT),
+                new RecipeFilter(RecipeFilterLabels.MultitoolTech, RecipeType.MULTITOOL_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.PortableTech, RecipeType.PORTABLE_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.StarshipTech, RecipeType.STARSHIP_TECHNOLOGY)
             };
 
             return ret;
@@ -65,8 +69,19 @@ namespace CraftingCalculator.Utilities
         /// <returns></returns>
         public static List<Recipe> GetRecipesByFilter(RecipeFilter filter)
         {
-            List<Recipe> ret = SortRecipes((List<Recipe>)ReflectionUtil.
-                GetEnumerableOfType<Recipe>(filter.Type.GetNamespace(), new string[0]));
+            List<Recipe> ret;          
+
+            if (recipeCache.ContainsKey(filter.Type))
+            {
+                ret = recipeCache[filter.Type];
+            }
+            else
+            {
+                ret = SortRecipes((List<Recipe>)ReflectionUtil.
+                    GetEnumerableOfType<Recipe>(filter.Type.GetNamespace(), new string[0]));
+                recipeCache.Add(filter.Type, ret);
+            }
+            
             return ret;
         }
 
