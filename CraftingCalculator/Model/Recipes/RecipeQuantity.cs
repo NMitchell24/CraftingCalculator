@@ -6,19 +6,19 @@ namespace CraftingCalculator.Model.Recipes
     /// <summary>
     /// A class that represents a recipe and quantity
     /// </summary>
-    class RecipeQuantity
+    public class RecipeQuantity
     {
-        private Recipe _recipe;
+        public Recipe Recipe { get; set; }
         public int Quantity { get; set; }
-        public string CoreComponents { get => _recipe.GetCoreComponents(Quantity); private set { } }
-        public string Name { get => _recipe.Name; private set { } }
-        public string Type { get => _recipe.Type; private set { } }
-        public string Tooltip { get => _recipe.Tooltip; private set { } }
-        public IDictionary<IngredientType, int> Ingredients { get => _recipe.GetIngredients(); private set { } }
+        public string CoreComponents { get => Recipe.GetCoreComponents(Quantity); private set { } }
+        public string Name { get => Recipe.Name; private set { } }
+        public string Type { get => Recipe.Type; private set { } }
+        public string Tooltip { get => Recipe.Tooltip; private set { } }
+        public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
 
         public RecipeQuantity(Recipe recipe, int quantity)
         {
-            _recipe = recipe;
+            Recipe = recipe;
             Quantity = quantity;
         }
     }

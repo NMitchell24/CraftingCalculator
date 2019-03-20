@@ -14,7 +14,7 @@ namespace CraftingCalculator.Model.Recipes
     public abstract class Recipe 
     {
 
-        protected IDictionary<IngredientType, int> Ingredients = new Dictionary<IngredientType, int>();
+        protected IngredientMap Ingredients = new IngredientMap();
         public string Name { get; protected set; }
         public string Type { get; protected set; }
         public string Tooltip
@@ -27,9 +27,9 @@ namespace CraftingCalculator.Model.Recipes
                 sb.Append(Environment.NewLine);
                 sb.AppendLine("Ingredients:");
 
-                foreach (KeyValuePair<IngredientType, int> ingredient in Ingredients)
+                foreach (IngredientQuantity ingredient in Ingredients.IngredientList)
                 {
-                    sb.AppendLine(ingredient.Key.GetDisplayName() + " x" + ingredient.Value);
+                    sb.AppendLine(ingredient.Name + " x" + ingredient.Quantity);
                 }
 
                 return sb.ToString();
@@ -38,7 +38,7 @@ namespace CraftingCalculator.Model.Recipes
         }
        
 
-        public virtual IDictionary<IngredientType, int> GetIngredients()
+        public virtual IngredientMap GetIngredients()
         {
             return Ingredients;
         }

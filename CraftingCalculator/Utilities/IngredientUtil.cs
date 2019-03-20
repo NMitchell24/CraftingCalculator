@@ -6,34 +6,14 @@ namespace CraftingCalculator.Utilities
 {
     public static class IngredientUtil
     {
-        public static IDictionary<IngredientType, int> GetIngredientsFor(Recipe recipe, int quantity)
+
+        public static IngredientMap CombineIngredients(IngredientMap source, IngredientMap dest, int multiplier)
         {
-            IDictionary<IngredientType, int> ret = recipe.GetIngredients();
+            IngredientMap ret = dest;
 
-            foreach(KeyValuePair<IngredientType, int> ingredient in recipe.GetIngredients())
+            foreach (IngredientQuantity ingredient in source.IngredientList) 
             {
-                ret.Add(ingredient.Key, (ingredient.Value * quantity));
-            }
-
-            return ret;
-        }
-
-        public static IDictionary<IngredientType, int> CombineIngredients(IDictionary<IngredientType, int> source, 
-            IDictionary<IngredientType, int> dest, int multiplier)
-        {
-            IDictionary<IngredientType, int> ret = dest;
-
-            foreach(KeyValuePair<IngredientType, int> ingredient in source)
-            {
-                if (ret.ContainsKey(ingredient.Key))
-                {
-                    ret[ingredient.Key] = ret[ingredient.Key]
-                        + (ingredient.Value * multiplier);
-                }
-                else
-                {
-                    ret.Add(ingredient.Key, (ingredient.Value * multiplier));
-                }
+                ret.Add(ingredient.Ingredient, (ingredient.Quantity * multiplier));
             }
 
             return ret;

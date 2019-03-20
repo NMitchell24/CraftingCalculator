@@ -55,6 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Ingredients\IngredientMap.cs" />
+    <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
     <Compile Include="Model\Ingredients\IngredientType.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\Acid.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\CircuitBoard.cs" />
@@ -350,6 +352,7 @@
     <Compile Include="Model\Recipes\PortableTechnology\SignalBooster.cs" />
     <Compile Include="Model\Recipes\RecipeFilter.cs" />
     <Compile Include="Model\Recipes\RecipeFilterLabels.cs" />
+    <Compile Include="Model\Recipes\RecipeMap.cs" />
     <Compile Include="Model\Recipes\RecipeQuantity.cs" />
     <Compile Include="Model\Recipes\RecipeType.cs" />
     <Compile Include="Model\Recipes\StarshipTechnology\AblativeArmour.cs" />

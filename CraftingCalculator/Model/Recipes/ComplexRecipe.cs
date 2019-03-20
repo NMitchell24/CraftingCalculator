@@ -14,7 +14,7 @@ namespace CraftingCalculator.Model.Recipes
     /// </summary>
     public abstract class ComplexRecipe : Recipe
     {
-        protected IDictionary<Recipe, int> ChildRecipes = new Dictionary<Recipe, int>();
+        protected RecipeMap ChildRecipes = new RecipeMap();
         public new string Tooltip
         {
             get
@@ -24,14 +24,15 @@ namespace CraftingCalculator.Model.Recipes
                 sb.AppendLine(Type);
                 sb.Append(Environment.NewLine);
                 sb.AppendLine("Ingredients:");
-                foreach (KeyValuePair<IngredientType, int> ingredient in Ingredients)
+
+                foreach (IngredientQuantity ingredient in Ingredients.IngredientList)
                 {
-                    sb.AppendLine(ingredient.Key.GetDisplayName() + " x" + ingredient.Value);
+                    sb.AppendLine(ingredient.Name + " x" + ingredient.Quantity);
                 }
 
-                foreach(KeyValuePair<Recipe, int> recipe in ChildRecipes)
+                foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
                 {
-                    sb.AppendLine(recipe.Key.Name + " x" + recipe.Value);
+                    sb.AppendLine(recipe.Name + " x" + recipe.Quantity);
                 }
 
                 return sb.ToString();
@@ -40,15 +41,15 @@ namespace CraftingCalculator.Model.Recipes
         }
 
         override 
-        public IDictionary<IngredientType, int> GetIngredients()
+        public IngredientMap GetIngredients()
         {
-            IDictionary<IngredientType, int> NewIngredients = Ingredients;
+            IngredientMap NewIngredients = Ingredients;
 
-            foreach (KeyValuePair<Recipe, int> Recipe in ChildRecipes)
+            foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
             {
-                IDictionary<IngredientType, int> RecipeIngredients = Recipe.Key.GetIngredients();
+                IngredientMap RecipeIngredients = recipe.Ingredients;
 
-                NewIngredients = IngredientUtil.CombineIngredients(RecipeIngredients, NewIngredients, Recipe.Value);
+                NewIngredients = IngredientUtil.CombineIngredients(RecipeIngredients, NewIngredients, recipe.Quantity);
             }
 
             return NewIngredients;
