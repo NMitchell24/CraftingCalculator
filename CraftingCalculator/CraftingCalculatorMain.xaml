@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CraftingCalculator"
         xmlns:views="clr-namespace:CraftingCalculator.Views"
         mc:Ignorable="d"
-        Title="NMS Crafting Calculator" Height="900" Width="1000">
+        Title="NMS Crafting Calculator" Height="900" Width="1200">
     <Grid>
         <views:RecipesView x:Name="RecipesViewControl" />
     </Grid>

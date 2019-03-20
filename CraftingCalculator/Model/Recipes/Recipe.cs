@@ -41,6 +41,14 @@ namespace CraftingCalculator.Model.Recipes
             return Ingredients;
         }
 
+        public virtual string GetCoreComponents(int multiplier)
+        {
+            // Do the thing where you build out the core components of this recipe
+            // Override this in ComplexRecipe
+
+            return "";
+        }
+
 
     }
 }

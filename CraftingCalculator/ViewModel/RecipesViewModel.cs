@@ -29,14 +29,14 @@ namespace CraftingCalculator.ViewModel
 
         public RecipesViewModel()
         {
-            RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByType(RecipeType.ALL));
             RecipeFilters = RecipeUtil.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
+            RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(SelectedFilter));
         }
 
         public void ReloadRecipesForFilter(RecipeFilter filter)
         {
-            RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByType(filter.Type));
+            RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(filter));
             RaisePropertyChanged(nameof(RecipesList));
         }
 

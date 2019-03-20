@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CraftingCalculator.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="900" d:DesignWidth="1200">
     <Grid Margin="10,0,0,-428">
         <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList}" 
                  HorizontalAlignment="Left" Height="822" Margin="10,37,0,0" VerticalAlignment="Top" Width="320">
@@ -31,6 +31,14 @@
                    VerticalAlignment="Top"
                    FontWeight="Bold"
                    Height="22" Width="140"/>
+        <Button Content="Add &gt;" HorizontalAlignment="Left" Margin="348,336,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.08,0"/>
+        <Button Content="&lt; Remove" HorizontalAlignment="Left" Margin="348,425,0,0" VerticalAlignment="Top" Width="75"/>
+        <ListBox HorizontalAlignment="Left" Height="822" Margin="444,37,0,0" VerticalAlignment="Top" Width="320"/>
+        <TreeView HorizontalAlignment="Left" Height="395" Margin="782,37,0,0" VerticalAlignment="Top" Width="320"/>
+        <ListBox HorizontalAlignment="Left" Height="395" Margin="782,464,0,0" VerticalAlignment="Top" Width="320"/>
+        <TextBlock HorizontalAlignment="Left" Margin="444,10,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Top" RenderTransformOrigin="0.531,0.5" Height="22" Width="185"/>
+        <TextBlock HorizontalAlignment="Left" Margin="782,10,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Ingredients Needed" VerticalAlignment="Top" Height="22" Width="320"/>
+        <TextBlock HorizontalAlignment="Left" Margin="782,437,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Top" Height="22" Width="320"/>
 
     </Grid>
 </UserControl>

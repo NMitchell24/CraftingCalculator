@@ -27,7 +27,10 @@ namespace CraftingCalculator.Model.Ingredients
 
         private static MemberInfo ForValue(IngredientType i)
         {
-            return typeof(IngredientType).GetField(Enum.GetName(typeof(IngredientType), i));
+            MemberInfo ret = typeof(IngredientType).GetField(Enum.GetName(typeof(IngredientType), i));
+
+            return ret;
+
         }
     }
 

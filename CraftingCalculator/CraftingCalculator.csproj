@@ -399,6 +399,7 @@
     <Compile Include="Model\Recipes\StarshipTechnology\TeleportReceiver.cs" />
     <Compile Include="Utilities\IngredientUtil.cs" />
     <Compile Include="Utilities\RecipeUtil.cs" />
+    <Compile Include="Utilities\ReflectionUtil.cs" />
     <Compile Include="ViewModel\RecipesViewModel.cs" />
     <Compile Include="Views\RecipesView.xaml.cs">
       <DependentUpon>RecipesView.xaml</DependentUpon>

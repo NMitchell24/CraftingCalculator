@@ -5,6 +5,14 @@ namespace CraftingCalculator.Model.Recipes
     {
         public Recipe Recipe { get; set; }
         public int Quantity { get; set; }
+        public string CoreComponents
+        {
+            get
+            {
+                return Recipe.GetCoreComponents(Quantity);
+            }
+            private set { CoreComponents = value; }
+        }
 
         public RecipeMultiplier(Recipe recipe, int quantity)
         {
