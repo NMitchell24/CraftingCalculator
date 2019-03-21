@@ -6,12 +6,34 @@
              xmlns:local="clr-namespace:CraftingCalculator.Views"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1200">
-    <Grid Margin="10,0,0,-428">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.05*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.05*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.1*"/>
+        </Grid.ColumnDefinitions>
+
         <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList, NotifyOnSourceUpdated=True}" 
                  SelectedItem="{Binding Path=SelectedRecipe,UpdateSourceTrigger=PropertyChanged}"
                  SelectedIndex="{Binding Path=SelectedRecipeIndex}"
                  SelectionMode="Extended"
-                 HorizontalAlignment="Left" Height="822" Margin="10,37,0,0" VerticalAlignment="Top" Width="320">
+                 Margin="5" HorizontalAlignment="Stretch"
+                 Grid.Row="2" Grid.RowSpan="4" Grid.Column="1" Grid.ColumnSpan="2">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path = Name}" 
@@ -25,42 +47,43 @@
             </ListBox.ItemContainerStyle>
         </ListBox>
         <ComboBox x:Name ="recipeFilters" ItemsSource="{Binding Path = RecipeFilters}" SelectedItem="{Binding SelectedFilter}"
-                  HorizontalAlignment="Left" Margin="155,10,0,0" VerticalAlignment="Top" Width="175" >
+                  Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" >
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path = Name}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBlock HorizontalAlignment="Left" 
-                   Margin="10,10,0,0" 
+        <TextBlock HorizontalAlignment="Right" 
+                   Margin="0,0,5,0" 
                    TextWrapping="Wrap" 
                    Text="Filter Recipes By" 
-                   VerticalAlignment="Top"
+                   VerticalAlignment="Center"
                    FontWeight="Bold"
-                   Height="22" Width="140"/>
+                   Grid.Row="1" Grid.Column="1"/>
         <Button Content="Add &gt;" 
                 Command="{Binding AddRecipeCommand}"
-                HorizontalAlignment="Left" 
-                Margin="348,336,0,0" 
-                VerticalAlignment="Top" 
-                Width="75" 
-                RenderTransformOrigin="0.08,0"/>
+                HorizontalAlignment="Stretch" 
+                Margin="0,0,0,5" 
+                VerticalAlignment="Bottom" 
+                Padding="4"
+                Grid.Row="3" Grid.Column="3"/>
         <Button Content="&lt; Remove" 
                 Command="{Binding RemoveRecipeCommand}"
-                HorizontalAlignment="Left" 
-                Margin="348,425,0,0" 
-                VerticalAlignment="Top" 
-                Width="75"/>
+                HorizontalAlignment="Stretch" 
+                Margin="0,5,0,0" 
+                VerticalAlignment="Top"
+                Padding="4"
+                Grid.Row="4" Grid.Column="3"/>
         <ListBox x:Name="recipeQuantities" ItemsSource="{Binding Path=RecipeQuantities, NotifyOnSourceUpdated=True}"
                  SelectedItem="{Binding Path=SelectedRecipeQuantity, UpdateSourceTrigger=PropertyChanged}"
                  SelectedIndex="{Binding Path=SelectedRecipeQuantityIndex}"
                  SelectionMode="Extended"
-                 HorizontalAlignment="Left" 
-                 Height="822" 
-                 Margin="444,37,0,0" 
-                 VerticalAlignment="Top" 
-                 Width="320">
+                 HorizontalAlignment="Stretch" 
+                 Margin="5" 
+                 Grid.Row="2" Grid.RowSpan="4" 
+                 Grid.Column="4" Grid.ColumnSpan="2" 
+                 BorderThickness="1">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -82,11 +105,18 @@
             </ListBox.ItemContainerStyle>
         </ListBox>
 
-        <TreeView HorizontalAlignment="Left" Height="395" Margin="782,37,0,0" VerticalAlignment="Top" Width="320"/>
-        <ListBox HorizontalAlignment="Left" Height="395" Margin="782,464,0,0" VerticalAlignment="Top" Width="320"/>
-        <TextBlock HorizontalAlignment="Left" Margin="444,10,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Top" RenderTransformOrigin="0.531,0.5" Height="22" Width="185"/>
-        <TextBlock HorizontalAlignment="Left" Margin="782,10,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Ingredients Needed" VerticalAlignment="Top" Height="22" Width="320"/>
-        <TextBlock HorizontalAlignment="Left" Margin="782,437,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Top" Height="22" Width="320"/>
+        <TreeView Margin="5" HorizontalAlignment="Stretch" Grid.Row="2" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2" BorderThickness="1"/>
+        <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.7*"/>
+                <RowDefinition Height="9.3*"/>
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
+            <ListBox Margin="5" Grid.Row="1" BorderThickness="1"/>
+        </Grid>
+
+        <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4"/>
+        <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Ingredients Needed" VerticalAlignment="Center" Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="2"/>
 
     </Grid>
 </UserControl>
