@@ -32,5 +32,36 @@ namespace CraftingCalculator.Model.Recipes
             }
         }
 
+        /// <summary>
+        /// Decrement a RecipeQuantity by the provided amount.  
+        /// If the current Quantity - the provided quantity would be less than or equal to 0
+        /// Then the recipe will be removed.
+        /// </summary>
+        /// <param name="recipe"></param>
+        /// <param name="quantity"></param>
+        public void Remove(Recipe recipe, int quantity)
+        {
+            if(_internalList.Any(i => i.Recipe.Name == recipe.Name && i.Quantity - quantity > 0))
+            {
+                Add(recipe, -quantity);
+            }
+            else
+            {
+                RemoveAll(recipe);
+            }
+            
+        }
+
+        /// <summary>
+        /// Remove a RecipeQuantity from the list entirely if it exists.
+        /// </summary>
+        /// <param name="recipe"></param>
+        public void RemoveAll(Recipe recipe)
+        {
+            if(_internalList.Any(i => i.Recipe.Name == recipe.Name)) {
+                _internalList.Remove(_internalList.Find(i => i.Recipe.Name == recipe.Name));
+            }
+        }
+
     }
 }

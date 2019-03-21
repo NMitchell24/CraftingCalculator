@@ -15,6 +15,19 @@ namespace CraftingCalculator.Model.Recipes
         public string Type { get => Recipe.Type; private set { } }
         public string Tooltip { get => Recipe.Tooltip; private set { } }
         public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                RaisePropertyChanged("IsSelected");
+            }
+        }
+
+        
         //public bool IsSelected { get => Recipe.IsSelected; set => Recipe.IsSelected = value; }
 
         public RecipeQuantity(Recipe recipe, int quantity)

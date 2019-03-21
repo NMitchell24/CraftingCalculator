@@ -46,8 +46,16 @@
                 VerticalAlignment="Top" 
                 Width="75" 
                 RenderTransformOrigin="0.08,0"/>
-        <Button Content="&lt; Remove" HorizontalAlignment="Left" Margin="348,425,0,0" VerticalAlignment="Top" Width="75"/>
-        <ListBox x:Name="recipeQuantities" ItemsSource="{Binding Path=RecipeQuantities}"
+        <Button Content="&lt; Remove" 
+                Command="{Binding RemoveRecipeCommand}"
+                HorizontalAlignment="Left" 
+                Margin="348,425,0,0" 
+                VerticalAlignment="Top" 
+                Width="75"/>
+        <ListBox x:Name="recipeQuantities" ItemsSource="{Binding Path=RecipeQuantities, NotifyOnSourceUpdated=True}"
+                 SelectedItem="{Binding Path=SelectedRecipeQuantity, UpdateSourceTrigger=PropertyChanged}"
+                 SelectedIndex="{Binding Path=SelectedRecipeQuantityIndex}"
+                 SelectionMode="Extended"
                  HorizontalAlignment="Left" 
                  Height="822" 
                  Margin="444,37,0,0" 
@@ -67,6 +75,11 @@
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
 
         <TreeView HorizontalAlignment="Left" Height="395" Margin="782,37,0,0" VerticalAlignment="Top" Width="320"/>

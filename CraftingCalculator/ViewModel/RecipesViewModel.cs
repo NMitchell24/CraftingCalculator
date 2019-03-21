@@ -14,6 +14,7 @@ namespace CraftingCalculator.ViewModel
         public List<RecipeFilter> RecipeFilters { get; set; }
         private RecipeMap _recipeMap = new RecipeMap();
         public CommandRunner AddRecipeCommand { get; set; }
+        public CommandRunner RemoveRecipeCommand { get; set; }
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
 
@@ -32,6 +33,23 @@ namespace CraftingCalculator.ViewModel
 
             RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
             RaisePropertyChanged(nameof(RecipeQuantities));
+            RemoveRecipeCommand.RaiseCanExecuteChanged();
+        }
+
+        private bool CanRemoveRecipes()
+        {
+            return RecipeQuantities != null && RecipeQuantities.Where(x => x.IsSelected).Count() > 0;
+        }
+
+        private void RemoveRecipes()
+        {
+            foreach(RecipeQuantity recipe in RecipeQuantities.Where(x => x.IsSelected))
+            {
+                _recipeMap.RemoveAll(recipe.Recipe);
+            }
+            RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
+            RaisePropertyChanged(nameof(RecipeQuantities));
+            RemoveRecipeCommand.RaiseCanExecuteChanged();
         }
 
         private RecipeFilter _selectedFilter;
@@ -58,7 +76,18 @@ namespace CraftingCalculator.ViewModel
                 var selectedItems = RecipesList.Where(x => x.IsSelected).Count();
                 RaisePropertyChanged(nameof(SelectedRecipe));
                 RaisePropertyChanged(nameof(RecipesList));
-               //AddRecipeCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private RecipeQuantity _selectedRecipeQuantity;
+        public RecipeQuantity SelectedRecipeQuantity
+        {
+            get => _selectedRecipeQuantity;
+            set
+            {
+                var selectedItems = RecipeQuantities.Where(x => x.IsSelected).Count();
+                RaisePropertyChanged(nameof(SelectedRecipeQuantity));
+                RaisePropertyChanged(nameof(RecipeQuantities));
             }
         }
         
@@ -75,12 +104,24 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
+        private int _selectedRecipeQuantityIndex;
+        public int SelectedRecipeQuantityIndex
+        {
+            get => _selectedRecipeQuantityIndex;
+            set
+            {
+                _selectedRecipeQuantityIndex = value;
+                RemoveRecipeCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         public RecipesViewModel()
         {
             RecipeFilters = RecipeUtil.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
             RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(SelectedFilter));
             AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
+            RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
         }
 
         public void ReloadRecipesForFilter(RecipeFilter filter)
