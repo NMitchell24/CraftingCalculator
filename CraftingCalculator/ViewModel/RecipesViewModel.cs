@@ -26,7 +26,7 @@ namespace CraftingCalculator.ViewModel
         {
             foreach(Recipe recipe in RecipesList.Where(x => x.IsSelected))
             {
-                //Add or adjust recipe quantity.
+                // Add or adjust recipe quantity.
                 _recipeMap.Add(recipe, 1);
             }
 
@@ -58,6 +58,19 @@ namespace CraftingCalculator.ViewModel
                 var selectedItems = RecipesList.Where(x => x.IsSelected).Count();
                 RaisePropertyChanged(nameof(SelectedRecipe));
                 RaisePropertyChanged(nameof(RecipesList));
+               //AddRecipeCommand.RaiseCanExecuteChanged();
+            }
+        }
+        
+        // Have to bind to selected index so that we can disable the Add button when 
+        // User Deselects all recipes
+        private int _selectedRecipeIndex;
+        public int SelectedRecipeIndex
+        {
+            get => _selectedRecipeIndex;
+            set
+            {
+                _selectedRecipeIndex = value;
                 AddRecipeCommand.RaiseCanExecuteChanged();
             }
         }

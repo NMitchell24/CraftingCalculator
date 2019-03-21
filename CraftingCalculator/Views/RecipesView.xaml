@@ -9,6 +9,7 @@
     <Grid Margin="10,0,0,-428">
         <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList, NotifyOnSourceUpdated=True}" 
                  SelectedItem="{Binding Path=SelectedRecipe,UpdateSourceTrigger=PropertyChanged}"
+                 SelectedIndex="{Binding Path=SelectedRecipeIndex}"
                  SelectionMode="Extended"
                  HorizontalAlignment="Left" Height="822" Margin="10,37,0,0" VerticalAlignment="Top" Width="320">
             <ListBox.ItemTemplate>
