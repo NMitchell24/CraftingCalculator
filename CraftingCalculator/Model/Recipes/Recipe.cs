@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using CraftingCalculator.Model.Ingredients;
+﻿using CraftingCalculator.Model.Ingredients;
+using System.ComponentModel;
 using System.Text;
 using System;
 
@@ -11,7 +11,7 @@ namespace CraftingCalculator.Model.Recipes
     /// If creating a new Namespace then you must add a RecipeType as well, 
     /// and then create a filter for that type in RecipeUtil.
     /// </summary>
-    public abstract class Recipe 
+    public abstract class Recipe : INotifyPropertyChanged
     {
 
         protected IngredientMap Ingredients = new IngredientMap();
@@ -51,6 +51,23 @@ namespace CraftingCalculator.Model.Recipes
             return "";
         }
 
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+
+            set
+            {
+                _isSelected = value;
+                RaisePropertyChanged("IsSelected");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void RaisePropertyChanged(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        }
 
     }
 }

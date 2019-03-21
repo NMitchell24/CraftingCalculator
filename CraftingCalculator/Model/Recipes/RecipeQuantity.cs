@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using CraftingCalculator.Model.Ingredients;
+﻿using CraftingCalculator.Model.Ingredients;
+using System.ComponentModel;
 
 namespace CraftingCalculator.Model.Recipes
 {
     /// <summary>
     /// A class that represents a recipe and quantity
     /// </summary>
-    public class RecipeQuantity
+    public class RecipeQuantity : INotifyPropertyChanged
     {
         public Recipe Recipe { get; set; }
         public int Quantity { get; set; }
@@ -15,11 +15,19 @@ namespace CraftingCalculator.Model.Recipes
         public string Type { get => Recipe.Type; private set { } }
         public string Tooltip { get => Recipe.Tooltip; private set { } }
         public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
+        //public bool IsSelected { get => Recipe.IsSelected; set => Recipe.IsSelected = value; }
 
         public RecipeQuantity(Recipe recipe, int quantity)
         {
             Recipe = recipe;
             Quantity = quantity;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void RaisePropertyChanged(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        }
+
     }
 }

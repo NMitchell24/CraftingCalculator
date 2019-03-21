@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CraftingCalculator.Utilities;
 using CraftingCalculator.Model.Recipes;
+using System.Linq;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -11,6 +12,27 @@ namespace CraftingCalculator.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<Recipe> RecipesList { get; set; }
         public List<RecipeFilter> RecipeFilters { get; set; }
+        private RecipeMap _recipeMap = new RecipeMap();
+        public CommandRunner AddRecipeCommand { get; set; }
+
+        public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
+
+        private bool CanAddRecipes()
+        {
+            return RecipesList.Where(x => x.IsSelected).Count() > 0;
+        }
+
+        private void AddRecipes()
+        {
+            foreach(Recipe recipe in RecipesList.Where(x => x.IsSelected))
+            {
+                //Add or adjust recipe quantity.
+                _recipeMap.Add(recipe, 1);
+            }
+
+            RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
+            RaisePropertyChanged(nameof(RecipeQuantities));
+        }
 
         private RecipeFilter _selectedFilter;
         public RecipeFilter SelectedFilter
@@ -27,11 +49,25 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
+        private Recipe _selectedRecipe;
+        public Recipe SelectedRecipe
+        {
+            get => _selectedRecipe;
+            set
+            {
+                var selectedItems = RecipesList.Where(x => x.IsSelected).Count();
+                RaisePropertyChanged(nameof(SelectedRecipe));
+                RaisePropertyChanged(nameof(RecipesList));
+                AddRecipeCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         public RecipesViewModel()
         {
             RecipeFilters = RecipeUtil.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
             RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(SelectedFilter));
+            AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
         }
 
         public void ReloadRecipesForFilter(RecipeFilter filter)

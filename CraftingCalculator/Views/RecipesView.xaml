@@ -7,7 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1200">
     <Grid Margin="10,0,0,-428">
-        <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList}" 
+        <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList, NotifyOnSourceUpdated=True}" 
+                 SelectedItem="{Binding Path=SelectedRecipe,UpdateSourceTrigger=PropertyChanged}"
+                 SelectionMode="Extended"
                  HorizontalAlignment="Left" Height="822" Margin="10,37,0,0" VerticalAlignment="Top" Width="320">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -15,6 +17,11 @@
                         ToolTipService.ToolTip="{Binding Path = Tooltip}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
         <ComboBox x:Name ="recipeFilters" ItemsSource="{Binding Path = RecipeFilters}" SelectedItem="{Binding SelectedFilter}"
                   HorizontalAlignment="Left" Margin="155,10,0,0" VerticalAlignment="Top" Width="175" >
@@ -31,9 +38,36 @@
                    VerticalAlignment="Top"
                    FontWeight="Bold"
                    Height="22" Width="140"/>
-        <Button Content="Add &gt;" HorizontalAlignment="Left" Margin="348,336,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.08,0"/>
+        <Button Content="Add &gt;" 
+                Command="{Binding AddRecipeCommand}"
+                HorizontalAlignment="Left" 
+                Margin="348,336,0,0" 
+                VerticalAlignment="Top" 
+                Width="75" 
+                RenderTransformOrigin="0.08,0"/>
         <Button Content="&lt; Remove" HorizontalAlignment="Left" Margin="348,425,0,0" VerticalAlignment="Top" Width="75"/>
-        <ListBox HorizontalAlignment="Left" Height="822" Margin="444,37,0,0" VerticalAlignment="Top" Width="320"/>
+        <ListBox x:Name="recipeQuantities" ItemsSource="{Binding Path=RecipeQuantities}"
+                 HorizontalAlignment="Left" 
+                 Height="822" 
+                 Margin="444,37,0,0" 
+                 VerticalAlignment="Top" 
+                 Width="320">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock 
+                            Text="{Binding Path=Name, Mode=OneWay}" 
+                            ToolTipService.ToolTip="{Binding Path=Tooltip}"
+                            Width="240"
+                            Margin="0,0,5,0"/>
+                        <TextBox 
+                            Text="{Binding Path=Quantity, Mode=TwoWay}"
+                            Width="50"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
         <TreeView HorizontalAlignment="Left" Height="395" Margin="782,37,0,0" VerticalAlignment="Top" Width="320"/>
         <ListBox HorizontalAlignment="Left" Height="395" Margin="782,464,0,0" VerticalAlignment="Top" Width="320"/>
         <TextBlock HorizontalAlignment="Left" Margin="444,10,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Top" RenderTransformOrigin="0.531,0.5" Height="22" Width="185"/>
