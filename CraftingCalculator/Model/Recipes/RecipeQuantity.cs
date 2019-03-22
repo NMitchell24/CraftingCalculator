@@ -13,7 +13,22 @@ namespace CraftingCalculator.Model.Recipes
         public string CoreComponents { get => Recipe.GetCoreComponents(Quantity); private set { } }
         public string Name { get => Recipe.Name; private set { } }
         public string Type { get => Recipe.Type; private set { } }
-        public string Tooltip { get => Recipe.Tooltip; private set { } }
+        public string Tooltip
+        {
+            get
+            {
+                if(Recipe.GetType().IsSubclassOf(typeof(ComplexRecipe)))
+                {
+                    return ((ComplexRecipe)Recipe).Tooltip;
+                }
+                else
+                {
+                    return Recipe.Tooltip;
+                }
+            }
+
+            private set { }
+        }
         public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
 
         private bool _isSelected;

@@ -13,6 +13,16 @@ namespace CraftingCalculator.Model.Recipes
             private set { }
         }
 
+        public RecipeMap(RecipeMap map)
+        {
+            _internalList = new List<RecipeQuantity>(map.RecipeList);
+        }
+
+        public RecipeMap()
+        {
+            //nothing
+        }
+
         /// <summary>
         /// Adds the Recipe and quantity to the list if it does not exist.
         /// If it does exist then it will just increase the quantity of the existing record

@@ -43,7 +43,7 @@ namespace CraftingCalculator.Model.Recipes
         override 
         public IngredientMap GetIngredients()
         {
-            IngredientMap NewIngredients = Ingredients;
+            IngredientMap NewIngredients = new IngredientMap(Ingredients);
 
             foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
             {

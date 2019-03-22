@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CraftingCalculator.Utilities;
 using CraftingCalculator.Model.Recipes;
+using CraftingCalculator.Model.Ingredients;
 using System.Linq;
 
 namespace CraftingCalculator.ViewModel
@@ -12,11 +13,15 @@ namespace CraftingCalculator.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<Recipe> RecipesList { get; set; }
         public List<RecipeFilter> RecipeFilters { get; set; }
+
         private RecipeMap _recipeMap = new RecipeMap();
+        private IngredientMap _ingredientMap = new IngredientMap();
+
         public CommandRunner AddRecipeCommand { get; set; }
         public CommandRunner RemoveRecipeCommand { get; set; }
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
+        public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
 
         private bool CanAddRecipes()
         {
@@ -32,6 +37,9 @@ namespace CraftingCalculator.ViewModel
             }
 
             RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
+
+            CalculateTotalIngredients();
+
             RaisePropertyChanged(nameof(RecipeQuantities));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
         }
@@ -47,9 +55,28 @@ namespace CraftingCalculator.ViewModel
             {
                 _recipeMap.RemoveAll(recipe.Recipe);
             }
+
             RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
+
+            CalculateTotalIngredients();
+
             RaisePropertyChanged(nameof(RecipeQuantities));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
+        }
+
+
+        private void CalculateTotalIngredients()
+        {
+            _ingredientMap.Reset();
+            foreach(RecipeQuantity q in RecipeQuantities)
+            {
+                foreach(IngredientQuantity i in q.Ingredients.IngredientList)
+                {
+                    _ingredientMap.Add(i.Ingredient, (i.Quantity * q.Quantity));
+                }
+            }
+            TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList);
+            RaisePropertyChanged(nameof(TotalIngredients));
         }
 
         private RecipeFilter _selectedFilter;

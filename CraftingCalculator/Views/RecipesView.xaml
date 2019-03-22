@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="CraftingCalculator.Views.RecipesView"
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -92,9 +93,15 @@
                             ToolTipService.ToolTip="{Binding Path=Tooltip}"
                             Width="240"
                             Margin="0,0,5,0"/>
-                        <TextBox 
-                            Text="{Binding Path=Quantity, Mode=TwoWay}"
-                            Width="50"/>
+                        <Controls:NumericUpDown
+                            Value="{Binding Path=Quantity, Mode=TwoWay}"
+                            Minimum="0"
+                            Maximum="100"
+                            HasDecimals="False"
+                            HorizontalAlignment="Stretch"
+                            TextAlignment="Left"
+                            Width="100"
+                            MinWidth="50"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -112,7 +119,18 @@
                 <RowDefinition Height="9.3*"/>
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
-            <ListBox Margin="5" Grid.Row="1" BorderThickness="1"/>
+            <ListBox
+                x:Name="totalIngredients"
+                ItemsSource="{Binding Path=TotalIngredients}"
+                Margin="5" 
+                Grid.Row="1" 
+                BorderThickness="1">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=DisplayName, Mode=OneWay}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
 
         <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4"/>

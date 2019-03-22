@@ -82,7 +82,6 @@
     <Compile Include="Model\Ingredients\IngredientMap.cs" />
     <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
     <Compile Include="Model\Ingredients\IngredientType.cs" />
-    <Compile Include="Model\RecipeConfig.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\Acid.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\CircuitBoard.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\HeatCapacitor.cs" />

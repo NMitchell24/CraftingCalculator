@@ -9,7 +9,7 @@ namespace CraftingCalculator.Utilities
 
         public static IngredientMap CombineIngredients(IngredientMap source, IngredientMap dest, int multiplier)
         {
-            IngredientMap ret = dest;
+            IngredientMap ret = new IngredientMap(dest);
 
             foreach (IngredientQuantity ingredient in source.IngredientList) 
             {

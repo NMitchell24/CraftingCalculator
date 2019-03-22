@@ -15,6 +15,12 @@ namespace CraftingCalculator.Model.Ingredients
             private set { }
         }
 
+        public string DisplayName
+        {
+            get => Ingredient.GetDisplayName() + " x" + Quantity;
+            private set { }
+        }
+
         public IngredientQuantity(IngredientType i, int q)
         {
             Ingredient = i;
