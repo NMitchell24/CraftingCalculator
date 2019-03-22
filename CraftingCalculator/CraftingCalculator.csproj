@@ -378,6 +378,7 @@
     <Compile Include="Model\Recipes\RecipeFilterLabels.cs" />
     <Compile Include="Model\Recipes\RecipeMap.cs" />
     <Compile Include="Model\Recipes\RecipeQuantity.cs" />
+    <Compile Include="Model\Recipes\RecipeTree.cs" />
     <Compile Include="Model\Recipes\RecipeType.cs" />
     <Compile Include="Model\Recipes\StarshipTechnology\AblativeArmour.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnology\AdvancedMiningLaser.cs" />

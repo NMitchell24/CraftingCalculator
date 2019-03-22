@@ -24,6 +24,7 @@ namespace CraftingCalculator.ViewModel
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
         public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
+        public ObservableCollection<RecipeTree> RecipeTotals { get; set; }
 
         private bool CanAddRecipes()
         {
@@ -80,6 +81,23 @@ namespace CraftingCalculator.ViewModel
             }
             TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList);
             RaisePropertyChanged(nameof(TotalIngredients));
+
+            // rebuild recipe tree
+            CalculateRecipeTotals();
+        }
+
+        private void CalculateRecipeTotals()
+        {
+            RecipeTotals.Clear();
+            foreach(RecipeQuantity q in RecipeQuantities)
+            {
+                RecipeTotals.Add(q.Recipe.GetRecipeNodes(q.Quantity));
+            }
+            foreach(RecipeTree t in RecipeTotals)
+            {
+                t.SetParent();
+            }
+            RaisePropertyChanged(nameof(RecipeTotals));
         }
 
         private bool CanClearRecipes()
@@ -168,6 +186,7 @@ namespace CraftingCalculator.ViewModel
             RecipeFilters = RecipeUtil.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
             RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(SelectedFilter));
+            RecipeTotals = new ObservableCollection<RecipeTree>();
             AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
             RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
             RecalculateTotalsCommand = new CommandRunner(CalculateTotalIngredients);

@@ -43,12 +43,19 @@ namespace CraftingCalculator.Model.Recipes
             return Ingredients;
         }
 
-        public virtual string GetCoreComponents(int multiplier)
+       public virtual RecipeTree GetRecipeNodes( int quantity )
         {
-            // Do the thing where you build out the core components of this recipe
-            // Override this in ComplexRecipe
+            RecipeTree ret = new RecipeTree
+            {
+                Name = Name + " x" + quantity
+            };
 
-            return "";
+            foreach (IngredientQuantity i in Ingredients.IngredientList)
+            {
+                ret.AddRecipeNode(new RecipeTree(i.Name + " x" + (i.Quantity * quantity)));
+            }
+
+            return ret;
         }
 
         private bool _isSelected;

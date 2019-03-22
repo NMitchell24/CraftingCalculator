@@ -54,5 +54,26 @@ namespace CraftingCalculator.Model.Recipes
 
             return NewIngredients;
         }
+
+        override
+        public RecipeTree GetRecipeNodes(int quantity)
+        {
+            RecipeTree ret = new RecipeTree
+            {
+                Name = Name + " x" + quantity
+            };
+
+            foreach (IngredientQuantity i in Ingredients.IngredientList)
+            {
+                ret.AddRecipeNode(new RecipeTree(i.Name + " x" + (i.Quantity * quantity)));
+            }
+
+            foreach(RecipeQuantity r in ChildRecipes.RecipeList)
+            {
+                ret.AddRecipeNode(r.Recipe.GetRecipeNodes(r.Quantity * quantity));
+            }
+
+            return ret;
+        }
     }
 }

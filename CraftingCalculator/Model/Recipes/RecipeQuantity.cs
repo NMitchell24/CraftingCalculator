@@ -24,7 +24,6 @@ namespace CraftingCalculator.Model.Recipes
                 }
             }
         }
-        public string CoreComponents { get => Recipe.GetCoreComponents(Quantity); private set { } }
         public string Name { get => Recipe.Name; private set { } }
         public string Type { get => Recipe.Type; private set { } }
         public string Tooltip

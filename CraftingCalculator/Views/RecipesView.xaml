@@ -6,6 +6,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:CraftingCalculator.Views"
+             xmlns:model="clr-namespace:CraftingCalculator.Model.Recipes"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1200">
     <Grid>
@@ -138,7 +140,21 @@
             </ListBox.ContextMenu>
         </ListBox>
 
-        <TreeView Margin="5" HorizontalAlignment="Stretch" Grid.Row="2" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2" BorderThickness="1"/>
+        <TreeView ItemsSource="{Binding RecipeTotals}"
+                  Margin="5" 
+                  HorizontalAlignment="Stretch" 
+                  Grid.Row="2" 
+                  Grid.RowSpan="2" 
+                  Grid.Column="6" 
+                  Grid.ColumnSpan="2" 
+                  BorderThickness="1">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate ItemsSource="{Binding RecipeNodes}"
+                                          DataType="{x:Type model:RecipeTree}">
+                    <TextBlock Text="{Binding Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
         <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.07*"/>
