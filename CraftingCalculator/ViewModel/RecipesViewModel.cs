@@ -20,6 +20,7 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner AddRecipeCommand { get; set; }
         public CommandRunner RemoveRecipeCommand { get; set; }
         public CommandRunner RecalculateTotalsCommand { get; set; }
+        public CommandRunner ClearQuantitiesCommand { get; set; }
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
         public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
@@ -43,6 +44,7 @@ namespace CraftingCalculator.ViewModel
 
             RaisePropertyChanged(nameof(RecipeQuantities));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
+            ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
 
         private bool CanRemoveRecipes()
@@ -63,6 +65,7 @@ namespace CraftingCalculator.ViewModel
 
             RaisePropertyChanged(nameof(RecipeQuantities));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
+            ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
 
         private void CalculateTotalIngredients()
@@ -77,6 +80,21 @@ namespace CraftingCalculator.ViewModel
             }
             TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList);
             RaisePropertyChanged(nameof(TotalIngredients));
+        }
+
+        private bool CanClearRecipes()
+        {
+            return RecipeQuantities != null && RecipeQuantities.Count() > 0;
+        }
+
+        private void ClearRecipes()
+        {
+            _recipeMap.Reset();
+            RecipeQuantities.Clear();
+
+            CalculateTotalIngredients();
+            RaisePropertyChanged(nameof(RecipeQuantities));
+            RemoveRecipeCommand.RaiseCanExecuteChanged();
         }
 
         private RecipeFilter _selectedFilter;
@@ -150,6 +168,7 @@ namespace CraftingCalculator.ViewModel
             AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
             RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
             RecalculateTotalsCommand = new CommandRunner(CalculateTotalIngredients);
+            ClearQuantitiesCommand = new CommandRunner(ClearRecipes, CanClearRecipes);
         }
 
         public void ReloadRecipesForFilter(RecipeFilter filter)

@@ -141,7 +141,18 @@
         </Grid>
 
         <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4"/>
+
         <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Ingredients Needed" VerticalAlignment="Center" Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="2"/>
+        <Button Content="Clear" 
+                ToolTip="Clear Recipes"
+                Command="{Binding ClearQuantitiesCommand}"
+                Grid.Column="5" 
+                HorizontalAlignment="Stretch"
+                Margin="128,0,0,0" 
+                Padding="0"
+                VerticalAlignment="Top" 
+                Width="50"
+                Height="20" Grid.Row="1"/>
 
     </Grid>
 </UserControl>

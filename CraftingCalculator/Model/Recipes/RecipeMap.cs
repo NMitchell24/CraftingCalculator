@@ -73,5 +73,12 @@ namespace CraftingCalculator.Model.Recipes
             }
         }
 
+        /// <summary>
+        /// Reset the Map and clear all RecipeQuantity objects
+        /// </summary>
+        public void Reset()
+        {
+            _internalList.Clear();
+        }
     }
 }
