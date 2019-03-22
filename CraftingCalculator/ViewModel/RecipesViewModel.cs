@@ -122,6 +122,7 @@ namespace CraftingCalculator.ViewModel
                 var selectedItems = RecipesList.Where(x => x.IsSelected).Count();
                 RaisePropertyChanged(nameof(SelectedRecipe));
                 RaisePropertyChanged(nameof(RecipesList));
+                AddRecipeCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -134,6 +135,7 @@ namespace CraftingCalculator.ViewModel
                 var selectedItems = RecipeQuantities.Where(x => x.IsSelected).Count();
                 RaisePropertyChanged(nameof(SelectedRecipeQuantity));
                 RaisePropertyChanged(nameof(RecipeQuantities));
+                RemoveRecipeCommand.RaiseCanExecuteChanged();
             }
         }
         

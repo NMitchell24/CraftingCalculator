@@ -1,5 +1,6 @@
 ﻿using CraftingCalculator.Model.Ingredients;
 using System.ComponentModel;
+using System;
 
 namespace CraftingCalculator.Model.Recipes
 {
@@ -9,7 +10,20 @@ namespace CraftingCalculator.Model.Recipes
     public class RecipeQuantity : INotifyPropertyChanged
     {
         public Recipe Recipe { get; set; }
-        public int Quantity { get; set; }
+        private int _quantity;
+        public int Quantity
+        {
+            get => _quantity;
+            set
+            {
+                // This should match the maximum set for the NumericUpDown control in the RecipesView.xaml
+                // Prevents the user from increasing the ingredient totals over the maximum for the numeric up down.
+                if(value <= 100)
+                {
+                    _quantity = Math.Abs(value);
+                }
+            }
+        }
         public string CoreComponents { get => Recipe.GetCoreComponents(Quantity); private set { } }
         public string Name { get => Recipe.Name; private set { } }
         public string Type { get => Recipe.Type; private set { } }
