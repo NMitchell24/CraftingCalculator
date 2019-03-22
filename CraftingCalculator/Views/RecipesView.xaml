@@ -89,20 +89,27 @@
                  BorderThickness="1">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
                         <TextBlock 
                             Text="{Binding Path=Name, Mode=OneWay}" 
                             ToolTipService.ToolTip="{Binding Path=Tooltip}"
-                            Width="240"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Center"
-                            Margin="0,0,5,0"/>
+                            Margin="0,0,5,0"
+                            Grid.Column="0"/>
                         <Controls:NumericUpDown
                             Value="{Binding Path=Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="1"
                             Maximum="100"
                             NumericInputMode="Numbers"
+                            HorizontalAlignment="Right"
                             TextAlignment="Left"
-                            Width="100">
+                            Width="100"
+                            Grid.Column="1">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="ValueChanged">
                                     <i:InvokeCommandAction 
@@ -111,7 +118,7 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Controls:NumericUpDown>
-                    </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
             <ListBox.ItemContainerStyle>
