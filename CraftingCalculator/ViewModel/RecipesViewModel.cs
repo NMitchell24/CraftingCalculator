@@ -95,6 +95,7 @@ namespace CraftingCalculator.ViewModel
             CalculateTotalIngredients();
             RaisePropertyChanged(nameof(RecipeQuantities));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
+            ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
 
         private RecipeFilter _selectedFilter;
