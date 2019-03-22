@@ -122,8 +122,8 @@
         <TreeView Margin="5" HorizontalAlignment="Stretch" Grid.Row="2" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2" BorderThickness="1"/>
         <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.7*"/>
-                <RowDefinition Height="9.3*"/>
+                <RowDefinition Height="0.07*"/>
+                <RowDefinition Height="0.93*"/>
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
             <ListBox
@@ -147,12 +147,11 @@
                 ToolTip="Clear Recipes"
                 Command="{Binding ClearQuantitiesCommand}"
                 Grid.Column="5" 
-                HorizontalAlignment="Stretch"
-                Margin="128,0,0,0" 
+                HorizontalAlignment="Right"
+                Margin="0,0,5,0" 
                 Padding="0"
                 VerticalAlignment="Top" 
                 Width="50"
                 Height="20" Grid.Row="1"/>
-
     </Grid>
 </UserControl>
