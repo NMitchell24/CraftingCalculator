@@ -94,6 +94,7 @@
                             Text="{Binding Path=Name, Mode=OneWay}" 
                             ToolTipService.ToolTip="{Binding Path=Tooltip}"
                             Width="240"
+                            VerticalAlignment="Center"
                             Margin="0,0,5,0"/>
                         <Controls:NumericUpDown
                             Value="{Binding Path=Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
