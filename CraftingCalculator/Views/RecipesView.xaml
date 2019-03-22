@@ -1,9 +1,10 @@
 ﻿<UserControl x:Class="CraftingCalculator.Views.RecipesView"
-             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:CraftingCalculator.Views"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1200">
@@ -94,14 +95,20 @@
                             Width="240"
                             Margin="0,0,5,0"/>
                         <Controls:NumericUpDown
-                            Value="{Binding Path=Quantity, Mode=TwoWay}"
-                            Minimum="0"
+                            Value="{Binding Path=Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Minimum="1"
                             Maximum="100"
                             HasDecimals="False"
-                            HorizontalAlignment="Stretch"
                             TextAlignment="Left"
-                            Width="100"
-                            MinWidth="50"/>
+                            Width="100">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="ValueChanged">
+                                    <i:InvokeCommandAction 
+                                        Command="{Binding DataContext.RecalculateTotalsCommand, 
+                                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Controls:NumericUpDown>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

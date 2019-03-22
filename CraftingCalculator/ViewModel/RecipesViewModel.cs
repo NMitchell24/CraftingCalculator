@@ -19,6 +19,7 @@ namespace CraftingCalculator.ViewModel
 
         public CommandRunner AddRecipeCommand { get; set; }
         public CommandRunner RemoveRecipeCommand { get; set; }
+        public CommandRunner RecalculateTotalsCommand { get; set; }
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
         public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
@@ -63,7 +64,6 @@ namespace CraftingCalculator.ViewModel
             RaisePropertyChanged(nameof(RecipeQuantities));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
         }
-
 
         private void CalculateTotalIngredients()
         {
@@ -149,6 +149,7 @@ namespace CraftingCalculator.ViewModel
             RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(SelectedFilter));
             AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
             RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
+            RecalculateTotalsCommand = new CommandRunner(CalculateTotalIngredients);
         }
 
         public void ReloadRecipesForFilter(RecipeFilter filter)
