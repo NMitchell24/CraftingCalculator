@@ -98,7 +98,7 @@
                             Value="{Binding Path=Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="1"
                             Maximum="100"
-                            HasDecimals="False"
+                            NumericInputMode="Numbers"
                             TextAlignment="Left"
                             Width="100">
                             <i:Interaction.Triggers>
