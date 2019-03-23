@@ -37,12 +37,12 @@ namespace CraftingCalculator.ViewModel
 
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to quit?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            //var result = MessageBox.Show("Are you sure you want to quit?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            if (result == MessageBoxResult.No)
-            {
-                e.Cancel = true;
-            }
+            //if (result == MessageBoxResult.No)
+            //{
+            //    e.Cancel = true;
+            //}
 
             Properties.Settings.Default.Save();
         }
