@@ -19,12 +19,10 @@
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <ToggleButton Command="{Binding TopMostCommand}" ToolTip="Always on top">
-                <Rectangle Width="18"           
-                           Height="18"
+                <Rectangle Width="18" Height="18"
                            Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
                     <Rectangle.OpacityMask>
-                        <VisualBrush Stretch="Uniform"
-                         Visual="{iconPacks:MaterialDesign Kind=Lock}"/>
+                        <VisualBrush Stretch="Uniform" Visual="{iconPacks:MaterialDesign Kind=Lock}"/>
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </ToggleButton>
