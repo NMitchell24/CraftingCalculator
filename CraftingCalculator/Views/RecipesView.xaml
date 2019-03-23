@@ -7,6 +7,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:CraftingCalculator.Views"
              xmlns:model="clr-namespace:CraftingCalculator.Model.Recipes"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1200">
     <Grid>
@@ -32,7 +33,7 @@
         </Grid.ColumnDefinitions>
 
         <ListBox x:Name="recipesList" ItemsSource="{Binding Path = RecipesList, NotifyOnSourceUpdated=True}" 
-                 SelectedItem="{Binding Path=SelectedRecipe,UpdateSourceTrigger=PropertyChanged}"
+                 SelectedItem="{Binding Path=SelectedRecipe, UpdateSourceTrigger=PropertyChanged}"
                  SelectedIndex="{Binding Path=SelectedRecipeIndex}"
                  SelectionMode="Extended"
                  Margin="5" HorizontalAlignment="Stretch"
@@ -51,11 +52,15 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Add" Command="{Binding AddRecipeCommand}" />
+                    <MenuItem Header="Add" Command="{Binding AddRecipeCommand}">
+                        <MenuItem.Icon>
+                            <iconPacks:PackIconMaterialDesign Kind="Add" Margin="4,0,4,0"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
-        <ComboBox x:Name ="recipeFilters" ItemsSource="{Binding Path = RecipeFilters}" SelectedItem="{Binding SelectedFilter}"
+        <ComboBox x:Name="recipeFilters" ItemsSource="{Binding Path = RecipeFilters}" SelectedItem="{Binding SelectedFilter}"
                   Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" >
             <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -63,27 +68,35 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBlock HorizontalAlignment="Right" 
-                   Margin="0,0,5,0" 
-                   TextWrapping="Wrap" 
-                   Text="Filter Recipes By" 
-                   VerticalAlignment="Center"
-                   FontWeight="Bold"
-                   Grid.Row="1" Grid.Column="1"/>
-        <Button Content="Add &gt;" 
-                Command="{Binding AddRecipeCommand}"
+        
+        <iconPacks:PackIconMaterialDesign Grid.Row="1" Grid.Column="1" Margin="0,0,5,0" Kind="FilterList" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Filter Recipes By" FontWeight="Bold"/>
+
+        <Button Command="{Binding AddRecipeCommand}"
+                ToolTip="Add Recipe"
                 HorizontalAlignment="Stretch" 
                 Margin="0,0,0,5" 
                 VerticalAlignment="Bottom" 
                 Padding="4"
-                Grid.Row="3" Grid.Column="3"/>
-        <Button Content="&lt; Remove" 
-                Command="{Binding RemoveRecipeCommand}"
+                Grid.Row="3" Grid.Column="3">
+            <StackPanel Orientation="Horizontal">
+                <iconPacks:PackIconMaterialDesign Kind="Add" />
+                <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Text="Add" />
+            </StackPanel>
+        </Button>
+
+        <Button Command="{Binding RemoveRecipeCommand}"
+                ToolTip="Remove Recipe"
                 HorizontalAlignment="Stretch" 
                 Margin="0,5,0,0" 
                 VerticalAlignment="Top"
                 Padding="4"
-                Grid.Row="4" Grid.Column="3"/>
+                Grid.Row="4" Grid.Column="3">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="0,0,4,0" Text="Remove"/>
+                <iconPacks:PackIconMaterialDesign Kind="Remove" />
+            </StackPanel>
+        </Button>
         <ListBox x:Name="recipeQuantities" ItemsSource="{Binding Path=RecipeQuantities, NotifyOnSourceUpdated=True}"
                  SelectedItem="{Binding Path=SelectedRecipeQuantity, UpdateSourceTrigger=PropertyChanged}"
                  SelectedIndex="{Binding Path=SelectedRecipeQuantityIndex}"
@@ -134,7 +147,11 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Remove" Command="{Binding RemoveRecipeCommand}" />
+                    <MenuItem Header="Remove" Command="{Binding RemoveRecipeCommand}">
+                        <MenuItem.Icon>
+                            <iconPacks:PackIconMaterialDesign Kind="Remove" Margin="4,0,4,0"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
@@ -177,8 +194,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Quantities" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4"/>
 
         <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Recipe Ingredients Needed" VerticalAlignment="Center" Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="2"/>
-        <Button Content="Clear" 
-                ToolTip="Clear Recipes"
+        <Button ToolTip="Clear Recipes"
                 Command="{Binding ClearQuantitiesCommand}"
                 Grid.Column="5" 
                 HorizontalAlignment="Right"
@@ -186,6 +202,11 @@
                 Padding="0"
                 VerticalAlignment="Top" 
                 Width="50"
-                Height="20" Grid.Row="1"/>
+                Height="20" Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <iconPacks:PackIconMaterialDesign Kind="ClearAll"/>
+                <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Clear"/>
+            </StackPanel>
+        </Button>
     </Grid>
 </UserControl>
