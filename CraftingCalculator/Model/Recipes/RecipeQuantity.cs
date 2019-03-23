@@ -18,7 +18,7 @@ namespace CraftingCalculator.Model.Recipes
             {
                 // This should match the maximum set for the NumericUpDown control in the RecipesView.xaml
                 // Prevents the user from increasing the ingredient totals over the maximum for the numeric up down.
-                if(value <= 100)
+                if(value <= 500)
                 {
                     _quantity = Math.Abs(value);
                 }

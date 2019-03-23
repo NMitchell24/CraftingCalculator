@@ -110,7 +110,7 @@
                         <Controls:NumericUpDown
                             Value="{Binding Path=Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="1"
-                            Maximum="100"
+                            Maximum="500"
                             NumericInputMode="Numbers"
                             HorizontalAlignment="Right"
                             TextAlignment="Left"
