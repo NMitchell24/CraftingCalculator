@@ -1,4 +1,6 @@
-﻿namespace CraftingCalculator
+﻿using CraftingCalculator.ViewModel;
+
+namespace CraftingCalculator
 {
     /// <summary>
     /// Interaction logic for CraftingCalculatorMainWindow.xaml
@@ -8,6 +10,9 @@
         public CraftingCalculatorMainWindow()
         {
             InitializeComponent();
+            CraftingCalculatorMainViewModel vm = new CraftingCalculatorMainViewModel();
+            DataContext = vm;
+            Closing += vm.OnWindowClosing;
         }
     }
 }

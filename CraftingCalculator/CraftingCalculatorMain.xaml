@@ -6,8 +6,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CraftingCalculator"
         xmlns:views="clr-namespace:CraftingCalculator.Views"
+        xmlns:p="clr-namespace:CraftingCalculator.Properties"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
-        Title="NMS Crafting Calculator" Height="900" Width="1200" WindowStartupLocation="CenterScreen">
+        Title="NMS Crafting Calculator"
+        TitleCharacterCasing="Normal"
+        Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
+        Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
+        Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
+        Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
+        Topmost="{Binding IsTopMost, Mode=TwoWay}">
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <ToggleButton Command="{Binding TopMostCommand}" ToolTip="Always on top">
+                <Rectangle Width="18"           
+                           Height="18"
+                           Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Uniform"
+                         Visual="{iconPacks:MaterialDesign Kind=Lock}"/>
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </ToggleButton>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
     <Grid>
         <views:RecipesView x:Name="RecipesViewControl" />
     </Grid>
