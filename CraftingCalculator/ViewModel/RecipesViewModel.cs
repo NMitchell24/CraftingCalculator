@@ -5,6 +5,8 @@ using CraftingCalculator.Utilities;
 using CraftingCalculator.Model.Recipes;
 using CraftingCalculator.Model.Ingredients;
 using System.Linq;
+using System.Windows;
+using System.Text;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -21,6 +23,7 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner RemoveRecipeCommand { get; set; }
         public CommandRunner RecalculateTotalsCommand { get; set; }
         public CommandRunner ClearQuantitiesCommand { get; set; }
+        public CommandRunner CopyIngredientsCommand { get; set; }
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
         public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
@@ -87,6 +90,7 @@ namespace CraftingCalculator.ViewModel
             }
             TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList);
             RaisePropertyChanged(nameof(TotalIngredients));
+            CopyIngredientsCommand.RaiseCanExecuteChanged();
 
             // rebuild recipe tree
             CalculateRecipeTotals();
@@ -121,6 +125,20 @@ namespace CraftingCalculator.ViewModel
             RaisePropertyChanged(nameof(SelectedRecipe));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
+        }
+
+        private bool CanCopyIngredients()
+        {
+            return TotalIngredients != null && TotalIngredients.Count() > 0;
+        }
+
+        private void CopyIngredientsToClipboard()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            TotalIngredients.Select(i => sb.AppendLine(i.DisplayName));
+
+            Clipboard.SetText(sb.ToString());
         }
 
         private RecipeFilter _selectedFilter;
@@ -197,6 +215,7 @@ namespace CraftingCalculator.ViewModel
             RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
             RecalculateTotalsCommand = new CommandRunner(CalculateTotalIngredients);
             ClearQuantitiesCommand = new CommandRunner(ClearRecipes, CanClearRecipes);
+            CopyIngredientsCommand = new CommandRunner(CopyIngredientsToClipboard, CanCopyIngredients);
         }
 
         public void ReloadRecipesForFilter(RecipeFilter filter)
