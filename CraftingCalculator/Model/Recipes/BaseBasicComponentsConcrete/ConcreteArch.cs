@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteArch()
         {
             Name = "Concrete Arch";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
         }
     }

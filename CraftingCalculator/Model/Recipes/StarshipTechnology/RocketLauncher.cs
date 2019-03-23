@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public RocketLauncher()
         {
             Name = "Rocket Launcher";
-            Type = "Starship Weapon Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.COPPER, 200);
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 100);
         }

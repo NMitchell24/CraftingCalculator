@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public SidePanel()
         {
             Name = "Side Panel";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.FERRITE_DUST, 10);
             Ingredients.Add(IngredientType.SODIUM, 10);
         }

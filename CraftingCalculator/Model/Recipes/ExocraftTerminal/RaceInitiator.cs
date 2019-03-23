@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTerminal
         public RaceInitiator()
         {
             Name = "Race Initiator";
-            Type = "Exocraft Race Module";
+            Type = RecipeFilterLabels.ExocraftTerminals;
             ChildRecipes.Add(new MetalPlating(), 5);
             ChildRecipes.Add(new Microprocessor(), 2);
             ChildRecipes.Add(new IonBattery(), 1);

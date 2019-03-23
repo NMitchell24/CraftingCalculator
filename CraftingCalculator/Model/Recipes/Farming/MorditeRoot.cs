@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public MorditeRoot()
         {
             Name = "Mordite Root";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.MORDITE, 40);
         }
     }

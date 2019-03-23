@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public CapturedNanode()
         {
             Name = "Captured Nanode";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 100);
         }
     }

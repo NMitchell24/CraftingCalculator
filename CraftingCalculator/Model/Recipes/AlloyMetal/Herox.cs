@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AlloyMetal
         public Herox()
         {
             Name = "Herox";
-            Type = "Alloy Metal";
+            Type = RecipeFilterLabels.AlloyMetal;
             Ingredients.Add(IngredientType.AMMONIA, 50);
             Ingredients.Add(IngredientType.IONISED_COBALT, 50);
         }

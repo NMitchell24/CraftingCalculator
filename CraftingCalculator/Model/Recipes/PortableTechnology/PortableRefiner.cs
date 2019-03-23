@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public PortableRefiner()
         {
             Name = "Portable Refiner";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.OXYGEN, 30);
             ChildRecipes.Add(new MetalPlating(), 1);
         }

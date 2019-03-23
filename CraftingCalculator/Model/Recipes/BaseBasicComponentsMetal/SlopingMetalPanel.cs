@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public SlopingMetalPanel()
         {
             Name = "Sloping Metal Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }
     }

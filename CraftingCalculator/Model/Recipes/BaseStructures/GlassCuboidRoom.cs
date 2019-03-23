@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public GlassCuboidRoom()
         {
             Name = "Glass Cuboid Room";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.IONISED_COBALT, 20);
             ChildRecipes.Add(new Glass(), 2);
         }

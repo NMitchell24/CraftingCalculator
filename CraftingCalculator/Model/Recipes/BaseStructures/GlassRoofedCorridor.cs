@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public GlassRoofedCorridor()
         {
             Name = "Glass Roofed Cooridor";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
             ChildRecipes.Add(new Glass(), 1);
         }

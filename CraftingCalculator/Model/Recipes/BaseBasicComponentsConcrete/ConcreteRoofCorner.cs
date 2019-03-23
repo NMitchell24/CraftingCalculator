@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteRoofCorner()
         {
             Name = "Concrete Roof Corner";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 30);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public PositronEjector()
         {
             Name = "Positron Ejector";
-            Type = "Starship Weapon Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.URANIUM, 200);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsWood
         public SlopingWoodPanel()
         {
             Name = "Sloping Wood Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsWood;
             Ingredients.Add(IngredientType.CARBON, 20);
         }
     }

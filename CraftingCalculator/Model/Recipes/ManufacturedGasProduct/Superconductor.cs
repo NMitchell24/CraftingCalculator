@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ManufacturedGasProduct
         public Superconductor()
         {
             Name = "Superconductor";
-            Type = "Manufactured Gas Product";
+            Type = RecipeFilterLabels.ManufacturedGasProducts;
             ChildRecipes.Add(new Semiconductor(), 1);
             ChildRecipes.Add(new EnrichedCarbon(), 1);
         }

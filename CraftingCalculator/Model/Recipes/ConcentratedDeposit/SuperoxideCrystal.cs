@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ConcentratedDeposit
         public SuperoxideCrystal()
         {
             Name = "Superoxide Crystal";
-            Type = "Concentrated Deposit";
+            Type = RecipeFilterLabels.ConcentratedDeposits;
             Ingredients.Add(IngredientType.OXYGEN, 150);
         }
     }

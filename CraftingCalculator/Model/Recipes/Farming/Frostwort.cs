@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public Frostwort()
         {
             Name = "Frostwort";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.FROST_CRYSTAL, 50);
             Ingredients.Add(IngredientType.DIOXITE, 25);
         }

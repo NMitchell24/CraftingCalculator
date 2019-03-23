@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public PottedPlant()
         {
             Name = "Potted Plant";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.CARBON, 10);
         }
     }

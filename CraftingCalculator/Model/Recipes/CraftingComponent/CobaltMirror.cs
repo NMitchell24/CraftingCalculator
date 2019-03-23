@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public CobaltMirror()
         {
             Name = "Cobalt Mirror";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.IONISED_COBALT, 50);
         }
     }

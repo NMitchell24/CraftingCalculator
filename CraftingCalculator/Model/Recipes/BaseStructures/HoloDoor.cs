@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public HoloDoor()
         {
             Name = "Holo Door";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.IONISED_COBALT, 40);
             Ingredients.Add(IngredientType.PURE_FERRITE, 40);
         }

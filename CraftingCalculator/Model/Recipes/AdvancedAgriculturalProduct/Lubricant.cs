@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public Lubricant()
         {
             Name = "Lubricant";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             Ingredients.Add(IngredientType.COPRITE, 50);
             Ingredients.Add(IngredientType.GAMMA_ROOT, 400);
         }

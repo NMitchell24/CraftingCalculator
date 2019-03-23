@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public SmallWedge()
         {
             Name = "Small Wedge";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }
     }

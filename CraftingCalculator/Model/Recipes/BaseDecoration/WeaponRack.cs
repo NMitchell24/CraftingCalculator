@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public WeaponRack()
         {
             Name = "Weapon Rack";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.PURE_FERRITE, 5);
             Ingredients.Add(IngredientType.COBALT, 5);
         }

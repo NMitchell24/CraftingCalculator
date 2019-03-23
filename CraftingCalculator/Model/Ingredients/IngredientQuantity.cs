@@ -27,6 +27,10 @@ namespace CraftingCalculator.Model.Ingredients
             Quantity = q;
         }
 
+        public IngredientQuantity Clone()
+        {
+            return new IngredientQuantity(Ingredient, Quantity);
+        }
 
     }
 }

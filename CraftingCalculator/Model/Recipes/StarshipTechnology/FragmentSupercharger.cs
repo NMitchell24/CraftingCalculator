@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public FragmentSupercharger()
         {
             Name = "Fragment Supercharger";
-            Type = "Starship Positron Ejector Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
             ChildRecipes.Add(new RareMetalElement(), 3);
         }

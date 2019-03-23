@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public MetalFrontage()
         {
             Name = "Metal Frontage";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
         }

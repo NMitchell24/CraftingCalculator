@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseAquaticConstruction
         public SquareDeepwaterChamber()
         {
             Name = "Square Deepwater Chamber";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseAquaticConstruction;
             Ingredients.Add(IngredientType.PURE_FERRITE, 350);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteFramedGlassPanel()
         {
             Name = "Concrete-Framed Glass Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }
     }

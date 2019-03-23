@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteDoorway()
         {
             Name = "Concrete Doorway";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }
     }

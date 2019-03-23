@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AlloyMetal
         public DirtyBronze()
         {
             Name = "Dirty Bronze";
-            Type = "Alloy Metal";
+            Type = RecipeFilterLabels.AlloyMetal;
             Ingredients.Add(IngredientType.PYRITE, 50);
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
         }

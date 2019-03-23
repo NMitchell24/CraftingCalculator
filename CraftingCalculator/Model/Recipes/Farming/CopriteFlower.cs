@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public CopriteFlower()
         {
             Name = "Coprite Flower";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.COPRITE, 40);
         }
     }

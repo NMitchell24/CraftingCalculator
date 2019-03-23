@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public MetalDoorFrame()
         {
             Name = "Metal Door Frame";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ManufacturedGasProduct
         public CryoPump()
         {
             Name = "Cryo-Pump";
-            Type = "Manufactured Gas Product";
+            Type = RecipeFilterLabels.ManufacturedGasProducts;
             ChildRecipes.Add(new HotIce(), 1);
             ChildRecipes.Add(new ThermicCondensate(), 1);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteFrontage()
         {
             Name = "Concrete Frontage";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
         }

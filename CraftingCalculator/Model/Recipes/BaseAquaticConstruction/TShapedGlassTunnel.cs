@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseAquaticConstruction
         public TShapedGlassTunnel()
         {
             Name = "T-Shaped Glass Tunnel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseAquaticConstruction;
             Ingredients.Add(IngredientType.CRYSTAL_SULPHIDE, 2);
             Ingredients.Add(IngredientType.FERRITE_DUST, 25);
             ChildRecipes.Add(new Glass(), 1);

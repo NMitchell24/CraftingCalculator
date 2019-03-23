@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public IonBattery()
         {
             Name = "Ion Battery";
-            Type = "Consumable";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.COBALT, 25);
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }

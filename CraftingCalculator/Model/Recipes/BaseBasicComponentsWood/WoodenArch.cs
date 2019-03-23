@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsWood
         public WoodenArch()
         {
             Name = "Wooden Arch";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsWood;
             Ingredients.Add(IngredientType.CARBON, 40);
         }
     }

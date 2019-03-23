@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public Acid()
         {
             Name = "Acid";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             Ingredients.Add(IngredientType.MORDITE, 25);
             Ingredients.Add(IngredientType.FUNGAL_MOULD, 600);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public LargeHydroponicTray()
         {
             Name = "Large Hydroponic Tray";
-            Type = "Farming (Technology)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.PURE_FERRITE, 60);
             Ingredients.Add(IngredientType.IONISED_COBALT, 50);
             Ingredients.Add(IngredientType.CARBON, 50);

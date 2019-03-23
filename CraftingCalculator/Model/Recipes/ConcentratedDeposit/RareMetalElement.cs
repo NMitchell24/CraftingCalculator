@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ConcentratedDeposit
         public RareMetalElement()
         {
             Name = "Rare Metal Element";
-            Type = "Concentrated Deposit";
+            Type = RecipeFilterLabels.ConcentratedDeposits;
             Ingredients.Add(IngredientType.PURE_FERRITE, 150);
         }
     }

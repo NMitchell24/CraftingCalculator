@@ -9,7 +9,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTechnology
         public ExocraftSignalBoosterSigma()
         {
             Name = "Exocraft Signal Booster Upgrade Sigma";
-            Type = "Exocraft Scanner Module";
+            Type = RecipeFilterLabels.ExocraftTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 100);
             ChildRecipes.Add(new IonBattery(), 2);
             ChildRecipes.Add(new Microprocessor(), 2);

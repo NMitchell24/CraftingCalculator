@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public WaveformRecycler()
         {
             Name = "Waveform Recycler";
-            Type = "Scanner Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 100);
             ChildRecipes.Add(new IonBattery(), 1);
         }

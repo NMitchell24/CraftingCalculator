@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public TeleportReceiver()
         {
             Name = "Teleport Receiver";
-            Type = "Starship Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 3);
             ChildRecipes.Add(new Antimatter(), 1);
         }

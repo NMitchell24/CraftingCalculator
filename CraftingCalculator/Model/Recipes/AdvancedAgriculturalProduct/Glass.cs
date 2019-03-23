@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public Glass()
         {
             Name = "Glass";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             Ingredients.Add(IngredientType.FROST_CRYSTAL, 50);
         }
     }

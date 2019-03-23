@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public TerrainManipulator()
         {
             Name = "Terrain Manipulator";
-            Type = "Multitool Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             ChildRecipes.Add(new DihydrogenJelly(), 1);
             ChildRecipes.Add(new CarbonNanotubes(), 2);
         }

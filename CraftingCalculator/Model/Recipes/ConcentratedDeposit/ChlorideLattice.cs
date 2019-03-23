@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ConcentratedDeposit
         public ChlorideLattice()
         {
             Name = "Chloride Lattice";
-            Type = "Concentrated Deposit";
+            Type = RecipeFilterLabels.ConcentratedDeposits;
             Ingredients.Add(IngredientType.CHLORINE, 150);
         }
     }

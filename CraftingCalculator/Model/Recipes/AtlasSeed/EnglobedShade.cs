@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public EnglobedShade()
         {
             Name = "Englobed Shade";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
             ChildRecipes.Add(new CapturedNanode(), 1);
         }

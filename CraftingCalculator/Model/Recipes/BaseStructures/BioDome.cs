@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public BioDome()
         {
             Name = "Bio-Dome";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 25);
             ChildRecipes.Add(new Glass(), 5);
         }

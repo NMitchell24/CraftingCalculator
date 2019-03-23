@@ -6,7 +6,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public CircuitBoard()
         {
             Name = "Circuit Board";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             ChildRecipes.Add(new HeatCapacitor(), 1);
             ChildRecipes.Add(new PolyFibre(), 1);
         }

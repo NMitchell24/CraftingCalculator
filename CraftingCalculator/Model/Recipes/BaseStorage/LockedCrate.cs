@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStorage
         public LockedCrate()
         {
             Name = "Locked Crate";
-            Type = "Base Storage";
+            Type = RecipeFilterLabels.BaseStorage;
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
         }
     }

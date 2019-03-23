@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public SimpleDesk()
         {
             Name = "Simple Desk";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 10);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public AdvancedIonBattery()
         {
             Name = "Advanced Ion Battery";
-            Type = "Consumable (Exosuit)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.IONISED_COBALT, 25);
             Ingredients.Add(IngredientType.PURE_FERRITE, 20);
         }

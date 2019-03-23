@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public MetalHalfArch()
         {
             Name = "Metal Half Arch";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }
     }

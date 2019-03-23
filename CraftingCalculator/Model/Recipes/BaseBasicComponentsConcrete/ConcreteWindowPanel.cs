@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteWindowPanel()
         {
             Name = "Concrete Window Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
             ChildRecipes.Add(new Glass(), 1);
         }

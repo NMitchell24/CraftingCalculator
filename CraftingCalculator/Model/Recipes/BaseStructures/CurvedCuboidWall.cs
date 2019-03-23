@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public CurvedCuboidWall()
         {
             Name = "Curved Cuboid Wall";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
         }
     }

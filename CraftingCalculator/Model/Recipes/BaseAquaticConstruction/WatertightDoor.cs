@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseAquaticConstruction
         public WatertightDoor()
         {
             Name = "Watertight Door";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseAquaticConstruction;
             Ingredients.Add(IngredientType.FERRITE_DUST, 25);
             Ingredients.Add(IngredientType.CRYSTAL_SULPHIDE, 1);
         }

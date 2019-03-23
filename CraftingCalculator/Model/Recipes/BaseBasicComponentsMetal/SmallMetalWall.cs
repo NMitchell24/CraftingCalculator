@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public SmallMetalWall()
         {
             Name = "Small Metal Wall";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 20);
         }
     }

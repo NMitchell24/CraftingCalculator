@@ -6,7 +6,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public LiquidExplosive()
         {
             Name = "Liquid Explosive";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             ChildRecipes.Add(new Acid(), 1);
             ChildRecipes.Add(new UnstableGel(), 1);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public FrigateFuel100()
         {
             Name = "Frigate Fuel (100 Tonnes)";
-            Type = "Consumable (Frigate)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.DIHYDROGEN, 100);
             Ingredients.Add(IngredientType.TRITIUM, 100);
         }

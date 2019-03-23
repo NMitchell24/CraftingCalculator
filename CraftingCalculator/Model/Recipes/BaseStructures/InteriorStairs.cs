@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public InteriorStairs()
         {
             Name = "Interior Stairs";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 50);
             Ingredients.Add(IngredientType.CARBON, 30);
         }

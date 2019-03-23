@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public SodiumDiode()
         {
             Name = "Sodium Diode";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.SODIUM_NITRATE, 40);
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
         }

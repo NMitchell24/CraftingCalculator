@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public CornerSofa()
         {
             Name = "Corner Sofa";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 10);
         }
     }

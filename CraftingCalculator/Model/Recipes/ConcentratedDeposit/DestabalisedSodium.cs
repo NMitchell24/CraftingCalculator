@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ConcentratedDeposit
         public DestabalisedSodium()
         {
             Name = "Destablised Sodium";
-            Type = "Concentrated Deposit";
+            Type = RecipeFilterLabels.ConcentratedDeposits;
             Ingredients.Add(IngredientType.SODIUM_NITRATE, 150);
         }
     }

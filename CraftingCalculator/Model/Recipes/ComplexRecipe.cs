@@ -47,7 +47,7 @@ namespace CraftingCalculator.Model.Recipes
 
             foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
             {
-                IngredientMap RecipeIngredients = recipe.Ingredients;
+                IngredientMap RecipeIngredients = new IngredientMap(recipe.Ingredients);
 
                 NewIngredients = IngredientUtil.CombineIngredients(RecipeIngredients, NewIngredients, recipe.Quantity);
             }

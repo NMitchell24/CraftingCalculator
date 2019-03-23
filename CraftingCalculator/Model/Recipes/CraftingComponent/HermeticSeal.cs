@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public HermeticSeal()
         {
             Name = "Hermetic Seal";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 30);
         }
     }

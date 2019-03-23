@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStorage
         public StorageContainer()
         {
             Name = "Storage Container (0 - 9)";
-            Type = "Base Storage";
+            Type = RecipeFilterLabels.BaseStorage;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 50);
             Ingredients.Add(IngredientType.SODIUM, 20);
         }

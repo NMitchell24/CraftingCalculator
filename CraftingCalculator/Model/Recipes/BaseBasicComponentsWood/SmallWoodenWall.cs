@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsWood
         public SmallWoodenWall()
         {
             Name = "Small Wooden Wall";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsWood;
             Ingredients.Add(IngredientType.CARBON, 20);
         }
     }

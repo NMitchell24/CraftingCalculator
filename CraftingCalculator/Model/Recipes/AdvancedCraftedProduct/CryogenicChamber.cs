@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedCraftedProduct
         public CryogenicChamber()
         {
             Name = "Cryogenic Chamber";
-            Type = "Advanced Crafted Product";
+            Type = RecipeFilterLabels.AdvancedCraftedProduct;
             ChildRecipes.Add(new LivingGlass(), 1);
             ChildRecipes.Add(new CryoPump(), 1);
         }

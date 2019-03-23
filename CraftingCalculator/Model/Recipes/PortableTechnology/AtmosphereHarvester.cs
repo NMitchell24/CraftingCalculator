@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public AtmosphereHarvester()
         {
             Name = "Atmosphere Harvester";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.AMMONIA, 100);
             ChildRecipes.Add(new MetalPlating(), 2);
             ChildRecipes.Add(new HermeticSeal(), 2);

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public ModifiedQuanta()
         {
             Name = "Modified Quanta";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.INDIUM, 100);
             ChildRecipes.Add(new NovaeReclaiment(), 1);
         }

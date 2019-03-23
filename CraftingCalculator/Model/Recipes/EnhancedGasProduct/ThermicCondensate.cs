@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.EnhancedGasProduct
         public ThermicCondensate()
         {
             Name = "Thermic Condensate";
-            Type = "Enhanced Gas Product";
+            Type = RecipeFilterLabels.EnhancedGasProduct;
             Ingredients.Add(IngredientType.SULPHURINE, 250);
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 50);
         }

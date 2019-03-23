@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public LargeMonitorStation()
         {
             Name = "Large Monitor Station";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.PURE_FERRITE, 5);
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 5);
         }

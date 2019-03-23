@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsWood
         public WoodenWindowPanel()
         {
             Name = "Wooden Window Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsWood;
             Ingredients.Add(IngredientType.CARBON, 40);
             ChildRecipes.Add(new Glass(), 1);
         }

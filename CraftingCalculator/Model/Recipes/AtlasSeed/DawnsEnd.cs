@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public DawnsEnd()
         {
             Name = "Dawn's End";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 25);
             ChildRecipes.Add(new DarkMatter(), 1);
         }

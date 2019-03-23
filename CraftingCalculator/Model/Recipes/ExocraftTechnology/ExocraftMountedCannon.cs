@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTechnology
         public ExocraftMountedCannon()
         {
             Name = "Exocraft Mounted Cannon";
-            Type = "Exocraft Weapon Module";
+            Type = RecipeFilterLabels.ExocraftTech;
             Ingredients.Add(IngredientType.PUGNEUM, 50);
             Ingredients.Add(IngredientType.COPPER, 100);
         }

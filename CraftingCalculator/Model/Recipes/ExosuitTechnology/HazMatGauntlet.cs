@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExosuitTechnology
         public HazMatGauntlet()
         {
             Name = "Haz-Mat Gauntlet";
-            Type = "Exosuit Module";
+            Type = RecipeFilterLabels.ExosuitTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 50);
             Ingredients.Add(IngredientType.SODIUM_NITRATE, 20);
         }

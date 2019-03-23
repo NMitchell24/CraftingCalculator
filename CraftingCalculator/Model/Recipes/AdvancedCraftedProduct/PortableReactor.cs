@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedCraftedProduct
         public PortableReactor()
         {
             Name = "Portable Reactor";
-            Type = "Advanced Crafted Product";
+            Type = RecipeFilterLabels.AdvancedCraftedProduct;
             ChildRecipes.Add(new LiquidExplosive(), 1);
             ChildRecipes.Add(new FusionAccelerant(), 1);
         }

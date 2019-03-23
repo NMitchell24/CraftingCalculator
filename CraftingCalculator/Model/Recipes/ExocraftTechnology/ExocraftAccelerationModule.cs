@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTechnology
         public ExocraftAccelerationModule()
         {
             Name = "Exocraft Acceleration Module";
-            Type = "Exocraft Acceleration Upgrade";
+            Type = RecipeFilterLabels.ExocraftTech;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 15);
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 50);
             ChildRecipes.Add(new CarbonNanotubes(), 2);

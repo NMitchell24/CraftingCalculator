@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public AlbumenPearlOrb()
         {
             Name = "Albumen Pearl Orb";
-            Type = "Farming (Orb Plant)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.INDIUM, 60);
             Ingredients.Add(IngredientType.PARAFFINIUM, 20);
         }

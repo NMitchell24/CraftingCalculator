@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseEquipment
         public GalacticTradeTerminal()
         {
             Name = "Galactic Trade Terminal";
-            Type = "Base Equipment";
+            Type = RecipeFilterLabels.BaseEquipment;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 25);
             ChildRecipes.Add(new Microprocessor(), 3);
         }

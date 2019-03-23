@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExosuitTechnology
         public EfficientWaterJets()
         {
             Name = "Efficient Water Jets";
-            Type = "Jetpack Module";
+            Type = RecipeFilterLabels.ExosuitTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 100);
             Ingredients.Add(IngredientType.OXYGEN, 100);
             Ingredients.Add(IngredientType.LIVING_PEARL, 6);

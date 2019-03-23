@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public CuboidRoomFlooring()
         {
             Name = "Cuboid Room Flooring";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 80);
         }
     }

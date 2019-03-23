@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public TShapedCorridor()
         {
             Name = "T-Shaped Corridor";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
         }
     }

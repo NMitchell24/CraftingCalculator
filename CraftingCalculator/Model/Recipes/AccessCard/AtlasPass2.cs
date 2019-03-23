@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.AccessCard
         public AtlasPass2()
         {
             Name = "Atlas Pass v2";
-            Type = "Access Card";
+            Type = RecipeFilterLabels.AccessCard;
             Ingredients.Add(IngredientType.CADMIUM, 200);
             ChildRecipes.Add(new Microprocessor(), 1);
         }

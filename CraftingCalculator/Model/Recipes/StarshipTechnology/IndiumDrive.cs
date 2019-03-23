@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public IndiumDrive()
         {
             Name = "Indium Drive";
-            Type = "Hyperdrive Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.EMERIL, 250);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 3);
         }

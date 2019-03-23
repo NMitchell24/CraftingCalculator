@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public PolyFibre()
         {
             Name = "Poly Fibre";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             Ingredients.Add(IngredientType.CACTUS_FLESH, 100);
             Ingredients.Add(IngredientType.STAR_BULB, 200);
         }

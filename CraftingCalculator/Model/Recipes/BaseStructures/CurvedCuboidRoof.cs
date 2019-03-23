@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public CurvedCuboidRoof()
         {
             Name = "Curved Cuboid Roof";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
             ChildRecipes.Add(new Glass(), 1);
         }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public SignalBooster()
         {
             Name = "Signal Booster";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.SODIUM, 15);
             ChildRecipes.Add(new MetalPlating(), 1);
             ChildRecipes.Add(new CarbonNanotubes(), 1);

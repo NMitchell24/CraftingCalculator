@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public BarrelIoniser()
         {
             Name = "Barrel Ioniser";
-            Type = "Boltcaster Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             ChildRecipes.Add(new CobaltMirror(), 1);
         }

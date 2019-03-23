@@ -9,7 +9,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTerminal
         public NomadGeobay()
         {
             Name = "Nomad Geobay";
-            Type = "Exocraft Geobay";
+            Type = RecipeFilterLabels.ExocraftTerminals;
             Ingredients.Add(IngredientType.PARAFFINIUM, 100);
             ChildRecipes.Add(new MetalPlating(), 5);
             ChildRecipes.Add(new IonBattery(), 4);

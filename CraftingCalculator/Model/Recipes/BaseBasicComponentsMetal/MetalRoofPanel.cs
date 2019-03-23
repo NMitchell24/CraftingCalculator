@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public MetalRoofPanel()
         {
             Name = "Metal Roof Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.CARBON, 20);
             Ingredients.Add(IngredientType.FERRITE_DUST, 10);
         }

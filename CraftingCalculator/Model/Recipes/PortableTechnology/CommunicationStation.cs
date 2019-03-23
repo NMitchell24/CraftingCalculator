@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public CommunicationStation()
         {
             Name = "Communication Station";
-            Type = "Portable Message Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.PURE_FERRITE, 20);
         }
     }

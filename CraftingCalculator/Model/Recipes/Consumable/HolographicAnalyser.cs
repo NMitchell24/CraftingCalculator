@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public HolographicAnalyser()
         {
             Name = "Holographic Analyser";
-            Type = "Consumable (Frigate)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.GOLD, 50);
             ChildRecipes.Add(new OxygenFilter(), 1);
         }

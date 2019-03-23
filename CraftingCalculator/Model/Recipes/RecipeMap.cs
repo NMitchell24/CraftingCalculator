@@ -42,6 +42,14 @@ namespace CraftingCalculator.Model.Recipes
             }
         }
 
+        public void AddifDoesNotExist(Recipe recipe, int quantity)
+        {
+            if (!_internalList.Any(i => i.Recipe.Name == recipe.Name))
+            {
+                _internalList.Add(new RecipeQuantity(recipe, quantity));
+            }
+        }
+
         /// <summary>
         /// Decrement a RecipeQuantity by the provided amount.  
         /// If the current Quantity - the provided quantity would be less than or equal to 0

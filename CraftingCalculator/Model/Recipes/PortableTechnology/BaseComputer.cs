@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public BaseComputer()
         {
             Name = "Base Computer";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 40);
         }
     }

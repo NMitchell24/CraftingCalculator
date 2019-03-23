@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.ExosuitTechnology
         public RocketBoots()
         {
             Name = "Rocket Boots";
-            Type = "Jetpack Module";
+            Type = RecipeFilterLabels.ExosuitTech;
             Ingredients.Add(IngredientType.TRITIUM, 100);
             ChildRecipes.Add(new SaltRefractor(), 1);
         }

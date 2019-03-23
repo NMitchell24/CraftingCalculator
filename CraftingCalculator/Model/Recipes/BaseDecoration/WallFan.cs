@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public WallFan()
         {
             Name = "Wall Fan";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 5);
             Ingredients.Add(IngredientType.COBALT, 5);
         }

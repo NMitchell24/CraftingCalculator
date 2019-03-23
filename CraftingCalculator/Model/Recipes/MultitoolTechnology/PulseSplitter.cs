@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public PulseSplitter()
         {
             Name = "Pulse Splitter";
-            Type = "Multitool Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             Ingredients.Add(IngredientType.DEUTERIUM, 200);
         }

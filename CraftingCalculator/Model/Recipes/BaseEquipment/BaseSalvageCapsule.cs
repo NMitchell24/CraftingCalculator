@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseEquipment
         public BaseSalvageCapsule()
         {
             Name = "Base Salvage Capsule";
-            Type = "Base Equipment";
+            Type = RecipeFilterLabels.BaseEquipment;
             Ingredients.Add(IngredientType.PURE_FERRITE, 50);
         }
     }

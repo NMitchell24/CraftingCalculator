@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public Scanner()
         {
             Name = "Scanner";
-            Type = "Multitool Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.FERRITE_DUST, 150);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public StandingPlanter()
         {
             Name = "Standing Planter";
-            Type = "Farming (Technology)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.CARBON, 20);
         }
     }

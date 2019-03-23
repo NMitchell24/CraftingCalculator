@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public AmplifiedCartridges()
         {
             Name = "Amplified Cartridges";
-            Type = "Pulse Splitter Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             ChildRecipes.Add(new TetraCobalt(), 1);
         }

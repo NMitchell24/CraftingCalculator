@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public Server()
         {
             Name = "Server";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
             Ingredients.Add(IngredientType.COBALT, 5);
         }

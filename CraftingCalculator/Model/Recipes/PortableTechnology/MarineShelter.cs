@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public MarineShelter()
         {
             Name = "Marine Shelter";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.LIVING_PEARL, 5);
             Ingredients.Add(IngredientType.IONISED_COBALT, 20);
             ChildRecipes.Add(new Glass(), 1);

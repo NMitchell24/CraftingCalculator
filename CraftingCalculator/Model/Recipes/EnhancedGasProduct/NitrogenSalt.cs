@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.EnhancedGasProduct
         public NitrogenSalt()
         {
             Name = "Nitrogen Salt";
-            Type = "Enhanced Gas Product";
+            Type = RecipeFilterLabels.EnhancedGasProduct;
             Ingredients.Add(IngredientType.NITROGEN, 250);
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 50);
         }

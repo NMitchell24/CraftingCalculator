@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public CuboidRoofCap()
         {
             Name = "Cuboid Roof Cap";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.PURE_FERRITE, 80);
         }
     }

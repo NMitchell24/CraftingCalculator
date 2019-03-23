@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public FungalCluster()
         {
             Name = "Fungal Cluster";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.FUNGAL_MOULD, 50);
             Ingredients.Add(IngredientType.AMMONIA, 25);
         }

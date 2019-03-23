@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public AblativeArmour()
         {
             Name = "Ablative Armour";
-            Type = "Starship Shield Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.SODIUM_NITRATE, 50);
             ChildRecipes.Add(new CobaltMirror(), 1);
         }

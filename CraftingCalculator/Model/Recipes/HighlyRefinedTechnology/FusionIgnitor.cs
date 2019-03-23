@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.HighlyRefinedTechnology
         public FusionIgnitor()
         {
             Name = "Fusion Ignitor";
-            Type = "Highly Refined Technology";
+            Type = RecipeFilterLabels.HighlyRefinedTech;
             ChildRecipes.Add(new PortableReactor(), 1);
             ChildRecipes.Add(new QuantumProcessor(), 1);
             ChildRecipes.Add(new Geodesite(), 1);

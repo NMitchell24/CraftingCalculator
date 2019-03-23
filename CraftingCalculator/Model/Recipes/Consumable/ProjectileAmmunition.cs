@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public ProjectileAmmunition()
         {
             Name = "Projectile Ammunition (500)";
-            Type = "Consumable (Universal Ammo Module)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.FERRITE_DUST, 60);
         }
     }

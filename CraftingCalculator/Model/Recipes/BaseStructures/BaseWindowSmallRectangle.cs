@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public BaseWindowSmallRectangle()
         {
             Name = "Small Rectangular Window";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.IONISED_COBALT, 5);
             ChildRecipes.Add(new Glass(), 1);
         }

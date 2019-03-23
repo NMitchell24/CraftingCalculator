@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTerminal
         public RaceObstacle()
         {
             Name = "Race Obstacle";
-            Type = "Exocraft Race Module";
+            Type = RecipeFilterLabels.ExocraftTerminals;
             ChildRecipes.Add(new MetalPlating(), 5);
         }
     }

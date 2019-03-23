@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public CyclotronBallista()
         {
             Name = "Cyclotron Ballista";
-            Type = "Starship Weapon Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.DIOXITE, 200);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
         }

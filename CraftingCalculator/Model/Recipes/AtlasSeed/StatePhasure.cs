@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public StatePhasure()
         {
             Name = "State Phasure";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.CADMIUM, 100);
             ChildRecipes.Add(new PhoticJade(), 1);
         }

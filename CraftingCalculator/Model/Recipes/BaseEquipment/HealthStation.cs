@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseEquipment
         public HealthStation()
         {
             Name = "Health Station";
-            Type = "Base Equipment";
+            Type = RecipeFilterLabels.BaseEquipment;
             Ingredients.Add(IngredientType.IONISED_COBALT, 20);
             Ingredients.Add(IngredientType.URANIUM, 50);
             ChildRecipes.Add(new MetalPlating(), 1);

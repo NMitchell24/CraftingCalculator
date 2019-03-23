@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsWood
         public WoodenFrontage()
         {
             Name = "Wooden Frontage";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsWood;
             Ingredients.Add(IngredientType.CARBON, 40);
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
         }

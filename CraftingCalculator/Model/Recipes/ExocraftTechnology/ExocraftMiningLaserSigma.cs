@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTechnology
         public ExocraftMiningLaserSigma()
         {
             Name = "Exocraft Mining Laser Upgrade Sigma";
-            Type = "Exocraft Mining Laser Module";
+            Type = RecipeFilterLabels.ExocraftTech;
             Ingredients.Add(IngredientType.PUGNEUM, 50);
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 50);
         }

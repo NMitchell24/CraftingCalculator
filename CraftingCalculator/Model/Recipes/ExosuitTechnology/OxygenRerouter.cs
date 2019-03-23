@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.ExosuitTechnology
         public OxygenRerouter()
         {
             Name = "Oxygen Rerouter";
-            Type = "Life Support Module";
+            Type = RecipeFilterLabels.ExosuitTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 100);
             Ingredients.Add(IngredientType.CRYSTAL_SULPHIDE, 6);
             ChildRecipes.Add(new SaltRefractor(), 1);

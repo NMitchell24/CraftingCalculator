@@ -9,7 +9,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTerminal
         public ExocraftSummoningStation()
         {
             Name = "Exocraft Summoning Station";
-            Type = "Exocraft Summoning Station";
+            Type = RecipeFilterLabels.ExocraftTerminals;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 100);
             ChildRecipes.Add(new IonBattery(), 4);
             ChildRecipes.Add(new Antimatter(), 1);

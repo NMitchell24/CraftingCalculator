@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public Echinocactus()
         {
             Name = "Echinocactus";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.CACTUS_FLESH, 50);
             Ingredients.Add(IngredientType.PYRITE, 25);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public SaltRefractor()
         {
             Name = "Salt Refractor";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.SALT, 100);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public SolarVine()
         {
             Name = "Solar Vine";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.SOLANIUM, 50);
             Ingredients.Add(IngredientType.PHOSPHORUS, 25);
         }

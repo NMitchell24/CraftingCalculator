@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExosuitTechnology
         public NeuralStimulator()
         {
             Name = "Neural Stimulator";
-            Type = "Jetpack Module";
+            Type = RecipeFilterLabels.ExosuitTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 100);
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 100);
         }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public UnstablePlasma()
         {
             Name = "Unstable Plasma";
-            Type = "Consumable (Plasma Launcher)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.OXYGEN, 50);
             ChildRecipes.Add(new MetalPlating(), 1);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsConcrete
         public ConcreteRamp()
         {
             Name = "Concrete Ramp";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsConcrete;
             Ingredients.Add(IngredientType.FERRITE_DUST, 50);
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
         }

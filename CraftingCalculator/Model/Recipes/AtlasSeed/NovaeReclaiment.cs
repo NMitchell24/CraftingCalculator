@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public NovaeReclaiment()
         {
             Name = "Novae Reclaiment";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.EMERIL, 100);
             ChildRecipes.Add(new StatePhasure(), 1);
         }

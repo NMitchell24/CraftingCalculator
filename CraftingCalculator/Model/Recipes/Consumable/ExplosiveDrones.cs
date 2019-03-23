@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public ExplosiveDrones()
         {
             Name = "Explosive Drones";
-            Type = "Consumable (Frigate)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.WALKER_BRAIN, 1);
             Ingredients.Add(IngredientType.GOLD, 50);
         }

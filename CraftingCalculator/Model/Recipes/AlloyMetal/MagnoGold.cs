@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AlloyMetal
         public MagnoGold()
         {
             Name = "Magno-Gold";
-            Type = "Alloy Metal";
+            Type = RecipeFilterLabels.AlloyMetal;
             Ingredients.Add(IngredientType.PHOSPHORUS, 50);
             Ingredients.Add(IngredientType.IONISED_COBALT, 50);
         }

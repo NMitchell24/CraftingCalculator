@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AlloyMetal
         public Lemmium()
         {
             Name = "Lemmium";
-            Type = "Alloy Metal";
+            Type = RecipeFilterLabels.AlloyMetal;
             Ingredients.Add(IngredientType.URANIUM, 50);
             Ingredients.Add(IngredientType.PURE_FERRITE, 100);
         }

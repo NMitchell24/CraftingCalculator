@@ -15,7 +15,13 @@ namespace CraftingCalculator.Model.Ingredients
 
         public IngredientMap(IngredientMap map)
         {
-            _internalList = new List<IngredientQuantity>(map.IngredientList);
+            _internalList = new List<IngredientQuantity>();
+            foreach(IngredientQuantity i in map.IngredientList)
+            {
+                // Insures we don't retain references to the original IngredientQuantity object and cause those 
+                // objects to get mutated elsewhere.
+                _internalList.Add(i.Clone());
+            }
         }
 
         public IngredientMap()

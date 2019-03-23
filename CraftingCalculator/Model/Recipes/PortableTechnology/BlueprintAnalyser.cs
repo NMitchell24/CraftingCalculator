@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public BlueprintAnalyser()
         {
             Name = "Blueprint Analyser";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 20);
             ChildRecipes.Add(new CarbonNanotubes(), 1);
         }

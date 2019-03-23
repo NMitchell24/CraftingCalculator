@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public BaseLargeGlassPanel()
         {
             Name = "Large Glass Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             ChildRecipes.Add(new Glass(), 1);
         }
     }

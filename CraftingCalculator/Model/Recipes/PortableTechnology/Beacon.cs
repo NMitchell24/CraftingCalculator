@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public Beacon()
         {
             Name = "Beacon";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             ChildRecipes.Add(new MetalPlating(), 1);
             ChildRecipes.Add(new Microprocessor(), 1);
             ChildRecipes.Add(new IonBattery(), 2);

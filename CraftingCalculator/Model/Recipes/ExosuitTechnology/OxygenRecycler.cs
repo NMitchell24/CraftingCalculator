@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExosuitTechnology
         public OxygenRecycler()
         {
             Name = "Oxygen Recycler";
-            Type = "Life Support Module";
+            Type = RecipeFilterLabels.ExosuitTech;
             ChildRecipes.Add(new OxygenFilter(), 1);
         }
     }

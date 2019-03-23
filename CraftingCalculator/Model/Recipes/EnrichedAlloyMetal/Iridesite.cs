@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.EnrichedAlloyMetal
         public Iridesite()
         {
             Name = "Iridesite";
-            Type = "Enriched Alloy Metal";
+            Type = RecipeFilterLabels.EnrichedAlloyMetals;
             ChildRecipes.Add(new Aronium(), 1);
             ChildRecipes.Add(new MagnoGold(), 1);
             ChildRecipes.Add(new Grantine(), 1);

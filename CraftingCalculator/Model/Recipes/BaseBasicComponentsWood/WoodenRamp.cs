@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsWood
         public WoodenRamp()
         {
             Name = "Wooden Ramp";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsWood;
             Ingredients.Add(IngredientType.CARBON, 50);
             Ingredients.Add(IngredientType.PURE_FERRITE, 10);
         }

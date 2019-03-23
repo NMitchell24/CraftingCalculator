@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public PlasmaLauncher()
         {
             Name = "Plasma Launcher";
-            Type = "Multitool Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             ChildRecipes.Add(new SuperoxideCrystal(), 1);
         }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public LargeRocketTubes()
         {
             Name = "Large Rocket Tubes";
-            Type = "Starship Rocket Launcher Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
             ChildRecipes.Add(new UnstablePlasma(), 4);
         }

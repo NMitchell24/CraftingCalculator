@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public AnalysisVisor()
         {
             Name = "Analysis Visor";
-            Type = "Scanner Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             ChildRecipes.Add(new CarbonNanotubes(), 1);
         }
     }

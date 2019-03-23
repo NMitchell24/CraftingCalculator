@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public WarpCell()
         {
             Name = "Warp Cell";
-            Type = "Consumable (Hyperdrive Fuel)";
+            Type = RecipeFilterLabels.Consumables;
             ChildRecipes.Add(new AntimatterHousing(), 1);
             ChildRecipes.Add(new Antimatter(), 1);
         }

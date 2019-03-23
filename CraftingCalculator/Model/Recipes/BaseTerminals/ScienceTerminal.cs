@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseTerminals
         public ScienceTerminal()
         {
             Name = "Science Terminal";
-            Type = "Base Terminal";
+            Type = RecipeFilterLabels.BaseTerminals;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 40);
             Ingredients.Add(IngredientType.MAGNETISED_FERRITE, 25);
         }

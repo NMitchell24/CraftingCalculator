@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public Boltcaster()
         {
             Name = "Boltcaster";
-            Type = "Multitool Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 100);
             ChildRecipes.Add(new CarbonNanotubes(), 3);
         }

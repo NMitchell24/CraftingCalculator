@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.FreighterTechnology
         public FreighterWarpReactorSigma()
         {
             Name = "Freighter Warp Reactor Sigma";
-            Type = "Freighter Warp Module";
+            Type = RecipeFilterLabels.FreighterTech;
             Ingredients.Add(IngredientType.CADMIUM, 250);
             ChildRecipes.Add(new OxygenFilter(), 1);
             ChildRecipes.Add(new AntimatterHousing(), 4);

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public CadmiumDrive()
         {
             Name = "Cadmium Drive";
-            Type = "Hyperdrive Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 250);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
         }

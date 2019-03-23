@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ManufacturedGasProduct
         public Semiconductor()
         {
             Name = "Semiconductor";
-            Type = "Manufactured Gas Product";
+            Type = RecipeFilterLabels.ManufacturedGasProducts;
             ChildRecipes.Add(new ThermicCondensate(), 1);
             ChildRecipes.Add(new NitrogenSalt(), 1);
         }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStorage
         public CrateFabricator()
         {
             Name = "Crate Fabricator";
-            Type = "Base Storage";
+            Type = RecipeFilterLabels.BaseStorage;
             Ingredients.Add(IngredientType.IONISED_COBALT, 10);
             ChildRecipes.Add(new Antimatter(), 1);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public PavingDecoration()
         {
             Name = "Paving (Decoration)";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.PURE_FERRITE, 25);
         }
     }

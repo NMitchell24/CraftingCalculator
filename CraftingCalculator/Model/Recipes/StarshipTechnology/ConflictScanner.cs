@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public ConflictScanner()
         {
             Name = "Conflict Scanner";
-            Type = "Starship Scanner Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.WALKER_BRAIN, 1);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
         }

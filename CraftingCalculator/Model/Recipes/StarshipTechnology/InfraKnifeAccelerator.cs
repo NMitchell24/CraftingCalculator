@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public InfraKnifeAccelerator()
         {
             Name = "Infra-Knife Accelerator";
-            Type = "Starship Weapon Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.PHOSPHORUS, 200);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
         }

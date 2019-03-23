@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseEquipment
         public HazardProtectionUnit()
         {
             Name = "Hazard Protection Unit";
-            Type = "Base Equipment";
+            Type = RecipeFilterLabels.BaseEquipment;
             Ingredients.Add(IngredientType.IONISED_COBALT, 20);
             Ingredients.Add(IngredientType.PHOSPHORUS, 50);
             ChildRecipes.Add(new Microprocessor(), 1);

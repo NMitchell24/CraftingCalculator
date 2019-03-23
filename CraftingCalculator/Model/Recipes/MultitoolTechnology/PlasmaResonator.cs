@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public PlasmaResonator()
         {
             Name = "Plasma Resonator";
-            Type = "Mining Beam Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.PURE_FERRITE, 50);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AlloyMetal
         public Grantine()
         {
             Name = "Grantine";
-            Type = "Alloy Metal";
+            Type = RecipeFilterLabels.AlloyMetal;
             Ingredients.Add(IngredientType.IONISED_COBALT, 50);
             Ingredients.Add(IngredientType.DIOXITE, 50);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseStructures
         public CuboidRoomFoundationStrutQuad()
         {
             Name = "Cuboid Room Foundation Strut Quad";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseStructures;
             Ingredients.Add(IngredientType.PURE_FERRITE, 80);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ConcentratedDeposit
         public CarbonCrystal()
         {
             Name = "Carbon Crystal";
-            Type = "Concentrated Deposit";
+            Type = RecipeFilterLabels.ConcentratedDeposits;
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 150);
         }
     }

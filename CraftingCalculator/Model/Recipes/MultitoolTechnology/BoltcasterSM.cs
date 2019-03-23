@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public BoltcasterSM()
         {
             Name = "Boltcaster SM";
-            Type = "Boltcaster Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.PURE_FERRITE, 50);
         }
     }

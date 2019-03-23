@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public MetalWindowPanel()
         {
             Name = "Metal Window Panel";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 40);
             ChildRecipes.Add(new Glass(), 1);
         }

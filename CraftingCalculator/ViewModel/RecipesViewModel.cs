@@ -35,8 +35,11 @@ namespace CraftingCalculator.ViewModel
         {
             foreach(Recipe recipe in RecipesList.Where(x => x.IsSelected))
             {
-                // Add or adjust recipe quantity.
+                // Add the recipe or increase the quantity.
                 _recipeMap.Add(recipe, 1);
+                 
+                // need to deselect recipe so that the ListBox does not leave them selected when they are out of view.
+                recipe.IsSelected = false;
             }
 
             RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
@@ -44,6 +47,8 @@ namespace CraftingCalculator.ViewModel
             CalculateTotalIngredients();
 
             RaisePropertyChanged(nameof(RecipeQuantities));
+            RaisePropertyChanged(nameof(SelectedRecipe));
+            RaisePropertyChanged(nameof(RecipesList));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
@@ -65,6 +70,7 @@ namespace CraftingCalculator.ViewModel
             CalculateTotalIngredients();
 
             RaisePropertyChanged(nameof(RecipeQuantities));
+            RaisePropertyChanged(nameof(SelectedRecipe));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
@@ -112,6 +118,7 @@ namespace CraftingCalculator.ViewModel
 
             CalculateTotalIngredients();
             RaisePropertyChanged(nameof(RecipeQuantities));
+            RaisePropertyChanged(nameof(SelectedRecipe));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
@@ -139,7 +146,6 @@ namespace CraftingCalculator.ViewModel
             {
                 var selectedItems = RecipesList.Where(x => x.IsSelected).Count();
                 RaisePropertyChanged(nameof(SelectedRecipe));
-                RaisePropertyChanged(nameof(RecipesList));
                 AddRecipeCommand.RaiseCanExecuteChanged();
             }
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseBasicComponentsMetal
         public MetalHalfRamp()
         {
             Name = "Metal Half Ramp";
-            Type = "Base Building";
+            Type = RecipeFilterLabels.BaseComponentsMetal;
             Ingredients.Add(IngredientType.FERRITE_DUST, 25);
             Ingredients.Add(IngredientType.PURE_FERRITE, 5);
         }

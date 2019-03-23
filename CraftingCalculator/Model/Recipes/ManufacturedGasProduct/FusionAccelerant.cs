@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ManufacturedGasProduct
         public FusionAccelerant()
         {
             Name = "Fusion Accelerant";
-            Type = "Manufactured Gas Product";
+            Type = RecipeFilterLabels.ManufacturedGasProducts;
             ChildRecipes.Add(new OrganicCatalyst(), 1);
             ChildRecipes.Add(new NitrogenSalt(), 1);
         }

@@ -6,7 +6,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public LivingGlass()
         {
             Name = "Living Glass";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             ChildRecipes.Add(new Lubricant(), 1);
             ChildRecipes.Add(new Glass(), 5);
         }

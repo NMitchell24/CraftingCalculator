@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public StarshipLaunchFuel()
         {
             Name = "Starship Launch Fuel";
-            Type = "Consumable (Starship)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.DIHYDROGEN, 40);
             ChildRecipes.Add(new MetalPlating(), 1);
         }

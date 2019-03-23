@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseEquipment
         public BaseTeleportModule()
         {
             Name = "Base Teleport Module";
-            Type = "Base Equipment";
+            Type = RecipeFilterLabels.BaseEquipment;
             Ingredients.Add(IngredientType.IONISED_COBALT, 50);
             ChildRecipes.Add(new IonBattery(), 1);
         }

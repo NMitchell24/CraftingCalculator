@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public LifeSupportGel()
         {
             Name = "Life Support Gel";
-            Type = "Consumable";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.CARBON, 20);
             ChildRecipes.Add(new DihydrogenJelly(), 1);
         }

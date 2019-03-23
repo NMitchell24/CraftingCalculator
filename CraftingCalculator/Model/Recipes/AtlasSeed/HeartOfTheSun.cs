@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public HeartOfTheSun()
         {
             Name = "Heart of the Sun";
-            Type = "Atlas Seed";
+            Type = RecipeFilterLabels.AtlasSeed;
             Ingredients.Add(IngredientType.GOLD, 100);
             ChildRecipes.Add(new ModifiedQuanta(), 1);
         }

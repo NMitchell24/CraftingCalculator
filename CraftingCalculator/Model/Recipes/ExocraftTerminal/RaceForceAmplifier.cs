@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTerminal
         public RaceForceAmplifier()
         {
             Name = "Race Force Amplifier";
-            Type = "Exocraft Race Module";
+            Type = RecipeFilterLabels.ExocraftTerminals;
             ChildRecipes.Add(new MetalPlating(), 5);
             ChildRecipes.Add(new DihydrogenJelly(), 2);
         }

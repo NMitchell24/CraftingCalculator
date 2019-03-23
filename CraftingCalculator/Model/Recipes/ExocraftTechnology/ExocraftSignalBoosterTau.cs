@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.ExocraftTechnology
         public ExocraftSignalBoosterTau()
         {
             Name = "Exocraft Signal Booster Upgrade Tau";
-            Type = "Exocraft Scanner Module";
+            Type = RecipeFilterLabels.ExocraftTech;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 150);
             Ingredients.Add(IngredientType.GOLD, 50);
             ChildRecipes.Add(new IonBattery(), 2);

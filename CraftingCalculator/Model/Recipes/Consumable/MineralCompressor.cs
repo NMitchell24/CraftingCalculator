@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public MineralCompressor()
         {
             Name = "Mineral Compressor";
-            Type = "Consumable (Frigate)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.GOLD, 50);
             ChildRecipes.Add(new CobaltMirror(), 1);
         }

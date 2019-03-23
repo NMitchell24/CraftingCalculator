@@ -9,7 +9,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public AutonomousMiningUnit()
         {
             Name = "Autonomous Mining Unit";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             Ingredients.Add(IngredientType.URANIUM, 100);
             ChildRecipes.Add(new MetalPlating(), 2);
             ChildRecipes.Add(new AdvancedIonBattery(), 1);

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public WallFlag()
         {
             Name = "Wall Flag (All)";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.PURE_FERRITE, 5);
             Ingredients.Add(IngredientType.CARBON, 5);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public UnstableGel()
         {
             Name = "Unstable Gel";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             Ingredients.Add(IngredientType.CACTUS_FLESH, 200);
         }
     }

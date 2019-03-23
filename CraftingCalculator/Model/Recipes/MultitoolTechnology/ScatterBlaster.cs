@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnology
         public ScatterBlaster()
         {
             Name = "Scatter Blaster";
-            Type = "Multitool Module";
+            Type = RecipeFilterLabels.MultitoolTech;
             Ingredients.Add(IngredientType.PUGNEUM, 200);
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
         }

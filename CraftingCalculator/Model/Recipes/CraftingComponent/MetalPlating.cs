@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public MetalPlating()
         {
             Name = "Metal Plating";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.FERRITE_DUST, 50);
         }
     }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.HighlyRefinedTechnology
         public StasisDevice()
         {
             Name = "Stasis Device";
-            Type = "Highly Refined Technology";
+            Type = RecipeFilterLabels.HighlyRefinedTech;
             ChildRecipes.Add(new QuantumProcessor(), 1);
             ChildRecipes.Add(new CryogenicChamber(), 1);
             ChildRecipes.Add(new Iridesite(), 1);

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public SmallLanternLight()
         {
             Name = "Light (Small Lamp Style)";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.SODIUM, 5);
         }
     }

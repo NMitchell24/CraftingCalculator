@@ -7,8 +7,8 @@ namespace CraftingCalculator.Model.Recipes.AtlasSeed
         public NoosphericOrb()
         {
             Name = "Noospheric Orb";
-            Type = "Atlas Seed";
-            Ingredients.Add(IngredientType.IONISED_COBALT, 200);
+            Type = RecipeFilterLabels.AtlasSeed;
+            Ingredients.Add(IngredientType.IONISED_COBALT, 100);
             ChildRecipes.Add(new EnglobedShade(), 1);
         }
     }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public Antimatter()
         {
             Name = "Antimatter";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 25);
             Ingredients.Add(IngredientType.CONDENSED_CARBON, 20);
         }

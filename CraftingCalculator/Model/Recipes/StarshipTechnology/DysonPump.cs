@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public DysonPump()
         {
             Name = "Dyson Pump";
-            Type = "Starship Cyclotron Ballista Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
             ChildRecipes.Add(new TetraCobalt(), 3);
         }

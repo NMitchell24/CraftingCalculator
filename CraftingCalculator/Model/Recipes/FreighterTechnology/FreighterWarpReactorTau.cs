@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.FreighterTechnology
         public FreighterWarpReactorTau()
         {
             Name = "Freighter Warp Reactor Tau";
-            Type = "Freighter Warp Module";
+            Type = RecipeFilterLabels.FreighterTech;
             Ingredients.Add(IngredientType.EMERIL, 250);
             ChildRecipes.Add(new SodiumDiode(), 1);
             ChildRecipes.Add(new AntimatterHousing(), 5);

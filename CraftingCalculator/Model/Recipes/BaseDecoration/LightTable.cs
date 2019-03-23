@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.BaseDecoration
         public LightTable()
         {
             Name = "Light Table";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.BaseDecorations;
             Ingredients.Add(IngredientType.SODIUM, 10);
             Ingredients.Add(IngredientType.FERRITE_DUST, 10);
         }

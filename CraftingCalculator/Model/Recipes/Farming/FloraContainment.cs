@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public FloraContainment()
         {
             Name = "Flora Containment";
-            Type = "Base Decoration";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.CARBON, 15);
         }
     }

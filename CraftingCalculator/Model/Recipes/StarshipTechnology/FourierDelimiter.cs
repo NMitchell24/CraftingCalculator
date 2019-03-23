@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public FourierDelimiter()
         {
             Name = "Fourier De-limiter";
-            Type = "Starship Phase Beam Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 2);
             ChildRecipes.Add(new SaltRefractor(), 1);
         }

@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public StarBramble()
         {
             Name = "Star Bramble";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.STAR_BULB, 50);
             Ingredients.Add(IngredientType.PARAFFINIUM, 25);
         }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedCraftedProduct
         public QuantumProcessor()
         {
             Name = "Quantum Processor";
-            Type = "Advanced Crafted Product";
+            Type = RecipeFilterLabels.AdvancedCraftedProduct;
             ChildRecipes.Add(new CircuitBoard(), 1);
             ChildRecipes.Add(new Superconductor(), 1);
         }

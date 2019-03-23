@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public DihydrogenJelly()
         {
             Name = "Di-Hydrogen Jelly";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.DIHYDROGEN, 40);
         }
     }

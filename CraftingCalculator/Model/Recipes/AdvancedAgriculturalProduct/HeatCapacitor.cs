@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.AdvancedAgriculturalProduct
         public HeatCapacitor()
         {
             Name = "Heat Capacitor";
-            Type = "Advanced Agricultural Product";
+            Type = RecipeFilterLabels.AdvancedAgriculturalProduct;
             Ingredients.Add(IngredientType.FROST_CRYSTAL, 100);
             Ingredients.Add(IngredientType.SOLANIUM, 200);
         }

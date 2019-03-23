@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.PortableTechnology
         public SavePoint()
         {
             Name = "Save Point";
-            Type = "Portable Base Technology";
+            Type = RecipeFilterLabels.PortableTech;
             ChildRecipes.Add(new MetalPlating(), 2);
             ChildRecipes.Add(new DihydrogenJelly(), 1);
         }

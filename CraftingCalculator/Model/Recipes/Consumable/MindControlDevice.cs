@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.Consumable
         public MindControlDevice()
         {
             Name = "Mind Control Device";
-            Type = "Consumable (Frigate)";
+            Type = RecipeFilterLabels.Consumables;
             Ingredients.Add(IngredientType.GOLD, 50);
             ChildRecipes.Add(new SodiumDiode(), 1);
         }

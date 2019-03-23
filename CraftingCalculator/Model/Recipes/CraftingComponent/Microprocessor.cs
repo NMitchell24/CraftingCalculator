@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.CraftingComponent
         public Microprocessor()
         {
             Name = "Microprocessor";
-            Type = "Crafting Component";
+            Type = RecipeFilterLabels.CraftingComponents;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 40);
             ChildRecipes.Add(new CarbonNanotubes(), 1);
         }

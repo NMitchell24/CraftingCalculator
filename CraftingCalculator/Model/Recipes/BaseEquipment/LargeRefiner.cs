@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.BaseEquipment
         public LargeRefiner()
         {
             Name = "Large Refiner";
-            Type = "Base Equipment";
+            Type = RecipeFilterLabels.BaseEquipment;
             Ingredients.Add(IngredientType.CHROMATIC_METAL, 200);
             Ingredients.Add(IngredientType.SODIUM, 100);
             ChildRecipes.Add(new Microprocessor(), 5);

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.StarshipTechnology
         public EconomyScanner()
         {
             Name = "Economy Scanner";
-            Type = "Starship Scanner Module";
+            Type = RecipeFilterLabels.StarshipTech;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             ChildRecipes.Add(new Microprocessor(), 5);
         }

@@ -8,7 +8,7 @@ namespace CraftingCalculator.Model.Recipes.AccessCard
         public AtlasPass3()
         {
             Name = "Atlas Pass v3";
-            Type = "Access Card";
+            Type = RecipeFilterLabels.AccessCard;
             Ingredients.Add(IngredientType.EMERIL, 200);
             ChildRecipes.Add(new Microprocessor(), 1);
         }

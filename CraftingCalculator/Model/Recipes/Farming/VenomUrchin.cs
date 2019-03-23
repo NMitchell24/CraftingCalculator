@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Recipes.Farming
         public VenomUrchin()
         {
             Name = "Venom Urchin";
-            Type = "Farming (Plantable Seed)";
+            Type = RecipeFilterLabels.Farming;
             Ingredients.Add(IngredientType.EMERIL, 100);
             Ingredients.Add(IngredientType.IONISED_COBALT, 100);
         }
