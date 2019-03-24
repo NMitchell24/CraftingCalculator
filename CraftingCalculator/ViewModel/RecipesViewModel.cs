@@ -1,6 +1,7 @@
 ﻿using CraftingCalculator.Model.Ingredients;
 using CraftingCalculator.Model.Recipes;
 using CraftingCalculator.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -136,8 +137,8 @@ namespace CraftingCalculator.ViewModel
         {
             StringBuilder sb = new StringBuilder();
 
-            // TotalIngredients.ToList().ForEach(i => sb.AppendLine(i.DisplayName));
-            sb.Append(string.Join("\n", TotalIngredients.Select(i => i.DisplayName)));
+            var displayNames = TotalIngredients.Select(i => i.DisplayName);
+            sb.Append(string.Join(Environment.NewLine, displayNames));
 
             Clipboard.SetText(sb.ToString());
         }
