@@ -11,13 +11,14 @@
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         Dialog:DialogParticipation.Register="{Binding}"
         mc:Ignorable="d"
-        Title="NMS Crafting Calculator"
+        Title="Crafting Calculator"
         TitleCharacterCasing="Normal"
         Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
         Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
         Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
         Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
-        Topmost="{Binding IsTopMost, Mode=TwoWay}">
+        Topmost="{Binding IsTopMost, Mode=TwoWay}"
+        Icon="atom_512_0zL_icon.ico">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <ToggleButton Command="{Binding TopMostCommand}" ToolTip="Always on top">
