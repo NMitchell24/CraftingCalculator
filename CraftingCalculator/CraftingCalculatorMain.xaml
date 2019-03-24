@@ -28,7 +28,38 @@
             </ToggleButton>
         </Controls:WindowCommands>
     </Controls:MetroWindow.RightWindowCommands>
-    <Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Preferences">
+                <MenuItem Header="Theme">
+                    <MenuItem Header="Dark" Command="{Binding ChangeThemeCommand}" CommandParameter="Dark"/>
+                    <MenuItem Header="Light" Command="{Binding ChangeThemeCommand}" CommandParameter="Light"/>
+                </MenuItem>
+                <MenuItem Header="Accent">
+                    <MenuItem Header="Blue" Command="{Binding ChangeAccentCommand}" CommandParameter="Blue"/>
+                    <MenuItem Header="Green" Command="{Binding ChangeAccentCommand}" CommandParameter="Green"/>
+                    <MenuItem Header="Red" Command="{Binding ChangeAccentCommand}" CommandParameter="Red"/>
+                    <MenuItem Header="Yellow" Command="{Binding ChangeAccentCommand}" CommandParameter="Yellow"/>
+                    <MenuItem Header="Orange" Command="{Binding ChangeAccentCommand}" CommandParameter="Orange"/>
+                    <MenuItem Header="Purple" Command="{Binding ChangeAccentCommand}" CommandParameter="Purple"/>
+                    <MenuItem Header="Pink" Command="{Binding ChangeAccentCommand}" CommandParameter="Pink"/>
+                    <MenuItem Header="Steel" Command="{Binding ChangeAccentCommand}" CommandParameter="Steel"/>
+                    <MenuItem Header="Olive" Command="{Binding ChangeAccentCommand}" CommandParameter="Olive"/>
+                    <MenuItem Header="Teal" Command="{Binding ChangeAccentCommand}" CommandParameter="Teal"/>
+                    <MenuItem Header="Magenta" Command="{Binding ChangeAccentCommand}" CommandParameter="Magenta"/>
+                    <MenuItem Header="Lime" Command="{Binding ChangeAccentCommand}" CommandParameter="Lime"/>
+                    <MenuItem Header="Emerald" Command="{Binding ChangeAccentCommand}" CommandParameter="Emerald"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Reset Preferences" Command="{Binding ResetSettingsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About"/>
+            </MenuItem>
+        </Menu>
         <views:RecipesView x:Name="RecipesViewControl" />
-    </Grid>
+    </DockPanel>
 </Controls:MetroWindow>

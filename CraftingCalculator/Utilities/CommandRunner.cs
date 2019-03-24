@@ -5,15 +5,15 @@ namespace CraftingCalculator.Utilities
 {
     public class CommandRunner : ICommand
     {
-        Action _TargetExecuteMethod;
-        Func<bool> _TargetCanExecuteMethod;
+        private Action<object> _TargetExecuteMethod;
+        private Func<bool> _TargetCanExecuteMethod;
 
-        public CommandRunner(Action executeMethod)
+        public CommandRunner(Action<object> executeMethod)
         {
             _TargetExecuteMethod = executeMethod;
         }
 
-        public CommandRunner(Action executeMethod, Func<bool> canExecuteMethod)
+        public CommandRunner(Action<object> executeMethod, Func<bool> canExecuteMethod)
         {
             _TargetExecuteMethod = executeMethod;
             _TargetCanExecuteMethod = canExecuteMethod;
@@ -44,7 +44,7 @@ namespace CraftingCalculator.Utilities
 
         void ICommand.Execute(object parameter)
         {
-            _TargetExecuteMethod?.Invoke();
+            _TargetExecuteMethod?.Invoke(parameter);
         }
 
     }

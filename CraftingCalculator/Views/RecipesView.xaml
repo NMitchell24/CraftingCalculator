@@ -12,7 +12,7 @@
              d:DesignHeight="900" d:DesignWidth="1200">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="0.05"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
@@ -21,7 +21,7 @@
             <RowDefinition Height="0.05*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="0.05*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
@@ -29,31 +29,20 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="0.05*"/>
         </Grid.ColumnDefinitions>
 
-        <!--Menubar-->
-        <Menu Grid.Row="0" Grid.ColumnSpan="9">
-            <MenuItem Header="File">
-                <MenuItem Header="Exit"/>
-            </MenuItem>
-            <MenuItem Header="Preferences">
-                <MenuItem Header="Theme">
-                    <MenuItem Header="Dark"/>
-                    <MenuItem Header="Light"/>
-                </MenuItem>
-            </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Header="About"/>
-            </MenuItem>
-        </Menu>
-        
         <!--Filter Recipes By-->
-        <iconPacks:PackIconMaterialDesign Kind="FilterList" Grid.Row="1" Grid.Column="1" Margin="0,0,5,0" 
-                                          VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBlock Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" TextWrapping="Wrap" 
-                   HorizontalAlignment="Left" VerticalAlignment="Center" 
-                   Text="Filter Recipes By" FontWeight="Bold"/>
+        <Grid Grid.Row="1" Grid.Column="1" Margin="5,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" TextWrapping="Wrap"
+                       HorizontalAlignment="Left" VerticalAlignment="Center" 
+                       Text="Filter Recipes By" FontWeight="Bold"/>
+            <iconPacks:PackIconMaterialDesign Kind="FilterList" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        </Grid>
         <ComboBox x:Name="recipeFilters" ItemsSource="{Binding Path = RecipeFilters}" SelectedItem="{Binding SelectedFilter}"
                   Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" >
             <ComboBox.ItemTemplate>
@@ -78,7 +67,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
             <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
                     <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
                 </Style>
             </ListBox.ItemContainerStyle>
@@ -128,7 +117,7 @@
                 HorizontalAlignment="Right"
                 Margin="0,0,5,0" 
                 Padding="0"
-                VerticalAlignment="Top" 
+                VerticalAlignment="Center" 
                 Width="50"
                 Height="20" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
@@ -179,11 +168,11 @@
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
+            <ListBox.Resources>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
                     <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}" />
                 </Style>
-            </ListBox.ItemContainerStyle>
+            </ListBox.Resources>
             <ListBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Remove" Command="{Binding RemoveRecipeCommand}">
@@ -219,14 +208,14 @@
         <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="0.93*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
-            <Button Command="{Binding CopyIngredientsCommand}" Grid.Column="1" HorizontalAlignment="Right" ToolTip="Copy ingredient totals to clipboard" Margin="0,0,5,0">
+            <Button Command="{Binding CopyIngredientsCommand}" Grid.Column="1" HorizontalAlignment="Right" ToolTip="Copy ingredient totals to clipboard" Margin="0,0,5,0" Height="30">
                 <StackPanel>
                     <iconPacks:PackIconMaterialDesign Kind="ContentCopy"/>
                 </StackPanel>
