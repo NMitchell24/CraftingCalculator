@@ -13,16 +13,17 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CraftingCalculator
+namespace CraftingCalculator.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for RecipesView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class RecipesView : UserControl
     {
-        public MainWindow()
+        public RecipesView()
         {
             InitializeComponent();
+            this.DataContext = new ViewModel.RecipesViewModel();
         }
     }
 }

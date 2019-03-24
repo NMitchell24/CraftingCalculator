@@ -1,0 +1,68 @@
+﻿<Controls:MetroWindow x:Class="CraftingCalculator.CraftingCalculatorMainWindow"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CraftingCalculator"
+        xmlns:views="clr-namespace:CraftingCalculator.Views"
+        xmlns:p="clr-namespace:CraftingCalculator.Properties"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        Dialog:DialogParticipation.Register="{Binding}"
+        mc:Ignorable="d"
+        Title="Crafting Calculator"
+        TitleCharacterCasing="Normal"
+        Height="{Binding Source={x:Static p:Settings.Default}, Path=Height, Mode=TwoWay}"
+        Width="{Binding Source={x:Static p:Settings.Default}, Path=Width, Mode=TwoWay}"
+        Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
+        Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
+        Topmost="{Binding IsTopMost, Mode=TwoWay}"
+        Icon="atom_512_0zL_icon.ico">
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <ToggleButton Command="{Binding TopMostCommand}" ToolTip="Always on top">
+                <Rectangle Width="18" Height="18"
+                           Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Uniform" Visual="{iconPacks:MaterialDesign Kind=Lock}"/>
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </ToggleButton>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Preferences">
+                <MenuItem Header="Theme">
+                    <MenuItem Header="Dark" Command="{Binding ChangeThemeCommand}" CommandParameter="Dark"/>
+                    <MenuItem Header="Light" Command="{Binding ChangeThemeCommand}" CommandParameter="Light"/>
+                </MenuItem>
+                <MenuItem Header="Accent">
+                    <MenuItem Header="Blue" Command="{Binding ChangeAccentCommand}" CommandParameter="Blue"/>
+                    <MenuItem Header="Green" Command="{Binding ChangeAccentCommand}" CommandParameter="Green"/>
+                    <MenuItem Header="Red" Command="{Binding ChangeAccentCommand}" CommandParameter="Red"/>
+                    <MenuItem Header="Yellow" Command="{Binding ChangeAccentCommand}" CommandParameter="Yellow"/>
+                    <MenuItem Header="Orange" Command="{Binding ChangeAccentCommand}" CommandParameter="Orange"/>
+                    <MenuItem Header="Purple" Command="{Binding ChangeAccentCommand}" CommandParameter="Purple"/>
+                    <MenuItem Header="Pink" Command="{Binding ChangeAccentCommand}" CommandParameter="Pink"/>
+                    <MenuItem Header="Steel" Command="{Binding ChangeAccentCommand}" CommandParameter="Steel"/>
+                    <MenuItem Header="Olive" Command="{Binding ChangeAccentCommand}" CommandParameter="Olive"/>
+                    <MenuItem Header="Teal" Command="{Binding ChangeAccentCommand}" CommandParameter="Teal"/>
+                    <MenuItem Header="Magenta" Command="{Binding ChangeAccentCommand}" CommandParameter="Magenta"/>
+                    <MenuItem Header="Lime" Command="{Binding ChangeAccentCommand}" CommandParameter="Lime"/>
+                    <MenuItem Header="Emerald" Command="{Binding ChangeAccentCommand}" CommandParameter="Emerald"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Reset Preferences" Command="{Binding ResetSettingsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About" Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+        <views:RecipesView x:Name="RecipesViewControl" />
+    </DockPanel>
+</Controls:MetroWindow>

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Costura.Fody.3.3.3\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.3.3.3\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -14,6 +15,23 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,9 +52,30 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>atom_512_0zL_icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ControlzEx, Version=3.0.2.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.3.0.2.4\lib\net45\ControlzEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Costura, Version=3.3.3.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Costura.Fody.3.3.3\lib\net40\Costura.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net46\MahApps.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.MaterialDesign.3.0.0-alpha0134\lib\net46\MahApps.Metro.IconPacks.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.MaterialDesign, Version=3.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.MaterialDesign.3.0.0-alpha0134\lib\net46\MahApps.Metro.IconPacks.MaterialDesign.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.3.0.2.4\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -55,7 +94,363 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Model\Ingredients\IngredientMap.cs" />
+    <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
+    <Compile Include="Model\Ingredients\IngredientType.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\Acid.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\CircuitBoard.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\HeatCapacitor.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\LiquidExplosive.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\PolyFibre.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\UnstableGel.cs" />
+    <Compile Include="Model\Recipes\AdvancedCraftedProduct\CryogenicChamber.cs" />
+    <Compile Include="Model\Recipes\AdvancedCraftedProduct\PortableReactor.cs" />
+    <Compile Include="Model\Recipes\AdvancedCraftedProduct\QuantumProcessor.cs" />
+    <Compile Include="Model\Recipes\AlloyMetal\Aronium.cs" />
+    <Compile Include="Model\Recipes\AlloyMetal\DirtyBronze.cs" />
+    <Compile Include="Model\Recipes\AlloyMetal\Grantine.cs" />
+    <Compile Include="Model\Recipes\AlloyMetal\Herox.cs" />
+    <Compile Include="Model\Recipes\AlloyMetal\Lemmium.cs" />
+    <Compile Include="Model\Recipes\AlloyMetal\MagnoGold.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\DeepwaterChamber.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\GlassTunnel.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\LShapedGlassTunnel.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\MoonpoolFloor.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\SquareDeepwaterChamber.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\TShapedGlassTunnel.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\VerticalGlassTunnel.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\WatertightDoor.cs" />
+    <Compile Include="Model\Recipes\BaseAquaticConstruction\XShapedGlassTunnel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteArch.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteDoorFrame.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteDoorway.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteFloorPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteFramedGlassPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteFrontage.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteHalfArch.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteHalfRamp.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteRamp.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteRoof.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteRoofCorner.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteRoofPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ConcreteWindowPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ShortConcreteWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\SlopingConcretePanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\SmallConcretePanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\SmallConcreteWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsConcrete\ThinConcreteWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalArch.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalDoorFrame.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalDoorPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalDoorway.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalFramedGlassPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalFrontage.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalHalfArch.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalHalfRamp.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalRamp.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalRoof.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalRoofCorner.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalRoofPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\MetalWindowPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\ShortMetalWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\SlopingMetalPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\SmallMetalPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\SmallMetalWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsMetal\ThinMetalWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\ShortWoodenWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\SlopingWoodPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\SmallWoodenWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\SmallWoodPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\ThinWoodenWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenArch.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenDoorFrame.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenDoorway.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenFrontage.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenHalfArch.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenHalfRamp.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenRamp.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenRoof.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenRoofCorner.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenRoofPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenWall.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodenWindowPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodFloorPanel.cs" />
+    <Compile Include="Model\Recipes\BaseBasicComponentsWood\WoodFramedGlassPanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Bed.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CanisterRack.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CeilingLight.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CeilingPanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Chair.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\ColouredLight.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CornerSofa.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Cube.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CuboidRoofCap.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CurvedDesk.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\CurvedPipe.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Cylinder.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Decal.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Drawers.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Flag.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\FlatPanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\FloorMat.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\LabLamp.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\LargeMonitorStation.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\LargeWedge.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\LightTable.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Locker.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\MonitorStation.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\OctaCabinet.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Oscilloscope.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\PavingDecoration.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Pipe.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Pyramid.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\RoboticArm.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Server.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\ShelfPanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\SidePanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\SimpleDesk.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\SmallLanternLight.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\SmallWedge.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Sofa.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Sphere.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\StandingLight.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\StoragePanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\SweptSofa.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Table.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\TallCabinet.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\TechPanel.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\WallFan.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\ColouredWallScreen.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\WallFlag.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\WallScreen.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\WallUnit.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\WeaponRack.cs" />
+    <Compile Include="Model\Recipes\BaseDecoration\Worktop.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\BaseSalvageCapsule.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\BaseTeleportModule.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\GalacticTradeTerminal.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\HazardProtectionUnit.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\HealthStation.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\LandingPad.cs" />
+    <Compile Include="Model\Recipes\BaseEquipment\LargeRefiner.cs" />
+    <Compile Include="Model\Recipes\BaseStorage\BarrelFabricator.cs" />
+    <Compile Include="Model\Recipes\BaseStorage\CrateFabricator.cs" />
+    <Compile Include="Model\Recipes\BaseStorage\LockedCrate.cs" />
+    <Compile Include="Model\Recipes\BaseStorage\SmallCrate.cs" />
+    <Compile Include="Model\Recipes\BaseStorage\StorageContainer.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\AccessRamp.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\BaseLargeGlassPanel.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\BaseWindowLargeSquare.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\BaseWindowSectionedRect.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\BaseWindowSmallPortal.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\BaseWindowSmallRectangle.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\BioDome.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidInnerDoor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidInnerWall.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidRoom.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidRoomFlooring.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidRoomFoundationStrut.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidRoomFoundationStrutQuad.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CuboidRoomFrame.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CurvedCorridor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CurvedCuboidRoof.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CurvedCuboidWall.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CylindricalRoom.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\CylindricalRoomFrame.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\Door.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\Foundation.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\GlassCuboidRoom.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\GlassRoofedCorridor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\HoloDoor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\InfrastructureLadder.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\InteriorStairs.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\Ladder.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\LShapedCorridor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\Paving.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\SolidCube.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\SquareRoom.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\StraightCorridor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\TShapedCorridor.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\ViewingSphere.cs" />
+    <Compile Include="Model\Recipes\BaseStructures\XShapedCorridor.cs" />
+    <Compile Include="Model\Recipes\BaseTerminals\AgriculturalTerminal.cs" />
+    <Compile Include="Model\Recipes\BaseTerminals\ConstructionTerminal.cs" />
+    <Compile Include="Model\Recipes\BaseTerminals\ExocraftTerminal.cs" />
+    <Compile Include="Model\Recipes\BaseTerminals\ScienceTerminal.cs" />
+    <Compile Include="Model\Recipes\BaseTerminals\WeaponsTerminal.cs" />
+    <Compile Include="Model\Recipes\Consumable\AdvancedIonBattery.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\Antimatter.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\AntimatterHousing.cs" />
+    <Compile Include="Model\Recipes\AccessCard\AtlasPass1.cs" />
+    <Compile Include="Model\Recipes\AccessCard\AtlasPass2.cs" />
+    <Compile Include="Model\Recipes\AccessCard\AtlasPass3.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\CapturedNanode.cs" />
+    <Compile Include="Model\Recipes\ConcentratedDeposit\CarbonCrystal.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\CarbonNanotubes.cs" />
+    <Compile Include="Model\Recipes\ConcentratedDeposit\ChlorideLattice.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\CobaltMirror.cs" />
+    <Compile Include="Model\Recipes\ComplexRecipe.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\DarkMatter.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\DawnsEnd.cs" />
+    <Compile Include="Model\Recipes\ConcentratedDeposit\DestabalisedSodium.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\DihydrogenJelly.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\EnglobedShade.cs" />
+    <Compile Include="Model\Recipes\Consumable\ExplosiveDrones.cs" />
+    <Compile Include="Model\Recipes\Consumable\FrigateFuel100.cs" />
+    <Compile Include="Model\Recipes\Consumable\FrigateFuel200.cs" />
+    <Compile Include="Model\Recipes\Consumable\FrigateFuel50.cs" />
+    <Compile Include="Model\Recipes\Consumable\FuelOxidiser.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\Glass.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\HeartOfTheSun.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\HermeticSeal.cs" />
+    <Compile Include="Model\Recipes\Consumable\HolographicAnalyser.cs" />
+    <Compile Include="Model\Recipes\Consumable\HydrothermalFuelCell.cs" />
+    <Compile Include="Model\Recipes\Consumable\IonBattery.cs" />
+    <Compile Include="Model\Recipes\Consumable\LifeSupportGel.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\LivingGlass.cs" />
+    <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\Lubricant.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\MetalPlating.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\Microprocessor.cs" />
+    <Compile Include="Model\Recipes\AdvancedCraftedProduct\MindArc.cs" />
+    <Compile Include="Model\Recipes\Consumable\MindControlDevice.cs" />
+    <Compile Include="Model\Recipes\Consumable\MineralCompressor.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\ModifiedQuanta.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\NoosphericOrb.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\NovaeReclaiment.cs" />
+    <Compile Include="Model\Recipes\Consumable\OxygenCapsule.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\OxygenFilter.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\PhoticJade.cs" />
+    <Compile Include="Model\Recipes\Consumable\ProjectileAmmunition.cs" />
+    <Compile Include="Model\Recipes\ConcentratedDeposit\RareMetalElement.cs" />
+    <Compile Include="Model\Recipes\EnhancedGasProduct\EnrichedCarbon.cs" />
+    <Compile Include="Model\Recipes\EnhancedGasProduct\NitrogenSalt.cs" />
+    <Compile Include="Model\Recipes\EnhancedGasProduct\ThermicCondensate.cs" />
+    <Compile Include="Model\Recipes\EnrichedAlloyMetal\Geodesite.cs" />
+    <Compile Include="Model\Recipes\EnrichedAlloyMetal\Iridesite.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftAccelerationModule.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftMountedCannon.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftSignalBoosterSigma.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftSignalBoosterTau.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\ColossusGeobay.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\ExocraftSummoningStation.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\NautilonChamber.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\NomadGeobay.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\PilgrimGeobay.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\RaceForceAmplifier.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\RaceInitiator.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\RaceObstacle.cs" />
+    <Compile Include="Model\Recipes\ExocraftTerminal\RoamerGeobay.cs" />
+    <Compile Include="Model\Recipes\Farming\AlbumenPearlOrb.cs" />
+    <Compile Include="Model\Recipes\Farming\CopriteFlower.cs" />
+    <Compile Include="Model\Recipes\Farming\Echinocactus.cs" />
+    <Compile Include="Model\Recipes\Farming\FloraContainment.cs" />
+    <Compile Include="Model\Recipes\Farming\Frostwort.cs" />
+    <Compile Include="Model\Recipes\Farming\FungalCluster.cs" />
+    <Compile Include="Model\Recipes\Farming\GammaWeed.cs" />
+    <Compile Include="Model\Recipes\Farming\GravatinoHost.cs" />
+    <Compile Include="Model\Recipes\Farming\HydroponicTray.cs" />
+    <Compile Include="Model\Recipes\Farming\LargeHydroponicTray.cs" />
+    <Compile Include="Model\Recipes\Farming\MorditeRoot.cs" />
+    <Compile Include="Model\Recipes\Farming\PottedPlant.cs" />
+    <Compile Include="Model\Recipes\Farming\SolarVine.cs" />
+    <Compile Include="Model\Recipes\Farming\StandingPlanter.cs" />
+    <Compile Include="Model\Recipes\Farming\StarBramble.cs" />
+    <Compile Include="Model\Recipes\Farming\VenomUrchin.cs" />
+    <Compile Include="Model\Recipes\FreighterTechnology\FreighterWarpReactorSigma.cs" />
+    <Compile Include="Model\Recipes\FreighterTechnology\FreighterWarpReactorTau.cs" />
+    <Compile Include="Model\Recipes\FreighterTechnology\FreighterWarpReactorTheta.cs" />
+    <Compile Include="Model\Recipes\HighlyRefinedTechnology\FusionIgnitor.cs" />
+    <Compile Include="Model\Recipes\HighlyRefinedTechnology\StasisDevice.cs" />
+    <Compile Include="Model\Recipes\ManufacturedGasProduct\CryoPump.cs" />
+    <Compile Include="Model\Recipes\ManufacturedGasProduct\FusionAccelerant.cs" />
+    <Compile Include="Model\Recipes\ManufacturedGasProduct\HotIce.cs" />
+    <Compile Include="Model\Recipes\ManufacturedGasProduct\OrganicCatalyst.cs" />
+    <Compile Include="Model\Recipes\ManufacturedGasProduct\Semiconductor.cs" />
+    <Compile Include="Model\Recipes\ManufacturedGasProduct\Superconductor.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\BlazeJavelin.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\Boltcaster.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\CombatScope.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\GeologyCannon.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\PersonalForcefield.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\PlasmaLauncher.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\PulseSplitter.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\Scanner.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\ScatterBlaster.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\TerrainManipulator.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\AtmosphereHarvester.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\AutonomousMiningUnit.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\BaseComputer.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\Beacon.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\BlueprintAnalyser.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\CommunicationStation.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\MarineShelter.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\PortableRefiner.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\SavePoint.cs" />
+    <Compile Include="Model\Recipes\PortableTechnology\SignalBooster.cs" />
+    <Compile Include="Model\Recipes\RecipeFilter.cs" />
+    <Compile Include="Model\Recipes\RecipeFilterLabels.cs" />
+    <Compile Include="Model\Recipes\RecipeMap.cs" />
+    <Compile Include="Model\Recipes\RecipeQuantity.cs" />
+    <Compile Include="Model\Recipes\RecipeTree.cs" />
+    <Compile Include="Model\Recipes\RecipeType.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\AblativeArmour.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\AdvancedMiningLaser.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\AmplifiedCartridges.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\AnalysisVisor.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\BarrelIoniser.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\BoltcasterSM.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\CadmiumDrive.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\ConflictScanner.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\CyclotronBallista.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\DysonPump.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\EfficientWaterJets.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\EconomyScanner.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\EfficientThrusters.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\EmerilDrive.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftMiningLaser.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftMiningLaserSigma.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\FourierDelimiter.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\FragmentSupercharger.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\HazMatGauntlet.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\IndiumDrive.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\MassAccelerator.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\NeuralStimulator.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\InfraKnifeAccelerator.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\LargeRocketTubes.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\NonlinearOptics.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\OxygenRecycler.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\OxygenRerouter.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\PlasmaResonator.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\RocketBoots.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\ShellGreaser.cs" />
+    <Compile Include="Model\Recipes\ExosuitTechnology\ShieldLattice.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnology\WaveformRecycler.cs" />
+    <Compile Include="Model\Recipes\Recipe.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\SaltRefractor.cs" />
+    <Compile Include="Model\Recipes\CraftingComponent\SodiumDiode.cs" />
+    <Compile Include="Model\Recipes\Consumable\StarshipLaunchFuel.cs" />
+    <Compile Include="Model\Recipes\AtlasSeed\StatePhasure.cs" />
+    <Compile Include="Model\Recipes\ConcentratedDeposit\SuperoxideCrystal.cs" />
+    <Compile Include="Model\Recipes\ConcentratedDeposit\TetraCobalt.cs" />
+    <Compile Include="Model\Recipes\Consumable\UnstablePlasma.cs" />
+    <Compile Include="Model\Recipes\Consumable\WarpCell.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\NonLinearOpticsIKA.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\PhaseBeam.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\PositronEjector.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\RocketLauncher.cs" />
+    <Compile Include="Model\Recipes\StarshipTechnology\TeleportReceiver.cs" />
+    <Compile Include="Utilities\CommandRunner.cs" />
+    <Compile Include="Utilities\IngredientUtil.cs" />
+    <Compile Include="Utilities\RecipeUtil.cs" />
+    <Compile Include="Utilities\ReflectionUtil.cs" />
+    <Compile Include="ViewModel\CraftingCalculatorMainViewModel.cs" />
+    <Compile Include="ViewModel\RecipesViewModel.cs" />
+    <Compile Include="Views\RecipesView.xaml.cs">
+      <DependentUpon>RecipesView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="CraftingCalculatorMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -63,10 +458,22 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="CraftingCalculatorMain.xaml.cs">
+      <DependentUpon>CraftingCalculatorMain.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Resources\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\IconsNonShared.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\RecipesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -86,13 +493,46 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\Entypo.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WindowsIcons-license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Entypo-license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="atom_512_0zL_icon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Fody.4.0.2\build\Fody.targets" Condition="Exists('..\packages\Fody.4.0.2\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.4.0.2\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.4.0.2\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.3.3.3\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.3.3\build\Costura.Fody.props'))" />
+  </Target>
 </Project>
