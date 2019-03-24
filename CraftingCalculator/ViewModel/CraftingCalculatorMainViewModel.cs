@@ -1,5 +1,8 @@
 ﻿using CraftingCalculator.Utilities;
+using MahApps.Metro;
+using System;
 using System.ComponentModel;
+using System.Windows;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -7,6 +10,8 @@ namespace CraftingCalculator.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public CommandRunner TopMostCommand { get; set; }
+        public CommandRunner ChangeThemeCommand { get; set; }
+        public CommandRunner ChangeAccentCommand { get; set; }
 
         private bool _isTopMost;
         public bool IsTopMost
@@ -15,16 +20,42 @@ namespace CraftingCalculator.ViewModel
             set
             {
                 _isTopMost = value;
-                RaisePropertyChanged("IsTopMost");
+                RaisePropertyChanged(nameof(IsTopMost));
             }
         }
 
         public CraftingCalculatorMainViewModel()
         {
             TopMostCommand = new CommandRunner(ToggleTopMost);
+            ChangeThemeCommand = new CommandRunner(ChangeTheme);
+            ChangeAccentCommand = new CommandRunner(ChangeAccent);
+
+            ChangeTheme(Properties.Settings.Default["Theme"]);
         }
 
-        private void ToggleTopMost()
+        private void ChangeTheme(object obj)
+        {
+            string accent = Properties.Settings.Default["Accent"].ToString();
+
+            ThemeManager.ChangeAppStyle(Application.Current,
+                       ThemeManager.GetAccent(accent),
+                       ThemeManager.GetAppTheme($"Base{obj}"));
+
+            Properties.Settings.Default["Theme"] = obj;
+        }
+
+        private void ChangeAccent(object obj)
+        {
+            string theme = $"Base{Properties.Settings.Default["Theme"]}";
+
+            ThemeManager.ChangeAppStyle(Application.Current,
+                       ThemeManager.GetAccent(obj as string),
+                       ThemeManager.GetAppTheme(theme));
+
+            Properties.Settings.Default["Accent"] = obj;
+        }
+
+        private void ToggleTopMost(object obj)
         {
             IsTopMost = !IsTopMost;
         }
