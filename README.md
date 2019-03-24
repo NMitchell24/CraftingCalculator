@@ -1,37 +1,12 @@
-## Welcome to GitHub Pages
+## Crafting Calculator
 
-You can use the [editor on GitHub](https://github.com/NMitchell24/CraftingCalculator/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Calculate total ingredients needed to craft any combination of recipes.  Current app version 1.0.0.0 is designed to work with [No Man's Sky](https://www.nomanssky.com/), and is distributed as a standalone Windows executable (No install required)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### What does it do?
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/NMitchell24/CraftingCalculator/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+- Contains almost all recipes from the base game.  (Items purchased with Quicksilver are currently not included)
+- Allows you to adjust the crafting quantity from 1 - 500.
+- Calcluates the totals for each recipe and displays the ingredients including all components.
+- Displays the total ingredients required to craft all recipes.
+- Allows you to copy the total ingredients to the clipboard
+- Supports Light and Dark themes with various accent colors.  
