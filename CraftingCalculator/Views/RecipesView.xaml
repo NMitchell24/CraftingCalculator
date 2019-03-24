@@ -67,7 +67,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
             <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
                     <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
                 </Style>
             </ListBox.ItemContainerStyle>
@@ -168,11 +168,11 @@
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
+            <ListBox.Resources>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
                     <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}" />
                 </Style>
-            </ListBox.ItemContainerStyle>
+            </ListBox.Resources>
             <ListBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Remove" Command="{Binding RemoveRecipeCommand}">
