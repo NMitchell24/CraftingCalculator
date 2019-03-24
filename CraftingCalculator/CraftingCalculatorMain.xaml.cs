@@ -1,4 +1,5 @@
 ﻿using CraftingCalculator.ViewModel;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace CraftingCalculator
 {
@@ -10,7 +11,7 @@ namespace CraftingCalculator
         public CraftingCalculatorMainWindow()
         {
             InitializeComponent();
-            CraftingCalculatorMainViewModel vm = new CraftingCalculatorMainViewModel();
+            CraftingCalculatorMainViewModel vm = new CraftingCalculatorMainViewModel(DialogCoordinator.Instance);
             DataContext = vm;
             Closing += vm.OnWindowClosing;
         }
