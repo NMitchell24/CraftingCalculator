@@ -18,6 +18,7 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner ChangeAccentCommand { get; set; }
         public CommandRunner ResetSettingsCommand { get; private set; }
         public CommandRunner AboutCommand { get; set; }
+        public CommandRunner ExitCommand { get; set; }
         private bool _doClose;
 
         private bool _isTopMost;
@@ -38,6 +39,7 @@ namespace CraftingCalculator.ViewModel
             ChangeAccentCommand = new CommandRunner(ChangeAccent);
             ResetSettingsCommand = new CommandRunner(ResetSettings);
             AboutCommand = new CommandRunner(ShowAboutDialog);
+            ExitCommand = new CommandRunner(Close);
             
             dialogCoordinator = instance;
 
@@ -118,6 +120,11 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
+        private void Close(object obj)
+        {
+            Application.Current.MainWindow.Close();
+        }
+
         /// <summary>
         /// Shows dialogue with Application Information.
         /// </summary>
@@ -143,10 +150,13 @@ namespace CraftingCalculator.ViewModel
             sb.AppendLine("This program is distributed in the hope that it will be useful, " +
                 "but WITHOUT ANY WARRANTY; without even the implied warranty of " +
                 "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the " +
-                "GNU General Public License for more details.");     
+                "GNU General Public License for more details.");
+            sb.Append(Environment.NewLine);
+            sb.AppendLine("Crafting Calculator was brought to you by the color clear, " +
+                "the number 0 and was made possible with contributions from BlendedAptness");
 
             //Show the dialog
-            await dialogCoordinator.ShowMessageAsync(this, "About Crafting Calculator", sb.ToString());
+            await dialogCoordinator.ShowMessageAsync(this, "About", sb.ToString());
         }
 
         private void RaisePropertyChanged(string property)
