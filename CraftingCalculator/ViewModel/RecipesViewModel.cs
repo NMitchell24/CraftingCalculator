@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using CraftingCalculator.Model.Ingredients;
+using CraftingCalculator.Model.Recipes;
+using CraftingCalculator.Utilities;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using CraftingCalculator.Utilities;
-using CraftingCalculator.Model.Recipes;
-using CraftingCalculator.Model.Ingredients;
 using System.Linq;
-using System.Windows;
 using System.Text;
+using System.Windows;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -136,7 +136,8 @@ namespace CraftingCalculator.ViewModel
         {
             StringBuilder sb = new StringBuilder();
 
-            TotalIngredients.Select(i => sb.AppendLine(i.DisplayName));
+            // TotalIngredients.ToList().ForEach(i => sb.AppendLine(i.DisplayName));
+            sb.Append(string.Join("\n", TotalIngredients.Select(i => i.DisplayName)));
 
             Clipboard.SetText(sb.ToString());
         }
