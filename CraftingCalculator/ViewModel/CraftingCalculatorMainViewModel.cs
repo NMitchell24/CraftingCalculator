@@ -18,6 +18,7 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner ChangeAccentCommand { get; set; }
         public CommandRunner ResetSettingsCommand { get; private set; }
         public CommandRunner AboutCommand { get; set; }
+        private bool _doClose;
 
         private bool _isTopMost;
         public bool IsTopMost
@@ -96,16 +97,25 @@ namespace CraftingCalculator.ViewModel
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnWindowClosing(object sender, CancelEventArgs e)
+        public async void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            //var result = MessageBox.Show("Are you sure you want to quit?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            //if (result == MessageBoxResult.No)
-            //{
-            //    e.Cancel = true;
-            //}
-
             Properties.Settings.Default.Save();
+
+            e.Cancel = !_doClose;
+            if (_doClose) return;
+
+            var _settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
+            var _result = await dialogCoordinator.ShowMessageAsync(this, "Confirm", 
+                "Are you sure you want to exit?", 
+                MessageDialogStyle.AffirmativeAndNegative, 
+                _settings);
+
+            _doClose = _result == MessageDialogResult.Affirmative;
+
+            if (_doClose)
+            {
+                Application.Current.Shutdown();
+            }
         }
 
         /// <summary>
