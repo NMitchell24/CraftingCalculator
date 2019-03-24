@@ -226,7 +226,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
-            <Button Grid.Column="1" HorizontalAlignment="Right" ToolTip="Copy ingredient totals to clipboard" Margin="0,0,5,0">
+            <Button Command="{Binding CopyIngredientsCommand}" Grid.Column="1" HorizontalAlignment="Right" ToolTip="Copy ingredient totals to clipboard" Margin="0,0,5,0">
                 <StackPanel>
                     <iconPacks:PackIconMaterialDesign Kind="ContentCopy"/>
                 </StackPanel>
