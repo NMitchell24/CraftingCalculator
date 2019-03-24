@@ -35,7 +35,7 @@ namespace CraftingCalculator.ViewModel
             return RecipesList.Where(x => x.IsSelected).Count() > 0;
         }
 
-        private void AddRecipes()
+        private void AddRecipes(object obj)
         {
             foreach(Recipe recipe in RecipesList.Where(x => x.IsSelected))
             {
@@ -62,7 +62,7 @@ namespace CraftingCalculator.ViewModel
             return RecipeQuantities != null && RecipeQuantities.Where(x => x.IsSelected).Count() > 0;
         }
 
-        private void RemoveRecipes()
+        private void RemoveRecipes(object obj)
         {
             foreach(RecipeQuantity recipe in RecipeQuantities.Where(x => x.IsSelected))
             {
@@ -79,7 +79,7 @@ namespace CraftingCalculator.ViewModel
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
         }
 
-        private void CalculateTotalIngredients()
+        private void CalculateTotalIngredients(object obj = null)
         {
             _ingredientMap.Reset();
             foreach(RecipeQuantity q in RecipeQuantities)
@@ -116,7 +116,7 @@ namespace CraftingCalculator.ViewModel
             return RecipeQuantities != null && RecipeQuantities.Count() > 0;
         }
 
-        private void ClearRecipes()
+        private void ClearRecipes(object obj)
         {
             _recipeMap.Reset();
             RecipeQuantities.Clear();
@@ -133,7 +133,7 @@ namespace CraftingCalculator.ViewModel
             return TotalIngredients != null && TotalIngredients.Count() > 0;
         }
 
-        private void CopyIngredientsToClipboard()
+        private void CopyIngredientsToClipboard(object obj)
         {
             StringBuilder sb = new StringBuilder();
 
