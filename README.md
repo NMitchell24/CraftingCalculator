@@ -2,6 +2,8 @@
 
 Calculate total ingredients needed to craft any combination of recipes.  Current app version 1.0.0.0 is designed to work with [No Man's Sky](https://www.nomanssky.com/), and is distributed as a standalone Windows executable (No install required)
 
+[Download](CraftingCalculator.zip)
+
 ### What does it do?
 
 - Contains almost all recipes from the base game.  (Items purchased with Quicksilver are currently not included)
@@ -10,3 +12,9 @@ Calculate total ingredients needed to craft any combination of recipes.  Current
 - Displays the total ingredients required to craft all recipes.
 - Allows you to copy the total ingredients to the clipboard
 - Supports Light and Dark themes with various accent colors.  
+
+#### Light Theme
+![Light Theme](LightThemeScreenshot.png)
+
+#### Dark Theme
+![Dark Theme](DarkThemeScreenshot.png)
