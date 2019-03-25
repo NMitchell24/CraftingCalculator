@@ -7,7 +7,7 @@ Calculate total ingredients needed to craft any combination of recipes.  Current
 ### What does it do?
 
 - Contains almost all recipes from the base game.  (Items purchased with Quicksilver are currently not included)
-- Allows you to adjust the crafting quantity from 1 - 500.
+- Allows you to adjust the crafting quantity from 1 - 500 on each recipe.
 - Calcluates the totals for each recipe and displays the ingredients including all components.
 - Displays the total ingredients required to craft all recipes.
 - Allows you to copy the total ingredients to the clipboard
