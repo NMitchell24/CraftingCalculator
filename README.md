@@ -14,7 +14,7 @@ Calculate total ingredients needed to craft any combination of recipes.  Current
 - Supports Light and Dark themes with various accent colors.  
 
 #### Light Theme
-![Light Theme](..\docs\LightThemeScreenshot.png)
+![Light Theme](docs\LightThemeScreenshot.png)
 
 #### Dark Theme
-![Dark Theme](..\docs\DarkThemeScreenshot.png)
+![Dark Theme](docs\DarkThemeScreenshot.png)
