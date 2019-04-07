@@ -58,12 +58,15 @@ namespace CraftingCalculator.Model.Recipes
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExocraftTechnology")]                 EXOCRAFT_TECHNOLOGY,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExocraftTerminal")]                   EXOCRAFT_TERMINAL,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExosuitTechnology")]                  EXOSUIT_TECHNOLOGY,
+        [RecipeAttr("CraftingCalculator.Model.Recipes.ExosuitTechnologyRepair")]            EXOSUIT_TECHNOLOGY_REPAIR,
         [RecipeAttr("CraftingCalculator.Model.Recipes.Farming")]                            FARMING,
         [RecipeAttr("CraftingCalculator.Model.Recipes.FreighterTechnology")]                FREIGHTER_TECHNOLOGY,
         [RecipeAttr("CraftingCalculator.Model.Recipes.HighlyRefinedTechnology")]            HIGHLY_REFINED_TECHNOLOGY,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ManufacturedGasProduct")]             MANUFACTURED_GAS_PRODUCT,
         [RecipeAttr("CraftingCalculator.Model.Recipes.MultitoolTechnology")]                MULTITOOL_TECHNOLOGY,
+        [RecipeAttr("CraftingCalculator.Model.Recipes.MultitoolTechnologyRepair")]          MULTITOOL_TECH_REPAIR,
         [RecipeAttr("CraftingCalculator.Model.Recipes.PortableTechnology")]                 PORTABLE_TECHNOLOGY,
-        [RecipeAttr("CraftingCalculator.Model.Recipes.StarshipTechnology")]                 STARSHIP_TECHNOLOGY
+        [RecipeAttr("CraftingCalculator.Model.Recipes.StarshipTechnology")]                 STARSHIP_TECHNOLOGY,
+        [RecipeAttr("CraftingCalculator.Model.Recipes.StarshipTechnologyRepair")]           STARSHIP_TECHNOLOGY_REPAIR,
     }
 }

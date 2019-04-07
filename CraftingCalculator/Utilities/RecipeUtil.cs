@@ -50,13 +50,16 @@ namespace CraftingCalculator.Utilities
                 new RecipeFilter(RecipeFilterLabels.ExocraftTech, RecipeType.EXOCRAFT_TECHNOLOGY),
                 new RecipeFilter(RecipeFilterLabels.ExocraftTerminals, RecipeType.EXOCRAFT_TERMINAL),
                 new RecipeFilter(RecipeFilterLabels.ExosuitTech, RecipeType.EXOSUIT_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.ExosuitTechRepair, RecipeType.EXOSUIT_TECHNOLOGY_REPAIR),
                 new RecipeFilter(RecipeFilterLabels.Farming, RecipeType.FARMING),
                 new RecipeFilter(RecipeFilterLabels.FreighterTech, RecipeType.FREIGHTER_TECHNOLOGY),
                 new RecipeFilter(RecipeFilterLabels.HighlyRefinedTech, RecipeType.HIGHLY_REFINED_TECHNOLOGY),
                 new RecipeFilter(RecipeFilterLabels.ManufacturedGasProducts, RecipeType.MANUFACTURED_GAS_PRODUCT),
                 new RecipeFilter(RecipeFilterLabels.MultitoolTech, RecipeType.MULTITOOL_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.MultitoolTechRepair, RecipeType.MULTITOOL_TECH_REPAIR),
                 new RecipeFilter(RecipeFilterLabels.PortableTech, RecipeType.PORTABLE_TECHNOLOGY),
-                new RecipeFilter(RecipeFilterLabels.StarshipTech, RecipeType.STARSHIP_TECHNOLOGY)
+                new RecipeFilter(RecipeFilterLabels.StarshipTech, RecipeType.STARSHIP_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.StarshipTechRepair, RecipeType.STARSHIP_TECHNOLOGY_REPAIR)
             };
 
             return ret;

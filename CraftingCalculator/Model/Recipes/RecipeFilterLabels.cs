@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CraftingCalculator.Model.Recipes
+﻿namespace CraftingCalculator.Model.Recipes
 {
     public class RecipeFilterLabels
     {
@@ -31,12 +25,15 @@ namespace CraftingCalculator.Model.Recipes
         public const string ExocraftTech                    = "Exocraft Technology";
         public const string ExocraftTerminals               = "Exocraft Terminal";
         public const string ExosuitTech                     = "Exosuit Technology";
+        public const string ExosuitTechRepair               = "Exosuit Technology (Repair)";
         public const string Farming                         = "Farming";
         public const string FreighterTech                   = "Freighter Technology";
         public const string HighlyRefinedTech               = "Highly Refined Technology";
         public const string ManufacturedGasProducts         = "Manufactured Gas Product";
         public const string MultitoolTech                   = "Multi-tool Technology";
+        public const string MultitoolTechRepair             = "Multi-tool Technology (Repair)";
         public const string PortableTech                    = "Portable Base Technology";
         public const string StarshipTech                    = "Starship Technology";
+        public const string StarshipTechRepair              = "Starship Technology (Repair)";
     }
 }
