@@ -1,14 +1,14 @@
 ﻿using CraftingCalculator.Model.Ingredients;
 using CraftingCalculator.Model.Recipes.CraftingComponent;
 
-namespace CraftingCalculator.Model.Recipes.StarshipTechnology
+namespace CraftingCalculator.Model.Recipes.MultitoolTechnologyRepair
 {
-    class NonlinearOptics : ComplexRecipe
+    class BarrelIoniserRepair : ComplexRecipe
     {
-        public NonlinearOptics()
+        public BarrelIoniserRepair()
         {
-            Name = "Nonlinear Optics - Photon Cannon";
-            Type = RecipeFilterLabels.StarshipTech;
+            Name = "Barrel Ioniser (Repair)";
+            Type = RecipeFilterLabels.MultitoolTechRepair;
             Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             ChildRecipes.Add(new CobaltMirror(), 1);
         }
