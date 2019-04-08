@@ -397,10 +397,14 @@
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\AnalysisVisorModuleRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\AnalysisVisorRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\BarrelIoniserRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\BlazeJavelinModuleRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\BlazeJavelinRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\BoltcasterModuleRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\BoltcasterRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\BoltcasterSMRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\GeologyCannonModuleRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\GeologyCannonRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\MassAcceleratorRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\MiningBeamModuleRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\MiningBeamRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\PlasmaLauncherModuleRepair.cs" />
@@ -409,6 +413,9 @@
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\PulseSpitterModuleRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\PulseSpitterRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\ScannerRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\ScatterBlasterModuleRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\ScatterBlasterRepair.cs" />
+    <Compile Include="Model\Recipes\MultitoolTechnologyRepair\ShellGreaserRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\TerrainManipulatorRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnologyRepair\WaveformRecyclerRepair.cs" />
     <Compile Include="Model\Recipes\MultitoolTechnology\BlazeJavelin.cs" />
