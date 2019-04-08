@@ -56,6 +56,7 @@ namespace CraftingCalculator.Model.Recipes
         [RecipeAttr("CraftingCalculator.Model.Recipes.EnhancedGasProduct")]                 ENHANCED_GAS_PRODUCT,
         [RecipeAttr("CraftingCalculator.Model.Recipes.EnrichedAlloyMetal")]                 ENRICHED_ALLOY_METAL,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExocraftTechnology")]                 EXOCRAFT_TECHNOLOGY,
+        [RecipeAttr("CraftingCalculator.Model.Recipes.ExocraftTechnologyRepair")]           EXOCRAFT_TECHNOLOGY_REPAIR,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExocraftTerminal")]                   EXOCRAFT_TERMINAL,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExosuitTechnology")]                  EXOSUIT_TECHNOLOGY,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExosuitTechnologyRepair")]            EXOSUIT_TECHNOLOGY_REPAIR,

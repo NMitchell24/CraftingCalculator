@@ -48,6 +48,7 @@ namespace CraftingCalculator.Utilities
                 new RecipeFilter(RecipeFilterLabels.EnhancedGasProduct, RecipeType.ENHANCED_GAS_PRODUCT),
                 new RecipeFilter(RecipeFilterLabels.EnrichedAlloyMetals, RecipeType.ENRICHED_ALLOY_METAL),
                 new RecipeFilter(RecipeFilterLabels.ExocraftTech, RecipeType.EXOCRAFT_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.ExocraftTechRepair, RecipeType.EXOCRAFT_TECHNOLOGY_REPAIR),
                 new RecipeFilter(RecipeFilterLabels.ExocraftTerminals, RecipeType.EXOCRAFT_TERMINAL),
                 new RecipeFilter(RecipeFilterLabels.ExosuitTech, RecipeType.EXOSUIT_TECHNOLOGY),
                 new RecipeFilter(RecipeFilterLabels.ExosuitTechRepair, RecipeType.EXOSUIT_TECHNOLOGY_REPAIR),

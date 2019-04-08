@@ -23,6 +23,7 @@
         public const string EnhancedGasProduct              = "Enhanced Gas Product";
         public const string EnrichedAlloyMetals             = "Enriched Alloy Metal";
         public const string ExocraftTech                    = "Exocraft Technology";
+        public const string ExocraftTechRepair              = "Exocraft Technology (Repair)";
         public const string ExocraftTerminals               = "Exocraft Terminal";
         public const string ExosuitTech                     = "Exosuit Technology";
         public const string ExosuitTechRepair               = "Exosuit Technology (Repair)";

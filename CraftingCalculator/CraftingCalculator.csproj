@@ -341,6 +341,11 @@
     <Compile Include="Model\Recipes\EnhancedGasProduct\ThermicCondensate.cs" />
     <Compile Include="Model\Recipes\EnrichedAlloyMetal\Geodesite.cs" />
     <Compile Include="Model\Recipes\EnrichedAlloyMetal\Iridesite.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnologyRepair\ExocraftAccelerationModuleRepair.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnologyRepair\ExocraftCannonModuleRepair.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnologyRepair\ExocraftFusionEngineModuleRepair.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnologyRepair\ExocraftMiningLaserModuleRepair.cs" />
+    <Compile Include="Model\Recipes\ExocraftTechnologyRepair\ExocraftMiningLaserSigmaRepair.cs" />
     <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftAccelerationModule.cs" />
     <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftMountedCannon.cs" />
     <Compile Include="Model\Recipes\ExocraftTechnology\ExocraftSignalBoosterSigma.cs" />
