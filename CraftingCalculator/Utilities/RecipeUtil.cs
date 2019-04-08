@@ -54,6 +54,7 @@ namespace CraftingCalculator.Utilities
                 new RecipeFilter(RecipeFilterLabels.ExosuitTechRepair, RecipeType.EXOSUIT_TECHNOLOGY_REPAIR),
                 new RecipeFilter(RecipeFilterLabels.Farming, RecipeType.FARMING),
                 new RecipeFilter(RecipeFilterLabels.FreighterTech, RecipeType.FREIGHTER_TECHNOLOGY),
+                new RecipeFilter(RecipeFilterLabels.FreighterTechRepair, RecipeType.FREIGHTER_TECHNOLOGY_REPAIR),
                 new RecipeFilter(RecipeFilterLabels.HighlyRefinedTech, RecipeType.HIGHLY_REFINED_TECHNOLOGY),
                 new RecipeFilter(RecipeFilterLabels.ManufacturedGasProducts, RecipeType.MANUFACTURED_GAS_PRODUCT),
                 new RecipeFilter(RecipeFilterLabels.MultitoolTech, RecipeType.MULTITOOL_TECHNOLOGY),

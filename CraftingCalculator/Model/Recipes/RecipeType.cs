@@ -62,6 +62,7 @@ namespace CraftingCalculator.Model.Recipes
         [RecipeAttr("CraftingCalculator.Model.Recipes.ExosuitTechnologyRepair")]            EXOSUIT_TECHNOLOGY_REPAIR,
         [RecipeAttr("CraftingCalculator.Model.Recipes.Farming")]                            FARMING,
         [RecipeAttr("CraftingCalculator.Model.Recipes.FreighterTechnology")]                FREIGHTER_TECHNOLOGY,
+        [RecipeAttr("CraftingCalculator.Model.Recipes.FreighterTechnologyRepair")]          FREIGHTER_TECHNOLOGY_REPAIR,
         [RecipeAttr("CraftingCalculator.Model.Recipes.HighlyRefinedTechnology")]            HIGHLY_REFINED_TECHNOLOGY,
         [RecipeAttr("CraftingCalculator.Model.Recipes.ManufacturedGasProduct")]             MANUFACTURED_GAS_PRODUCT,
         [RecipeAttr("CraftingCalculator.Model.Recipes.MultitoolTechnology")]                MULTITOOL_TECHNOLOGY,

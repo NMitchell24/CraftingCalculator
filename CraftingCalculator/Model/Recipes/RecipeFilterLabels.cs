@@ -29,6 +29,7 @@
         public const string ExosuitTechRepair               = "Exosuit Technology (Repair)";
         public const string Farming                         = "Farming";
         public const string FreighterTech                   = "Freighter Technology";
+        public const string FreighterTechRepair             = "Freighter Technology (Repair)";
         public const string HighlyRefinedTech               = "Highly Refined Technology";
         public const string ManufacturedGasProducts         = "Manufactured Gas Product";
         public const string MultitoolTech                   = "Multi-tool Technology";

@@ -386,6 +386,7 @@
     <Compile Include="Model\Recipes\Farming\StandingPlanter.cs" />
     <Compile Include="Model\Recipes\Farming\StarBramble.cs" />
     <Compile Include="Model\Recipes\Farming\VenomUrchin.cs" />
+    <Compile Include="Model\Recipes\FreighterTechnologyRepair\FreighterWarpReactorSigmaRepair.cs" />
     <Compile Include="Model\Recipes\FreighterTechnology\FreighterWarpReactorSigma.cs" />
     <Compile Include="Model\Recipes\FreighterTechnology\FreighterWarpReactorTau.cs" />
     <Compile Include="Model\Recipes\FreighterTechnology\FreighterWarpReactorTheta.cs" />
