@@ -9,7 +9,7 @@ namespace CraftingCalculator.Model.Recipes.MultitoolTechnologyRepair
         {
             Name = "Geology Cannon (Repair)";
             Type = RecipeFilterLabels.MultitoolTechRepair;
-            Ingredients.Add(IngredientType.TECHNOLOGY_MODULE);
+            Ingredients.Add(IngredientType.TECHNOLOGY_MODULE, 1);
             ChildRecipes.Add(new RareMetalElement(), 1);
         }
     }
