@@ -74,6 +74,9 @@
     <Reference Include="Costura, Version=3.3.3.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.3.3.3\lib\net40\Costura.dll</HintPath>
     </Reference>
+    <Reference Include="LiteDB, Version=4.1.4.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.4.1.4\lib\net40\LiteDB.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.6.5.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net46\MahApps.Metro.dll</HintPath>
     </Reference>
@@ -109,6 +112,13 @@
     <Compile Include="Model\Ingredients\IngredientMap.cs" />
     <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
     <Compile Include="Model\Ingredients\IngredientType.cs" />
+    <Compile Include="Model\LiteDB\CollectionLabels.cs" />
+    <Compile Include="Model\LiteDB\DataManager.cs" />
+    <Compile Include="Model\LiteDB\IngredientData.cs" />
+    <Compile Include="Model\LiteDB\IngredientQuantityData.cs" />
+    <Compile Include="Model\LiteDB\RecipeData.cs" />
+    <Compile Include="Model\LiteDB\RecipeFilterData.cs" />
+    <Compile Include="Model\LiteDB\RecipeQuantityData.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\Acid.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\CircuitBoard.cs" />
     <Compile Include="Model\Recipes\AdvancedAgriculturalProduct\HeatCapacitor.cs" />
@@ -518,6 +528,7 @@
     <Compile Include="Model\Recipes\StarshipTechnology\RocketLauncher.cs" />
     <Compile Include="Model\Recipes\StarshipTechnology\TeleportReceiver.cs" />
     <Compile Include="Utilities\CommandRunner.cs" />
+    <Compile Include="Utilities\DataUtil.cs" />
     <Compile Include="Utilities\IngredientUtil.cs" />
     <Compile Include="Utilities\RecipeUtil.cs" />
     <Compile Include="Utilities\ReflectionUtil.cs" />

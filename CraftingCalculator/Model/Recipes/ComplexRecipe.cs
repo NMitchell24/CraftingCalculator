@@ -55,6 +55,11 @@ namespace CraftingCalculator.Model.Recipes
             return NewIngredients;
         }
 
+        public RecipeMap GetChildren()
+        {
+            return ChildRecipes;
+        }
+
         override
         public RecipeTree GetRecipeNodes(int quantity)
         {

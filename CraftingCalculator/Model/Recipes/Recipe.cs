@@ -43,6 +43,11 @@ namespace CraftingCalculator.Model.Recipes
             return Ingredients;
         }
 
+        public IngredientMap GetBaseIngredients()
+        {
+            return Ingredients;
+        }
+
        public virtual RecipeTree GetRecipeNodes( int quantity )
         {
             RecipeTree ret = new RecipeTree
