@@ -7,10 +7,7 @@ using System;
 namespace CraftingCalculator.Model.Recipes
 {
     /// <summary>
-    /// Abstract Recipe Implementation for recipes that contain only basic Elements as ingredients.
-    /// When Adding new Recipes they will show up automagically as long as they are added to an existing Namespace.
-    /// If creating a new Namespace then you must add a RecipeType as well, 
-    /// and then create a filter for that type in RecipeUtil.
+    /// Represents an individual UI Model for the Recipes
     /// </summary>
     public class Recipe : INotifyPropertyChanged
     {

@@ -2,7 +2,7 @@
 namespace CraftingCalculator.Model.Recipes
 {
     /// <summary>
-    /// Simple Class to define a Label and Type for filtering Recipes.
+    /// Simple Class to define the UI Model for RecipeFilters
     /// </summary>
     public class RecipeFilter
     {
