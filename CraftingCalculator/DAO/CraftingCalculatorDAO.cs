@@ -2,53 +2,44 @@
 using CraftingCalculator.Model.Recipes;
 using LiteDB;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
-namespace CraftingCalculator.Utilities
+namespace CraftingCalculator.DAO
 {
-    public static class DataUtil
+    public static class CraftingCalculatorDAO
     {
         public const string ALL = "All";
+        private static DataManager _data = DataManager.Instance;
         /// <summary>
         /// This method will make sure the database exists, all the correct Documents (tables) exist, 
         /// and that the appropriate indexes are created
         /// </summary>
         public static void EnsureDatabaseExists()
-        {
-            // Creates Default Database from No Mans Sky configuration if no Database currently exists.
-            // Prevents program from starting with blank DB.
-            if (!File.Exists(Properties.Resources.dbName))
-            {
-                File.WriteAllBytes(Properties.Resources.dbName, Properties.Resources.CraftingCalculator);
-            }
-            
-            //Return the db.  Creates if it does not exist.
-            var db = DataManager.Instance.GetDatabase();
+        {            
             //Gets ingredients.  creates Collection if it does not exist.
-            var ing = db.GetCollection<IngredientData>(CollectionLabels.Ingredients);
+            var ing = _data.GetCollectionByType<IngredientData>(CollectionLabels.Ingredients);
             //Create indexes for ingredients if they do not exist.
             ing.EnsureIndex(x => x.Name);
             ing.EnsureIndex(x => x.Id);
 
             //Get Filters and create indexes.
-            var filt = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
+            var filt = _data.GetCollectionByType<RecipeFilterData>(CollectionLabels.RecipeFilters);
             filt.EnsureIndex(x => x.Name);
             filt.EnsureIndex(x => x.Id);
 
             //Ingredient Quantity objects.
-            var ingQ = db.GetCollection<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
+            var ingQ = _data.GetCollectionByType<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
             ingQ.EnsureIndex(x => x.Id);
             ingQ.EnsureIndex(x => x.Ingredient.Id);
 
             //recipe objects.
-            var rec = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
+            var rec = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
             rec.EnsureIndex(x => x.Id);
             rec.EnsureIndex(x => x.Filter.Id);
             rec.EnsureIndex(x => x.Name);
 
             //Recipe quantities
-            var recQ = db.GetCollection<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+            var recQ = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
             recQ.EnsureIndex(x => x.Id);
             recQ.EnsureIndex(x => x.ChildRecipe.Id);
             recQ.EnsureIndex(x => x.ParentRecipe.Id);
@@ -61,8 +52,7 @@ namespace CraftingCalculator.Utilities
         /// <returns></returns>
         public static List<RecipeFilterData> GetAllRecipeFiltersData()
         {
-            var db = DataManager.Instance.GetDatabase();
-            var col = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
+            var col = _data.GetCollectionByType<RecipeFilterData>(CollectionLabels.RecipeFilters);
             List<RecipeFilterData> ret = new List<RecipeFilterData>();
 
             ret.AddRange(col.Find(Query.All(Query.Ascending))
@@ -76,11 +66,10 @@ namespace CraftingCalculator.Utilities
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static List<RecipeData> GetRecipesByFilterWithIngredients(RecipeFilter filter)
+        public static List<RecipeData> GetRecipeDataByFilter(RecipeFilter filter)
         {
             List<RecipeData> ret = new List<RecipeData>();
-            var db = DataManager.Instance.GetDatabase();
-            var col = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
+            var col = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
 
             if (filter.Name == ALL)
             {
@@ -107,8 +96,7 @@ namespace CraftingCalculator.Utilities
         /// <returns></returns>
         public static IngredientData GetIngredientById(int id)
         {
-            var db = DataManager.Instance.GetDatabase();
-            var col = db.GetCollection<IngredientData>(CollectionLabels.Ingredients);
+            var col = _data.GetCollectionByType<IngredientData>(CollectionLabels.Ingredients);
 
             return col.FindById(id);
         }
@@ -121,8 +109,7 @@ namespace CraftingCalculator.Utilities
         public static List<RecipeQuantityData> GetRecipeQuantityByParentId(int id)
         {
             List<RecipeQuantityData> ret = new List<RecipeQuantityData>();
-            var db = DataManager.Instance.GetDatabase();
-            var col = db.GetCollection<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+            var col = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
 
             ret.AddRange(col.Include(x => x.ParentRecipe)
                 .Include(x => x.ChildRecipe)
@@ -138,8 +125,7 @@ namespace CraftingCalculator.Utilities
         /// <returns></returns>
         public static RecipeData GetRecipeById(int id)
         {
-            var db = DataManager.Instance.GetDatabase();
-            var col = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
+            var col = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
 
             return col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
