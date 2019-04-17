@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CraftingCalculator.DAO;
 using CraftingCalculator.Model.Data;
 using CraftingCalculator.Model.Recipes;
 using CraftingCalculator.Model.Ingredients;
@@ -26,7 +27,7 @@ namespace CraftingCalculator.Utilities
         {
             List<RecipeFilter> ret = new List<RecipeFilter>();
 
-            foreach(RecipeFilterData data in DataUtil.GetAllRecipeFiltersData())
+            foreach(RecipeFilterData data in CraftingCalculatorDAO.GetAllRecipeFiltersData())
             {
                 RecipeFilter filter = new RecipeFilter
                 {
@@ -39,20 +40,29 @@ namespace CraftingCalculator.Utilities
             return ret;
         }
 
+        /// <summary>
+        /// Loads all Recipes for a provided RecipeFilter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public static List<Recipe> GetRecipesByFilter(RecipeFilter filter)
         {
             List<Recipe> ret = new List<Recipe>();
 
-            foreach (RecipeData data in DataUtil.GetRecipesByFilterWithIngredients(filter))
+            foreach (RecipeData data in CraftingCalculatorDAO.GetRecipeDataByFilter(filter))
             {
-                ret.Add(GetRecipeForDataType(data));
+                ret.Add(GetRecipeForData(data));
             }
 
             return ret;
         }
 
-
-        private static Recipe GetRecipeForDataType(RecipeData data)
+        /// <summary>
+        /// Builds a Recipe wrapper object from a provided RecipeData object.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static Recipe GetRecipeForData(RecipeData data)
         {
             Recipe ret = new Recipe
             {
@@ -63,21 +73,21 @@ namespace CraftingCalculator.Utilities
             IngredientMap ingMap = new IngredientMap();
             foreach(IngredientQuantityData iData in data.Ingredients)
             {
-                IngredientData ing = DataUtil.GetIngredientById(iData.Ingredient.Id);
+                IngredientData ing = CraftingCalculatorDAO.GetIngredientById(iData.Ingredient.Id);
                 ingMap.Add(ing.Name, iData.Quantity);
             }
 
             ret.Ingredients = ingMap;
 
-            List<RecipeQuantityData> children = DataUtil.GetRecipeQuantityByParentId(data.Id);
+            List<RecipeQuantityData> children = CraftingCalculatorDAO.GetRecipeQuantityByParentId(data.Id);
 
             if(children != null && children.Count > 0)
             {
                 RecipeMap recMap = new RecipeMap();
                 foreach(RecipeQuantityData recQ in children)
                 {
-                    RecipeData childData = DataUtil.GetRecipeById(recQ.ChildRecipe.Id);
-                    Recipe child = GetRecipeForDataType(childData);
+                    RecipeData childData = CraftingCalculatorDAO.GetRecipeById(recQ.ChildRecipe.Id);
+                    Recipe child = GetRecipeForData(childData);
                     recMap.Add(child, recQ.Quantity);
                 }
                 ret.ChildRecipes = recMap;

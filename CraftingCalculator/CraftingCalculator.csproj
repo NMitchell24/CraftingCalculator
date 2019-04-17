@@ -112,7 +112,7 @@
     <Compile Include="Model\Ingredients\IngredientMap.cs" />
     <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
     <Compile Include="Model\Data\CollectionLabels.cs" />
-    <Compile Include="Model\Data\DataManager.cs" />
+    <Compile Include="DAO\DataManager.cs" />
     <Compile Include="Model\Data\IngredientData.cs" />
     <Compile Include="Model\Data\IngredientQuantityData.cs" />
     <Compile Include="Model\Data\RecipeData.cs" />
@@ -124,7 +124,7 @@
     <Compile Include="Model\Recipes\RecipeTree.cs" />
     <Compile Include="Model\Recipes\Recipe.cs" />
     <Compile Include="Utilities\CommandRunner.cs" />
-    <Compile Include="Utilities\DataUtil.cs" />
+    <Compile Include="DAO\CraftingCalculatorDAO.cs" />
     <Compile Include="Utilities\IngredientUtil.cs" />
     <Compile Include="Utilities\RecipeUtil.cs" />
     <Compile Include="ViewModel\CraftingCalculatorMainViewModel.cs" />
