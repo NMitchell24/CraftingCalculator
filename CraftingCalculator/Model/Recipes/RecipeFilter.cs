@@ -7,12 +7,6 @@ namespace CraftingCalculator.Model.Recipes
     public class RecipeFilter
     {
         public string Name { get; set; }
-        public RecipeType Type { get; set; }
-
-        public RecipeFilter(string name, RecipeType type)
-        {
-            Name = name;
-            Type = type;
-        }
+        public int Id { get; set; }
     }
 }

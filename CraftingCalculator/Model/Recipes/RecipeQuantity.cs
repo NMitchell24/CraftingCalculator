@@ -30,14 +30,7 @@ namespace CraftingCalculator.Model.Recipes
         {
             get
             {
-                if(Recipe.GetType().IsSubclassOf(typeof(ComplexRecipe)))
-                {
-                    return ((ComplexRecipe)Recipe).Tooltip;
-                }
-                else
-                {
-                    return Recipe.Tooltip;
-                }
+                return Recipe.Tooltip;
             }
 
             private set { }

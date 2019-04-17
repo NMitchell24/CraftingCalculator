@@ -13,7 +13,7 @@ namespace CraftingCalculator.Utilities
 
             foreach (IngredientQuantity ingredient in source.IngredientList) 
             {
-                ret.Add(ingredient.Ingredient, (ingredient.Quantity * multiplier));
+                ret.Add(ingredient.Name, (ingredient.Quantity * multiplier));
             }
 
             return ret;

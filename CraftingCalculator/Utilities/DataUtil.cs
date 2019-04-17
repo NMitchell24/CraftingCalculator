@@ -1,166 +1,146 @@
 ﻿using CraftingCalculator.Model.LiteDB;
-using LiteDB;
-using System;
-using System.Collections.Generic;
-using CraftingCalculator.Model.Ingredients;
 using CraftingCalculator.Model.Recipes;
+using LiteDB;
+using System.Collections.Generic;
+using System.IO;
 
 namespace CraftingCalculator.Utilities
 {
     public static class DataUtil
     {
-        
+        /// <summary>
+        /// This method will make sure the database exists, all the correct Documents (tables) exist, 
+        /// and that the appropriate indexes are created
+        /// </summary>
+        public static void EnsureDatabaseExists()
+        {
+            // Creates Default Database from No Mans Sky configuration if no Database currently exists.
+            // Prevents program from starting with blank DB.
+            if (!File.Exists("CraftingCalculator.db"))
+            {
+                File.WriteAllBytes(@"CraftingCalculator.db", Properties.Resources.CraftingCalculator);
+            }
+            
+            //Return the db.  Creates if it does not exist.
+            var db = DataManager.Instance.GetDatabase();
+            //Gets ingredients.  creates Collection if it does not exist.
+            var ing = db.GetCollection<IngredientData>(CollectionLabels.Ingredients);
+            //Create indexes for ingredients if they do not exist.
+            ing.EnsureIndex(x => x.Name);
+            ing.EnsureIndex(x => x.Id);
+
+            //Get Filters and create indexes.
+            var filt = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
+            filt.EnsureIndex(x => x.Name);
+            filt.EnsureIndex(x => x.Id);
+
+            //Ingredient Quantity objects.
+            var ingQ = db.GetCollection<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
+            ingQ.EnsureIndex(x => x.Id);
+            ingQ.EnsureIndex(x => x.Ingredient.Id);
+
+            //recipe objects.
+            var rec = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
+            rec.EnsureIndex(x => x.Id);
+            rec.EnsureIndex(x => x.Filter.Id);
+            rec.EnsureIndex(x => x.Name);
+
+            //Recipe quantities
+            var recQ = db.GetCollection<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+            recQ.EnsureIndex(x => x.Id);
+            recQ.EnsureIndex(x => x.ChildRecipe.Id);
+            recQ.EnsureIndex(x => x.ParentRecipe.Id);
+
+        }
+
+        /// <summary>
+        /// Gets all the Recipe Filter data objects
+        /// </summary>
+        /// <returns></returns>
         public static List<RecipeFilterData> GetAllRecipeFiltersData()
         {
             var db = DataManager.Instance.GetDatabase();
-            var filters = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
+            var col = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
             List<RecipeFilterData> ret = new List<RecipeFilterData>();
 
-            var all = filters.Find(Query.All(Query.Ascending));
-            ret.AddRange(all);
+            var filters = col.Find(Query.All(Query.Ascending));
+            ret.AddRange(filters);
             return ret;
         }
 
-
-        //Temporarily keeping this in case I need it again.  
-        //TODO: Remove before final commit.
-        public static void CreateDatabase()
+        /// <summary>
+        /// Returns all Recipes for a given filter.   
+        /// If the Filter name is 'All' then we will return all recipes.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static List<RecipeData> GetRecipesByFilterWithIngredients(RecipeFilter filter)
         {
-            LiteDatabase db = DataManager.Instance.GetDatabase();
-            Dictionary<RecipeData, List<RecipeQuantity>> childRecipeMap = new Dictionary<RecipeData, List<RecipeQuantity>>();
-            //Create Collections:
-            var ingredients = db.GetCollection<IngredientData>(CollectionLabels.Ingredients);
-            var recipeFilters = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
-            var ingredientQuantites = db.GetCollection<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
-            var recipeQuantities = db.GetCollection<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
-            var recipes = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
+            List<RecipeData> ret = new List<RecipeData>();
+            var db = DataManager.Instance.GetDatabase();
+            var col = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
 
-            //Create Ingredients
-            var Ings = Enum.GetValues(typeof(IngredientType));
-            foreach (var i in Ings)
+            if (filter.Name == "All")
             {
-                var ing = new IngredientData
-                {
-                    Name = ((IngredientType)i).GetDisplayName(),
-                    Description = ((IngredientType)i).GetDisplayName()
-                };
-                ingredients.Insert(ing);
+                ret.AddRange(col.Include(x => x.Ingredients)
+                .Include(x => x.Filter)
+                .Find(Query.All(Query.Ascending)));
             }
-            //build index for Ingredient Name
-            ingredients.EnsureIndex(x => x.Name);
-
-
-            //Create RecipeFilters
-            foreach (var r in RecipeUtil.GetRecipeFilters())
+            else
             {
-                RecipeFilterData filter = new RecipeFilterData
-                {
-                    Name = r.Name
-                };
-
-                recipeFilters.Insert(filter);
+                ret.AddRange(col.Include(x => x.Ingredients)
+                .Include(x => x.Filter)
+                .Find(x => x.Filter.Id == filter.Id));
             }
-            //Build index for RecipeFilter name
-            recipeFilters.EnsureIndex(x => x.Name);
-
-            //Create Recipes
-            int id = 1;
-            int id2 = 1;
-            foreach (Recipe rec in RecipeUtil.GetRecipesByFilter(new RecipeFilter(RecipeFilterLabels.All, RecipeType.ALL)))
-            {
-                RecipeData data = new RecipeData
-                {
-                    Id = id,
-                    Name = rec.Name,
-                    Description = rec.Name,
-                    Ingredients = new List<IngredientQuantityData>()
-                };
-
-
-                //Lookup filter and set it on the recipe
-                var filter = recipeFilters.FindOne(x => x.Name == rec.Type);
-                if (filter != null)
-                {
-                    data.Filter = filter;
-                }
-                else
-                {
-                    throw new ArgumentNullException("RecipeFilter cannot be null for Recipe " + rec.Name + ", " + rec.Type);
-                }
-
-                //IngredientQuantities
-                foreach (var i in rec.GetBaseIngredients().IngredientList)
-                {
-                    //Lookup the ingredient object
-                    var IngD = ingredients.FindOne(x => x.Name == i.Name);
-                    if (IngD != null)
-                    {
-                        IngredientQuantityData IngQuantD = new IngredientQuantityData
-                        {
-                            Id = id2,
-                            Ingredient = IngD,
-                            Quantity = i.Quantity
-                        };
-
-                        ingredientQuantites.Insert(IngQuantD);
-
-                        data.Ingredients.Add(ingredientQuantites.FindById(id2));
-
-                        id2++;
-                    }
-                    else
-                    {
-                        throw new ArgumentNullException("Ingredient For Recipe cannot be null " + rec.Name + ", " + i.Name);
-                    }
-                }
-
-                recipes.Insert(data);
-
-                //If this is a complex recipe store child recipes in a map temporarily.  This will be processed after all recipes are finished.
-                if (rec.GetType().IsSubclassOf(typeof(ComplexRecipe)))
-                {
-                    List<RecipeQuantity> childRecipes = new List<RecipeQuantity>();
-
-                    foreach (RecipeQuantity recQ in ((ComplexRecipe)rec).GetChildren().RecipeList)
-                    {
-                        childRecipes.Add(recQ);
-                    }
-
-                    childRecipeMap.Add(recipes.FindById(id), childRecipes);
-
-                }
-
-                id++;
-            }
-
-            //RecipeQuantities
-            foreach (KeyValuePair<RecipeData, List<RecipeQuantity>> c in childRecipeMap)
-            {
-                RecipeData parent = c.Key;
-                foreach (RecipeQuantity rq in c.Value)
-                {
-                    RecipeData child = recipes.FindOne(x => x.Name == rq.Recipe.Name);
-
-                    if (child != null)
-                    {
-                        RecipeQuantityData rqData = new RecipeQuantityData
-                        {
-                            ParentRecipe = parent,
-                            ChildRecipe = child,
-                            Quantity = rq.Quantity
-                        };
-
-                        recipeQuantities.Insert(rqData);
-                    }
-                    else
-                    {
-                        throw new ArgumentNullException("ChildRecipe For RecipeQuantity cannot be null " + rq.Recipe.Name + ", " + c.Key.Name);
-                    }
-
-                }
-            }
-
+            
+            return ret;
         }
 
+        /// <summary>
+        /// Gets an Ingredient by its Identifier
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static IngredientData GetIngredientById(int id)
+        {
+            var db = DataManager.Instance.GetDatabase();
+            var col = db.GetCollection<IngredientData>(CollectionLabels.Ingredients);
+
+            return col.FindById(id);
+        }
+        
+        /// <summary>
+        /// Gets all Recipe Quantity objects for a given Parent Recipe id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static List<RecipeQuantityData> GetRecipeQuantityByParentId(int id)
+        {
+            List<RecipeQuantityData> ret = new List<RecipeQuantityData>();
+            var db = DataManager.Instance.GetDatabase();
+            var col = db.GetCollection<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+
+            ret.AddRange(col.Include(x => x.ParentRecipe)
+                .Include(x => x.ChildRecipe)
+                .Find(x => x.ParentRecipe.Id == id));
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Gets a Recipe by the ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static RecipeData GetRecipeById(int id)
+        {
+            var db = DataManager.Instance.GetDatabase();
+            var col = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
+
+            return col.Include(x => x.Ingredients)
+                .Include(x => x.Filter)
+                .FindById(id);
+        }
+        
     }
 }
