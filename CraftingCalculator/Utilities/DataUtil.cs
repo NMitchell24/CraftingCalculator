@@ -9,6 +9,7 @@ namespace CraftingCalculator.Utilities
 {
     public static class DataUtil
     {
+        public const string ALL = "All";
         /// <summary>
         /// This method will make sure the database exists, all the correct Documents (tables) exist, 
         /// and that the appropriate indexes are created
@@ -65,7 +66,7 @@ namespace CraftingCalculator.Utilities
             List<RecipeFilterData> ret = new List<RecipeFilterData>();
 
             ret.AddRange(col.Find(Query.All(Query.Ascending))
-                .OrderByDescending(x => x.Name == "All").ThenBy(x => x.Name));
+                .OrderByDescending(x => x.Name == ALL).ThenBy(x => x.Name));
             return ret;
         }
 
@@ -81,7 +82,7 @@ namespace CraftingCalculator.Utilities
             var db = DataManager.Instance.GetDatabase();
             var col = db.GetCollection<RecipeData>(CollectionLabels.Recipes);
 
-            if (filter.Name == "All")
+            if (filter.Name == ALL)
             {
                 ret.AddRange(col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
