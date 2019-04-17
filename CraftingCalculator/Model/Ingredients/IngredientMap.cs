@@ -35,11 +35,11 @@ namespace CraftingCalculator.Model.Ingredients
         /// </summary>
         /// <param name="ingredient"></param>
         /// <param name="quantity"></param>
-        public void Add(IngredientType ingredient, int quantity)
+        public void Add(string ingredient, long quantity)
         {
-            if(_internalList.Any(i => i.Ingredient == ingredient))
+            if(_internalList.Any(i => i.Name == ingredient))
             {
-                _internalList.Find(i => i.Ingredient == ingredient).Quantity += quantity;
+                _internalList.Find(i => i.Name == ingredient).Quantity += quantity;
             } 
             else
             {
@@ -54,9 +54,9 @@ namespace CraftingCalculator.Model.Ingredients
         /// </summary>
         /// <param name="ingredient"></param>
         /// <param name="quantity"></param>
-        public void Remove(IngredientType ingredient, int quantity)
+        public void Remove(string ingredient, long quantity)
         {
-            if (_internalList.Any(i => i.Ingredient == ingredient && i.Quantity - quantity > 0))
+            if (_internalList.Any(i => i.Name == ingredient && i.Quantity - quantity > 0))
             {
                 Add(ingredient, -quantity);
             }
@@ -71,11 +71,11 @@ namespace CraftingCalculator.Model.Ingredients
         /// Remove an IngredientType from the list entirely if it exists.
         /// </summary>
         /// <param name="ingredient"></param>
-        public void RemoveAll(IngredientType ingredient)
+        public void RemoveAll(string ingredient)
         {
-            if (_internalList.Any(i => i.Ingredient == ingredient))
+            if (_internalList.Any(i => i.Name == ingredient))
             {
-                _internalList.Remove(_internalList.Find(i => i.Ingredient == ingredient));
+                _internalList.Remove(_internalList.Find(i => i.Name == ingredient));
             }
         }
 

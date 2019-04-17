@@ -6,30 +6,25 @@ namespace CraftingCalculator.Model.Ingredients
     /// </summary>
     public class IngredientQuantity
     {
-        public IngredientType Ingredient { get; set; }
-        public int Quantity { get; set; }
+        public long Quantity { get; set; }
 
-        public string Name
-        {
-            get => Ingredient.GetDisplayName();
-            private set { }
-        }
+        public string Name { get; set; }
 
         public string DisplayName
         {
-            get => Ingredient.GetDisplayName() + " x" + Quantity;
+            get => Name + " x" + Quantity;
             private set { }
         }
 
-        public IngredientQuantity(IngredientType i, int q)
+        public IngredientQuantity(string name, long quantity)
         {
-            Ingredient = i;
-            Quantity = q;
+            Name = name;
+            Quantity = quantity;
         }
 
         public IngredientQuantity Clone()
         {
-            return new IngredientQuantity(Ingredient, Quantity);
+            return new IngredientQuantity (Name, Quantity);
         }
 
     }

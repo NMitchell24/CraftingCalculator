@@ -44,6 +44,7 @@ namespace CraftingCalculator.ViewModel
             dialogCoordinator = instance;
 
             ChangeTheme(Properties.Settings.Default["Theme"]);
+
         }
 
         /// <summary>

@@ -86,7 +86,7 @@ namespace CraftingCalculator.ViewModel
             {
                 foreach(IngredientQuantity i in q.Ingredients.IngredientList)
                 {
-                    _ingredientMap.Add(i.Ingredient, (i.Quantity * q.Quantity));
+                    _ingredientMap.Add(i.Name, (i.Quantity * q.Quantity));
                 }
             }
             TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList);
