@@ -7,7 +7,7 @@ namespace CraftingCalculator.Model.Data
         private LiteDatabase _db;
         private DataManager()
         {
-            _db = new LiteDatabase("CraftingCalculator.db");
+            _db = new LiteDatabase(Properties.Resources.dbName);
         }
 
         public static DataManager Instance

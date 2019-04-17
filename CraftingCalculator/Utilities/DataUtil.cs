@@ -17,9 +17,9 @@ namespace CraftingCalculator.Utilities
         {
             // Creates Default Database from No Mans Sky configuration if no Database currently exists.
             // Prevents program from starting with blank DB.
-            if (!File.Exists("CraftingCalculator.db"))
+            if (!File.Exists(Properties.Resources.dbName))
             {
-                File.WriteAllBytes(@"CraftingCalculator.db", Properties.Resources.CraftingCalculator);
+                File.WriteAllBytes(Properties.Resources.dbName, Properties.Resources.CraftingCalculator);
             }
             
             //Return the db.  Creates if it does not exist.

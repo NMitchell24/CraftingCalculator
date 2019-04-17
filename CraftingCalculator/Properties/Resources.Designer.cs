@@ -69,5 +69,14 @@ namespace CraftingCalculator.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CraftingCalculator.db.
+        /// </summary>
+        internal static string dbName {
+            get {
+                return ResourceManager.GetString("dbName", resourceCulture);
+            }
+        }
     }
 }
