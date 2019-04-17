@@ -1,4 +1,4 @@
-﻿namespace CraftingCalculator.Model.LiteDB
+﻿namespace CraftingCalculator.Model.Data
 {
     public class IngredientData
     {

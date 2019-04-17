@@ -1,4 +1,4 @@
-﻿using CraftingCalculator.Model.LiteDB;
+﻿using CraftingCalculator.Model.Data;
 using CraftingCalculator.Model.Recipes;
 using LiteDB;
 using System.Collections.Generic;

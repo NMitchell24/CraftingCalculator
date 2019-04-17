@@ -1,6 +1,6 @@
 ﻿using LiteDB;
 
-namespace CraftingCalculator.Model.LiteDB
+namespace CraftingCalculator.Model.Data
 {
     public sealed class DataManager
     {

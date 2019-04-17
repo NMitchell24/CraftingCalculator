@@ -111,13 +111,13 @@
     </ApplicationDefinition>
     <Compile Include="Model\Ingredients\IngredientMap.cs" />
     <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
-    <Compile Include="Model\LiteDB\CollectionLabels.cs" />
-    <Compile Include="Model\LiteDB\DataManager.cs" />
-    <Compile Include="Model\LiteDB\IngredientData.cs" />
-    <Compile Include="Model\LiteDB\IngredientQuantityData.cs" />
-    <Compile Include="Model\LiteDB\RecipeData.cs" />
-    <Compile Include="Model\LiteDB\RecipeFilterData.cs" />
-    <Compile Include="Model\LiteDB\RecipeQuantityData.cs" />
+    <Compile Include="Model\Data\CollectionLabels.cs" />
+    <Compile Include="Model\Data\DataManager.cs" />
+    <Compile Include="Model\Data\IngredientData.cs" />
+    <Compile Include="Model\Data\IngredientQuantityData.cs" />
+    <Compile Include="Model\Data\RecipeData.cs" />
+    <Compile Include="Model\Data\RecipeFilterData.cs" />
+    <Compile Include="Model\Data\RecipeQuantityData.cs" />
     <Compile Include="Model\Recipes\RecipeFilter.cs" />
     <Compile Include="Model\Recipes\RecipeMap.cs" />
     <Compile Include="Model\Recipes\RecipeQuantity.cs" />
