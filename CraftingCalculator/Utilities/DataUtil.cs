@@ -3,6 +3,7 @@ using CraftingCalculator.Model.Recipes;
 using LiteDB;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CraftingCalculator.Utilities
 {
@@ -63,8 +64,8 @@ namespace CraftingCalculator.Utilities
             var col = db.GetCollection<RecipeFilterData>(CollectionLabels.RecipeFilters);
             List<RecipeFilterData> ret = new List<RecipeFilterData>();
 
-            var filters = col.Find(Query.All(Query.Ascending));
-            ret.AddRange(filters);
+            ret.AddRange(col.Find(Query.All(Query.Ascending))
+                .OrderByDescending(x => x.Name == "All").ThenBy(x => x.Name));
             return ret;
         }
 
@@ -84,13 +85,15 @@ namespace CraftingCalculator.Utilities
             {
                 ret.AddRange(col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
-                .Find(Query.All(Query.Ascending)));
+                .Find(Query.All(Query.Ascending))
+                .OrderBy(x => x.Name));
             }
             else
             {
                 ret.AddRange(col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
-                .Find(x => x.Filter.Id == filter.Id));
+                .Find(x => x.Filter.Id == filter.Id)
+                .OrderBy(x => x.Name));
             }
             
             return ret;
