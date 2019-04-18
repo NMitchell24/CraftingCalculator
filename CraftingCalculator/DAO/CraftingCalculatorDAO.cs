@@ -220,7 +220,10 @@ namespace CraftingCalculator.DAO
                 var recCol = _data.GetCollectionByType<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities);
                 var favCol = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
 
-                recCol.Delete(Query.Where("Favorite.Id", x => x.AsInt32 == data.Id));
+                foreach(FavoriteRecipeQuantitiesData recData in GetRecipeQuantitesForFavoriteId(data.Id)){
+                    recCol.Delete(recData.Id);
+                }
+
                 favCol.Delete(data.Id);
             }
         }
