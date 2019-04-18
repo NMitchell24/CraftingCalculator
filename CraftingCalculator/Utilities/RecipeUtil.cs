@@ -83,6 +83,9 @@ namespace CraftingCalculator.Utilities
         /// <param name="fav"></param>
         public static void SaveRecipeFavorite(RecipeFavorite fav, List<RecipeQuantity> quantities)
         {
+            //First delete existing data (if it exists)
+            DeleteFavoriteData(fav);
+
             RecipeFavoritesData data = new RecipeFavoritesData()
             {
                 Name = fav.Name
@@ -119,6 +122,17 @@ namespace CraftingCalculator.Utilities
         }
 
         /// <summary>
+        /// Deletes the data for a provided favorite.
+        /// </summary>
+        /// <param name="fav"></param>
+        public static void DeleteFavoriteData(RecipeFavorite fav)
+        {
+            RecipeFavoritesData data = CraftingCalculatorDAO.GetFavoriteByName(fav.Name);
+
+            CraftingCalculatorDAO.DeleteFavoritesData(data);
+        }
+
+        /// <summary>
         /// Check to see if a Favorite already exists in the DB
         /// </summary>
         /// <param name="fav"></param>
@@ -136,7 +150,7 @@ namespace CraftingCalculator.Utilities
 
             foreach(FavoriteRecipeQuantitiesData favRecData in data)
             {
-                RecipeData recData = CraftingCalculatorDAO.GetRecipeById(favRecData.Id);
+                RecipeData recData = CraftingCalculatorDAO.GetRecipeById(favRecData.Recipe.Id);
                 Recipe rec = GetRecipeForData(recData);
                 ret.Add(new RecipeQuantity(rec, favRecData.Quantity));
             }

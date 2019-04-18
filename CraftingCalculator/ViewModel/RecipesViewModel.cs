@@ -149,6 +149,9 @@ namespace CraftingCalculator.ViewModel
             RaisePropertyChanged(nameof(SelectedRecipe));
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
+            SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
+            SelectedFav = null;
+            RaisePropertyChanged(nameof(RecipeFavorites));
         }
 
         private RecipeFavorite _selectedFav;
