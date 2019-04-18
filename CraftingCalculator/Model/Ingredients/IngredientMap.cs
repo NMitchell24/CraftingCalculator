@@ -54,11 +54,11 @@ namespace CraftingCalculator.Model.Ingredients
         /// </summary>
         /// <param name="ingredient"></param>
         /// <param name="quantity"></param>
-        public void Remove(string ingredient, long quantity)
+        public void Remove(string ingredient, string description, long quantity)
         {
             if (_internalList.Any(i => i.Name == ingredient && i.Quantity - quantity > 0))
             {
-                Add(ingredient, "", -quantity);
+                Add(ingredient, description, -quantity);
             }
             else
             {
