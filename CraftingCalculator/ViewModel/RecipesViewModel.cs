@@ -29,6 +29,7 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner ClearQuantitiesCommand { get; set; }
         public CommandRunner CopyIngredientsCommand { get; set; }
         public CommandRunner SaveRecipeFavoritesCommand { get; set; }
+        public CommandRunner DeleteFavoriteCommand { get; set; }
 
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
         public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
@@ -61,8 +62,6 @@ namespace CraftingCalculator.ViewModel
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
             SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
-            SelectedFav = null;
-            RaisePropertyChanged(nameof(RecipeFavorites));
         }
 
         private bool CanRemoveRecipes()
@@ -86,8 +85,6 @@ namespace CraftingCalculator.ViewModel
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             ClearQuantitiesCommand.RaiseCanExecuteChanged();
             SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
-            SelectedFav = null;
-            RaisePropertyChanged(nameof(RecipeFavorites));
         }
 
         private void CalculateTotalIngredients(object obj = null)
@@ -182,9 +179,10 @@ namespace CraftingCalculator.ViewModel
                     RaisePropertyChanged(nameof(RecipesList));
                     RemoveRecipeCommand.RaiseCanExecuteChanged();
                     ClearQuantitiesCommand.RaiseCanExecuteChanged();
-                    SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
+                    SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();                  
                 }
                 RaisePropertyChanged(nameof(SelectedFav));
+                DeleteFavoriteCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -194,27 +192,45 @@ namespace CraftingCalculator.ViewModel
         }
 
         private async void SaveRecipes(object obj)
-        {
-            var name = await dialogCoordinator
-                .ShowInputAsync(this,"Save Recipe Favorites", "Enter a Name for this Favorite:");
-
-            //User cancelled.
-            if (name == null)
-                return;
-
+        {            
+            bool doSaveExisting = false;
             bool doSave = true;
-            if (RecipeUtil.DoesFavoriteExist(name))
+            var name = "";
+            if (SelectedFav != null)
             {
-                var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
-                var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
-                "Recipe Favorite already exists, do you want to overwrite?",
+                var settings = new MetroDialogSettings { AffirmativeButtonText = "Update", NegativeButtonText = "Create New" };
+                var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Update or Create New?",
+                "Would you like to update '" + SelectedFav.Name + "' or create a new favorite?",
                 MessageDialogStyle.AffirmativeAndNegative,
                 settings);
 
-                doSave = yesNo == MessageDialogResult.Affirmative;
+                doSaveExisting = yesNo == MessageDialogResult.Affirmative;
+
+                if (doSaveExisting)
+                    name = SelectedFav.Name;
             }
 
-            if (doSave)
+            if (((!doSaveExisting) && SelectedFav != null ) || SelectedFav == null)
+            {
+                name = await dialogCoordinator
+                    .ShowInputAsync(this, "Save Recipe Favorites", "Enter a Name for this Favorite:");
+
+                //User cancelled.
+                if (name == null)
+                    return;
+                
+                if (RecipeUtil.DoesFavoriteExist(name))
+                {
+                    var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
+                    var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
+                    "Recipe Favorite already exists, do you want to overwrite?",
+                    MessageDialogStyle.AffirmativeAndNegative,
+                    settings);
+
+                    doSave = yesNo == MessageDialogResult.Affirmative;
+                }
+            }
+            if (doSave || doSaveExisting)
             {
                 RecipeFavorite fav = new RecipeFavorite()
                 {
@@ -227,6 +243,33 @@ namespace CraftingCalculator.ViewModel
             SelectedFav = RecipeFavorites.Where(x => x.Name == name).FirstOrDefault();
             RaisePropertyChanged(nameof(SelectedFav));
             RaisePropertyChanged(nameof(RecipeFavorites));
+        }
+
+        private bool CanDeleteFavorite()
+        {
+            return SelectedFav != null;
+        }
+
+        private async void DeleteSelectedFavorite(object obj)
+        {
+            bool doDelete = false;
+
+            var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
+            var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
+            "This action will permanently delete the saved favorites '"+SelectedFav.Name+"'.  Are you sure you want to continue?",
+            MessageDialogStyle.AffirmativeAndNegative,
+            settings);
+
+            doDelete = yesNo == MessageDialogResult.Affirmative;
+
+            if (doDelete)
+            {
+                RecipeUtil.DeleteFavoriteData(SelectedFav);
+                SelectedFav = null;
+                RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeUtil.GetAllRecipeFavorites());
+                RaisePropertyChanged(nameof(SelectedFav));
+                RaisePropertyChanged(nameof(RecipeFavorites));
+            }
         }
 
         private bool CanCopyIngredients()
@@ -321,6 +364,7 @@ namespace CraftingCalculator.ViewModel
             ClearQuantitiesCommand = new CommandRunner(ClearRecipes, CanClearRecipes);
             CopyIngredientsCommand = new CommandRunner(CopyIngredientsToClipboard, CanCopyIngredients);
             SaveRecipeFavoritesCommand = new CommandRunner(SaveRecipes, CanSaveRecipes);
+            DeleteFavoriteCommand = new CommandRunner(DeleteSelectedFavorite, CanDeleteFavorite);
             dialogCoordinator = instance;
         }
 
