@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace CraftingCalculator.Model.Recipes
 {
@@ -8,6 +8,8 @@ namespace CraftingCalculator.Model.Recipes
         RecipeTree parent;
         public string Name { get; set; }
         public ObservableCollection<RecipeTree> RecipeNodes { get; set; }
+        public bool IsNodeExpanded { get; set; }
+        public string Id { get; set; }
 
         public RecipeTree()
         {
@@ -31,6 +33,22 @@ namespace CraftingCalculator.Model.Recipes
             {
                 tree.parent = this;
                 tree.SetParent();
+            }
+        }
+
+        public void SetExpandedNodes(RecipeTree tree)
+        {
+            if(Id == tree.Id)
+            {
+                IsNodeExpanded = tree.IsNodeExpanded;
+            }
+            foreach(RecipeTree node in tree.RecipeNodes)
+            {
+                RecipeTree thisNode = RecipeNodes.Where(x => x.Id == node.Id).FirstOrDefault();
+                if(thisNode != null)
+                {
+                    thisNode.SetExpandedNodes(node);
+                }
             }
         }
     }

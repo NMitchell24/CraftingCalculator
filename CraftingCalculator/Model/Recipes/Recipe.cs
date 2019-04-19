@@ -14,6 +14,8 @@ namespace CraftingCalculator.Model.Recipes
         public IngredientMap Ingredients { get; set; }
         public RecipeMap ChildRecipes { get; set; }
         public string Name { get; set; }
+        public int Id { get; set; }
+        public string Description { get; set; }
         public string Type { get; set; }
         public string Tooltip
         {
@@ -23,6 +25,12 @@ namespace CraftingCalculator.Model.Recipes
                 sb.AppendLine(Name);
                 sb.AppendLine(Type);
                 sb.Append(Environment.NewLine);
+                if(Description != null && Description.Length > 0)
+                {
+                    sb.AppendLine("Description:");
+                    sb.AppendLine(Description);
+                    sb.Append(Environment.NewLine);
+                }
                 sb.AppendLine("Ingredients:");
 
                 foreach (IngredientQuantity ingredient in Ingredients.IngredientList)
@@ -65,7 +73,8 @@ namespace CraftingCalculator.Model.Recipes
         {
             RecipeTree ret = new RecipeTree
             {
-                Name = Name + " x" + quantity
+                Name = Name + " x" + quantity,
+                Id = Name
             };
 
             foreach (IngredientQuantity i in Ingredients.IngredientList)

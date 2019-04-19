@@ -109,6 +109,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Data\FavoriteRecipeQuantitiesData.cs" />
+    <Compile Include="Model\Data\RecipeFavoritesData.cs" />
     <Compile Include="Model\Ingredients\IngredientMap.cs" />
     <Compile Include="Model\Ingredients\IngredientQuantity.cs" />
     <Compile Include="Model\Data\CollectionLabels.cs" />
@@ -118,6 +120,7 @@
     <Compile Include="Model\Data\RecipeData.cs" />
     <Compile Include="Model\Data\RecipeFilterData.cs" />
     <Compile Include="Model\Data\RecipeQuantityData.cs" />
+    <Compile Include="Model\Recipes\RecipeFavorites.cs" />
     <Compile Include="Model\Recipes\RecipeFilter.cs" />
     <Compile Include="Model\Recipes\RecipeMap.cs" />
     <Compile Include="Model\Recipes\RecipeQuantity.cs" />

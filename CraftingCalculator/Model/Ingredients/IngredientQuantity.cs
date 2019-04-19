@@ -9,6 +9,7 @@ namespace CraftingCalculator.Model.Ingredients
         public long Quantity { get; set; }
 
         public string Name { get; set; }
+        public string Description { get; set; }
 
         public string DisplayName
         {
@@ -16,15 +17,16 @@ namespace CraftingCalculator.Model.Ingredients
             private set { }
         }
 
-        public IngredientQuantity(string name, long quantity)
+        public IngredientQuantity(string name, string description, long quantity)
         {
             Name = name;
+            Description = description;
             Quantity = quantity;
         }
 
         public IngredientQuantity Clone()
         {
-            return new IngredientQuantity (Name, Quantity);
+            return new IngredientQuantity (Name, Description, Quantity);
         }
 
     }

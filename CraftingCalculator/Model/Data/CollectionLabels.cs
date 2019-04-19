@@ -7,5 +7,7 @@
         public const string IngredientQuantities = "IngredientQuantities";
         public const string RecipeQuantities = "RecipeQuantities";
         public const string Recipes = "Recipes";
+        public const string RecipeFavorites = "RecipeFavorites";
+        public const string FavoriteRecipeQuantities = "FavoriteRecipeQuantities";
     }
 }
