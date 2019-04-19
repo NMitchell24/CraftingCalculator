@@ -134,7 +134,7 @@
             </StackPanel>
         </Button>
 
-        <!--Recipe Quantities Listbox-->
+        <!-- Recipe Favorites Controls -->
         <Grid Grid.Row="1" Grid.Column="4" Margin="5,0,5,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="47"/>
@@ -143,7 +143,7 @@
             <TextBlock HorizontalAlignment="Left" Margin="5,5,0,5" TextWrapping="Wrap" FontWeight="Bold"
                        Text="Recipes" VerticalAlignment="Center" Grid.Column="0" Height="16" Width="47" Grid.ColumnSpan="2"/>
             <ComboBox ItemsSource="{Binding RecipeFavorites}" 
-                    SelectedItem="{Binding SelectedFav}"
+                    SelectedItem="{Binding SelectedFav, Mode=TwoWay}"
                     HorizontalAlignment="Stretch" 
                     Margin="10,0,0,0" 
                     Grid.Column="1"
@@ -152,7 +152,7 @@
                     ToolTip="Load Recipes from Saved Favorites">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Path = Name}" />
+                            <TextBlock Text="{Binding Path = Name, Mode=TwoWay}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -171,6 +171,8 @@
                 <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Save"/>
             </StackPanel>
         </Button>
+        
+        <!-- Clear Recipe Quantities button -->
         <Button ToolTip="Clear Recipes"
                     Command="{Binding ClearQuantitiesCommand}"
                     Grid.Column="5" 
@@ -185,6 +187,8 @@
                 <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Clear"/>
             </StackPanel>
         </Button>
+        
+        <!--Recipe Quantities Listbox-->
         <ListBox x:Name="recipeQuantities" ItemsSource="{Binding Path=RecipeQuantities, NotifyOnSourceUpdated=True}"
                      SelectedItem="{Binding Path=SelectedRecipeQuantity, UpdateSourceTrigger=PropertyChanged}"
                      SelectedIndex="{Binding Path=SelectedRecipeQuantityIndex}"
@@ -269,38 +273,36 @@
         </TreeView>
 
         <!--Total Ingredients Grid-->
-        <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
-            <Button Command="{Binding CopyIngredientsCommand}" Grid.Column="1" HorizontalAlignment="Right" ToolTip="Copy ingredient totals to clipboard" Margin="0,0,5,0" Height="30">
-                <StackPanel>
-                    <iconPacks:PackIconMaterialDesign Kind="ContentCopy"/>
-                </StackPanel>
-            </Button>
-            <ListBox
+            <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="6" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock HorizontalAlignment="Left" Margin="5,0,0,0" TextWrapping="Wrap" FontWeight="Bold" Text="Total Ingredients Needed" VerticalAlignment="Center"/>
+                <Button Command="{Binding CopyIngredientsCommand}" Grid.Column="1" HorizontalAlignment="Right" ToolTip="Copy ingredient totals to clipboard" Margin="0,0,5,0" Height="30">
+                    <StackPanel>
+                        <iconPacks:PackIconMaterialDesign Kind="ContentCopy"/>
+                    </StackPanel>
+                </Button>
+                <ListBox
                     x:Name="totalIngredients"
                     ItemsSource="{Binding Path=TotalIngredients}"
                     Margin="5" 
                     Grid.Row="1" Grid.RowSpan="2"
                     Grid.Column="0" Grid.ColumnSpan="2"
                     BorderThickness="1">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=DisplayName, Mode=OneWay}" 
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=DisplayName, Mode=OneWay}" 
                                        ToolTipService.ToolTip="{Binding Path = Description}" ToolTipService.ShowDuration="45000"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
         </Grid>
-
-
-    </Grid>
     </ScrollViewer>
 </UserControl>

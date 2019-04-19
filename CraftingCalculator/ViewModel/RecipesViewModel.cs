@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
+using System.Threading.Tasks;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -183,6 +184,7 @@ namespace CraftingCalculator.ViewModel
                     ClearQuantitiesCommand.RaiseCanExecuteChanged();
                     SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
                 }
+                RaisePropertyChanged(nameof(SelectedFav));
             }
         }
 
@@ -195,6 +197,10 @@ namespace CraftingCalculator.ViewModel
         {
             var name = await dialogCoordinator
                 .ShowInputAsync(this,"Save Recipe Favorites", "Enter a Name for this Favorite:");
+
+            //User cancelled.
+            if (name == null)
+                return;
 
             bool doSave = true;
             if (RecipeUtil.DoesFavoriteExist(name))
@@ -218,6 +224,8 @@ namespace CraftingCalculator.ViewModel
             }
 
             RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeUtil.GetAllRecipeFavorites());
+            SelectedFav = RecipeFavorites.Where(x => x.Name == name).FirstOrDefault();
+            RaisePropertyChanged(nameof(SelectedFav));
             RaisePropertyChanged(nameof(RecipeFavorites));
         }
 
