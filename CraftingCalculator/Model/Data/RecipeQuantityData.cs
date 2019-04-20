@@ -6,10 +6,10 @@ namespace CraftingCalculator.Model.Data
     {
         public int Id { get; set; }
         
-        [BsonRef("Recipes")]
+        [BsonRef(CollectionLabels.Recipes)]
         public RecipeData ParentRecipe { get; set; }
 
-        [BsonRef("Recipes")]
+        [BsonRef(CollectionLabels.Recipes)]
         public RecipeData ChildRecipe { get; set; }
 
         public int Quantity { get; set; }

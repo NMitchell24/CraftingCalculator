@@ -9,10 +9,10 @@ namespace CraftingCalculator.Model.Data
         public string Name { get; set; }
         public string Description { get; set; }
 
-        [BsonRef("RecipeFilters")]
+        [BsonRef(CollectionLabels.RecipeFilters)]
         public RecipeFilterData Filter { get; set; }
 
-        [BsonRef("IngredientQuantities")]
+        [BsonRef(CollectionLabels.IngredientQuantities)]
         public List<IngredientQuantityData> Ingredients { get; set; }
     }
 }
