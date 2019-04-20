@@ -59,10 +59,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6D6B7896FA8C7E8AC237492337D3E0BA9DF826B5</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>C5CD6950DEC626BCE3053FA88956B10EE97E4EA6</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>CraftingCalculatorCert.pfx</ManifestKeyFile>
+    <ManifestKeyFile>CraftingCalculator.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
@@ -187,6 +187,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="CraftingCalculator.pfx" />
     <None Include="CraftingCalculatorCert.pfx" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
