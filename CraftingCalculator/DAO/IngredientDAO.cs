@@ -2,10 +2,8 @@
 
 namespace CraftingCalculator.DAO
 {
-    public static class IngredientDAO
+    public class IngredientDAO : AbstractDAO
     {
-        private static DataManager _data = DataManager.Instance;
-
         /// <summary>
         /// Gets an Ingredient by its Identifier
         /// </summary>

@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CraftingCalculator.Model.Data;
 using LiteDB;
 using CraftingCalculator.Model.Recipes;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CraftingCalculator.DAO
 {
-    public static class RecipeFilterDAO
+    public class RecipeFilterDAO : AbstractDAO
     {
-        private static DataManager _data = DataManager.Instance;
         /// <summary>
         /// Gets all the Recipe Filter data objects
         /// </summary>

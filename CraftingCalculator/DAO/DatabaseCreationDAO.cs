@@ -2,9 +2,8 @@
 
 namespace CraftingCalculator.DAO
 {
-    public static class DatabaseCreationDAO
+    public class DatabaseCreationDAO : AbstractDAO
     {
-        private static DataManager _data = DataManager.Instance;
         /// <summary>
         /// This method will make sure the database exists, all the correct Documents (tables) exist, 
         /// and that the appropriate indexes are created

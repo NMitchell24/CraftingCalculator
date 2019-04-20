@@ -6,10 +6,8 @@ using System.Linq;
 
 namespace CraftingCalculator.DAO
 {
-    public static class RecipeDAO
+    public class RecipeDAO : AbstractDAO
     {      
-        private static DataManager _data = DataManager.Instance;
-
         /// <summary>
         /// Returns all Recipes for a given filter.   
         /// If the Filter name is 'All' then we will return all recipes.

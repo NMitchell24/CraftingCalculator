@@ -6,10 +6,8 @@ using System.Linq;
 
 namespace CraftingCalculator.DAO
 {
-    public static class RecipeFavoritesDAO
+    public class RecipeFavoritesDAO : AbstractDAO
     {
-        private static DataManager _data = DataManager.Instance;
-
         /// <summary>
         /// Returns all the Recipe Favorites
         /// </summary>
@@ -85,15 +83,12 @@ namespace CraftingCalculator.DAO
         {
             if (data != null)
             {
-                var recCol = _data.GetCollectionByType<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities);
-                var favCol = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
-
                 foreach (FavoriteRecipeQuantitiesData recData in GetRecipeQuantitesForFavoriteId(data.Id))
                 {
-                    recCol.Delete(recData.Id);
+                    DeleteRecordById<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities, recData.Id);
                 }
 
-                favCol.Delete(data.Id);
+                DeleteRecordById<RecipeFavoritesData>(CollectionLabels.RecipeFavorites, data.Id);
             }
         }
     }
