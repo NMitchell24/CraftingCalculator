@@ -5,7 +5,7 @@ namespace CraftingCalculator.Model.Data
     {
         public int Id { get; set; }
 
-        [BsonRef("Ingredients")]
+        [BsonRef(CollectionLabels.Ingredients)]
         public IngredientData Ingredient { get; set; }
 
         public long Quantity { get; set; }
