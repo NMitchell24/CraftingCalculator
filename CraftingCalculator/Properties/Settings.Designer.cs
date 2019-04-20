@@ -37,18 +37,6 @@ namespace CraftingCalculator.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("900")]
-        public double Height {
-            get {
-                return ((double)(this["Height"]));
-            }
-            set {
-                this["Height"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double Top {
             get {
@@ -92,6 +80,18 @@ namespace CraftingCalculator.Properties {
             }
             set {
                 this["Accent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1080")]
+        public double Height {
+            get {
+                return ((double)(this["Height"]));
+            }
+            set {
+                this["Height"] = value;
             }
         }
     }
