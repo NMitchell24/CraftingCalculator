@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Home - Crafting Calculator</title>
+    <meta name="description" content="Simple Crafting Calculator for Survival Crafting Games.">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/Atom-512.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/Atom-512.png">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+    <nav class="navbar navbar-dark navbar-expand-lg fixed-top bg-white portfolio-navbar gradient">
+        <div class="container-fluid"><a class="navbar-brand logo" href="index.html">Crafting Calculator</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navbarNav"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div
+                class="collapse navbar-collapse" id="navbarNav">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link active" href="assets/resources/CraftingCalculator.zip">Download</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link active" href="release-notes.html">Release Notes</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="https://github.com/NMitchell24/CraftingCalculator" target="_blank">Visit on Github</a></li>
+                </ul>
+        </div>
+        </div>
+    </nav>
+    <main class="page lanidng-page">
+        <div class="container-fluid">
+            <div class="row"><style>
+nav[data-toggle="toc"] {
+    padding-top: 15px;
+    top: 100px;
+}
+
+/* small screens */
+@media (max-width: 768px) {
+  /* override stickyness so that the navigation does not follow scrolling */
+  nav[data-toggle="toc"] {
+    margin-bottom: 42px;
+    position: static;
+  }
+
+  /* don't expand nested items, which pushes down the rest of the page when navigating */
+  nav[data-toggle="toc"] .nav .active .nav {
+    display: none;
+  }
+}
+</style>  
+
+<div class="col-sm-3" >
+    <nav id="toc" data-toggle="toc" class="sticky-top"><h5>Table of Contents</h5></nav>
+</div>
+                <div class="col-sm-9">
+                    <section class="release-note">
+                        <h3>Version 1.0.0.0</h3>
+                        <ul>
+                            <li>Initial Release</li>
+                            <li>Automatically calculates total basic ingredients for all recipes added to the recipes list. &nbsp;Ingredients are calculated dynamically as soon as you add recipes or adjust their quantities.&nbsp;<br></li>
+                            <li>Displays the breakdown of all crafted items needed to make the recipes added.</li>
+                            <li>Allows you to copy the total ingredients section to the windows clipboard</li>
+                            <li>Supports almost all crafted items from No Man's Sky.</li>
+                            <li>Light and dark theme with various accent colors.</li>
+                            <li>Recipes list can be filtered down to specific groupings. &nbsp;</li>
+                        </ul>
+                    </section>
+                    <section class="release-note">
+                        <h3>Version 1.1.0.0</h3>
+                        <ul>
+                            <li>Several recipes were added to allow calculation of repair costs for various technology items.</li>
+                            <li>The Data Model was converted over to use <a href="http://www.litedb.org/" target="_blank">LiteDB</a>&nbsp;for data storage. &nbsp;More info on this can be found on the&nbsp;<a href="https://github.com/NMitchell24/CraftingCalculator/wiki"
+                                    target="_blank">Crafting Calculator Wiki</a></li>
+                            <li>The Recipe Ingredients Needed tree view will now remember expanded nodes when the quantities are adjusted or new recipes are added.</li>
+                            <li>Game descriptions for the Recipes and Basic Elements were included in the tooltips for Recipes and Ingredients. &nbsp;Total Ingredients now shows a tooltip when you hover over the ingredients.</li>
+                            <li>Total Ingredients list is now ordered alphabetically by Ingredient Name.</li>
+                            <li>Recipes List can be saved to customized favorites so that you can easily reload the recipes you use frequently.</li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="page-footer">
+        <div class="container">
+            <div class="links">
+                <p>Copyright © 2019 Nathan Mitchell.<a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html" target="_blank">Licensed with GPL 2.0</a></p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script src="assets/js/script.min.js"></script>
+</body>
+
+</html>
