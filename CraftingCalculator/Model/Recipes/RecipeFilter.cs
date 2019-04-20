@@ -6,6 +6,7 @@ namespace CraftingCalculator.Model.Recipes
     /// </summary>
     public class RecipeFilter
     {
+        public const string ALL = "All";
         public string Name { get; set; }
         public int Id { get; set; }
     }

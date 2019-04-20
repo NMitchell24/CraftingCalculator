@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
-using System.Threading.Tasks;
+using CraftingCalculator.Service;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -165,7 +165,7 @@ namespace CraftingCalculator.ViewModel
                 if (value != null)
                 {
                     _recipeMap.Reset();
-                    List<RecipeQuantity> quans = RecipeUtil.GetRecipeQuantitiesForFavorite(_selectedFav);
+                    List<RecipeQuantity> quans = RecipeFavoriteService.GetRecipeQuantitiesForFavorite(_selectedFav);
                     foreach (RecipeQuantity q in quans)
                     {
                         _recipeMap.Add(q.Recipe, q.Quantity);
@@ -219,7 +219,7 @@ namespace CraftingCalculator.ViewModel
                 if (name == null)
                     return;
                 
-                if (RecipeUtil.DoesFavoriteExist(name))
+                if (RecipeFavoriteService.DoesFavoriteExist(name))
                 {
                     var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
                     var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
@@ -236,10 +236,10 @@ namespace CraftingCalculator.ViewModel
                 {
                     Name = name
                 };
-                RecipeUtil.SaveRecipeFavorite(fav, RecipeQuantities.ToList());
+                RecipeFavoriteService.SaveRecipeFavorite(fav, RecipeQuantities.ToList());
             }
 
-            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeUtil.GetAllRecipeFavorites());
+            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
             SelectedFav = RecipeFavorites.Where(x => x.Name == name).FirstOrDefault();
             RaisePropertyChanged(nameof(SelectedFav));
             RaisePropertyChanged(nameof(RecipeFavorites));
@@ -264,9 +264,9 @@ namespace CraftingCalculator.ViewModel
 
             if (doDelete)
             {
-                RecipeUtil.DeleteFavoriteData(SelectedFav);
+                RecipeFavoriteService.DeleteFavoriteData(SelectedFav);
                 SelectedFav = null;
-                RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeUtil.GetAllRecipeFavorites());
+                RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
                 RaisePropertyChanged(nameof(SelectedFav));
                 RaisePropertyChanged(nameof(RecipeFavorites));
             }
@@ -353,10 +353,10 @@ namespace CraftingCalculator.ViewModel
 
         public RecipesViewModel(IDialogCoordinator instance)
         {
-            RecipeFilters = RecipeUtil.GetRecipeFilters();
+            RecipeFilters = RecipeFilterService.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
-            RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(SelectedFilter));
-            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeUtil.GetAllRecipeFavorites());
+            RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(SelectedFilter));
+            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
             RecipeTotals = new ObservableCollection<RecipeTree>();
             AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
             RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
@@ -370,7 +370,7 @@ namespace CraftingCalculator.ViewModel
 
         public void ReloadRecipesForFilter(RecipeFilter filter)
         {
-            RecipesList = new ObservableCollection<Recipe>(RecipeUtil.GetRecipesByFilter(filter));
+            RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(filter));
             RaisePropertyChanged(nameof(RecipesList));
         }
 

@@ -1,6 +1,6 @@
 ﻿using CraftingCalculator.ViewModel;
 using MahApps.Metro.Controls.Dialogs;
-using CraftingCalculator.DAO;
+using CraftingCalculator.Service;
 
 namespace CraftingCalculator
 {
@@ -12,7 +12,7 @@ namespace CraftingCalculator
         public CraftingCalculatorMainWindow()
         {
             //Must ensure the DB exists before starting the application.
-            CraftingCalculatorDAO.EnsureDatabaseExists();
+            DatabaseCreationService.CreateDatabase();
             InitializeComponent();
             CraftingCalculatorMainViewModel vm = new CraftingCalculatorMainViewModel(DialogCoordinator.Instance);
             DataContext = vm;

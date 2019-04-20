@@ -109,6 +109,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DAO\DatabaseCreationDAO.cs" />
+    <Compile Include="DAO\IngredientDAO.cs" />
+    <Compile Include="DAO\RecipeFavoritesDAO.cs" />
+    <Compile Include="DAO\RecipeFilterDAO.cs" />
     <Compile Include="Model\Data\FavoriteRecipeQuantitiesData.cs" />
     <Compile Include="Model\Data\RecipeFavoritesData.cs" />
     <Compile Include="Model\Ingredients\IngredientMap.cs" />
@@ -126,10 +130,13 @@
     <Compile Include="Model\Recipes\RecipeQuantity.cs" />
     <Compile Include="Model\Recipes\RecipeTree.cs" />
     <Compile Include="Model\Recipes\Recipe.cs" />
+    <Compile Include="Service\DatabaseCreationService.cs" />
+    <Compile Include="Service\RecipeFavoriteService.cs" />
+    <Compile Include="Service\RecipeFilterService.cs" />
+    <Compile Include="Service\RecipeService.cs" />
     <Compile Include="Utilities\CommandRunner.cs" />
-    <Compile Include="DAO\CraftingCalculatorDAO.cs" />
+    <Compile Include="DAO\RecipeDAO.cs" />
     <Compile Include="Utilities\IngredientUtil.cs" />
-    <Compile Include="Utilities\RecipeUtil.cs" />
     <Compile Include="ViewModel\CraftingCalculatorMainViewModel.cs" />
     <Compile Include="ViewModel\RecipesViewModel.cs" />
     <Compile Include="Views\RecipesView.xaml.cs">
