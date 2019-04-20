@@ -1,5 +1,5 @@
 ﻿
-namespace CraftingCalculator.Model.Ingredients
+namespace CraftingCalculator.ViewModel.Ingredients
 {
     /// <summary>
     /// Represents an ingredient and quantity.

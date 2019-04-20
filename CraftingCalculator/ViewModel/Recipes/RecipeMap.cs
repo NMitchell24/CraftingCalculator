@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CraftingCalculator.Model.Recipes
+namespace CraftingCalculator.ViewModel.Recipes
 {
     public class RecipeMap
     {

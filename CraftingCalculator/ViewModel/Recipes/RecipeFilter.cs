@@ -1,5 +1,5 @@
 ﻿
-namespace CraftingCalculator.Model.Recipes
+namespace CraftingCalculator.ViewModel.Recipes
 {
     /// <summary>
     /// Simple Class to define the UI Model for RecipeFilters

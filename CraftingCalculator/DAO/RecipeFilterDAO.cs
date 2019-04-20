@@ -2,7 +2,7 @@
 using System.Linq;
 using CraftingCalculator.Model.Data;
 using LiteDB;
-using CraftingCalculator.Model.Recipes;
+using CraftingCalculator.ViewModel.Recipes;
 
 namespace CraftingCalculator.DAO
 {

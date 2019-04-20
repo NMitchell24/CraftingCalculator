@@ -1,13 +1,12 @@
-﻿using CraftingCalculator.Model.Ingredients;
-using System.ComponentModel;
+﻿using CraftingCalculator.ViewModel.Ingredients;
 using System;
 
-namespace CraftingCalculator.Model.Recipes
+namespace CraftingCalculator.ViewModel.Recipes
 {
     /// <summary>
     /// A class that represents a recipe and quantity
     /// </summary>
-    public class RecipeQuantity : INotifyPropertyChanged
+    public class RecipeQuantity : AbstractPropertyChanged
     {
         public Recipe Recipe { get; set; }
         private int _quantity;
@@ -56,12 +55,5 @@ namespace CraftingCalculator.Model.Recipes
             Recipe = recipe;
             Quantity = quantity;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
-
     }
 }

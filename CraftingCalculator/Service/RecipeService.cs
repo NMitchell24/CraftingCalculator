@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using CraftingCalculator.DAO;
 using CraftingCalculator.Model.Data;
-using CraftingCalculator.Model.Ingredients;
-using CraftingCalculator.Model.Recipes;
+using CraftingCalculator.ViewModel.Ingredients;
+using CraftingCalculator.ViewModel.Recipes;
 
 namespace CraftingCalculator.Service
 {

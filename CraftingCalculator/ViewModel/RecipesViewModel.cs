@@ -1,10 +1,9 @@
-﻿using CraftingCalculator.Model.Ingredients;
-using CraftingCalculator.Model.Recipes;
+﻿using CraftingCalculator.ViewModel.Ingredients;
+using CraftingCalculator.ViewModel.Recipes;
 using CraftingCalculator.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -13,29 +12,50 @@ using CraftingCalculator.Service;
 
 namespace CraftingCalculator.ViewModel
 {
-    public class RecipesViewModel : INotifyPropertyChanged
+    public class RecipesViewModel : AbstractPropertyChanged
     {
+        #region class-definition
+        // Class level Variables used by multiple methods.
         private IDialogCoordinator dialogCoordinator;
-        public event PropertyChangedEventHandler PropertyChanged;
-        public ObservableCollection<Recipe> RecipesList { get; set; }
-        public List<RecipeFilter> RecipeFilters { get; set; }
-
         private RecipeMap _recipeMap = new RecipeMap();
         private IngredientMap _ingredientMap = new IngredientMap();
 
-        public CommandRunner AddRecipeCommand { get; set; }
-        public CommandRunner RemoveRecipeCommand { get; set; }
-        public CommandRunner RecalculateTotalsCommand { get; set; }
-        public CommandRunner ClearQuantitiesCommand { get; set; }
-        public CommandRunner CopyIngredientsCommand { get; set; }
-        public CommandRunner SaveRecipeFavoritesCommand { get; set; }
-        public CommandRunner DeleteFavoriteCommand { get; set; }
-
+        // Class level Collections used by multiple methods.
+        public ObservableCollection<Recipe> RecipesList { get; set; }
+        public List<RecipeFilter> RecipeFilters { get; set; }
         public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
         public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
         public ObservableCollection<RecipeTree> RecipeTotals { get; set; }
         public ObservableCollection<RecipeFavorite> RecipeFavorites { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="instance"></param>
+        public RecipesViewModel(IDialogCoordinator instance)
+        {
+            dialogCoordinator = instance;
+
+            AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
+            RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
+            RecalculateTotalsCommand = new CommandRunner(CalculateTotalIngredients);
+            ClearQuantitiesCommand = new CommandRunner(ClearRecipes, IsRecipesExist);
+            CopyIngredientsCommand = new CommandRunner(CopyIngredientsToClipboard, CanCopyIngredients);
+            SaveRecipeFavoritesCommand = new CommandRunner(SaveRecipes, IsRecipesExist);
+            DeleteFavoriteCommand = new CommandRunner(DeleteSelectedFavorite, CanDeleteFavorite);
+            
+            RecipeFilters = RecipeFilterService.GetRecipeFilters();
+            SelectedFilter = RecipeFilters[0];
+
+            RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(SelectedFilter));
+            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
+            RecipeTotals = new ObservableCollection<RecipeTree>();        
+        }
+        #endregion
+
+        #region commands
+        // Add Recipe Command and methods.
+        public CommandRunner AddRecipeCommand { get; set; }
         private bool CanAddRecipes()
         {
             return RecipesList.Where(x => x.IsSelected).Count() > 0;
@@ -55,15 +75,10 @@ namespace CraftingCalculator.ViewModel
             RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
 
             CalculateTotalIngredients();
-
-            RaisePropertyChanged(nameof(RecipeQuantities));
-            RaisePropertyChanged(nameof(SelectedRecipe));
-            RaisePropertyChanged(nameof(RecipesList));
-            RemoveRecipeCommand.RaiseCanExecuteChanged();
-            ClearQuantitiesCommand.RaiseCanExecuteChanged();
-            SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
         }
 
+        // Remove Recipe Command and Methods.
+        public CommandRunner RemoveRecipeCommand { get; set; }
         private bool CanRemoveRecipes()
         {
             return RecipeQuantities != null && RecipeQuantities.Where(x => x.IsSelected).Count() > 0;
@@ -79,120 +94,59 @@ namespace CraftingCalculator.ViewModel
             RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
 
             CalculateTotalIngredients();
-
-            RaisePropertyChanged(nameof(RecipeQuantities));
-            RaisePropertyChanged(nameof(SelectedRecipe));
-            RemoveRecipeCommand.RaiseCanExecuteChanged();
-            ClearQuantitiesCommand.RaiseCanExecuteChanged();
-            SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
         }
 
+        // Recalculate Totals Command and Methods
+        public CommandRunner RecalculateTotalsCommand { get; set; }
         private void CalculateTotalIngredients(object obj = null)
         {
             _ingredientMap.Reset();
-            foreach(RecipeQuantity q in RecipeQuantities)
+            foreach (RecipeQuantity q in RecipeQuantities)
             {
-                foreach(IngredientQuantity i in q.Ingredients.IngredientList)
+                foreach (IngredientQuantity i in q.Ingredients.IngredientList)
                 {
                     _ingredientMap.Add(i.Name, i.Description, (i.Quantity * q.Quantity));
                 }
             }
             TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList.OrderBy(x => x.Name));
-            RaisePropertyChanged(nameof(TotalIngredients));
-            CopyIngredientsCommand.RaiseCanExecuteChanged();
 
             // rebuild recipe tree
             CalculateRecipeTotals();
         }
 
-        private void CalculateRecipeTotals()
-        {
-            List<RecipeTree> temp = new List<RecipeTree>();
-            foreach(RecipeQuantity q in RecipeQuantities)
-            {
-                RecipeTree tree = q.Recipe.GetRecipeNodes(q.Quantity);
-                RecipeTree oldTree = RecipeTotals.Where(x => x.Id == tree.Id).FirstOrDefault();
-                if(oldTree != null)
-                {
-                    tree.SetExpandedNodes(oldTree);
-                }
-                temp.Add(tree);
-            }
-            foreach(RecipeTree t in temp)
-            {
-                t.SetParent();
-            }
-
-            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
-            RaisePropertyChanged(nameof(RecipeTotals));
-        }
-
-        private bool IsRecipesExist()
-        {
-            return RecipeQuantities != null && RecipeQuantities.Count() > 0;
-        }
-
-        private bool CanClearRecipes()
-        {
-            return IsRecipesExist();
-        }
-
+        // Clear Quantities command and Methods.
+        public CommandRunner ClearQuantitiesCommand { get; set; }
         private void ClearRecipes(object obj)
         {
             _recipeMap.Reset();
             RecipeQuantities.Clear();
 
-            CalculateTotalIngredients();
-            RaisePropertyChanged(nameof(RecipeQuantities));
-            RaisePropertyChanged(nameof(SelectedRecipe));
-            RemoveRecipeCommand.RaiseCanExecuteChanged();
-            ClearQuantitiesCommand.RaiseCanExecuteChanged();
-            SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
             SelectedFav = null;
-            RaisePropertyChanged(nameof(RecipeFavorites));
+
+            CalculateTotalIngredients();
         }
 
-        private RecipeFavorite _selectedFav;
-        public RecipeFavorite SelectedFav
+        // Copy Ingredients Command and Methods.
+        public CommandRunner CopyIngredientsCommand { get; set; }
+        private bool CanCopyIngredients()
         {
-            get => _selectedFav;
-            set
-            {
-                if (_selectedFav == value)
-                    return;
-                _selectedFav = value;
-
-                if (value != null)
-                {
-                    _recipeMap.Reset();
-                    List<RecipeQuantity> quans = RecipeFavoriteService.GetRecipeQuantitiesForFavorite(_selectedFav);
-                    foreach (RecipeQuantity q in quans)
-                    {
-                        _recipeMap.Add(q.Recipe, q.Quantity);
-                    }
-
-                    RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
-
-                    CalculateTotalIngredients();
-                    RaisePropertyChanged(nameof(RecipeQuantities));
-                    RaisePropertyChanged(nameof(SelectedRecipe));
-                    RaisePropertyChanged(nameof(RecipesList));
-                    RemoveRecipeCommand.RaiseCanExecuteChanged();
-                    ClearQuantitiesCommand.RaiseCanExecuteChanged();
-                    SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();                  
-                }
-                RaisePropertyChanged(nameof(SelectedFav));
-                DeleteFavoriteCommand.RaiseCanExecuteChanged();
-            }
+            return TotalIngredients != null && TotalIngredients.Count() > 0;
         }
 
-        private bool CanSaveRecipes()
+        private void CopyIngredientsToClipboard(object obj)
         {
-            return IsRecipesExist();
+            StringBuilder sb = new StringBuilder();
+
+            var displayNames = TotalIngredients.Select(i => i.DisplayName);
+            sb.Append(string.Join(Environment.NewLine, displayNames));
+
+            Clipboard.SetText(sb.ToString());
         }
 
+        // Save Recipe Favorites Command and Methods.
+        public CommandRunner SaveRecipeFavoritesCommand { get; set; }
         private async void SaveRecipes(object obj)
-        {            
+        {
             bool doSaveExisting = false;
             bool doSave = true;
             var name = "";
@@ -210,7 +164,7 @@ namespace CraftingCalculator.ViewModel
                     name = SelectedFav.Name;
             }
 
-            if (((!doSaveExisting) && SelectedFav != null ) || SelectedFav == null)
+            if (((!doSaveExisting) && SelectedFav != null) || SelectedFav == null)
             {
                 name = await dialogCoordinator
                     .ShowInputAsync(this, "Save Recipe Favorites", "Enter a Name for this Favorite:");
@@ -218,7 +172,7 @@ namespace CraftingCalculator.ViewModel
                 //User cancelled.
                 if (name == null)
                     return;
-                
+
                 if (RecipeFavoriteService.DoesFavoriteExist(name))
                 {
                     var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
@@ -241,10 +195,12 @@ namespace CraftingCalculator.ViewModel
 
             RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
             SelectedFav = RecipeFavorites.Where(x => x.Name == name).FirstOrDefault();
-            RaisePropertyChanged(nameof(SelectedFav));
-            RaisePropertyChanged(nameof(RecipeFavorites));
+
+            RaiseChanged();
         }
 
+        //Delete Recipe Favorite Command and Methods.
+        public CommandRunner DeleteFavoriteCommand { get; set; }
         private bool CanDeleteFavorite()
         {
             return SelectedFav != null;
@@ -256,7 +212,7 @@ namespace CraftingCalculator.ViewModel
 
             var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
             var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
-            "This action will permanently delete the saved favorites '"+SelectedFav.Name+"'.  Are you sure you want to continue?",
+            "This action will permanently delete the saved favorites '" + SelectedFav.Name + "'.  Are you sure you want to continue?",
             MessageDialogStyle.AffirmativeAndNegative,
             settings);
 
@@ -267,26 +223,40 @@ namespace CraftingCalculator.ViewModel
                 RecipeFavoriteService.DeleteFavoriteData(SelectedFav);
                 SelectedFav = null;
                 RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
-                RaisePropertyChanged(nameof(SelectedFav));
-                RaisePropertyChanged(nameof(RecipeFavorites));
+                RaiseChanged();
+            }
+        }
+        #endregion
+
+        #region selected-items
+        // Favorites
+        private RecipeFavorite _selectedFav;
+        public RecipeFavorite SelectedFav
+        {
+            get => _selectedFav;
+            set
+            {
+                if (_selectedFav == value)
+                    return;
+                _selectedFav = value;
+
+                if (value != null)
+                {
+                    _recipeMap.Reset();
+                    List<RecipeQuantity> quans = RecipeFavoriteService.GetRecipeQuantitiesForFavorite(_selectedFav);
+                    foreach (RecipeQuantity q in quans)
+                    {
+                        _recipeMap.Add(q.Recipe, q.Quantity);
+                    }
+
+                    RecipeQuantities = new ObservableCollection<RecipeQuantity>(_recipeMap.RecipeList);
+
+                    CalculateTotalIngredients();
+                }
             }
         }
 
-        private bool CanCopyIngredients()
-        {
-            return TotalIngredients != null && TotalIngredients.Count() > 0;
-        }
-
-        private void CopyIngredientsToClipboard(object obj)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            var displayNames = TotalIngredients.Select(i => i.DisplayName);
-            sb.Append(string.Join(Environment.NewLine, displayNames));
-
-            Clipboard.SetText(sb.ToString());
-        }
-
+        // Filters
         private RecipeFilter _selectedFilter;
         public RecipeFilter SelectedFilter
         {
@@ -302,6 +272,7 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
+        // Recipes
         private Recipe _selectedRecipe;
         public Recipe SelectedRecipe
         {
@@ -309,26 +280,10 @@ namespace CraftingCalculator.ViewModel
             set
             {
                 var selectedItems = RecipesList.Where(x => x.IsSelected).Count();
-                RaisePropertyChanged(nameof(SelectedRecipe));
-                AddRecipeCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        private RecipeQuantity _selectedRecipeQuantity;
-        public RecipeQuantity SelectedRecipeQuantity
-        {
-            get => _selectedRecipeQuantity;
-            set
-            {
-                var selectedItems = RecipeQuantities.Where(x => x.IsSelected).Count();
-                RaisePropertyChanged(nameof(SelectedRecipeQuantity));
-                RaisePropertyChanged(nameof(RecipeQuantities));
-                RemoveRecipeCommand.RaiseCanExecuteChanged();
+                RaiseChanged();
             }
         }
         
-        // Have to bind to selected index so that we can disable the Add button when 
-        // User Deselects all recipes
         private int _selectedRecipeIndex;
         public int SelectedRecipeIndex
         {
@@ -336,7 +291,19 @@ namespace CraftingCalculator.ViewModel
             set
             {
                 _selectedRecipeIndex = value;
-                AddRecipeCommand.RaiseCanExecuteChanged();
+                RaiseChanged();
+            }
+        }
+
+        // Recipe Quantities
+        private RecipeQuantity _selectedRecipeQuantity;
+        public RecipeQuantity SelectedRecipeQuantity
+        {
+            get => _selectedRecipeQuantity;
+            set
+            {
+                var selectedItems = RecipeQuantities.Where(x => x.IsSelected).Count();
+                RaiseChanged();
             }
         }
 
@@ -347,36 +314,80 @@ namespace CraftingCalculator.ViewModel
             set
             {
                 _selectedRecipeQuantityIndex = value;
-                RemoveRecipeCommand.RaiseCanExecuteChanged();
+                RaiseChanged();
             }
         }
+        #endregion
 
-        public RecipesViewModel(IDialogCoordinator instance)
+        #region helper-methods
+        /// <summary>
+        /// Helper Method used by multiple commands.
+        /// </summary>
+        /// <returns></returns>
+        private bool IsRecipesExist()
         {
-            RecipeFilters = RecipeFilterService.GetRecipeFilters();
-            SelectedFilter = RecipeFilters[0];
-            RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(SelectedFilter));
-            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
-            RecipeTotals = new ObservableCollection<RecipeTree>();
-            AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
-            RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
-            RecalculateTotalsCommand = new CommandRunner(CalculateTotalIngredients);
-            ClearQuantitiesCommand = new CommandRunner(ClearRecipes, CanClearRecipes);
-            CopyIngredientsCommand = new CommandRunner(CopyIngredientsToClipboard, CanCopyIngredients);
-            SaveRecipeFavoritesCommand = new CommandRunner(SaveRecipes, CanSaveRecipes);
-            DeleteFavoriteCommand = new CommandRunner(DeleteSelectedFavorite, CanDeleteFavorite);
-            dialogCoordinator = instance;
+            return RecipeQuantities != null && RecipeQuantities.Count() > 0;
         }
 
+        /// <summary>
+        /// Helper Method used by multiple commands.
+        /// </summary>
+        private void CalculateRecipeTotals()
+        {
+            List<RecipeTree> temp = new List<RecipeTree>();
+            foreach(RecipeQuantity q in RecipeQuantities)
+            {
+                RecipeTree tree = q.Recipe.GetRecipeNodes(q.Quantity);
+                RecipeTree oldTree = RecipeTotals.Where(x => x.Id == tree.Id).FirstOrDefault();
+                if(oldTree != null)
+                {
+                    tree.SetExpandedNodes(oldTree);
+                }
+                temp.Add(tree);
+            }
+            foreach(RecipeTree t in temp)
+            {
+                t.SetParent();
+            }
+
+            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
+
+            RaiseChanged();
+        }
+
+        /// <summary>
+        /// Helper method to reload recipes list when Filter changes.
+        /// </summary>
+        /// <param name="filter"></param>
         public void ReloadRecipesForFilter(RecipeFilter filter)
         {
             RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(filter));
-            RaisePropertyChanged(nameof(RecipesList));
+            RaiseChanged();
         }
 
-        private void RaisePropertyChanged(string property)
+        /// <summary>
+        /// Raises changed for all lists, selected values, and commands.
+        /// </summary>
+        private void RaiseChanged()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            RaisePropertyChanged(nameof(SelectedFilter));
+            RaisePropertyChanged(nameof(SelectedRecipe));
+            RaisePropertyChanged(nameof(SelectedRecipeQuantity));
+            RaisePropertyChanged(nameof(SelectedFav));
+            RaisePropertyChanged(nameof(RecipesList));
+            RaisePropertyChanged(nameof(RecipeFilters));
+            RaisePropertyChanged(nameof(RecipeQuantities));
+            RaisePropertyChanged(nameof(TotalIngredients));
+            RaisePropertyChanged(nameof(RecipeTotals));
+            RaisePropertyChanged(nameof(RecipeFavorites));
+            AddRecipeCommand.RaiseCanExecuteChanged();
+            RemoveRecipeCommand.RaiseCanExecuteChanged();
+            RecalculateTotalsCommand.RaiseCanExecuteChanged();
+            ClearQuantitiesCommand.RaiseCanExecuteChanged();
+            CopyIngredientsCommand.RaiseCanExecuteChanged();
+            SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
+            DeleteFavoriteCommand.RaiseCanExecuteChanged();
         }
+        #endregion
     }
 }

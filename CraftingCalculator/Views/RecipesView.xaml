@@ -8,7 +8,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:CraftingCalculator.Views"
-             xmlns:model="clr-namespace:CraftingCalculator.Model.Recipes"
+             xmlns:model="clr-namespace:CraftingCalculator.ViewModel.Recipes"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="990" d:DesignWidth="1200">

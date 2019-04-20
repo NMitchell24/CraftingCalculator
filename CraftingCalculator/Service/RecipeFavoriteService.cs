@@ -1,6 +1,6 @@
 ﻿using CraftingCalculator.DAO;
 using CraftingCalculator.Model.Data;
-using CraftingCalculator.Model.Recipes;
+using CraftingCalculator.ViewModel.Recipes;
 using System.Collections.Generic;
 
 namespace CraftingCalculator.Service
