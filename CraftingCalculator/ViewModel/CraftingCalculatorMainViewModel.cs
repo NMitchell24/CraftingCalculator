@@ -9,10 +9,9 @@ using System;
 
 namespace CraftingCalculator.ViewModel
 {
-    public class CraftingCalculatorMainViewModel : INotifyPropertyChanged
+    public class CraftingCalculatorMainViewModel : AbstractPropertyChanged
     {
         private IDialogCoordinator dialogCoordinator;
-        public event PropertyChangedEventHandler PropertyChanged;
         public CommandRunner TopMostCommand { get; set; }
         public CommandRunner ChangeThemeCommand { get; set; }
         public CommandRunner ChangeAccentCommand { get; set; }
@@ -158,11 +157,6 @@ namespace CraftingCalculator.ViewModel
 
             //Show the dialog
             await dialogCoordinator.ShowMessageAsync(this, "About", sb.ToString());
-        }
-
-        private void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

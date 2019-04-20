@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using CraftingCalculator.Model.Ingredients;
-using CraftingCalculator.Model.Recipes;
+﻿using CraftingCalculator.ViewModel.Ingredients;
 
 namespace CraftingCalculator.Utilities
 {

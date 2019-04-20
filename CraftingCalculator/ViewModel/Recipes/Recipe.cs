@@ -1,15 +1,14 @@
-﻿using CraftingCalculator.Model.Ingredients;
+﻿using CraftingCalculator.ViewModel.Ingredients;
 using CraftingCalculator.Utilities;
-using System.ComponentModel;
 using System.Text;
 using System;
 
-namespace CraftingCalculator.Model.Recipes
+namespace CraftingCalculator.ViewModel.Recipes
 {
     /// <summary>
     /// Represents an individual UI Model for the Recipes
     /// </summary>
-    public class Recipe : INotifyPropertyChanged
+    public class Recipe : AbstractPropertyChanged
     {
         public IngredientMap Ingredients { get; set; }
         public RecipeMap ChildRecipes { get; set; }
@@ -104,12 +103,5 @@ namespace CraftingCalculator.Model.Recipes
                 RaisePropertyChanged("IsSelected");
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
-
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace CraftingCalculator.Model.Recipes
+namespace CraftingCalculator.ViewModel.Recipes
 {
     public class RecipeTree
     {
