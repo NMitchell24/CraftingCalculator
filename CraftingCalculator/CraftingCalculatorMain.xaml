@@ -19,6 +19,14 @@
         Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
         Topmost="{Binding IsTopMost, Mode=TwoWay}"
         Icon="atom_512_0zL_icon.ico">
+    <Window.Resources>
+        <DataTemplate x:Key="RecipesViewTemplate" DataType="{x:Type views:RecipesView}">
+            <views:RecipesView />
+        </DataTemplate>
+        <DataTemplate x:Key="ConfigureRecipesViewTemplate" DataType="{x:Type views:ConfigureRecipes}">
+            <views:ConfigureRecipes />
+        </DataTemplate>
+    </Window.Resources>
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <ToggleButton Command="{Binding TopMostCommand}" ToolTip="Always on top">
@@ -34,6 +42,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
+                <MenuItem Header="Configure Recipes" Command="{Binding OpenRecipeConfiguratorCommand}" />
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="Preferences">
@@ -63,6 +72,17 @@
                 <MenuItem Header="About" Command="{Binding AboutCommand}"/>
             </MenuItem>
         </Menu>
-        <views:RecipesView x:Name="RecipesViewControl" />
+        <ContentControl Content="{Binding CurrentView, Mode=OneWay}">
+            <ContentControl.Style>
+                <Style TargetType="{x:Type ContentControl}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource RecipesViewTemplate}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentView}" Value="1">
+                            <Setter Property="ContentTemplate" Value="{StaticResource ConfigureRecipesViewTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
     </DockPanel>
 </Controls:MetroWindow>

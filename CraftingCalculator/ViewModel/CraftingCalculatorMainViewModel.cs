@@ -6,6 +6,7 @@ using MahApps.Metro.Controls.Dialogs;
 using System.Reflection;
 using System.Text;
 using System;
+using System.Windows.Controls;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -18,7 +19,19 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner ResetSettingsCommand { get; private set; }
         public CommandRunner AboutCommand { get; set; }
         public CommandRunner ExitCommand { get; set; }
+        public CommandRunner OpenRecipeConfiguratorCommand { get; set; }
+        public CommandRunner OpenRecipesViewCommand { get; set; }
         private bool _doClose;
+        private int _currentView;
+
+        public int CurrentView
+        {
+            get { return _currentView; }
+            set
+            {
+                _currentView = value; this.RaisePropertyChanged("CurrentView");
+            }
+        }
 
         private bool _isTopMost;
         public bool IsTopMost
@@ -39,6 +52,9 @@ namespace CraftingCalculator.ViewModel
             ResetSettingsCommand = new CommandRunner(ResetSettings);
             AboutCommand = new CommandRunner(ShowAboutDialog);
             ExitCommand = new CommandRunner(Close);
+            OpenRecipeConfiguratorCommand = new CommandRunner(OpenRecipeConfigurator);
+            OpenRecipesViewCommand = new CommandRunner(OpenRecipesView);
+            CurrentView = 0;
             
             dialogCoordinator = instance;
 
@@ -157,6 +173,16 @@ namespace CraftingCalculator.ViewModel
 
             //Show the dialog
             await dialogCoordinator.ShowMessageAsync(this, "About", sb.ToString());
+        }
+
+        private void OpenRecipeConfigurator(object obj)
+        {
+            CurrentView = 1;
+        }
+
+        private void OpenRecipesView(object obj)
+        {
+            CurrentView = 0;
         }
     }
 }

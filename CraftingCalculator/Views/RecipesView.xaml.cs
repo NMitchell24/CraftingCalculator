@@ -11,7 +11,7 @@ namespace CraftingCalculator.Views
         public RecipesView()
         {
             InitializeComponent();
-            this.DataContext = new ViewModel.RecipesViewModel(DialogCoordinator.Instance);
+            DataContext = new ViewModel.RecipesViewModel(DialogCoordinator.Instance);
         }
     }
 }
