@@ -1,6 +1,7 @@
 ﻿using CraftingCalculator.ViewModel;
 using MahApps.Metro.Controls.Dialogs;
 using CraftingCalculator.Service;
+using System.Windows;
 
 namespace CraftingCalculator
 {

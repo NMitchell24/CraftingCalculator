@@ -43,6 +43,8 @@ namespace CraftingCalculator.ViewModel
             CopyIngredientsCommand = new CommandRunner(CopyIngredientsToClipboard, CanCopyIngredients);
             SaveRecipeFavoritesCommand = new CommandRunner(SaveRecipes, IsRecipesExist);
             DeleteFavoriteCommand = new CommandRunner(DeleteSelectedFavorite, CanDeleteFavorite);
+            ExpandAllCommand = new CommandRunner(ExpandAllRecipes, CanExpandCollapseAll);
+            CollapseAllCommand = new CommandRunner(CollapseAllRecipes, CanExpandCollapseAll);
             
             RecipeFilters = RecipeFilterService.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
@@ -226,6 +228,41 @@ namespace CraftingCalculator.ViewModel
                 RaiseChanged();
             }
         }
+
+        //Expand and Collapse All Command and methods
+        public CommandRunner ExpandAllCommand { get; set; }
+        public CommandRunner CollapseAllCommand { get; set; }
+        private bool CanExpandCollapseAll()
+        {
+            return RecipeTotals != null && RecipeTotals.Count() > 0;
+        }
+
+        private void ExpandAllRecipes(object obj)
+        {
+            List<RecipeTree> temp = new List<RecipeTree>();
+            foreach (RecipeTree tree in RecipeTotals)
+            {
+                tree.ExpandAll();
+                temp.Add(tree);
+            }
+
+            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
+            RaiseChanged();
+        }
+        
+        private void CollapseAllRecipes(object obj)
+        {
+            List<RecipeTree> temp = new List<RecipeTree>();
+            foreach (RecipeTree tree in RecipeTotals)
+            {
+                tree.CollapseAll();
+                temp.Add(tree);
+            }
+
+            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
+            RaiseChanged();
+        }
+
         #endregion
 
         #region selected-items
@@ -387,6 +424,8 @@ namespace CraftingCalculator.ViewModel
             CopyIngredientsCommand.RaiseCanExecuteChanged();
             SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
             DeleteFavoriteCommand.RaiseCanExecuteChanged();
+            ExpandAllCommand.RaiseCanExecuteChanged();
+            CollapseAllCommand.RaiseCanExecuteChanged();
         }
         #endregion
     }
