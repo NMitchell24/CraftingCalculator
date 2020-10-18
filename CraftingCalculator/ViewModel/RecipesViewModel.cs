@@ -239,23 +239,20 @@ namespace CraftingCalculator.ViewModel
 
         private void ExpandAllRecipes(object obj)
         {
-            List<RecipeTree> temp = new List<RecipeTree>();
-            foreach (RecipeTree tree in RecipeTotals)
-            {
-                tree.ExpandAll();
-                temp.Add(tree);
-            }
-
-            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
-            RaiseChanged();
+            ExpandCollapseAll(true);
         }
         
         private void CollapseAllRecipes(object obj)
         {
+            ExpandCollapseAll(false);
+        }
+
+        private void ExpandCollapseAll(bool isExpand)
+        {
             List<RecipeTree> temp = new List<RecipeTree>();
             foreach (RecipeTree tree in RecipeTotals)
             {
-                tree.CollapseAll();
+                tree.ExpandCollapseAll(isExpand);
                 temp.Add(tree);
             }
 
