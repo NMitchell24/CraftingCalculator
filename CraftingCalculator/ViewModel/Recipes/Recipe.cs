@@ -8,21 +8,23 @@ namespace CraftingCalculator.ViewModel.Recipes
     /// <summary>
     /// Represents an individual UI Model for the Recipes
     /// </summary>
-    public class Recipe : AbstractPropertyChanged
+    public class Recipe : AbstractPropertyChanged, IBaseDataRecord
     {
         public IngredientMap Ingredients { get; set; }
         public RecipeMap ChildRecipes { get; set; }
         public string Name { get; set; }
         public int Id { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }
+        public string FilterType { get; set; }
+        public double Value { get; set; }
+
         public string Tooltip
         {
             get
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(Name);
-                sb.AppendLine(Type);
+                sb.AppendLine(FilterType);
                 sb.Append(Environment.NewLine);
                 if(Description != null && Description.Length > 0)
                 {
@@ -48,6 +50,16 @@ namespace CraftingCalculator.ViewModel.Recipes
                 return sb.ToString();
             }
             set { Tooltip = value;}
+        }
+
+        public DataType Type
+        {
+            get
+            {
+                return DataType.Recipe;
+            }
+            //Don't allow this to be changed as it should remain static.
+            set { }
         }
 
         public IngredientMap GetIngredients()
@@ -102,6 +114,31 @@ namespace CraftingCalculator.ViewModel.Recipes
                 _isSelected = value;
                 RaisePropertyChanged("IsSelected");
             }
+        }
+
+        public IBaseDataRecord Clone()
+        {
+            Recipe clone = new Recipe()
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Description = this.Description,
+                FilterType = this.FilterType,
+                Value = this.Value,
+                Ingredients = this.Ingredients,
+                ChildRecipes = this.ChildRecipes
+            };
+
+            return clone;
+        }
+
+        public IBaseDataRecord CopyForSave()
+        {
+            Recipe ret = (Recipe)Clone();
+            ret.Name = ret.Name + " - Copy";
+            ret.Id = 0;
+
+            return ret;
         }
     }
 }

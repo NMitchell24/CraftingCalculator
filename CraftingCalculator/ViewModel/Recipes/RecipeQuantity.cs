@@ -24,7 +24,7 @@ namespace CraftingCalculator.ViewModel.Recipes
             }
         }
         public string Name { get => Recipe.Name; private set { } }
-        public string Type { get => Recipe.Type; private set { } }
+        public string Type { get => Recipe.FilterType; private set { } }
         public string Tooltip
         {
             get

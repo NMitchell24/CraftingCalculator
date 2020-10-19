@@ -66,7 +66,20 @@ namespace CraftingCalculator.DAO
             return col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
                 .FindById(id);
-        }   
+        }
+        
+        /// <summary>
+        /// Returns a list of all recipes
+        /// </summary>
+        /// <returns></returns>
+        public static List<RecipeData> GetAllRecipeData()
+        {
+            return _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes)
+                .Include(x => x.Ingredients)
+                .Find(Query.All(Query.Ascending))
+                .OrderBy(x => x.Name)
+                .ToList();
+        }
         
     }
 }

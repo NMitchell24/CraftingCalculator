@@ -116,9 +116,14 @@
     <Compile Include="DAO\RecipeFilterDAO.cs" />
     <Compile Include="Model\Data\FavoriteRecipeQuantitiesData.cs" />
     <Compile Include="Model\Data\RecipeFavoritesData.cs" />
+    <Compile Include="Service\IngredientService.cs" />
+    <Compile Include="Utilities\DataTypeConverter.cs" />
+    <Compile Include="Utilities\DataTypeUtil.cs" />
     <Compile Include="ViewModel\AbstractPropertyChanged.cs" />
     <Compile Include="ViewModel\ConfigureRecipesViewModel.cs" />
     <Compile Include="ViewModel\DataType.cs" />
+    <Compile Include="ViewModel\IBaseDataRecord.cs" />
+    <Compile Include="ViewModel\Ingredients\Ingredient.cs" />
     <Compile Include="ViewModel\Ingredients\IngredientMap.cs" />
     <Compile Include="ViewModel\Ingredients\IngredientQuantity.cs" />
     <Compile Include="Model\Data\CollectionLabels.cs" />
@@ -146,6 +151,15 @@
     <Compile Include="Views\ConfigureRecipes.xaml.cs">
       <DependentUpon>ConfigureRecipes.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EditIngredientView.xaml.cs">
+      <DependentUpon>EditIngredientView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditRecipeTypeView.xaml.cs">
+      <DependentUpon>EditRecipeTypeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditRecipeView.xaml.cs">
+      <DependentUpon>EditRecipeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\RecipesView.xaml.cs">
       <DependentUpon>RecipesView.xaml</DependentUpon>
     </Compile>
@@ -170,6 +184,18 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ConfigureRecipes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditIngredientView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditRecipeTypeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditRecipeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

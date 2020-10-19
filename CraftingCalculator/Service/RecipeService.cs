@@ -15,14 +15,7 @@ namespace CraftingCalculator.Service
         /// <returns></returns>
         public static List<Recipe> GetRecipesByFilter(RecipeFilter filter)
         {
-            List<Recipe> ret = new List<Recipe>();
-
-            foreach (RecipeData data in RecipeDAO.GetRecipeDataByFilter(filter))
-            {
-                ret.Add(GetRecipeForData(data));
-            }
-
-            return ret;
+            return GetRecipeListForDataList(RecipeDAO.GetRecipeDataByFilter(filter));
         }
 
         /// <summary>
@@ -44,6 +37,23 @@ namespace CraftingCalculator.Service
         }
 
         /// <summary>
+        /// Convert a list of Data records to DTO records.
+        /// </summary>
+        /// <param name="dataList"></param>
+        /// <returns></returns>
+        private static List<Recipe> GetRecipeListForDataList(List<RecipeData> dataList)
+        {
+            List<Recipe> ret = new List<Recipe>();
+
+            foreach (RecipeData data in dataList)
+            {
+                ret.Add(GetRecipeForData(data));
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// Builds a Recipe wrapper object from a provided RecipeData object.
         /// </summary>
         /// <param name="data"></param>
@@ -54,7 +64,7 @@ namespace CraftingCalculator.Service
             {
                 Name = data.Name,
                 Description = data.Description,
-                Type = data.Filter.Name,
+                FilterType = data.Filter.Name,
                 Id = data.Id
             };
 
@@ -82,6 +92,11 @@ namespace CraftingCalculator.Service
             }
 
             return ret;
+        }
+
+        public static List<Recipe> GetAllRecipes()
+        {
+            return GetRecipeListForDataList(RecipeDAO.GetAllRecipeData());
         }
     }
 }
