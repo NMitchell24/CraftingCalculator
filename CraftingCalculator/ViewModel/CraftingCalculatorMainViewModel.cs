@@ -13,6 +13,7 @@ namespace CraftingCalculator.ViewModel
     public class CraftingCalculatorMainViewModel : AbstractPropertyChanged
     {
         private IDialogCoordinator dialogCoordinator;
+        public string ConfirmOnCloseHeader { get; set; }
         public CommandRunner TopMostCommand { get; set; }
         public CommandRunner ChangeThemeCommand { get; set; }
         public CommandRunner ChangeAccentCommand { get; set; }
@@ -21,6 +22,9 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner ExitCommand { get; set; }
         public CommandRunner OpenRecipeConfiguratorCommand { get; set; }
         public CommandRunner OpenRecipesViewCommand { get; set; }
+        public CommandRunner EnableDisableConfirmOnCloseCommand { get; set; }
+
+
         private bool _doClose;
         private int _currentView;
 
@@ -54,12 +58,42 @@ namespace CraftingCalculator.ViewModel
             ExitCommand = new CommandRunner(Close);
             OpenRecipeConfiguratorCommand = new CommandRunner(OpenRecipeConfigurator);
             OpenRecipesViewCommand = new CommandRunner(OpenRecipesView);
+            EnableDisableConfirmOnCloseCommand = new CommandRunner(EnableDisableConfirmOnClose);
             CurrentView = 0;
             
             dialogCoordinator = instance;
 
             ChangeTheme(Properties.Settings.Default["Theme"]);
+            UpdateConfirmOnCloseHeader();
 
+        }
+
+        /// <summary>
+        /// Dynamically sets the Menu Item text based upon current Settings for ConfirmOnClose
+        /// </summary>
+        private void UpdateConfirmOnCloseHeader()
+        {
+            bool confirmOnClose = (bool)Properties.Settings.Default["ConfirmOnClose"];
+            if(confirmOnClose)
+            {
+                ConfirmOnCloseHeader = "Disable Confirmation on Close (F3)";
+            }
+            else
+            {
+                ConfirmOnCloseHeader = "Enable Confirmation on Close (F3)";
+            }
+            RaisePropertyChanged(nameof(ConfirmOnCloseHeader));
+        }
+
+        /// <summary>
+        /// Enables or disables the Confirmation on Closing of the application.
+        /// </summary>
+        /// <param name="obj"></param>
+        private void EnableDisableConfirmOnClose(object obj)
+        {
+            bool confirmOnClose = (bool)Properties.Settings.Default["ConfirmOnClose"];
+            Properties.Settings.Default["ConfirmOnClose"] = !confirmOnClose;
+            UpdateConfirmOnCloseHeader();
         }
 
         /// <summary>
@@ -69,6 +103,7 @@ namespace CraftingCalculator.ViewModel
         private void ResetSettings(object obj)
         {
             Properties.Settings.Default.Reset();
+            UpdateConfirmOnCloseHeader();
         }
 
         /// <summary>
@@ -118,6 +153,12 @@ namespace CraftingCalculator.ViewModel
         public async void OnWindowClosing(object sender, CancelEventArgs e)
         {
             Properties.Settings.Default.Save();
+            bool confirmOnClose = (bool)Properties.Settings.Default["ConfirmOnClose"];
+
+            if(!confirmOnClose)
+            {
+                Application.Current.Shutdown();
+            }
 
             e.Cancel = !_doClose;
             if (_doClose) return;

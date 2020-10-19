@@ -18,7 +18,7 @@ namespace CraftingCalculator.ViewModel
         private IDialogCoordinator dialogCoordinator;
         public IReadOnlyList<DataType> DataTypeList { get; }
         public int SwitchView { get; set; }
-        public IBaseDataRecord ItemForUpdate { get; set; }
+        public IBaseDataRecord ItemForUpdate { get; set; }        
 
         public ObservableCollection<IBaseDataRecord> DataRecords { get; set; }
 
@@ -34,7 +34,7 @@ namespace CraftingCalculator.ViewModel
             ResetItemCommand = new CommandRunner(ResetItem);
             AddNewItemCommand = new CommandRunner(AddItem);
             DeleteItemCommand = new CommandRunner(DeleteItem);
-            CopyItemCommand = new CommandRunner(CopyItem);
+            CopyItemCommand = new CommandRunner(CopyItem);           
         }
 
         public CommandRunner SaveItemCommand { get; set; }

@@ -68,7 +68,7 @@
             </Grid.ColumnDefinitions>
             <Button Command="{Binding Path=DataContext.OpenRecipesViewCommand, 
             RelativeSource={RelativeSource findAncestor, AncestorType={x:Type Window}}}" 
-            ToolTip="Return to Recipes List" 
+            ToolTip="Return to Recipe Calculator" 
             HorizontalAlignment="Right" 
             Padding="0"
             Margin="0,0,5,0" 

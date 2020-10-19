@@ -94,5 +94,17 @@ namespace CraftingCalculator.Properties {
                 this["Height"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ConfirmOnClose {
+            get {
+                return ((bool)(this["ConfirmOnClose"]));
+            }
+            set {
+                this["ConfirmOnClose"] = value;
+            }
+        }
     }
 }
