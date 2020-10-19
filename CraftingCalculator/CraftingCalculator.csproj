@@ -56,7 +56,7 @@
     <ApplicationIcon>atom_512_0zL_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>C5CD6950DEC626BCE3053FA88956B10EE97E4EA6</ManifestCertificateThumbprint>
@@ -187,8 +187,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="CraftingCalculator.pfx" />
-    <None Include="CraftingCalculatorCert.pfx" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
