@@ -180,7 +180,7 @@
                     </Style>
                 </ContentControl.Style>
             </ContentControl>
-            <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="5" HorizontalAlignment="Center" Margin="0,5,0,0">
+            <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="5" HorizontalAlignment="Center" Margin="0,5,0,0">
                 <Button Command="{Binding SaveItemCommand}" 
                     ToolTip="Save all Changes" 
                     HorizontalAlignment="Center" 

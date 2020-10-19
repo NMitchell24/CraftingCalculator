@@ -20,7 +20,7 @@ namespace CraftingCalculator.ViewModel
         Recipe = 2
     }
 
-    public static class DurationExtensions
+    public static class DataTypeExtensions
     {
         public static string GetDescription(this Enum value)
         {

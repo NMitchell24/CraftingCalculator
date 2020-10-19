@@ -11,6 +11,10 @@ namespace CraftingCalculator.Service
 {
     public static class IngredientService
     {
+        /// <summary>
+        /// Returns a list of all Ingredients
+        /// </summary>
+        /// <returns></returns>
         public static List<Ingredient> GetAllIngredients()
         {
             List<Ingredient> ret = new List<Ingredient>();
@@ -25,12 +29,16 @@ namespace CraftingCalculator.Service
             return ret;
         }
 
+        /// <summary>
+        /// Saves or adds the Ingredient.  If the ID value is 0 a new one will be added, otherwise the existing record will be updated.
+        /// </summary>
+        /// <param name="ing"></param>
         public static void SaveIngredient(Ingredient ing)
         {
             IngredientData data;
             if (ing.Id > 0)
             {
-                data = IngredientDAO.GetIngredientById(ing.Id);
+                data = AbstractDAO.GetRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
             }
             else
             {
@@ -38,10 +46,14 @@ namespace CraftingCalculator.Service
             }
 
             CopyToData(ing, data);
-            IngredientDAO.AddOrUpdateRecord(data);
-            
+
+            AbstractDAO.AddOrUpdateRecord<IngredientData>(CollectionLabels.Ingredients, data, ing.Id <= 0);          
         }
 
+        /// <summary>
+        /// Deletes the provided Ingredient.
+        /// </summary>
+        /// <param name="ing"></param>
         public static void DeleteIngredient(Ingredient ing)
         {
             AbstractDAO.DeleteRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);

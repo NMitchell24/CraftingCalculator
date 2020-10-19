@@ -71,7 +71,7 @@ namespace CraftingCalculator.Service
             IngredientMap ingMap = new IngredientMap();
             foreach (IngredientQuantityData iData in data.Ingredients)
             {
-                IngredientData ing = IngredientDAO.GetIngredientById(iData.Ingredient.Id);
+                IngredientData ing = AbstractDAO.GetRecordById<IngredientData>(CollectionLabels.Ingredients, iData.Ingredient.Id);
                 ingMap.Add(ing.Name, ing.Description, iData.Quantity);
             }
 

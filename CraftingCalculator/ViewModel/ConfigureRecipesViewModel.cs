@@ -43,12 +43,11 @@ namespace CraftingCalculator.ViewModel
             string name = ItemForUpdate.Name;
             if (ItemForUpdate.Type == DataType.Ingredient)
             {
-                Ingredient ing = (Ingredient)ItemForUpdate;
-                IngredientService.SaveIngredient(ing);
+                IngredientService.SaveIngredient((Ingredient)ItemForUpdate);
             }
             else if (ItemForUpdate.Type == DataType.RecipeType)
             {
-                //TODO: Do the thing that does stuff
+                RecipeFilterService.SaveRecipeFilter((RecipeFilter)ItemForUpdate);
             }
             else if (ItemForUpdate.Type == DataType.Recipe)
             {
@@ -97,7 +96,7 @@ namespace CraftingCalculator.ViewModel
             }
             else if (ItemForUpdate.Type == DataType.RecipeType)
             {
-                //TODO: Do the thing that does stuff
+                RecipeFilterService.DeleteRecipeFilter((RecipeFilter)ItemForUpdate);
             }
             else if (ItemForUpdate.Type == DataType.Recipe)
             {
