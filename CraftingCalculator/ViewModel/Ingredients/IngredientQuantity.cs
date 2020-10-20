@@ -28,6 +28,5 @@ namespace CraftingCalculator.ViewModel.Ingredients
         {
             return new IngredientQuantity (Name, Description, Quantity);
         }
-
     }
 }

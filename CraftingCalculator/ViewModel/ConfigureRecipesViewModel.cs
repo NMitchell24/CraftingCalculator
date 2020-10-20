@@ -18,7 +18,8 @@ namespace CraftingCalculator.ViewModel
         private IDialogCoordinator dialogCoordinator;
         public IReadOnlyList<DataType> DataTypeList { get; }
         public int SwitchView { get; set; }
-        public IBaseDataRecord ItemForUpdate { get; set; }        
+        public IBaseDataRecord ItemForUpdate { get; set; }   
+        public bool ShowProgressRing { get; set; }
 
         public ObservableCollection<IBaseDataRecord> DataRecords { get; set; }
 
@@ -34,7 +35,9 @@ namespace CraftingCalculator.ViewModel
             ResetItemCommand = new CommandRunner(ResetItem);
             AddNewItemCommand = new CommandRunner(AddItem);
             DeleteItemCommand = new CommandRunner(DeleteItem);
-            CopyItemCommand = new CommandRunner(CopyItem);           
+            CopyItemCommand = new CommandRunner(CopyItem);
+
+            ShowProgressRing = false;
         }
 
         public CommandRunner SaveItemCommand { get; set; }
@@ -54,11 +57,9 @@ namespace CraftingCalculator.ViewModel
                 //TODO: Do the thing that does other stuff
             }
 
-            SelectedType = SelectedItem.Type;
-            SelectedItem = DataRecords.Where(x => x.Name == name).FirstOrDefault();
-
-            RaisePropertyChanged(nameof(DataRecords));
-            RaisePropertyChanged(nameof(SelectedItem));
+            SelectedType = ItemForUpdate.Type;
+            IBaseDataRecord rec = DataRecords.Where(x => x.Name == name).FirstOrDefault();
+            SelectedItem = rec;
         }
 
         public CommandRunner ResetItemCommand { get; set; } 
@@ -88,26 +89,49 @@ namespace CraftingCalculator.ViewModel
         }
 
         public CommandRunner DeleteItemCommand { get; set; }
-        private void DeleteItem(object obj)
+        private async void DeleteItem(object obj)
         {
-            if(ItemForUpdate.Type == DataType.Ingredient)
-            {
-                IngredientService.DeleteIngredient((Ingredient)ItemForUpdate);
-            }
-            else if (ItemForUpdate.Type == DataType.RecipeType)
-            {
-                RecipeFilterService.DeleteRecipeFilter((RecipeFilter)ItemForUpdate);
-            }
-            else if (ItemForUpdate.Type == DataType.Recipe)
-            {
-                //TODO: Do the thing that does other stuff
-            }
-            ItemForUpdate = SelectedType.GetDataRecord();
-            SelectedType = ItemForUpdate.Type;
+            bool doDelete = false;
 
-            RaisePropertyChanged(nameof(ItemForUpdate));
-            RaisePropertyChanged(nameof(DataRecords));
-            RaisePropertyChanged(nameof(SelectedItem));
+            var settings = new MetroDialogSettings { AffirmativeButtonText = "Delete", NegativeButtonText = "Cancel" };
+            var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Delete " + SelectedType.GetDescription(),
+            "This " + SelectedType.GetDescription() + " will be deleted forever and removed from any recipes " +
+            (SelectedType == DataType.Recipe ? " or recipe favorites " : "") +
+            "where it is used.  " +
+            "Are you sure you would like to continue?",
+            MessageDialogStyle.AffirmativeAndNegative,
+            settings);
+
+            doDelete = yesNo == MessageDialogResult.Affirmative;
+
+            if (doDelete)
+            {
+                ShowHideProgress();
+                await Task.Factory.StartNew(() =>
+                {
+                    if (ItemForUpdate.Type == DataType.Ingredient)
+                    {
+                        IngredientService.DeleteIngredient((Ingredient)ItemForUpdate);
+                    }
+                    else if (ItemForUpdate.Type == DataType.RecipeType)
+                    {
+                        RecipeFilterService.DeleteRecipeFilter((RecipeFilter)ItemForUpdate);
+                    }
+                    else if (ItemForUpdate.Type == DataType.Recipe)
+                    {
+                        //TODO: Do the thing that does other stuff
+                    }
+                    ItemForUpdate = SelectedType.GetDataRecord();
+                    SelectedType = ItemForUpdate.Type;
+
+                    RaisePropertyChanged(nameof(ItemForUpdate));
+                    RaisePropertyChanged(nameof(DataRecords));
+                    RaisePropertyChanged(nameof(SelectedItem));
+                }).ContinueWith(Task =>
+                {
+                    ShowHideProgress();
+                });              
+            }
         }
 
         public CommandRunner CopyItemCommand { get; set; }
@@ -180,6 +204,12 @@ namespace CraftingCalculator.ViewModel
             {
                 _selectedItemIndex = value;
             }
+        }
+
+        public void ShowHideProgress()
+        {
+            ShowProgressRing = !ShowProgressRing;
+            RaisePropertyChanged(nameof(ShowProgressRing));
         }
     }
 }

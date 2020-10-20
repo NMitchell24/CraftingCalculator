@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System;
 using System.Windows.Controls;
+using ControlzEx.Theming;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -64,6 +65,7 @@ namespace CraftingCalculator.ViewModel
             dialogCoordinator = instance;
 
             ChangeTheme(Properties.Settings.Default["Theme"]);
+            ChangeAccent(Properties.Settings.Default["Accent"]);
             UpdateConfirmOnCloseHeader();
 
         }
@@ -112,11 +114,7 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private void ChangeTheme(object obj)
         {
-            string accent = Properties.Settings.Default["Accent"].ToString();
-
-            ThemeManager.ChangeAppStyle(Application.Current,
-                       ThemeManager.GetAccent(accent),
-                       ThemeManager.GetAppTheme($"Base{obj}"));
+            ThemeManager.Current.ChangeThemeBaseColor(Application.Current, obj as string);
 
             Properties.Settings.Default["Theme"] = obj;
         }
@@ -127,11 +125,7 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private void ChangeAccent(object obj)
         {
-            string theme = $"Base{Properties.Settings.Default["Theme"]}";
-
-            ThemeManager.ChangeAppStyle(Application.Current,
-                       ThemeManager.GetAccent(obj as string),
-                       ThemeManager.GetAppTheme(theme));
+            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, obj as string);
 
             Properties.Settings.Default["Accent"] = obj;
         }

@@ -9,6 +9,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="990" d:DesignWidth="1200">
      <UserControl.Resources>
@@ -66,6 +67,13 @@
                 <ColumnDefinition Width="197*"/>
                 <ColumnDefinition Width="9*"/>
             </Grid.ColumnDefinitions>
+
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Grid.Row="0" Grid.RowSpan="7"
+                        Grid.Column="0" Grid.ColumnSpan="9">
+                <Controls:ProgressRing IsActive="{Binding ShowProgressRing, Mode=OneWay}" />
+            </StackPanel>
+            
             <Button Command="{Binding Path=DataContext.OpenRecipesViewCommand, 
             RelativeSource={RelativeSource findAncestor, AncestorType={x:Type Window}}}" 
             ToolTip="Return to Recipe Calculator" 
@@ -109,11 +117,27 @@
                 </StackPanel>
             </Button>
 
+            <Button Command="{Binding CopyItemCommand}" 
+            ToolTip="Copy selected item" 
+            HorizontalAlignment="Left" 
+            Padding="0"
+            Margin="55,0,5,0" 
+            VerticalAlignment="Center" 
+            Width="50"
+            Height="26"
+            Grid.Row="1"
+            Grid.Column="3">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterialDesign Kind="ContentCopy" />
+                    <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Copy"/>
+                </StackPanel>
+            </Button>
+
             <Button Command="{Binding DeleteItemCommand}" 
             ToolTip="Delete selected item" 
             HorizontalAlignment="Left" 
             Padding="0"
-            Margin="55,0,5,0" 
+            Margin="110,0,5,0" 
             VerticalAlignment="Center" 
             Width="55"
             Height="26"
@@ -141,7 +165,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
                         <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
@@ -165,7 +189,8 @@
                 Content="{Binding}" 
                 Grid.Row="2" 
                 Grid.Column="3" 
-                Grid.ColumnSpan="5">
+                Grid.ColumnSpan="5"
+                HorizontalAlignment="Center">
                 <ContentControl.Style>
                     <Style TargetType="{x:Type ContentControl}">
                         <Setter Property="ContentTemplate" Value="{StaticResource EditIngredientsTemplate}" />

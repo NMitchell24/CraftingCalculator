@@ -31,6 +31,7 @@ namespace CraftingCalculator.DAO
             rec.EnsureIndex(x => x.Id);
             rec.EnsureIndex(x => x.Filter.Id);
             rec.EnsureIndex(x => x.Name);
+            rec.EnsureIndex(x => x.Ingredients[0].Id);
 
             //Recipe quantities
             var recQ = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);

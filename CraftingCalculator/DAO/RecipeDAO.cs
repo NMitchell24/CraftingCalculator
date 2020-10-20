@@ -55,6 +55,23 @@ namespace CraftingCalculator.DAO
         }
 
         /// <summary>
+        /// Returns any Recipes that use the provided IngredientQuantity
+        /// </summary>
+        /// <param name="ingredient"></param>
+        /// <returns></returns>
+        public static List<RecipeData> GetRecipeByIngredient(IngredientQuantityData ingredient)
+        {
+            List<RecipeData> ret = new List<RecipeData>();
+            var col = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
+
+            ret.AddRange(col.Include(x => x.Ingredients)
+                .Include(x => x.Filter)
+                .FindAll().Where(x => x.Ingredients.Any(y => y.Id == ingredient.Id)));
+
+            return ret;
+        }
+
+        /// <summary>
         /// Gets a Recipe by the ID.
         /// </summary>
         /// <param name="id"></param>

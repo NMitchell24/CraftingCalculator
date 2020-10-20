@@ -64,7 +64,7 @@ namespace CraftingCalculator.Service
             {
                 Name = data.Name,
                 Description = data.Description,
-                FilterType = data.Filter.Name,
+                FilterType = data.Filter != null ? data.Filter.Name : null,
                 Id = data.Id
             };
 

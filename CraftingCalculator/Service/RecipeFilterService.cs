@@ -56,6 +56,15 @@ namespace CraftingCalculator.Service
         /// <param name="filter"></param>
         public static void DeleteRecipeFilter(RecipeFilter filter)
         {
+            //First remove filter reference from any Recipe objects.
+            List<RecipeData> recipes = RecipeDAO.GetRecipeDataByFilter(filter);
+            foreach (RecipeData recipe in recipes)
+            {
+                recipe.Filter = null;
+                AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe, false);
+            }
+
+            //Delete Filter
             AbstractDAO.DeleteRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, filter.Id);
         }
 

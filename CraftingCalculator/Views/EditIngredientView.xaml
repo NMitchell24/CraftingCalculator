@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CraftingCalculator.Views"         
+             xmlns:local="clr-namespace:CraftingCalculator.Views"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -27,7 +28,17 @@
             Ingredient Cost
         </TextBlock>
         <StackPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.ItemForUpdate, Mode=TwoWay}" Grid.Column="1" Grid.Row="2">
-            <TextBox HorizontalAlignment="Left" Height="33" TextWrapping="Wrap" Text="{Binding Cost}" VerticalAlignment="Top" Width="600" FontSize="18" Margin="0,0,5,5"/>
+            <Controls:NumericUpDown
+                Value="{Binding Path=Cost}"
+                NumericInputMode="Decimal"
+                HorizontalAlignment="Left" 
+                TextAlignment="Left"
+                Height="33"
+                VerticalAlignment="Top" 
+                Width="600" 
+                FontSize="18"
+                Margin="0,0,5,5">
+            </Controls:NumericUpDown>
         </StackPanel>
         <TextBlock FontSize="18" Margin="0,2.5,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="0">
             Ingredient Description

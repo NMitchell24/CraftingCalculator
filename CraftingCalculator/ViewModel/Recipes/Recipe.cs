@@ -17,7 +17,6 @@ namespace CraftingCalculator.ViewModel.Recipes
         public string Description { get; set; }
         public string FilterType { get; set; }
         public double Value { get; set; }
-
         public string Tooltip
         {
             get

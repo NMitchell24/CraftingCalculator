@@ -10,6 +10,7 @@
              xmlns:local="clr-namespace:CraftingCalculator.Views"
              xmlns:model="clr-namespace:CraftingCalculator.ViewModel.Recipes"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:i1="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="990" d:DesignWidth="1200">
     <UserControl.Resources>
@@ -93,7 +94,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
                         <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
@@ -231,19 +232,19 @@
                                 TextAlignment="Left"
                                 Width="100"
                                 Grid.Column="1">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="ValueChanged">
-                                        <i:InvokeCommandAction 
+                                <i1:Interaction.Triggers>
+                                    <i1:EventTrigger EventName="ValueChanged">
+                                        <i1:InvokeCommandAction 
                                             Command="{Binding DataContext.RecalculateTotalsCommand, 
                                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
+                                    </i1:EventTrigger>
+                                </i1:Interaction.Triggers>
                             </Controls:NumericUpDown>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.Resources>
-                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MetroListBoxItem}">
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
                         <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}" />
                     </Style>
                 </ListBox.Resources>

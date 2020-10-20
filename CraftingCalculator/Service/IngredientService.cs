@@ -52,10 +52,38 @@ namespace CraftingCalculator.Service
 
         /// <summary>
         /// Deletes the provided Ingredient.
+        /// 
+        /// TODO: Refactor this to be more performant.
         /// </summary>
         /// <param name="ing"></param>
         public static void DeleteIngredient(Ingredient ing)
         {
+            //First look up any IngredientQuantityData that uses this Ingredient.
+            List<IngredientQuantityData> recipeIngredients = IngredientDAO.GetIngredientQuantitiesForIngredient(ing);
+
+            foreach(IngredientQuantityData ingredientQuantity in recipeIngredients.ToList())
+            {
+                //Lookup the recipes associated with this data.
+                List<RecipeData> recipes = RecipeDAO.GetRecipeByIngredient(ingredientQuantity);
+
+                //Loop through recipes and remove associations.
+                foreach(RecipeData recipe in recipes)
+                {
+                    foreach(IngredientQuantityData recipeIngredient in recipe.Ingredients.ToList())
+                    {
+                        if(recipeIngredient.Id == ingredientQuantity.Id)
+                        {
+                            recipe.Ingredients.Remove(recipeIngredient);
+                        }
+                    }
+                    AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe, false);
+                }
+
+                //Delete the Ingredient Quantity
+                AbstractDAO.DeleteRecordById<IngredientQuantityData>(CollectionLabels.IngredientQuantities, ingredientQuantity.Id);
+            }
+
+            //Now delete ingredient.
             AbstractDAO.DeleteRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
         }
 
