@@ -18,7 +18,8 @@
         Top="{Binding Source={x:Static p:Settings.Default}, Path=Top, Mode=TwoWay}"
         Left="{Binding Source={x:Static p:Settings.Default}, Path=Left, Mode=TwoWay}"
         Topmost="{Binding IsTopMost, Mode=TwoWay}"
-        Icon="atom_512_0zL_icon.ico">
+        Icon="atom_512_0zL_icon.ico"
+        BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
     <Window.Resources>
         <DataTemplate x:Key="RecipesViewTemplate" DataType="{x:Type views:RecipesView}">
             <views:RecipesView />

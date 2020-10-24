@@ -20,6 +20,7 @@ namespace CraftingCalculator.ViewModel
         public int SwitchView { get; set; }
         public IBaseDataRecord ItemForUpdate { get; set; }   
         public bool ShowProgressRing { get; set; }
+        public bool EnableDisableWindow { get; set; }
 
         public ObservableCollection<IBaseDataRecord> DataRecords { get; set; }
 
@@ -38,6 +39,7 @@ namespace CraftingCalculator.ViewModel
             CopyItemCommand = new CommandRunner(CopyItem);
 
             ShowProgressRing = false;
+            EnableDisableWindow = true;
         }
 
         public CommandRunner SaveItemCommand { get; set; }
@@ -208,8 +210,10 @@ namespace CraftingCalculator.ViewModel
 
         public void ShowHideProgress()
         {
+            EnableDisableWindow = !EnableDisableWindow;
             ShowProgressRing = !ShowProgressRing;
             RaisePropertyChanged(nameof(ShowProgressRing));
+            RaisePropertyChanged(nameof(EnableDisableWindow));
         }
     }
 }

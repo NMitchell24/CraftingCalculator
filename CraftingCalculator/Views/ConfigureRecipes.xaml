@@ -9,9 +9,10 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:i1="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="990" d:DesignWidth="1200">
+             d:DesignHeight="990" d:DesignWidth="1200" IsEnabled="{Binding EnableDisableWindow, Mode=OneWay}">
      <UserControl.Resources>
         <util:DataTypeConverter x:Key="DataTypeConverter" />
         <Style TargetType="{x:Type ToolTip}" BasedOn="{StaticResource {x:Type ToolTip}}">
@@ -75,16 +76,18 @@
             </StackPanel>
             
             <Button Command="{Binding Path=DataContext.OpenRecipesViewCommand, 
-            RelativeSource={RelativeSource findAncestor, AncestorType={x:Type Window}}}" 
-            ToolTip="Return to Recipe Calculator" 
-            HorizontalAlignment="Right" 
-            Padding="0"
-            Margin="0,0,5,0" 
-            VerticalAlignment="Center" 
-            Width="50"
-            Height="26"
-            Grid.Row="1"
-            Grid.Column="7">
+                    RelativeSource={RelativeSource findAncestor, AncestorType={x:Type Window}}}" 
+                    Style="{StaticResource MetroRoundedAccentButton}"
+                    BorderThickness="1"
+                    ToolTip="Return to Recipe Calculator" 
+                    HorizontalAlignment="Right" 
+                    Padding="0"
+                    Margin="0,0,5,0" 
+                    VerticalAlignment="Center" 
+                    Width="60"
+                    Height="26"
+                    Grid.Row="1"
+                    Grid.Column="7">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterialDesign Kind="Done" />
                     <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Done"/>
@@ -101,48 +104,54 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <Button Command="{Binding AddNewItemCommand}" 
-            ToolTip="Add a new Item" 
-            HorizontalAlignment="Left" 
-            Padding="0"
-            Margin="0,0,5,0" 
-            VerticalAlignment="Center" 
-            Width="50"
-            Height="26"
-            Grid.Row="1"
-            Grid.Column="3">
+            <Button Command="{Binding AddNewItemCommand}"
+                    Style="{StaticResource MetroRoundedAccentButton}"
+                    BorderThickness="1"
+                    ToolTip="Add a new Item" 
+                    HorizontalAlignment="Left" 
+                    Padding="0"
+                    Margin="0,0,5,0" 
+                    VerticalAlignment="Center" 
+                    Width="55"
+                    Height="26"
+                    Grid.Row="1"
+                    Grid.Column="3">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterialDesign Kind="Add" />
                     <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Add"/>
                 </StackPanel>
             </Button>
 
-            <Button Command="{Binding CopyItemCommand}" 
-            ToolTip="Copy selected item" 
-            HorizontalAlignment="Left" 
-            Padding="0"
-            Margin="55,0,5,0" 
-            VerticalAlignment="Center" 
-            Width="50"
-            Height="26"
-            Grid.Row="1"
-            Grid.Column="3">
+            <Button Command="{Binding CopyItemCommand}"
+                    Style="{StaticResource MetroRoundedAccentButton}"
+                    BorderThickness="1"
+                    ToolTip="Copy selected item" 
+                    HorizontalAlignment="Left" 
+                    Padding="0"
+                    Margin="60,0,5,0" 
+                    VerticalAlignment="Center" 
+                    Width="60"
+                    Height="26"
+                    Grid.Row="1"
+                    Grid.Column="3">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterialDesign Kind="ContentCopy" />
                     <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Copy"/>
                 </StackPanel>
             </Button>
 
-            <Button Command="{Binding DeleteItemCommand}" 
-            ToolTip="Delete selected item" 
-            HorizontalAlignment="Left" 
-            Padding="0"
-            Margin="110,0,5,0" 
-            VerticalAlignment="Center" 
-            Width="55"
-            Height="26"
-            Grid.Row="1"
-            Grid.Column="3">
+            <Button Command="{Binding DeleteItemCommand}"
+                    Style="{StaticResource MetroRoundedAccentButton}"
+                    BorderThickness="1"
+                    ToolTip="Delete selected item" 
+                    HorizontalAlignment="Left" 
+                    Padding="0"
+                    Margin="125,0,5,0" 
+                    VerticalAlignment="Center" 
+                    Width="65"
+                    Height="26"
+                    Grid.Row="1"
+                    Grid.Column="3">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterialDesign Kind="DeleteForever" />
                     <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Delete"/>
@@ -207,26 +216,30 @@
             </ContentControl>
             <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="5" HorizontalAlignment="Center" Margin="0,5,0,0">
                 <Button Command="{Binding SaveItemCommand}" 
-                    ToolTip="Save all Changes" 
-                    HorizontalAlignment="Center" 
-                    Padding="0"
-                    Margin="0,0,0,5" 
-                    VerticalAlignment="Top" 
-                    Width="50"
-                    Height="26">
+                        Style="{StaticResource MetroRoundedAccentButton}"
+                        BorderThickness="1"
+                        ToolTip="Save all Changes" 
+                        HorizontalAlignment="Center" 
+                        Padding="0"
+                        Margin="0,0,0,5" 
+                        VerticalAlignment="Top" 
+                        Width="60"
+                        Height="26">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconMaterialDesign Kind="Save" />
                         <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Save"/>
                     </StackPanel>
                 </Button>
                 <Button Command="{Binding ResetItemCommand}" 
-                    ToolTip="Undo Changes to this Item" 
-                    HorizontalAlignment="Center" 
-                    Padding="0"
-                    Margin="5,0,0,5" 
-                    VerticalAlignment="Top" 
-                    Width="55"
-                    Height="26">
+                        Style="{StaticResource MetroRoundedAccentButton}"
+                        BorderThickness="1"
+                        ToolTip="Undo Changes to this Item" 
+                        HorizontalAlignment="Center" 
+                        Padding="0"
+                        Margin="5,0,0,5" 
+                        VerticalAlignment="Top" 
+                        Width="60"
+                        Height="26">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconMaterialDesign Kind="Undo" />
                         <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Reset"/>

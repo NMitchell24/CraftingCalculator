@@ -105,6 +105,8 @@ namespace CraftingCalculator.ViewModel
         private void ResetSettings(object obj)
         {
             Properties.Settings.Default.Reset();
+            ChangeTheme(Properties.Settings.Default["Theme"]);
+            ChangeAccent(Properties.Settings.Default["Accent"]);
             UpdateConfirmOnCloseHeader();
         }
 

@@ -1,5 +1,7 @@
 ﻿using CraftingCalculator.ViewModel.Ingredients;
 using CraftingCalculator.Utilities;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System;
 
@@ -17,6 +19,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         public string Description { get; set; }
         public string FilterType { get; set; }
         public double Value { get; set; }
+
         public string Tooltip
         {
             get

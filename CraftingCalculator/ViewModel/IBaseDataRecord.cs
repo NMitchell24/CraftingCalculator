@@ -16,6 +16,5 @@ namespace CraftingCalculator.ViewModel
 
         IBaseDataRecord Clone();
         IBaseDataRecord CopyForSave();
-
     }
 }
