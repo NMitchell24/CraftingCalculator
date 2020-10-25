@@ -55,6 +55,23 @@ namespace CraftingCalculator.DAO
         }
 
         /// <summary>
+        /// Gets all Recipe Quantity objects for a given Child Recipe Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static List<RecipeQuantityData> GetRecipeQuantityByChildId(int id)
+        {
+            List<RecipeQuantityData> ret = new List<RecipeQuantityData>();
+            var col = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+
+            ret.AddRange(col.Include(x => x.ParentRecipe)
+                .Include(x => x.ChildRecipe)
+                .Find(x => x.ChildRecipe.Id == id));
+
+            return ret;
+        }
+
+        /// <summary>
         /// Returns a RecipeQuantityData object by its identifier.
         /// </summary>
         /// <param name="id"></param>

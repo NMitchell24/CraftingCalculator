@@ -225,6 +225,12 @@ namespace CraftingCalculator.Service
             {
                 AbstractDAO.DeleteRecordById<RecipeQuantityData>(CollectionLabels.RecipeQuantities, recipeQuantity.Id);
             }
+            //Delete any Recipe Quantities where this recipe is used as the Child Recipe
+            List<RecipeQuantityData> parentRecipes = RecipeDAO.GetRecipeQuantityByChildId(recipe.Id);
+            foreach(RecipeQuantityData recipeQuantity in parentRecipes)
+            {
+                AbstractDAO.DeleteRecordById<RecipeQuantityData>(CollectionLabels.RecipeQuantities, recipeQuantity.Id);
+            }
             //Delete any Ingredient Quantities
             foreach(IngredientQuantity iq in recipe.Ingredients.IngredientList)
             {
