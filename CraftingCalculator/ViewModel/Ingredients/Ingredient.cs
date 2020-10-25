@@ -21,7 +21,7 @@ namespace CraftingCalculator.ViewModel.Ingredients
                 {
                     ret = ret +
                         Environment.NewLine + Environment.NewLine +
-                        "Cost Per Item: " + string.Format("{0:#,0.####}", Cost);
+                        "Cost Per Item: " + string.Format("{0:C2}", Cost);
                 }
                 return ret;
             }

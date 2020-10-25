@@ -28,7 +28,7 @@ namespace CraftingCalculator.ViewModel
         public ObservableCollection<RecipeTree> RecipeTotals { get; set; }
         public ObservableCollection<RecipeFavorite> RecipeFavorites { get; set; }
 
-        private const string _numberFormat = "{0:#,0.####}";
+        private const string _numberFormat = "{0:C2}";
 
         /// <summary>
         /// Constructor

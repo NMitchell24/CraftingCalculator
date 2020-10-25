@@ -31,6 +31,7 @@
             <Controls:NumericUpDown
                 Value="{Binding Path=Cost}"
                 NumericInputMode="Decimal"
+                StringFormat="C2"
                 HorizontalAlignment="Left" 
                 TextAlignment="Left"
                 Height="33"
