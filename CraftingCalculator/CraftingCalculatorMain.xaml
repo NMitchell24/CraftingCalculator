@@ -61,29 +61,29 @@
                 </MenuItem>
                 <MenuItem Header="Accent">
                     <MenuItem Header="Red" Command="{Binding ChangeAccentCommand}" CommandParameter="Red"/>
+                    <MenuItem Header="Orange" Command="{Binding ChangeAccentCommand}" CommandParameter="Orange"/>
+                    <MenuItem Header="Yellow" Command="{Binding ChangeAccentCommand}" CommandParameter="Yellow"/>
                     <MenuItem Header="Green" Command="{Binding ChangeAccentCommand}" CommandParameter="Green"/>
                     <MenuItem Header="Blue" Command="{Binding ChangeAccentCommand}" CommandParameter="Blue"/>
-                    <MenuItem Header="Purple" Command="{Binding ChangeAccentCommand}" CommandParameter="Purple"/>
-                    <MenuItem Header="Orange" Command="{Binding ChangeAccentCommand}" CommandParameter="Orange"/>
-                    <MenuItem Header="Lime" Command="{Binding ChangeAccentCommand}" CommandParameter="Lime"/>
-                    <MenuItem Header="Emerald" Command="{Binding ChangeAccentCommand}" CommandParameter="Emerald"/>
-                    <MenuItem Header="Teal" Command="{Binding ChangeAccentCommand}" CommandParameter="Teal"/>
-                    <MenuItem Header="Cyan" Command="{Binding ChangeAccentCommand}" CommandParameter="Cyan"/>
-                    <MenuItem Header="Cobalt" Command="{Binding ChangeAccentCommand}" CommandParameter="Cobalt"/>
                     <MenuItem Header="Indigo" Command="{Binding ChangeAccentCommand}" CommandParameter="Indigo"/>
                     <MenuItem Header="Violet" Command="{Binding ChangeAccentCommand}" CommandParameter="Violet"/>
-                    <MenuItem Header="Pink" Command="{Binding ChangeAccentCommand}" CommandParameter="Pink"/>
-                    <MenuItem Header="Magenta" Command="{Binding ChangeAccentCommand}" CommandParameter="Magenta"/>
                     <MenuItem Header="Crimson" Command="{Binding ChangeAccentCommand}" CommandParameter="Crimson"/>
+                    <MenuItem Header="Magenta" Command="{Binding ChangeAccentCommand}" CommandParameter="Magenta"/>
+                    <MenuItem Header="Pink" Command="{Binding ChangeAccentCommand}" CommandParameter="Pink"/>
                     <MenuItem Header="Amber" Command="{Binding ChangeAccentCommand}" CommandParameter="Amber"/>
-                    <MenuItem Header="Yellow" Command="{Binding ChangeAccentCommand}" CommandParameter="Yellow"/>
-                    <MenuItem Header="Brown" Command="{Binding ChangeAccentCommand}" CommandParameter="Brown"/>
+                    <MenuItem Header="Emerald" Command="{Binding ChangeAccentCommand}" CommandParameter="Emerald"/>
+                    <MenuItem Header="Lime" Command="{Binding ChangeAccentCommand}" CommandParameter="Lime"/>
                     <MenuItem Header="Olive" Command="{Binding ChangeAccentCommand}" CommandParameter="Olive"/>
-                    <MenuItem Header="Steel" Command="{Binding ChangeAccentCommand}" CommandParameter="Steel"/>
+                    <MenuItem Header="Cobalt" Command="{Binding ChangeAccentCommand}" CommandParameter="Cobalt"/>
+                    <MenuItem Header="Cyan" Command="{Binding ChangeAccentCommand}" CommandParameter="Cyan"/>
+                    <MenuItem Header="Teal" Command="{Binding ChangeAccentCommand}" CommandParameter="Teal"/>
                     <MenuItem Header="Mauve" Command="{Binding ChangeAccentCommand}" CommandParameter="Mauve"/>
-                    <MenuItem Header="Taupe" Command="{Binding ChangeAccentCommand}" CommandParameter="Taupe"/>
+                    <MenuItem Header="Purple" Command="{Binding ChangeAccentCommand}" CommandParameter="Purple"/>
+                    <MenuItem Header="Brown" Command="{Binding ChangeAccentCommand}" CommandParameter="Brown"/>
                     <MenuItem Header="Sienna" Command="{Binding ChangeAccentCommand}" CommandParameter="Sienna"/>
-                 </MenuItem>
+                    <MenuItem Header="Steel" Command="{Binding ChangeAccentCommand}" CommandParameter="Steel"/>
+                    <MenuItem Header="Taupe" Command="{Binding ChangeAccentCommand}" CommandParameter="Taupe"/>
+                </MenuItem>
                 <MenuItem Header="{Binding ConfirmOnCloseHeader}" Command="{Binding EnableDisableConfirmOnCloseCommand}" />
                 <Separator/>
                 <MenuItem Header="Reset Preferences (F11)" Command="{Binding ResetSettingsCommand}"/>
