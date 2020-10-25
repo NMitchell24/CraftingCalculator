@@ -16,7 +16,14 @@ namespace CraftingCalculator.ViewModel.Ingredients
         {
             get
             {
-                return Description;
+                string ret = Description;
+                if (Cost > 0)
+                {
+                    ret = ret +
+                        Environment.NewLine + Environment.NewLine +
+                        "Cost Per Item: " + string.Format("{0:#,0.####}", Cost);
+                }
+                return ret;
             }
             set { }
         }       

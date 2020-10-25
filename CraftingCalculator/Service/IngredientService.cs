@@ -62,8 +62,6 @@ namespace CraftingCalculator.Service
 
         /// <summary>
         /// Deletes the provided Ingredient.
-        /// 
-        /// TODO: Refactor this to be more performant.
         /// </summary>
         /// <param name="ing"></param>
         public static void DeleteIngredient(Ingredient ing)
@@ -97,6 +95,11 @@ namespace CraftingCalculator.Service
             AbstractDAO.DeleteRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
         }
 
+        /// <summary>
+        /// Copies all the Ingredient fields onto the IngredientData object.
+        /// </summary>
+        /// <param name="ing"></param>
+        /// <param name="data"></param>
         private static void CopyToData(Ingredient ing, IngredientData data)
         {
             data.Name = ing.Name;
@@ -104,6 +107,11 @@ namespace CraftingCalculator.Service
             data.Cost = ing.Cost;
         }
 
+        /// <summary>
+        /// Returns a new Ingredient DTO object from the IngredientData model object.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         private static Ingredient GetIngredientForData(IngredientData data)
         {
             return new Ingredient

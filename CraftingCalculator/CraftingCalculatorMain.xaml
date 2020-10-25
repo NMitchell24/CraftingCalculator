@@ -84,8 +84,8 @@
                     <MenuItem Header="Steel" Command="{Binding ChangeAccentCommand}" CommandParameter="Steel"/>
                     <MenuItem Header="Taupe" Command="{Binding ChangeAccentCommand}" CommandParameter="Taupe"/>
                 </MenuItem>
-                <MenuItem Header="{Binding ConfirmOnCloseHeader}" Command="{Binding EnableDisableConfirmOnCloseCommand}" />
                 <Separator/>
+                <MenuItem Header="{Binding ConfirmOnCloseHeader}" Command="{Binding EnableDisableConfirmOnCloseCommand}" />
                 <MenuItem Header="Reset Preferences (F11)" Command="{Binding ResetSettingsCommand}"/>
             </MenuItem>
             <MenuItem Header="Help">

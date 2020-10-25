@@ -27,6 +27,11 @@ namespace CraftingCalculator.ViewModel.Recipes
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(Name);
                 sb.AppendLine(Filter?.Name);
+                if (Value > 0)
+                {
+                    sb.AppendLine("Value per Item:");
+                    sb.AppendLine(string.Format("{0:#,0.####}", Value));
+                }
                 sb.Append(Environment.NewLine);
                 if(Description != null && Description.Length > 0)
                 {
@@ -48,7 +53,7 @@ namespace CraftingCalculator.ViewModel.Recipes
                         sb.AppendLine(recipe.Name + " x" + recipe.Quantity);
                     }
                 }
-
+               
                 return sb.ToString();
             }
             set { Tooltip = value;}

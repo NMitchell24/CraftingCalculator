@@ -13,6 +13,7 @@ namespace CraftingCalculator.ViewModel.Ingredients
         public string Description { get => Ingredient.Description; set { } }
         public string Tooltip { get => Ingredient.Tooltip; set { } }
         public DataType Type { get => DataType.Ingredient; set { } }
+        public double TotalCost { get => Ingredient.Cost * Quantity; set { } }
 
         public string DisplayName
         {

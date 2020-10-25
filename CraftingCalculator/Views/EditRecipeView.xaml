@@ -183,15 +183,7 @@
                                 TextAlignment="Left"
                                 Width="100"
                                 Margin="0,0,5,0"
-                                Grid.Column="2">
-                                <i1:Interaction.Triggers>
-                                    <i1:EventTrigger EventName="ValueChanged">
-                                        <i1:InvokeCommandAction 
-                                            Command="{Binding DataContext.RecalculateTotalsCommand, 
-                                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" />
-                                    </i1:EventTrigger>
-                                </i1:Interaction.Triggers>
-                            </Controls:NumericUpDown>
+                                Grid.Column="2"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

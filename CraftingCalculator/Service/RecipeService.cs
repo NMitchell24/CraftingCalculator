@@ -105,6 +105,10 @@ namespace CraftingCalculator.Service
             return ret;
         }
 
+        /// <summary>
+        /// Returns a list of all Recipes from the database.
+        /// </summary>
+        /// <returns></returns>
         public static List<Recipe> GetAllRecipes()
         {
             return GetRecipeListForDataList(RecipeDAO.GetAllRecipeData());

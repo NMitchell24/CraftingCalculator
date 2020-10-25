@@ -20,7 +20,11 @@ namespace CraftingCalculator.DAO
                 .ToList();
         }
 
-        //Returns a list of IngredientQuantity data objects that use the provided Ingredient.
+        /// <summary>
+        /// Returns a list of IngredientQuantity data objects that use the provided Ingredient.
+        /// </summary>
+        /// <param name="ingredient"></param>
+        /// <returns></returns>
         public static List<IngredientQuantityData> GetIngredientQuantitiesForIngredient(Ingredient ingredient)
         {
             List<IngredientQuantityData> ret = new List<IngredientQuantityData>();

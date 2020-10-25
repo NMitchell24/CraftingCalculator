@@ -23,6 +23,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         public string FilterType { get => Recipe.Filter?.Name; set { } }
         public DataType Type { get => Recipe.Type; set { } }
         public string Description { get => Recipe.Description; set { } }
+        public double TotalValue { get => Recipe.Value * Quantity; set { } }
         public string Tooltip
         {
             get

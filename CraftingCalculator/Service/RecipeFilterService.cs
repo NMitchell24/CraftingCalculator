@@ -88,6 +88,11 @@ namespace CraftingCalculator.Service
             };
         }
 
+        /// <summary>
+        /// Copies the RecipeFilter fields into the RecipeFilterData
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="data"></param>
         private static void CopyToData(RecipeFilter filter, RecipeFilterData data)
         {
             data.Name = filter.Name;

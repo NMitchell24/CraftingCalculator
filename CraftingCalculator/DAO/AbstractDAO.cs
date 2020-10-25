@@ -31,7 +31,7 @@
         }
 
         /// <summary>
-        /// Adds or updates a record.  Pass true to add, false to update.
+        /// Adds or updates a record.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="collectionLabel"></param>
