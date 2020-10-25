@@ -29,8 +29,7 @@ namespace CraftingCalculator.ViewModel.Recipes
                 sb.AppendLine(Filter?.Name);
                 if (Value > 0)
                 {
-                    sb.AppendLine("Value per Item:");
-                    sb.AppendLine(string.Format("{0:#,0.####}", Value));
+                    sb.AppendLine("Value per Item: " + string.Format("{0:#,0.####}", Value));
                 }
                 sb.Append(Environment.NewLine);
                 if(Description != null && Description.Length > 0)
