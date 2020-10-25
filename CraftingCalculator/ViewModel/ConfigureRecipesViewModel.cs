@@ -298,8 +298,11 @@ namespace CraftingCalculator.ViewModel
             {
                 //Make sure selected Recipe Filter matches from Recipe
                 Recipe recipe = ItemForUpdate as Recipe;
-                SelectedFilter = RecipeFilters.Where(x => x.Name == recipe.Filter.Name).FirstOrDefault();
-                RaisePropertyChanged(nameof(SelectedFilter));
+                if (recipe.Filter != null)
+                {
+                    SelectedFilter = RecipeFilters.Where(x => x.Name == recipe.Filter.Name).FirstOrDefault();
+                    RaisePropertyChanged(nameof(SelectedFilter));
+                }
             }
         }
 

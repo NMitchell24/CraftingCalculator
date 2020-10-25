@@ -26,7 +26,7 @@ namespace CraftingCalculator.ViewModel.Recipes
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(Name);
-                sb.AppendLine(Filter.Name);
+                sb.AppendLine(Filter?.Name);
                 sb.Append(Environment.NewLine);
                 if(Description != null && Description.Length > 0)
                 {
