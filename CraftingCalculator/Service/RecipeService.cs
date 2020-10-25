@@ -117,11 +117,9 @@ namespace CraftingCalculator.Service
         public static void SaveRecipe(Recipe recipe)
         {
             RecipeData data = new RecipeData();
-            bool add = true;
             if (recipe.Id > 0)
             {
                 data = RecipeDAO.GetRecipeById(recipe.Id);
-                add = false;
             }
             else
             {
@@ -159,7 +157,7 @@ namespace CraftingCalculator.Service
                 {
                     IngredientQuantityData iqData = IngredientDAO.GetIngredientQuantityById(iq.Id);
                     iqData.Quantity = iq.Quantity;
-                    AbstractDAO.AddOrUpdateRecord<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iqData, false);
+                    AbstractDAO.AddOrUpdateRecord<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iqData);
                 }
                 else
                 {
@@ -170,14 +168,14 @@ namespace CraftingCalculator.Service
                         Quantity = iq.Quantity
                     };
                     //Add the record in the DB
-                    AbstractDAO.AddOrUpdateRecord<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iqData, true);
+                    AbstractDAO.AddOrUpdateRecord<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iqData);
                     //Now update RecipeData
                     data.Ingredients.Add(iqData);
                 }
             }
 
             //Save the recipe before modifying ChildRecipes as child recipes are dependent on the parent recipe ID already existing.
-            AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, data, add);
+            AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, data);
 
             //Check and remove any ChildRecipes
             foreach (RecipeQuantity rq in recipe.ChildRecipes.RemovedRecipes)
@@ -190,7 +188,6 @@ namespace CraftingCalculator.Service
             //Add or update any ChildRecipes
             foreach(RecipeQuantity rq in recipe.ChildRecipes.RecipeList)
             {
-                bool addOrUpdate = true;
                 RecipeQuantityData rqData = new RecipeQuantityData();
                 if (rq.Id > 0)
                 {
@@ -203,7 +200,7 @@ namespace CraftingCalculator.Service
                     rqData.ChildRecipe = childRecipe;   
                 }
                 rqData.Quantity = rq.Quantity;
-                AbstractDAO.AddOrUpdateRecord<RecipeQuantityData>(CollectionLabels.RecipeQuantities, rqData, addOrUpdate);
+                AbstractDAO.AddOrUpdateRecord<RecipeQuantityData>(CollectionLabels.RecipeQuantities, rqData);
             }            
         }
 

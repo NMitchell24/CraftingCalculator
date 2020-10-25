@@ -57,7 +57,7 @@ namespace CraftingCalculator.Service
 
             CopyToData(ing, data);
 
-            AbstractDAO.AddOrUpdateRecord<IngredientData>(CollectionLabels.Ingredients, data, ing.Id <= 0);          
+            AbstractDAO.AddOrUpdateRecord<IngredientData>(CollectionLabels.Ingredients, data);          
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace CraftingCalculator.Service
                             recipe.Ingredients.Remove(recipeIngredient);
                         }
                     }
-                    AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe, false);
+                    AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe);
                 }
 
                 //Delete the Ingredient Quantity

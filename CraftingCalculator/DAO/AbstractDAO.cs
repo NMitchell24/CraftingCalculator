@@ -37,17 +37,10 @@
         /// <param name="collectionLabel"></param>
         /// <param name="data"></param>
         /// <param name="add"></param>
-        public static void AddOrUpdateRecord<T>(string collectionLabel, object data, bool add)
+        public static void AddOrUpdateRecord<T>(string collectionLabel, object data)
         {
             var col = _data.GetCollectionByType<T>(collectionLabel);
-            if (add)
-            {
-                col.Insert((T)data); 
-            }
-            else
-            {
-                col.Update((T)data);
-            }
+            col.Upsert((T)data); 
         }
     }
 }

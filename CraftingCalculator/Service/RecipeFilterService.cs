@@ -52,7 +52,7 @@ namespace CraftingCalculator.Service
 
             CopyToData(filter, data);
 
-            AbstractDAO.AddOrUpdateRecord<RecipeFilterData>(CollectionLabels.RecipeFilters, data, filter.Id <= 0);
+            AbstractDAO.AddOrUpdateRecord<RecipeFilterData>(CollectionLabels.RecipeFilters, data);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace CraftingCalculator.Service
             foreach (RecipeData recipe in recipes)
             {
                 recipe.Filter = null;
-                AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe, false);
+                AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe);
             }
 
             //Delete Filter
