@@ -30,6 +30,16 @@ namespace CraftingCalculator.Service
         }
 
         /// <summary>
+        /// Returns the Ingredient from the database by id.
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public static Ingredient GetIngredientById(int Id)
+        {
+            return GetIngredientForData(AbstractDAO.GetRecordById<IngredientData>(CollectionLabels.Ingredients, Id));
+        }
+
+        /// <summary>
         /// Saves or adds the Ingredient.  If the ID value is 0 a new one will be added, otherwise the existing record will be updated.
         /// </summary>
         /// <param name="ing"></param>

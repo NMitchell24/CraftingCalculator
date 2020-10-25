@@ -14,8 +14,8 @@ namespace CraftingCalculator.ViewModel
     {
         [Description("Ingredient")]
         Ingredient = 0,
-        [Description("Recipe Type")]
-        RecipeType = 1,
+        [Description("Recipe Filter")]
+        RecipeFilter = 1,
         [Description("Recipe")]
         Recipe = 2
     }
@@ -49,7 +49,7 @@ namespace CraftingCalculator.ViewModel
                     return new Ingredient();
                 case DataType.Recipe:
                     return new Recipe();
-                case DataType.RecipeType:
+                case DataType.RecipeFilter:
                     return new RecipeFilter();
                 default:
                     return null;

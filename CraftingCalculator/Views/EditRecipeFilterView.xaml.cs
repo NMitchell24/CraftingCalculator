@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace CraftingCalculator.Views
 {
     /// <summary>
-    /// Interaction logic for EditRecipeTypeView.xaml
+    /// Interaction logic for EditRecipeFilterView.xaml
     /// </summary>
-    public partial class EditRecipeTypeView : UserControl
+    public partial class EditRecipeFilterView : UserControl
     {
-        public EditRecipeTypeView()
+        public EditRecipeFilterView()
         {
             InitializeComponent();
         }

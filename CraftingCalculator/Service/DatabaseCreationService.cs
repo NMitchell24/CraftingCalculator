@@ -11,5 +11,13 @@ namespace CraftingCalculator.Service
         {
             DatabaseCreationDAO.EnsureDatabaseExists();
         }
+
+        /// <summary>
+        /// Deletes all data from the database leaving only empty collections.
+        /// </summary>
+        public static void DeleteAllData()
+        {
+            DatabaseCreationDAO.DeleteAllRecords();
+        }
     }
 }

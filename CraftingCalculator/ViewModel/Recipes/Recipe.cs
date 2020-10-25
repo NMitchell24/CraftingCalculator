@@ -17,7 +17,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         public string Name { get; set; }
         public int Id { get; set; }
         public string Description { get; set; }
-        public string FilterType { get; set; }
+        public RecipeFilter Filter { get; set; }
         public double Value { get; set; }
 
         public string Tooltip
@@ -26,7 +26,7 @@ namespace CraftingCalculator.ViewModel.Recipes
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(Name);
-                sb.AppendLine(FilterType);
+                sb.AppendLine(Filter.Name);
                 sb.Append(Environment.NewLine);
                 if(Description != null && Description.Length > 0)
                 {
@@ -64,15 +64,24 @@ namespace CraftingCalculator.ViewModel.Recipes
             set { }
         }
 
+        /// <summary>
+        /// Default constructor.  Insures maps are initialized.
+        /// </summary>
+        public Recipe()
+        {
+            this.Ingredients = new IngredientMap();
+            this.ChildRecipes = new RecipeMap();
+        }
+
         public IngredientMap GetIngredients()
         {
-            IngredientMap NewIngredients = new IngredientMap(Ingredients);
+            IngredientMap NewIngredients = new IngredientMap(Ingredients, false);
 
             if(ChildRecipes != null)
             {
                 foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
                 {
-                    IngredientMap RecipeIngredients = new IngredientMap(recipe.Ingredients);
+                    IngredientMap RecipeIngredients = new IngredientMap(recipe.Ingredients, false);
 
                     NewIngredients = IngredientUtil.CombineIngredients(RecipeIngredients, NewIngredients, recipe.Quantity);
                 }
@@ -82,7 +91,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         }
 
   
-        public RecipeTree GetRecipeNodes(int quantity)
+        public RecipeTree GetRecipeNodes(long quantity)
         {
             RecipeTree ret = new RecipeTree
             {
@@ -125,10 +134,10 @@ namespace CraftingCalculator.ViewModel.Recipes
                 Id = this.Id,
                 Name = this.Name,
                 Description = this.Description,
-                FilterType = this.FilterType,
+                Filter = this.Filter,
                 Value = this.Value,
-                Ingredients = this.Ingredients,
-                ChildRecipes = this.ChildRecipes
+                Ingredients = this.Ingredients.Clone(),
+                ChildRecipes = this.ChildRecipes.Clone()
             };
 
             return clone;
@@ -139,6 +148,8 @@ namespace CraftingCalculator.ViewModel.Recipes
             Recipe ret = (Recipe)Clone();
             ret.Name = ret.Name + " - Copy";
             ret.Id = 0;
+            ret.Ingredients = this.Ingredients.CloneForSave();
+            ret.ChildRecipes = this.ChildRecipes.CloneForSave();
 
             return ret;
         }

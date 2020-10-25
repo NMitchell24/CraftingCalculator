@@ -131,6 +131,7 @@
     <Compile Include="ViewModel\ConfigureRecipesViewModel.cs" />
     <Compile Include="ViewModel\DataType.cs" />
     <Compile Include="ViewModel\IBaseDataRecord.cs" />
+    <Compile Include="ViewModel\IBaseQuantityRecord.cs" />
     <Compile Include="ViewModel\Ingredients\Ingredient.cs" />
     <Compile Include="ViewModel\Ingredients\IngredientMap.cs" />
     <Compile Include="ViewModel\Ingredients\IngredientQuantity.cs" />
@@ -162,8 +163,8 @@
     <Compile Include="Views\EditIngredientView.xaml.cs">
       <DependentUpon>EditIngredientView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EditRecipeTypeView.xaml.cs">
-      <DependentUpon>EditRecipeTypeView.xaml</DependentUpon>
+    <Compile Include="Views\EditRecipeFilterView.xaml.cs">
+      <DependentUpon>EditRecipeFilterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EditRecipeView.xaml.cs">
       <DependentUpon>EditRecipeView.xaml</DependentUpon>
@@ -203,7 +204,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\EditRecipeTypeView.xaml">
+    <Page Include="Views\EditRecipeFilterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -4,12 +4,15 @@ namespace CraftingCalculator.ViewModel.Ingredients
     /// <summary>
     /// Represents an ingredient and quantity.
     /// </summary>
-    public class IngredientQuantity
+    public class IngredientQuantity : AbstractPropertyChanged, IBaseQuantityRecord
     {
+        public int Id { get; set; }
+        public Ingredient Ingredient { get; set; }
         public long Quantity { get; set; }
-
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get => Ingredient.Name; set { } }
+        public string Description { get => Ingredient.Description; set { } }
+        public string Tooltip { get => Ingredient.Tooltip; set { } }
+        public DataType Type { get => DataType.Ingredient; set { } }
 
         public string DisplayName
         {
@@ -17,16 +20,23 @@ namespace CraftingCalculator.ViewModel.Ingredients
             private set { }
         }
 
-        public IngredientQuantity(string name, string description, long quantity)
+        public IngredientQuantity(Ingredient ing, long quantity, int id)
         {
-            Name = name;
-            Description = description;
+            Ingredient = ing;
             Quantity = quantity;
+            Id = id;
         }
 
         public IngredientQuantity Clone()
         {
-            return new IngredientQuantity (Name, Description, Quantity);
+            return new IngredientQuantity (Ingredient, Quantity, Id);
+        }
+
+        public IngredientQuantity CloneForSave()
+        {
+            IngredientQuantity ret = this.Clone();
+            ret.Id = 0;
+            return ret;
         }
     }
 }

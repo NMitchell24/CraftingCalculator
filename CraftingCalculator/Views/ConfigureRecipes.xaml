@@ -35,8 +35,8 @@
         <DataTemplate x:Key="EditIngredientsTemplate" DataType="{x:Type views:EditIngredientView}">
             <views:EditIngredientView />
         </DataTemplate>
-        <DataTemplate x:Key="EditRecipeTypeTemplate" DataType="{x:Type views:EditRecipeTypeView}">
-            <views:EditRecipeTypeView />
+        <DataTemplate x:Key="EditRecipeFilterTemplate" DataType="{x:Type views:EditRecipeFilterView}">
+            <views:EditRecipeFilterView />
         </DataTemplate>
         <DataTemplate x:Key="EditRecipeTemplate" DataType="{x:Type views:EditRecipeView}">
             <views:EditRecipeView />
@@ -158,6 +158,24 @@
                 </StackPanel>
             </Button>
 
+            <Button Command="{Binding DeleteAllCommand}"
+                    Style="{StaticResource MetroRoundedAccentButton}"
+                    BorderThickness="1"
+                    ToolTip="Delete selected item" 
+                    HorizontalAlignment="Left" 
+                    Padding="0"
+                    Margin="195,0,5,0" 
+                    VerticalAlignment="Center" 
+                    Width="115"
+                    Height="26"
+                    Grid.Row="1"
+                    Grid.Column="3">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterialDesign Kind="DeleteSweep" />
+                    <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="Delete All Data"/>
+                </StackPanel>
+            </Button>
+
             <ListBox x:Name="dataList" ItemsSource="{Binding Path = DataRecords, NotifyOnSourceUpdated=True}" 
                      SelectedItem="{Binding Path=SelectedItem, UpdateSourceTrigger=PropertyChanged}"
                      SelectedIndex="{Binding Path=SelectedItemIndex}"
@@ -205,7 +223,7 @@
                         <Setter Property="ContentTemplate" Value="{StaticResource EditIngredientsTemplate}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding SwitchView}" Value="1">
-                                <Setter Property="ContentTemplate" Value="{StaticResource EditRecipeTypeTemplate}" />
+                                <Setter Property="ContentTemplate" Value="{StaticResource EditRecipeFilterTemplate}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding SwitchView}" Value="2">
                                 <Setter Property="ContentTemplate" Value="{StaticResource EditRecipeTemplate}" />

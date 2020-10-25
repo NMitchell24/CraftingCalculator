@@ -32,5 +32,17 @@ namespace CraftingCalculator.DAO
             return ret;
         }
 
+        /// <summary>
+        /// Looks up an IngredientQuantity by its ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static IngredientQuantityData GetIngredientQuantityById(int id)
+        {
+            var col = _data.GetCollectionByType<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
+
+            return col.Include(x => x.Ingredient).FindById(id);
+        }
+
     }
 }

@@ -108,7 +108,7 @@ namespace CraftingCalculator.Service
                 Recipe rec = RecipeService.GetRecipeForId(favRecData.Recipe.Id);
                 if(rec != null)
                 {
-                    ret.Add(new RecipeQuantity(rec, favRecData.Quantity));
+                    ret.Add(new RecipeQuantity(rec, favRecData.Quantity, 0));
                 }
             }
 

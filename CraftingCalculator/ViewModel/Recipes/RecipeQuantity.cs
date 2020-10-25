@@ -6,25 +6,23 @@ namespace CraftingCalculator.ViewModel.Recipes
     /// <summary>
     /// A class that represents a recipe and quantity
     /// </summary>
-    public class RecipeQuantity : AbstractPropertyChanged
+    public class RecipeQuantity : AbstractPropertyChanged, IBaseQuantityRecord
     {
+        public int Id { get; set; }
         public Recipe Recipe { get; set; }
-        private int _quantity;
-        public int Quantity
+        private long _quantity;
+        public long Quantity
         {
             get => _quantity;
             set
             {
-                // This should match the maximum set for the NumericUpDown control in the RecipesView.xaml
-                // Prevents the user from increasing the ingredient totals over the maximum for the numeric up down.
-                if(value <= 500)
-                {
-                    _quantity = Math.Abs(value);
-                }
+                _quantity = Math.Abs(value);
             }
         }
-        public string Name { get => Recipe.Name; private set { } }
-        public string Type { get => Recipe.FilterType; private set { } }
+        public string Name { get => Recipe.Name; set { } }
+        public string FilterType { get => Recipe.Filter?.Name; set { } }
+        public DataType Type { get => Recipe.Type; set { } }
+        public string Description { get => Recipe.Description; set { } }
         public string Tooltip
         {
             get
@@ -32,7 +30,7 @@ namespace CraftingCalculator.ViewModel.Recipes
                 return Recipe.Tooltip;
             }
 
-            private set { }
+            set { }
         }
         public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
 
@@ -47,13 +45,31 @@ namespace CraftingCalculator.ViewModel.Recipes
             }
         }
 
-        
-        //public bool IsSelected { get => Recipe.IsSelected; set => Recipe.IsSelected = value; }
-
-        public RecipeQuantity(Recipe recipe, int quantity)
+        public RecipeQuantity(Recipe recipe, long quantity, int id)
         {
             Recipe = recipe;
             Quantity = quantity;
+            Id = id;
+        }
+
+        /// <summary>
+        /// Clone this quantity object
+        /// </summary>
+        /// <returns></returns>
+        public RecipeQuantity Clone()
+        {
+            return new RecipeQuantity(Recipe, Quantity, Id);
+        }
+
+        /// <summary>
+        /// Clones for saving clears ID so that it can be saved as a new record.
+        /// </summary>
+        /// <returns></returns>
+        public RecipeQuantity CloneForSave()
+        {
+            RecipeQuantity ret = this.Clone();
+            ret.Id = 0;
+            return ret;
         }
     }
 }

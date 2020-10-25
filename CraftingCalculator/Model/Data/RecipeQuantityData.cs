@@ -12,6 +12,6 @@ namespace CraftingCalculator.Model.Data
         [BsonRef(CollectionLabels.Recipes)]
         public RecipeData ChildRecipe { get; set; }
 
-        public int Quantity { get; set; }
+        public long Quantity { get; set; }
     }
 }

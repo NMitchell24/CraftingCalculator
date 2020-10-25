@@ -17,16 +17,21 @@ namespace CraftingCalculator.Service
 
             foreach (RecipeFilterData data in RecipeFilterDAO.GetAllRecipeFiltersData())
             {
-                RecipeFilter filter = new RecipeFilter
-                {
-                    Description = data.Description,
-                    Name = data.Name,
-                    Id = data.Id
-                };
+                RecipeFilter filter = GetFilterForData(data);
                 ret.Add(filter);
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Return a RecipeFilter object by ID.
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public static RecipeFilter GetRecipeFilterById(int Id)
+        {
+            return GetFilterForData(AbstractDAO.GetRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, Id));
         }
 
         /// <summary>
@@ -66,6 +71,21 @@ namespace CraftingCalculator.Service
 
             //Delete Filter
             AbstractDAO.DeleteRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, filter.Id);
+        }
+
+        /// <summary>
+        /// Convert the Data object into the RecipeFilter object.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static RecipeFilter GetFilterForData(RecipeFilterData data)
+        {
+            return new RecipeFilter
+            {
+                Description = data.Description,
+                Name = data.Name,
+                Id = data.Id
+            };
         }
 
         private static void CopyToData(RecipeFilter filter, RecipeFilterData data)

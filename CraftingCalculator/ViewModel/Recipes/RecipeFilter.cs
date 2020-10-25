@@ -15,7 +15,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         {
             get
             {
-                return DataType.RecipeType;
+                return DataType.RecipeFilter;
             }
             //Don't allow this to be changed as it should remain static
             set { }
