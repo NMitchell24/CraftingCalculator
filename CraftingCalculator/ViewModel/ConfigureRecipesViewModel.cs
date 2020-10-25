@@ -219,7 +219,7 @@ namespace CraftingCalculator.ViewModel
                     SwitchView = 2;
                 }
 
-                ItemForUpdate = SelectedType.GetDataRecord();
+                SelectedItem = SelectedType.GetDataRecord();
 
                 RaisePropertyChanged(nameof(DataRecords));
                 RaisePropertyChanged(nameof(SwitchView));
