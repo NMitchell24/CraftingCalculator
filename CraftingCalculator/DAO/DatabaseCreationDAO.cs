@@ -65,6 +65,12 @@ namespace CraftingCalculator.DAO
                     db.Engine.Update(CollectionLabels.RecipeQuantities, doc);
                 }
 
+                foreach (var doc in db.Engine.FindAll(CollectionLabels.FavoriteRecipeQuantities))
+                {
+                    doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
+                    db.Engine.Update(CollectionLabels.FavoriteRecipeQuantities, doc);
+                }
+
                 db.Engine.UserVersion = 1;
             }
         }
