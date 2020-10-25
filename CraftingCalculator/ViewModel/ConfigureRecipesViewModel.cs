@@ -85,6 +85,11 @@ namespace CraftingCalculator.ViewModel
                 ItemForUpdate = SelectedType.GetDataRecord();
             }
 
+            if(SelectedType == DataType.Recipe)
+            {
+                ResetRecipeValues();
+            }
+
             RaisePropertyChanged(nameof(ItemForUpdate));
         }
 
@@ -242,12 +247,7 @@ namespace CraftingCalculator.ViewModel
                     // Reload Recipe specific Data.
                     if(ItemForUpdate.Type == DataType.Recipe)
                     {
-                        UpdateSelectedFilter();
-                        ResetQuantity();
-                        UpdateRecipeQuantityValues();
-                        //Reset to default data type selection to prevent data from being out of sync.
-                        RecipeSelectedType = DataType.Ingredient;
-                        RaisePropertyChanged(nameof(RecipeSelectedType));
+                        ResetRecipeValues();
                     }
                 }
             }
@@ -284,6 +284,16 @@ namespace CraftingCalculator.ViewModel
             {
                 UpdateSelectedFilter();
             }           
+        }
+
+        private void ResetRecipeValues()
+        {
+            UpdateSelectedFilter();
+            ResetQuantity();
+            UpdateRecipeQuantityValues();
+            //Reset to default data type selection to prevent data from being out of sync.
+            RecipeSelectedType = DataType.Ingredient;
+            RaisePropertyChanged(nameof(RecipeSelectedType));
         }
 
         private void ResetQuantity()
