@@ -83,6 +83,8 @@
                      SelectedItem="{Binding Path=SelectedRecipe, UpdateSourceTrigger=PropertyChanged}"
                      SelectedIndex="{Binding Path=SelectedRecipeIndex}"
                      SelectionMode="Extended"
+                     TextSearch.TextPath="Name"
+                     IsTextSearchEnabled="true"
                      Margin="5" HorizontalAlignment="Stretch"
                      BorderThickness="1"
                      Grid.Row="2" Grid.RowSpan="4" Grid.Column="1" Grid.ColumnSpan="2"

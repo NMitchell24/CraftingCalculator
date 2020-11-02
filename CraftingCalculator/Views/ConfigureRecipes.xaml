@@ -180,6 +180,8 @@
                      SelectedItem="{Binding Path=SelectedItem, UpdateSourceTrigger=PropertyChanged}"
                      SelectedIndex="{Binding Path=SelectedItemIndex}"
                      SelectionMode="Single"
+                     TextSearch.TextPath="Name"
+                     IsTextSearchEnabled="true"
                      Margin="5" HorizontalAlignment="Stretch"
                      BorderThickness="1"
                      Grid.Row="2" Grid.RowSpan="4" Grid.Column="1" Grid.ColumnSpan="2"
