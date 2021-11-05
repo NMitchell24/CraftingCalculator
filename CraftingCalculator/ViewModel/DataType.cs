@@ -1,12 +1,8 @@
 ﻿using CraftingCalculator.ViewModel.Ingredients;
 using CraftingCalculator.ViewModel.Recipes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -14,7 +10,7 @@ namespace CraftingCalculator.ViewModel
     {
         [Description("Ingredient")]
         Ingredient = 0,
-        [Description("Recipe Filter")]
+        [Description("Recipe Category")]
         RecipeFilter = 1,
         [Description("Recipe")]
         Recipe = 2

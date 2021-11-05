@@ -125,7 +125,7 @@
     <Compile Include="Model\Data\FavoriteRecipeQuantitiesData.cs" />
     <Compile Include="Model\Data\RecipeFavoritesData.cs" />
     <Compile Include="Service\IngredientService.cs" />
-    <Compile Include="Utilities\DataTypeConverter.cs" />
+    <Compile Include="ViewModel\CustomConverters\DataTypeConverter.cs" />
     <Compile Include="Utilities\DataTypeUtil.cs" />
     <Compile Include="ViewModel\AbstractPropertyChanged.cs" />
     <Compile Include="ViewModel\ConfigureRecipesViewModel.cs" />
@@ -160,7 +160,7 @@
     <Compile Include="Views\ConfigureRecipes.xaml.cs">
       <DependentUpon>ConfigureRecipes.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CustomConverters\ControlHeightConverter.cs" />
+    <Compile Include="ViewModel\CustomConverters\ControlHeightConverter.cs" />
     <Compile Include="Views\EditIngredientView.xaml.cs">
       <DependentUpon>EditIngredientView.xaml</DependentUpon>
     </Compile>

@@ -69,7 +69,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         }
 
         /// <summary>
-        /// Default constructor.  Insures maps are initialized.
+        /// Default constructor.  ensures maps are initialized.
         /// </summary>
         public Recipe()
         {

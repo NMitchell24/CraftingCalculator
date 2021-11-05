@@ -1,14 +1,9 @@
-﻿using CraftingCalculator.ViewModel;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace CraftingCalculator.Utilities
+namespace CraftingCalculator.ViewModel.CustomConverters
 {
     class DataTypeConverter : IValueConverter
     {

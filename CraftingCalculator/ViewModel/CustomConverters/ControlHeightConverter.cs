@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace CraftingCalculator.Views.CustomConverters
+namespace CraftingCalculator.ViewModel.CustomConverters
 {
     public class ControlHeightConverter : IValueConverter
     {
