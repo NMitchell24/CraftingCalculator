@@ -160,6 +160,7 @@
     <Compile Include="Views\ConfigureRecipes.xaml.cs">
       <DependentUpon>ConfigureRecipes.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\CustomConverters\ControlHeightConverter.cs" />
     <Compile Include="Views\EditIngredientView.xaml.cs">
       <DependentUpon>EditIngredientView.xaml</DependentUpon>
     </Compile>
