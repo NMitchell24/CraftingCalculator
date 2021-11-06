@@ -55,6 +55,54 @@ namespace CraftingCalculator.DAO
         }
 
         /// <summary>
+        /// Gets all Recipe Quantity objects for a given Child Recipe Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static List<RecipeQuantityData> GetRecipeQuantityByChildId(int id)
+        {
+            List<RecipeQuantityData> ret = new List<RecipeQuantityData>();
+            var col = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+
+            ret.AddRange(col.Include(x => x.ParentRecipe)
+                .Include(x => x.ChildRecipe)
+                .Find(x => x.ChildRecipe.Id == id));
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Returns a RecipeQuantityData object by its identifier.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static RecipeQuantityData GetRecipeQuantityByQuantityId(int id)
+        {
+            var col = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+
+            return col.Include(x => x.ParentRecipe)
+                .Include(x => x.ChildRecipe)
+                .FindById(id);
+        }
+
+        /// <summary>
+        /// Returns any Recipes that use the provided IngredientQuantity
+        /// </summary>
+        /// <param name="ingredient"></param>
+        /// <returns></returns>
+        public static List<RecipeData> GetRecipeByIngredient(IngredientQuantityData ingredient)
+        {
+            List<RecipeData> ret = new List<RecipeData>();
+            var col = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
+
+            ret.AddRange(col.Include(x => x.Ingredients)
+                .Include(x => x.Filter)
+                .FindAll().Where(x => x.Ingredients.Any(y => y.Id == ingredient.Id)));
+
+            return ret;
+        }
+
+        /// <summary>
         /// Gets a Recipe by the ID.
         /// </summary>
         /// <param name="id"></param>
@@ -66,7 +114,21 @@ namespace CraftingCalculator.DAO
             return col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
                 .FindById(id);
-        }   
+        }
+        
+        /// <summary>
+        /// Returns a list of all recipes
+        /// </summary>
+        /// <returns></returns>
+        public static List<RecipeData> GetAllRecipeData()
+        {
+            return _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes)
+                .Include(x => x.Ingredients)
+                .Include(x => x.Filter)
+                .Find(Query.All(Query.Ascending))
+                .OrderBy(x => x.Name)
+                .ToList();
+        }
         
     }
 }

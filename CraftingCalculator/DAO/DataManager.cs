@@ -15,7 +15,7 @@ namespace CraftingCalculator.DAO
                 File.WriteAllBytes(Properties.Resources.dbName, Properties.Resources.CraftingCalculator);
             }
 
-            _db = new LiteDatabase(Properties.Resources.dbName);
+            _db = new LiteDatabase("Filename="+Properties.Resources.dbName+";upgrade=true");
         }
 
         public static DataManager Instance

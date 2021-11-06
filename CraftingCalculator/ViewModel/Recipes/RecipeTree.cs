@@ -51,5 +51,14 @@ namespace CraftingCalculator.ViewModel.Recipes
                 }
             }
         }
+
+        public void ExpandCollapseAll(bool isExpand)
+        {
+            this.IsNodeExpanded = isExpand;
+            foreach(RecipeTree node in RecipeNodes)
+            {
+                node.ExpandCollapseAll(isExpand);
+            }
+        }
     }
 }

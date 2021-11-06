@@ -28,6 +28,8 @@ namespace CraftingCalculator.ViewModel
         public ObservableCollection<RecipeTree> RecipeTotals { get; set; }
         public ObservableCollection<RecipeFavorite> RecipeFavorites { get; set; }
 
+        private const string _numberFormat = "{0:C2}";
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -43,6 +45,8 @@ namespace CraftingCalculator.ViewModel
             CopyIngredientsCommand = new CommandRunner(CopyIngredientsToClipboard, CanCopyIngredients);
             SaveRecipeFavoritesCommand = new CommandRunner(SaveRecipes, IsRecipesExist);
             DeleteFavoriteCommand = new CommandRunner(DeleteSelectedFavorite, CanDeleteFavorite);
+            ExpandAllCommand = new CommandRunner(ExpandAllRecipes, CanExpandCollapseAll);
+            CollapseAllCommand = new CommandRunner(CollapseAllRecipes, CanExpandCollapseAll);
             
             RecipeFilters = RecipeFilterService.GetRecipeFilters();
             SelectedFilter = RecipeFilters[0];
@@ -100,13 +104,17 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner RecalculateTotalsCommand { get; set; }
         private void CalculateTotalIngredients(object obj = null)
         {
+            _totalCost = 0;
+            _totalValue = 0;
             _ingredientMap.Reset();
             foreach (RecipeQuantity q in RecipeQuantities)
             {
                 foreach (IngredientQuantity i in q.Ingredients.IngredientList)
                 {
-                    _ingredientMap.Add(i.Name, i.Description, (i.Quantity * q.Quantity));
+                    _ingredientMap.Add(i.Ingredient, (i.Quantity * q.Quantity));
+                    _totalCost += i.TotalCost * q.Quantity;
                 }
+                _totalValue += q.TotalValue;
             }
             TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList.OrderBy(x => x.Name));
 
@@ -226,6 +234,38 @@ namespace CraftingCalculator.ViewModel
                 RaiseChanged();
             }
         }
+
+        //Expand and Collapse All Command and methods
+        public CommandRunner ExpandAllCommand { get; set; }
+        public CommandRunner CollapseAllCommand { get; set; }
+        private bool CanExpandCollapseAll()
+        {
+            return RecipeTotals != null && RecipeTotals.Count() > 0;
+        }
+
+        private void ExpandAllRecipes(object obj)
+        {
+            ExpandCollapseAll(true);
+        }
+        
+        private void CollapseAllRecipes(object obj)
+        {
+            ExpandCollapseAll(false);
+        }
+
+        private void ExpandCollapseAll(bool isExpand)
+        {
+            List<RecipeTree> temp = new List<RecipeTree>();
+            foreach (RecipeTree tree in RecipeTotals)
+            {
+                tree.ExpandCollapseAll(isExpand);
+                temp.Add(tree);
+            }
+
+            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
+            RaiseChanged();
+        }
+
         #endregion
 
         #region selected-items
@@ -317,6 +357,28 @@ namespace CraftingCalculator.ViewModel
                 RaiseChanged();
             }
         }
+
+        //Cost and Values
+        private double _totalCost;
+        public string TotalCost
+        {
+            get => string.Format(_numberFormat, _totalCost);
+            private set { }
+        }
+
+        private double _totalValue;
+        public string TotalValue
+        {
+            get => string.Format(_numberFormat, _totalValue);
+            private set { }
+        }
+
+        public string PotentialProfit
+        {
+            get => string.Format(_numberFormat, (_totalValue - _totalCost));
+            private set { }
+        }
+
         #endregion
 
         #region helper-methods
@@ -380,6 +442,9 @@ namespace CraftingCalculator.ViewModel
             RaisePropertyChanged(nameof(TotalIngredients));
             RaisePropertyChanged(nameof(RecipeTotals));
             RaisePropertyChanged(nameof(RecipeFavorites));
+            RaisePropertyChanged(nameof(TotalCost));
+            RaisePropertyChanged(nameof(TotalValue));
+            RaisePropertyChanged(nameof(PotentialProfit));
             AddRecipeCommand.RaiseCanExecuteChanged();
             RemoveRecipeCommand.RaiseCanExecuteChanged();
             RecalculateTotalsCommand.RaiseCanExecuteChanged();
@@ -387,6 +452,8 @@ namespace CraftingCalculator.ViewModel
             CopyIngredientsCommand.RaiseCanExecuteChanged();
             SaveRecipeFavoritesCommand.RaiseCanExecuteChanged();
             DeleteFavoriteCommand.RaiseCanExecuteChanged();
+            ExpandAllCommand.RaiseCanExecuteChanged();
+            CollapseAllCommand.RaiseCanExecuteChanged();
         }
         #endregion
     }

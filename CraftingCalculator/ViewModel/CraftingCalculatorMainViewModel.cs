@@ -6,19 +6,37 @@ using MahApps.Metro.Controls.Dialogs;
 using System.Reflection;
 using System.Text;
 using System;
+using System.Windows.Controls;
+using ControlzEx.Theming;
 
 namespace CraftingCalculator.ViewModel
 {
     public class CraftingCalculatorMainViewModel : AbstractPropertyChanged
     {
         private IDialogCoordinator dialogCoordinator;
+        public string ConfirmOnCloseHeader { get; set; }
         public CommandRunner TopMostCommand { get; set; }
         public CommandRunner ChangeThemeCommand { get; set; }
         public CommandRunner ChangeAccentCommand { get; set; }
         public CommandRunner ResetSettingsCommand { get; private set; }
         public CommandRunner AboutCommand { get; set; }
         public CommandRunner ExitCommand { get; set; }
+        public CommandRunner OpenRecipeConfiguratorCommand { get; set; }
+        public CommandRunner OpenRecipesViewCommand { get; set; }
+        public CommandRunner EnableDisableConfirmOnCloseCommand { get; set; }
+
+
         private bool _doClose;
+        private int _currentView;
+
+        public int CurrentView
+        {
+            get { return _currentView; }
+            set
+            {
+                _currentView = value; this.RaisePropertyChanged("CurrentView");
+            }
+        }
 
         private bool _isTopMost;
         public bool IsTopMost
@@ -39,11 +57,45 @@ namespace CraftingCalculator.ViewModel
             ResetSettingsCommand = new CommandRunner(ResetSettings);
             AboutCommand = new CommandRunner(ShowAboutDialog);
             ExitCommand = new CommandRunner(Close);
+            OpenRecipeConfiguratorCommand = new CommandRunner(OpenRecipeConfigurator);
+            OpenRecipesViewCommand = new CommandRunner(OpenRecipesView);
+            EnableDisableConfirmOnCloseCommand = new CommandRunner(EnableDisableConfirmOnClose);
+            CurrentView = 0;
             
             dialogCoordinator = instance;
 
             ChangeTheme(Properties.Settings.Default["Theme"]);
+            ChangeAccent(Properties.Settings.Default["Accent"]);
+            UpdateConfirmOnCloseHeader();
 
+        }
+
+        /// <summary>
+        /// Dynamically sets the Menu Item text based upon current Settings for ConfirmOnClose
+        /// </summary>
+        private void UpdateConfirmOnCloseHeader()
+        {
+            bool confirmOnClose = (bool)Properties.Settings.Default["ConfirmOnClose"];
+            if(confirmOnClose)
+            {
+                ConfirmOnCloseHeader = "Disable Confirmation on Close (F3)";
+            }
+            else
+            {
+                ConfirmOnCloseHeader = "Enable Confirmation on Close (F3)";
+            }
+            RaisePropertyChanged(nameof(ConfirmOnCloseHeader));
+        }
+
+        /// <summary>
+        /// Enables or disables the Confirmation on Closing of the application.
+        /// </summary>
+        /// <param name="obj"></param>
+        private void EnableDisableConfirmOnClose(object obj)
+        {
+            bool confirmOnClose = (bool)Properties.Settings.Default["ConfirmOnClose"];
+            Properties.Settings.Default["ConfirmOnClose"] = !confirmOnClose;
+            UpdateConfirmOnCloseHeader();
         }
 
         /// <summary>
@@ -53,6 +105,9 @@ namespace CraftingCalculator.ViewModel
         private void ResetSettings(object obj)
         {
             Properties.Settings.Default.Reset();
+            ChangeTheme(Properties.Settings.Default["Theme"]);
+            ChangeAccent(Properties.Settings.Default["Accent"]);
+            UpdateConfirmOnCloseHeader();
         }
 
         /// <summary>
@@ -61,11 +116,7 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private void ChangeTheme(object obj)
         {
-            string accent = Properties.Settings.Default["Accent"].ToString();
-
-            ThemeManager.ChangeAppStyle(Application.Current,
-                       ThemeManager.GetAccent(accent),
-                       ThemeManager.GetAppTheme($"Base{obj}"));
+            ThemeManager.Current.ChangeThemeBaseColor(Application.Current, obj as string);
 
             Properties.Settings.Default["Theme"] = obj;
         }
@@ -76,11 +127,7 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private void ChangeAccent(object obj)
         {
-            string theme = $"Base{Properties.Settings.Default["Theme"]}";
-
-            ThemeManager.ChangeAppStyle(Application.Current,
-                       ThemeManager.GetAccent(obj as string),
-                       ThemeManager.GetAppTheme(theme));
+            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, obj as string);
 
             Properties.Settings.Default["Accent"] = obj;
         }
@@ -102,6 +149,12 @@ namespace CraftingCalculator.ViewModel
         public async void OnWindowClosing(object sender, CancelEventArgs e)
         {
             Properties.Settings.Default.Save();
+            bool confirmOnClose = (bool)Properties.Settings.Default["ConfirmOnClose"];
+
+            if(!confirmOnClose)
+            {
+                Application.Current.Shutdown();
+            }
 
             e.Cancel = !_doClose;
             if (_doClose) return;
@@ -157,6 +210,16 @@ namespace CraftingCalculator.ViewModel
 
             //Show the dialog
             await dialogCoordinator.ShowMessageAsync(this, "About", sb.ToString());
+        }
+
+        private void OpenRecipeConfigurator(object obj)
+        {
+            CurrentView = 1;
+        }
+
+        private void OpenRecipesView(object obj)
+        {
+            CurrentView = 0;
         }
     }
 }

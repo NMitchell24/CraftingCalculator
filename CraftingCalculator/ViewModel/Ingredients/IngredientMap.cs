@@ -12,15 +12,23 @@ namespace CraftingCalculator.ViewModel.Ingredients
             get => _internalList.AsReadOnly();
             private set { }
         }
+        public List<IngredientQuantity> RemovedIngredients = new List<IngredientQuantity>();
 
-        public IngredientMap(IngredientMap map)
+        public IngredientMap(IngredientMap map, bool cloneForSave)
         {
             _internalList = new List<IngredientQuantity>();
             foreach(IngredientQuantity i in map.IngredientList)
             {
                 // Insures we don't retain references to the original IngredientQuantity object and cause those 
                 // objects to get mutated elsewhere.
-                _internalList.Add(i.Clone());
+                if(cloneForSave)
+                {
+                    _internalList.Add(i.CloneForSave());
+                }
+                else
+                {
+                    _internalList.Add(i.Clone());
+                }
             }
         }
 
@@ -35,15 +43,20 @@ namespace CraftingCalculator.ViewModel.Ingredients
         /// </summary>
         /// <param name="ingredient"></param>
         /// <param name="quantity"></param>
-        public void Add(string ingredient, string description, long quantity)
+        public void Add(Ingredient ingredient, long quantity)
         {
-            if(_internalList.Any(i => i.Name == ingredient))
+            Add(ingredient, quantity, 0);
+        }
+
+        public void Add(Ingredient ingredient, long quantity, int id)
+        {
+            if (_internalList.Any(i => i.Name == ingredient.Name))
             {
-                _internalList.Find(i => i.Name == ingredient).Quantity += quantity;
-            } 
+                _internalList.Find(i => i.Name == ingredient.Name).Quantity += quantity;
+            }
             else
             {
-                _internalList.Add(new IngredientQuantity(ingredient, description, quantity));
+                _internalList.Add(new IngredientQuantity(ingredient, quantity, id));
             }
         }
 
@@ -54,11 +67,11 @@ namespace CraftingCalculator.ViewModel.Ingredients
         /// </summary>
         /// <param name="ingredient"></param>
         /// <param name="quantity"></param>
-        public void Remove(string ingredient, string description, long quantity)
+        public void Remove(Ingredient ingredient, long quantity)
         {
-            if (_internalList.Any(i => i.Name == ingredient && i.Quantity - quantity > 0))
+            if (_internalList.Any(i => i.Name == ingredient.Name && i.Quantity - quantity > 0))
             {
-                Add(ingredient, description, -quantity);
+                Add(ingredient, -quantity);
             }
             else
             {
@@ -71,11 +84,12 @@ namespace CraftingCalculator.ViewModel.Ingredients
         /// Remove an IngredientType from the list entirely if it exists.
         /// </summary>
         /// <param name="ingredient"></param>
-        public void RemoveAll(string ingredient)
+        public void RemoveAll(Ingredient ingredient)
         {
-            if (_internalList.Any(i => i.Name == ingredient))
+            if (_internalList.Any(i => i.Name == ingredient.Name))
             {
-                _internalList.Remove(_internalList.Find(i => i.Name == ingredient));
+                RemovedIngredients.Add(_internalList.Find(i => i.Name == ingredient.Name));
+                _internalList.Remove(_internalList.Find(i => i.Name == ingredient.Name));
             }
         }
 
@@ -85,6 +99,24 @@ namespace CraftingCalculator.ViewModel.Ingredients
         public void Reset()
         {
             _internalList.Clear();
+        }
+
+        /// <summary>
+        /// Return a clone of this map.
+        /// </summary>
+        /// <returns></returns>
+        public IngredientMap Clone()
+        {
+            return new IngredientMap(this, false);
+        }
+
+        /// <summary>
+        /// Return a clone of this map with the ID values on the internal IngredientQuantity objects cleared.
+        /// </summary>
+        /// <returns></returns>
+        public IngredientMap CloneForSave()
+        {
+            return new IngredientMap(this, true);
         }
     }
 }

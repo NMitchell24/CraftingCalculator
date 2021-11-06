@@ -91,5 +91,21 @@ namespace CraftingCalculator.DAO
                 DeleteRecordById<RecipeFavoritesData>(CollectionLabels.RecipeFavorites, data.Id);
             }
         }
+
+        /// <summary>
+        /// Returns a list of Favorite Quantities that use the provided Recipe ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static List<FavoriteRecipeQuantitiesData> GetFavoriteQuantitiesByRecipeId(int id)
+        {
+            List<FavoriteRecipeQuantitiesData> ret = new List<FavoriteRecipeQuantitiesData>();
+            var col = _data.GetCollectionByType<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities);
+            ret.AddRange(col.Include(x => x.Favorite)
+                .Include(x => x.Recipe)
+                .Find(x => x.Recipe.Id == id));
+
+            return ret;
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using CraftingCalculator.Model.Data;
+using LiteDB;
+using System;
 
 namespace CraftingCalculator.DAO
 {
@@ -10,6 +12,7 @@ namespace CraftingCalculator.DAO
         /// </summary>
         public static void EnsureDatabaseExists()
         {
+            UpdateRecipeQuantitiesToLong();
             //Gets ingredients.  creates Collection if it does not exist.
             var ing = _data.GetCollectionByType<IngredientData>(CollectionLabels.Ingredients);
             //Create indexes for ingredients if they do not exist.
@@ -31,6 +34,7 @@ namespace CraftingCalculator.DAO
             rec.EnsureIndex(x => x.Id);
             rec.EnsureIndex(x => x.Filter.Id);
             rec.EnsureIndex(x => x.Name);
+            rec.EnsureIndex(x => x.Ingredients[0].Id);
 
             //Recipe quantities
             var recQ = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
@@ -48,6 +52,56 @@ namespace CraftingCalculator.DAO
             favRecs.EnsureIndex(x => x.Id);
             favRecs.EnsureIndex(x => x.Favorite.Id);
             favRecs.EnsureIndex(x => x.Recipe.Id);
+        }
+
+        public static void UpdateRecipeQuantitiesToLong()
+        {
+            LiteDatabase db = _data.GetDatabase();
+            if (db.Engine.UserVersion == 0)
+            {
+                foreach (var doc in db.Engine.FindAll(CollectionLabels.RecipeQuantities)) 
+                {
+                    doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
+                    db.Engine.Update(CollectionLabels.RecipeQuantities, doc);
+                }
+
+                foreach (var doc in db.Engine.FindAll(CollectionLabels.FavoriteRecipeQuantities))
+                {
+                    doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
+                    db.Engine.Update(CollectionLabels.FavoriteRecipeQuantities, doc);
+                }
+
+                db.Engine.UserVersion = 1;
+            }
+        }
+
+        /// <summary>
+        /// Deletes all records in the database from all collections.  Used for completely wiping out all data to start over with fresh empty dataset.
+        /// </summary>
+        public static void DeleteAllRecords()
+        {
+            //Delete Recipes
+            var recipes = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
+            recipes.Delete(Query.All());
+            //Delete Filters
+            var recipeFilters = _data.GetCollectionByType<RecipeFilterData>(CollectionLabels.RecipeFilters);
+            //Don't delete all for filters.  Make sure we leave the default 'All' filter alone.
+            recipeFilters.Delete(x => x.Id > 1);
+            //Delete Ingredients
+            var ingredients = _data.GetCollectionByType<IngredientData>(CollectionLabels.Ingredients);
+            ingredients.Delete(Query.All());
+            //Delete Favorites
+            var recipeFavorites = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
+            recipeFavorites.Delete(Query.All());
+            //Delete FavoriteRecipeQuantities
+            var recipeFavQuantities = _data.GetCollectionByType<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities);
+            recipeFavQuantities.Delete(Query.All());
+            //Delete IngredientQuantities
+            var ingredientQuantities = _data.GetCollectionByType<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
+            ingredientQuantities.Delete(Query.All());
+            //Delete RecipeQuantities
+            var recipeQuantities = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
+            recipeQuantities.Delete(Query.All());
         }
     }
 }

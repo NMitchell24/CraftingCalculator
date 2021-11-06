@@ -12,10 +12,22 @@ namespace CraftingCalculator.ViewModel.Recipes
             get => _internalList.AsReadOnly();
             private set { }
         }
+        public List<RecipeQuantity> RemovedRecipes = new List<RecipeQuantity>();
 
-        public RecipeMap(RecipeMap map)
+        public RecipeMap(RecipeMap map, bool cloneForSave)
         {
-            _internalList = new List<RecipeQuantity>(map.RecipeList);
+            _internalList = new List<RecipeQuantity>();
+            foreach(RecipeQuantity r in map.RecipeList)
+            {
+                if(cloneForSave)
+                {
+                    _internalList.Add(r.CloneForSave());
+                }
+                else
+                {
+                    _internalList.Add(r.Clone());
+                }
+            }
         }
 
         public RecipeMap()
@@ -30,7 +42,18 @@ namespace CraftingCalculator.ViewModel.Recipes
         /// </summary>
         /// <param name="recipe"></param>
         /// <param name="quantity"></param>
-        public void Add(Recipe recipe, int quantity)
+        public void Add(Recipe recipe, long quantity)
+        {
+            Add(recipe, quantity, 0);
+        }
+
+        /// <summary>
+        /// Overload to preserve the data Identifier from the database.
+        /// </summary>
+        /// <param name="recipe"></param>
+        /// <param name="quantity"></param>
+        /// <param name="id"></param>
+        public void Add(Recipe recipe, long quantity, int id)
         {
             if (_internalList.Any(i => i.Recipe.Name == recipe.Name))
             {
@@ -38,15 +61,7 @@ namespace CraftingCalculator.ViewModel.Recipes
             }
             else
             {
-                _internalList.Add(new RecipeQuantity(recipe, quantity));
-            }
-        }
-
-        public void AddifDoesNotExist(Recipe recipe, int quantity)
-        {
-            if (!_internalList.Any(i => i.Recipe.Name == recipe.Name))
-            {
-                _internalList.Add(new RecipeQuantity(recipe, quantity));
+                _internalList.Add(new RecipeQuantity(recipe, quantity, id));
             }
         }
 
@@ -57,7 +72,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         /// </summary>
         /// <param name="recipe"></param>
         /// <param name="quantity"></param>
-        public void Remove(Recipe recipe, int quantity)
+        public void Remove(Recipe recipe, long quantity)
         {
             if(_internalList.Any(i => i.Recipe.Name == recipe.Name && i.Quantity - quantity > 0))
             {
@@ -77,6 +92,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         public void RemoveAll(Recipe recipe)
         {
             if(_internalList.Any(i => i.Recipe.Name == recipe.Name)) {
+                RemovedRecipes.AddRange(_internalList.FindAll(i => i.Recipe.Name == recipe.Name));
                 _internalList.Remove(_internalList.Find(i => i.Recipe.Name == recipe.Name));
             }
         }
@@ -87,6 +103,16 @@ namespace CraftingCalculator.ViewModel.Recipes
         public void Reset()
         {
             _internalList.Clear();
+        }
+
+        public RecipeMap Clone()
+        {
+            return new RecipeMap(this, false);
+        }
+
+        public RecipeMap CloneForSave()
+        {
+            return new RecipeMap(this, true);
         }
     }
 }

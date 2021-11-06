@@ -15,14 +15,7 @@ namespace CraftingCalculator.Service
         /// <returns></returns>
         public static List<Recipe> GetRecipesByFilter(RecipeFilter filter)
         {
-            List<Recipe> ret = new List<Recipe>();
-
-            foreach (RecipeData data in RecipeDAO.GetRecipeDataByFilter(filter))
-            {
-                ret.Add(GetRecipeForData(data));
-            }
-
-            return ret;
+            return GetRecipeListForDataList(RecipeDAO.GetRecipeDataByFilter(filter));
         }
 
         /// <summary>
@@ -44,6 +37,23 @@ namespace CraftingCalculator.Service
         }
 
         /// <summary>
+        /// Convert a list of Data records to DTO records.
+        /// </summary>
+        /// <param name="dataList"></param>
+        /// <returns></returns>
+        private static List<Recipe> GetRecipeListForDataList(List<RecipeData> dataList)
+        {
+            List<Recipe> ret = new List<Recipe>();
+
+            foreach (RecipeData data in dataList)
+            {
+                ret.Add(GetRecipeForData(data));
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// Builds a Recipe wrapper object from a provided RecipeData object.
         /// </summary>
         /// <param name="data"></param>
@@ -54,15 +64,22 @@ namespace CraftingCalculator.Service
             {
                 Name = data.Name,
                 Description = data.Description,
-                Type = data.Filter.Name,
+                Value = data.Value,
                 Id = data.Id
             };
+
+            if (data.Filter != null)
+            {
+                RecipeFilter filter = RecipeFilterService.GetRecipeFilterById(data.Filter.Id);
+                ret.Filter = filter;
+            }
 
             IngredientMap ingMap = new IngredientMap();
             foreach (IngredientQuantityData iData in data.Ingredients)
             {
-                IngredientData ing = IngredientDAO.GetIngredientById(iData.Ingredient.Id);
-                ingMap.Add(ing.Name, ing.Description, iData.Quantity);
+                Ingredient ing = IngredientService.GetIngredientById(iData.Ingredient.Id);
+
+                ingMap.Add(ing, iData.Quantity, iData.Id);
             }
 
             ret.Ingredients = ingMap;
@@ -76,12 +93,152 @@ namespace CraftingCalculator.Service
                 {
                     RecipeData childData = RecipeDAO.GetRecipeById(recQ.ChildRecipe.Id);
                     Recipe child = GetRecipeForData(childData);
-                    recMap.Add(child, recQ.Quantity);
+                    recMap.Add(child, recQ.Quantity, recQ.Id);
                 }
                 ret.ChildRecipes = recMap;
             }
+            else if (children == null || children.Count == 0)
+            {
+                ret.ChildRecipes = new RecipeMap();
+            }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Returns a list of all Recipes from the database.
+        /// </summary>
+        /// <returns></returns>
+        public static List<Recipe> GetAllRecipes()
+        {
+            return GetRecipeListForDataList(RecipeDAO.GetAllRecipeData());
+        }
+
+        /// <summary>
+        /// updates an existing recipe or adds a new one
+        /// </summary>
+        /// <param name="recipe"></param>
+        public static void SaveRecipe(Recipe recipe)
+        {
+            RecipeData data = new RecipeData();
+            if (recipe.Id > 0)
+            {
+                data = RecipeDAO.GetRecipeById(recipe.Id);
+            }
+            else
+            {
+                data.Ingredients = new List<IngredientQuantityData>();
+            }
+            //Set all basic fields.
+            data.Name = recipe.Name;
+            data.Description = recipe.Description;
+            data.Value = recipe.Value;
+            
+            //Set recipe filter
+            if(recipe.Filter != null)
+            {
+                RecipeFilterData filterData = AbstractDAO.GetRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, recipe.Filter.Id);
+                data.Filter = filterData;
+            }
+            
+            //Check and remove any IngredientQuantities
+            if(recipe.Ingredients.RemovedIngredients.Count > 0)
+            {
+                foreach(IngredientQuantity iq in recipe.Ingredients.RemovedIngredients)
+                {
+                    if( iq.Id > 0)
+                    {
+                        AbstractDAO.DeleteRecordById<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iq.Id);
+                        //Also remove the record from the recipe data list if it exists.
+                        data.Ingredients.RemoveAll(x => x.Id == iq.Id);
+                    }
+                }
+            }
+            //Add or update any IngredientQuantities
+            foreach(IngredientQuantity iq in recipe.Ingredients.IngredientList)
+            {
+                if(iq.Id > 0)
+                {
+                    IngredientQuantityData iqData = IngredientDAO.GetIngredientQuantityById(iq.Id);
+                    iqData.Quantity = iq.Quantity;
+                    AbstractDAO.AddOrUpdateRecord<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iqData);
+                }
+                else
+                {
+                    IngredientData ing = AbstractDAO.GetRecordById<IngredientData>(CollectionLabels.Ingredients, iq.Ingredient.Id);
+                    IngredientQuantityData iqData = new IngredientQuantityData
+                    {
+                        Ingredient = ing,
+                        Quantity = iq.Quantity
+                    };
+                    //Add the record in the DB
+                    AbstractDAO.AddOrUpdateRecord<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iqData);
+                    //Now update RecipeData
+                    data.Ingredients.Add(iqData);
+                }
+            }
+
+            //Save the recipe before modifying ChildRecipes as child recipes are dependent on the parent recipe ID already existing.
+            AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, data);
+
+            //Check and remove any ChildRecipes
+            foreach (RecipeQuantity rq in recipe.ChildRecipes.RemovedRecipes)
+            {
+                if(rq.Id > 0)
+                {
+                    AbstractDAO.DeleteRecordById<RecipeQuantityData>(CollectionLabels.RecipeQuantities, rq.Id);  
+                }
+            }
+            //Add or update any ChildRecipes
+            foreach(RecipeQuantity rq in recipe.ChildRecipes.RecipeList)
+            {
+                RecipeQuantityData rqData = new RecipeQuantityData();
+                if (rq.Id > 0)
+                {
+                    rqData = RecipeDAO.GetRecipeQuantityByQuantityId(rq.Id);
+                }
+                else
+                {
+                    RecipeData childRecipe = RecipeDAO.GetRecipeById(rq.Recipe.Id);
+                    rqData.ParentRecipe = data;
+                    rqData.ChildRecipe = childRecipe;   
+                }
+                rqData.Quantity = rq.Quantity;
+                AbstractDAO.AddOrUpdateRecord<RecipeQuantityData>(CollectionLabels.RecipeQuantities, rqData);
+            }            
+        }
+
+        /// <summary>
+        /// Deletes the provided Recipe
+        /// </summary>
+        /// <param name="recipe"></param>
+        public static void DeleteRecipe(Recipe recipe)
+        {
+            //First delete from any Recipe Favorites
+            List<FavoriteRecipeQuantitiesData> recipeFavs = RecipeFavoritesDAO.GetFavoriteQuantitiesByRecipeId(recipe.Id);
+            foreach(FavoriteRecipeQuantitiesData favData in recipeFavs)
+            {
+                AbstractDAO.DeleteRecordById<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities, favData.Id);
+            }
+            //Delete any child recipe quantities
+            List<RecipeQuantityData> childRecipes = RecipeDAO.GetRecipeQuantityByParentId(recipe.Id);
+            foreach(RecipeQuantityData recipeQuantity in childRecipes)
+            {
+                AbstractDAO.DeleteRecordById<RecipeQuantityData>(CollectionLabels.RecipeQuantities, recipeQuantity.Id);
+            }
+            //Delete any Recipe Quantities where this recipe is used as the Child Recipe
+            List<RecipeQuantityData> parentRecipes = RecipeDAO.GetRecipeQuantityByChildId(recipe.Id);
+            foreach(RecipeQuantityData recipeQuantity in parentRecipes)
+            {
+                AbstractDAO.DeleteRecordById<RecipeQuantityData>(CollectionLabels.RecipeQuantities, recipeQuantity.Id);
+            }
+            //Delete any Ingredient Quantities
+            foreach(IngredientQuantity iq in recipe.Ingredients.IngredientList)
+            {
+                AbstractDAO.DeleteRecordById<IngredientQuantityData>(CollectionLabels.IngredientQuantities, iq.Id);
+            }
+            //Delete the Recipe
+            AbstractDAO.DeleteRecordById<RecipeData>(CollectionLabels.Recipes, recipe.Id);
         }
     }
 }
