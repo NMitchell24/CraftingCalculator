@@ -129,6 +129,7 @@
     <Compile Include="Utilities\DataTypeUtil.cs" />
     <Compile Include="ViewModel\AbstractPropertyChanged.cs" />
     <Compile Include="ViewModel\ConfigureRecipesViewModel.cs" />
+    <Compile Include="ViewModel\CustomConverters\NestedControlHeightConverter.cs" />
     <Compile Include="ViewModel\DataType.cs" />
     <Compile Include="ViewModel\IBaseDataRecord.cs" />
     <Compile Include="ViewModel\IBaseQuantityRecord.cs" />
