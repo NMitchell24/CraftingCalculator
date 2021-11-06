@@ -51,6 +51,7 @@
         <Grid Height="{Binding ElementName=ConfiguratorView, Path=ActualHeight,
                                     Converter={StaticResource ControlHeightConverter}}"
           MinWidth="1080"
+          MinHeight="480"
           VerticalAlignment="Top"
           HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
