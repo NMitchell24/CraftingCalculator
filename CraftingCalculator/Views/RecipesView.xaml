@@ -37,6 +37,7 @@
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
         <Grid Height="{Binding ElementName=RecipesListView, Path=ActualHeight,
                                Converter={StaticResource ControlHeightConverter}}"
+          MinHeight="480"
           MinWidth="1080"
           VerticalAlignment="Top"
           HorizontalAlignment="Stretch">
@@ -153,7 +154,7 @@
             <Grid Grid.Row="1" Grid.Column="4" Margin="5,0,5,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" MinWidth="52"/>
-                    <ColumnDefinition MinWidth="250"/>
+                    <ColumnDefinition MinWidth="215"/>
                     <ColumnDefinition MinWidth="62" />
                 </Grid.ColumnDefinitions>
                 <TextBlock HorizontalAlignment="Left" Margin="5,5,0,5" TextWrapping="Wrap" FontWeight="Bold"
@@ -326,7 +327,9 @@
                 <TreeView.Resources>
                     <HierarchicalDataTemplate ItemsSource="{Binding RecipeNodes}"
                                               DataType="{x:Type model:RecipeTree}">
-                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="{Binding Name}"
+                                   ToolTipService.ToolTip="{Binding Path=Tooltip}"
+                                   ToolTipService.ShowDuration="45000"/>
                     </HierarchicalDataTemplate>
                     <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                         <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, Mode=TwoWay}" />

@@ -100,12 +100,13 @@ namespace CraftingCalculator.ViewModel.Recipes
             RecipeTree ret = new RecipeTree
             {
                 Name = Name + " x" + quantity,
-                Id = Name
+                Id = Name,
+                Tooltip = Tooltip
             };
 
             foreach (IngredientQuantity i in Ingredients.IngredientList)
             {
-                ret.AddRecipeNode(new RecipeTree(i.Name + " x" + (i.Quantity * quantity)));
+                ret.AddRecipeNode(new RecipeTree(i.Name + " x" + (i.Quantity * quantity), i.Tooltip));
             }
 
             if(ChildRecipes != null)

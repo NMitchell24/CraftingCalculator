@@ -10,15 +10,17 @@ namespace CraftingCalculator.ViewModel.Recipes
         public ObservableCollection<RecipeTree> RecipeNodes { get; set; }
         public bool IsNodeExpanded { get; set; }
         public string Id { get; set; }
+        public string Tooltip { get; set; }
 
         public RecipeTree()
         {
             RecipeNodes = new ObservableCollection<RecipeTree>();
         }
 
-        public RecipeTree(string name)
+        public RecipeTree(string name, string tooltip)
         {
             Name = name;
+            Tooltip = tooltip;
             RecipeNodes = new ObservableCollection<RecipeTree>();
         }
 
