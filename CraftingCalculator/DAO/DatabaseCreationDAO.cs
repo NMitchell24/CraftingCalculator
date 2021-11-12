@@ -56,23 +56,23 @@ namespace CraftingCalculator.DAO
 
         public static void UpdateRecipeQuantitiesToLong()
         {
-            LiteDatabase db = _data.GetDatabase();
-            if (db.Engine.UserVersion == 0)
-            {
-                foreach (var doc in db.Engine.FindAll(CollectionLabels.RecipeQuantities)) 
-                {
-                    doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
-                    db.Engine.Update(CollectionLabels.RecipeQuantities, doc);
-                }
+            //LiteDatabase db = _data.GetDatabase();
+            //if (db.UserVersion == 0)
+            //{
+            //    foreach (var doc in db.Engine.FindAll(CollectionLabels.RecipeQuantities)) 
+            //    {
+            //        doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
+            //        db.Engine.Update(CollectionLabels.RecipeQuantities, doc);
+            //    }
 
-                foreach (var doc in db.Engine.FindAll(CollectionLabels.FavoriteRecipeQuantities))
-                {
-                    doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
-                    db.Engine.Update(CollectionLabels.FavoriteRecipeQuantities, doc);
-                }
+            //    foreach (var doc in db.Engine.FindAll(CollectionLabels.FavoriteRecipeQuantities))
+            //    {
+            //        doc["Quantity"] = Convert.ToInt64(doc["Quantity"].AsString);
+            //        db.Engine.Update(CollectionLabels.FavoriteRecipeQuantities, doc);
+            //    }
 
-                db.Engine.UserVersion = 1;
-            }
+            //    db.UserVersion = 1;
+            //}
         }
 
         /// <summary>
@@ -82,26 +82,26 @@ namespace CraftingCalculator.DAO
         {
             //Delete Recipes
             var recipes = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
-            recipes.Delete(Query.All());
+            recipes.DeleteAll();
             //Delete Filters
             var recipeFilters = _data.GetCollectionByType<RecipeFilterData>(CollectionLabels.RecipeFilters);
             //Don't delete all for filters.  Make sure we leave the default 'All' filter alone.
-            recipeFilters.Delete(x => x.Id > 1);
+            recipeFilters.DeleteMany(x => x.Id > 1);
             //Delete Ingredients
             var ingredients = _data.GetCollectionByType<IngredientData>(CollectionLabels.Ingredients);
-            ingredients.Delete(Query.All());
+            ingredients.DeleteAll();
             //Delete Favorites
             var recipeFavorites = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
-            recipeFavorites.Delete(Query.All());
+            recipeFavorites.DeleteAll();
             //Delete FavoriteRecipeQuantities
             var recipeFavQuantities = _data.GetCollectionByType<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities);
-            recipeFavQuantities.Delete(Query.All());
+            recipeFavQuantities.DeleteAll();
             //Delete IngredientQuantities
             var ingredientQuantities = _data.GetCollectionByType<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
-            ingredientQuantities.Delete(Query.All());
+            ingredientQuantities.DeleteAll();
             //Delete RecipeQuantities
             var recipeQuantities = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
-            recipeQuantities.Delete(Query.All());
+            recipeQuantities.DeleteAll();
         }
     }
 }

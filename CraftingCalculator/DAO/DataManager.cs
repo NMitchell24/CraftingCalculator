@@ -31,7 +31,7 @@ namespace CraftingCalculator.DAO
             return _db;
         }
 
-        public LiteCollection<T> GetCollectionByType<T>(string label)
+        public ILiteCollection<T> GetCollectionByType<T>(string label)
         {
             return _db.GetCollection<T>(label);
         }
