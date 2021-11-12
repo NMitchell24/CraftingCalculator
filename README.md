@@ -5,3 +5,5 @@ Calculate total ingredients needed to craft any combination of recipes.  Current
 Download from [Here](https://nmitchell24.github.io/CraftingCalculator/)
 
 [![.NET Core Desktop](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/dotnet-desktop.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/dotnet-desktop.yml)
+
+[![CodeQL](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml)
