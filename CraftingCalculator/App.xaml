@@ -11,7 +11,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <!-- Accent and AppTheme setting -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
-                <ResourceDictionary Source="/Resources/Icons.xaml" />
                 <ResourceDictionary Source="/Views/CustomControls/CustomButtonControls.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
