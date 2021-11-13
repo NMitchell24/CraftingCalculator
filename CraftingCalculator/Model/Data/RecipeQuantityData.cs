@@ -13,5 +13,13 @@ namespace CraftingCalculator.Model.Data
         public RecipeData ChildRecipe { get; set; }
 
         public long Quantity { get; set; }
+
+        public RecipeQuantityData()
+        {
+            Id = default!;
+            ParentRecipe = default!;
+            ChildRecipe = default!;
+            Quantity = default!;
+        }
     }
 }

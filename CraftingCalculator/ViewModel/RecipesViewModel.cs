@@ -23,8 +23,8 @@ namespace CraftingCalculator.ViewModel
         // Class level Collections used by multiple methods.
         public ObservableCollection<Recipe> RecipesList { get; set; }
         public List<RecipeFilter> RecipeFilters { get; set; }
-        public ObservableCollection<RecipeQuantity> RecipeQuantities { get; set; }
-        public ObservableCollection<IngredientQuantity> TotalIngredients { get; set; }
+        public ObservableCollection<RecipeQuantity>? RecipeQuantities { get; set; }
+        public ObservableCollection<IngredientQuantity>? TotalIngredients { get; set; }
         public ObservableCollection<RecipeTree> RecipeTotals { get; set; }
         public ObservableCollection<RecipeFavorite> RecipeFavorites { get; set; }
 
@@ -53,7 +53,7 @@ namespace CraftingCalculator.ViewModel
 
             RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(SelectedFilter));
             RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
-            RecipeTotals = new ObservableCollection<RecipeTree>();        
+            RecipeTotals = new ObservableCollection<RecipeTree>();
         }
         #endregion
 
@@ -102,22 +102,24 @@ namespace CraftingCalculator.ViewModel
 
         // Recalculate Totals Command and Methods
         public CommandRunner RecalculateTotalsCommand { get; set; }
-        private void CalculateTotalIngredients(object obj = null)
+        private void CalculateTotalIngredients(object obj = default!)
         {
             _totalCost = 0;
             _totalValue = 0;
             _ingredientMap.Reset();
-            foreach (RecipeQuantity q in RecipeQuantities)
+            if (RecipeQuantities != null)
             {
-                foreach (IngredientQuantity i in q.Ingredients.IngredientList)
+                foreach (RecipeQuantity q in RecipeQuantities)
                 {
-                    _ingredientMap.Add(i.Ingredient, (i.Quantity * q.Quantity));
-                    _totalCost += i.TotalCost * q.Quantity;
+                    foreach (IngredientQuantity i in q.Ingredients.IngredientList)
+                    {
+                        _ingredientMap.Add(i.Ingredient, (i.Quantity * q.Quantity));
+                        _totalCost += i.TotalCost * q.Quantity;
+                    }
+                    _totalValue += q.TotalValue;
                 }
-                _totalValue += q.TotalValue;
+                TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList.OrderBy(x => x.Name));
             }
-            TotalIngredients = new ObservableCollection<IngredientQuantity>(_ingredientMap.IngredientList.OrderBy(x => x.Name));
-
             // rebuild recipe tree
             CalculateRecipeTotals();
         }
@@ -127,7 +129,7 @@ namespace CraftingCalculator.ViewModel
         private void ClearRecipes(object obj)
         {
             _recipeMap.Reset();
-            RecipeQuantities.Clear();
+            RecipeQuantities?.Clear();
 
             SelectedFav = null;
 
@@ -216,17 +218,17 @@ namespace CraftingCalculator.ViewModel
 
         private async void DeleteSelectedFavorite(object obj)
         {
-            bool doDelete = false;
+            bool doDelete;
 
             var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
             var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
-            "This action will permanently delete the saved favorites '" + SelectedFav.Name + "'.  Are you sure you want to continue?",
+            "This action will permanently delete the saved favorites '" + SelectedFav?.Name + "'.  Are you sure you want to continue?",
             MessageDialogStyle.AffirmativeAndNegative,
             settings);
 
             doDelete = yesNo == MessageDialogResult.Affirmative;
 
-            if (doDelete)
+            if (doDelete && SelectedFav != null)
             {
                 RecipeFavoriteService.DeleteFavoriteData(SelectedFav);
                 SelectedFav = null;
@@ -270,8 +272,8 @@ namespace CraftingCalculator.ViewModel
 
         #region selected-items
         // Favorites
-        private RecipeFavorite _selectedFav;
-        public RecipeFavorite SelectedFav
+        private RecipeFavorite? _selectedFav;
+        public RecipeFavorite? SelectedFav
         {
             get => _selectedFav;
             set
@@ -297,8 +299,8 @@ namespace CraftingCalculator.ViewModel
         }
 
         // Filters
-        private RecipeFilter _selectedFilter;
-        public RecipeFilter SelectedFilter
+        private RecipeFilter? _selectedFilter;
+        public RecipeFilter? SelectedFilter
         {
             get => _selectedFilter;
             set
@@ -313,8 +315,8 @@ namespace CraftingCalculator.ViewModel
         }
 
         // Recipes
-        private Recipe _selectedRecipe;
-        public Recipe SelectedRecipe
+        private Recipe? _selectedRecipe = default;
+        public Recipe? SelectedRecipe
         {
             get => _selectedRecipe;
             set
@@ -336,8 +338,8 @@ namespace CraftingCalculator.ViewModel
         }
 
         // Recipe Quantities
-        private RecipeQuantity _selectedRecipeQuantity;
-        public RecipeQuantity SelectedRecipeQuantity
+        private RecipeQuantity? _selectedRecipeQuantity = default;
+        public RecipeQuantity? SelectedRecipeQuantity
         {
             get => _selectedRecipeQuantity;
             set
@@ -396,35 +398,41 @@ namespace CraftingCalculator.ViewModel
         /// </summary>
         private void CalculateRecipeTotals()
         {
-            List<RecipeTree> temp = new List<RecipeTree>();
-            foreach(RecipeQuantity q in RecipeQuantities)
+            if (RecipeQuantities != null)
             {
-                RecipeTree tree = q.Recipe.GetRecipeNodes(q.Quantity);
-                RecipeTree oldTree = RecipeTotals.Where(x => x.Id == tree.Id).FirstOrDefault();
-                if(oldTree != null)
+                List<RecipeTree> temp = new List<RecipeTree>();
+                foreach (RecipeQuantity q in RecipeQuantities)
                 {
-                    tree.SetExpandedNodes(oldTree);
+                    RecipeTree tree = q.Recipe.GetRecipeNodes(q.Quantity);
+                    RecipeTree oldTree = RecipeTotals.Where(x => x.Id == tree.Id).FirstOrDefault();
+                    if (oldTree != null)
+                    {
+                        tree.SetExpandedNodes(oldTree);
+                    }
+                    temp.Add(tree);
                 }
-                temp.Add(tree);
-            }
-            foreach(RecipeTree t in temp)
-            {
-                t.SetParent();
-            }
+                foreach (RecipeTree t in temp)
+                {
+                    t.SetParent();
+                }
 
-            RecipeTotals = new ObservableCollection<RecipeTree>(temp);
+                RecipeTotals = new ObservableCollection<RecipeTree>(temp);
 
-            RaiseChanged();
+                RaiseChanged();
+            }
         }
 
         /// <summary>
         /// Helper method to reload recipes list when Filter changes.
         /// </summary>
         /// <param name="filter"></param>
-        public void ReloadRecipesForFilter(RecipeFilter filter)
+        public void ReloadRecipesForFilter(RecipeFilter? filter)
         {
-            RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(filter));
-            RaiseChanged();
+            if (filter != null)
+            {
+                RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(filter));
+                RaiseChanged();
+            }
         }
 
         /// <summary>

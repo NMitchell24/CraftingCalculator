@@ -43,9 +43,12 @@ namespace CraftingCalculator.DAO
         /// <param name="fav"></param>
         public static void SaveRecipeFavorite(RecipeFavoritesData fav)
         {
-            var col = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
+            if (fav != null)
+            {
+                var col = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
 
-            col.Upsert(fav);
+                col.Upsert(fav);
+            }
         }
 
         /// <summary>
@@ -54,10 +57,17 @@ namespace CraftingCalculator.DAO
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static RecipeFavoritesData GetFavoriteByName(string name)
+        public static RecipeFavoritesData GetFavoriteByName(string? name)
         {
-            var col = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
-            return col.FindOne(x => x.Name == name);
+            if (name != null)
+            {
+                var col = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
+                return col.FindOne(x => x.Name == name);
+            } 
+            else
+            { 
+                return new RecipeFavoritesData(); 
+            }
         }
 
         /// <summary>
@@ -79,7 +89,7 @@ namespace CraftingCalculator.DAO
         /// if favorite passed in is null we do nothing.
         /// </summary>
         /// <param name="data"></param>
-        public static void DeleteFavoritesData(RecipeFavoritesData data)
+        public static void DeleteFavoritesData(RecipeFavoritesData? data)
         {
             if (data != null)
             {

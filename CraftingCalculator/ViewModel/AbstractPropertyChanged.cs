@@ -8,7 +8,7 @@ namespace CraftingCalculator.ViewModel
     /// </summary>
     public abstract class AbstractPropertyChanged : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void RaisePropertyChanged(string property)
         {

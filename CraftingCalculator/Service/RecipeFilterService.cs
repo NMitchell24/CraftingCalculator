@@ -38,39 +38,45 @@ namespace CraftingCalculator.Service
         /// Saves or adds the Recipe Filter.  If the ID value of the provided filter is 0 a new one will be added.  otherwise this will update the existing filter.
         /// </summary>
         /// <param name="filter"></param>
-        public static void SaveRecipeFilter(RecipeFilter filter)
+        public static void SaveRecipeFilter(RecipeFilter? filter)
         {
-            RecipeFilterData data;
-            if (filter.Id > 0)
+            if (filter != null)
             {
-                data = AbstractDAO.GetRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, filter.Id);
-            }
-            else
-            {
-                data = new RecipeFilterData();
-            }
+                RecipeFilterData data;
+                if (filter.Id > 0)
+                {
+                    data = AbstractDAO.GetRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, filter.Id);
+                }
+                else
+                {
+                    data = new RecipeFilterData();
+                }
 
-            CopyToData(filter, data);
+                CopyToData(filter, data);
 
-            AbstractDAO.AddOrUpdateRecord<RecipeFilterData>(CollectionLabels.RecipeFilters, data);
+                AbstractDAO.AddOrUpdateRecord<RecipeFilterData>(CollectionLabels.RecipeFilters, data);
+            }
         }
 
         /// <summary>
         /// Deletes an existing Recipe Filter
         /// </summary>
         /// <param name="filter"></param>
-        public static void DeleteRecipeFilter(RecipeFilter filter)
+        public static void DeleteRecipeFilter(RecipeFilter? filter)
         {
-            //First remove filter reference from any Recipe objects.
-            List<RecipeData> recipes = RecipeDAO.GetRecipeDataByFilter(filter);
-            foreach (RecipeData recipe in recipes)
+            if (filter != null)
             {
-                recipe.Filter = null;
-                AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe);
-            }
+                //First remove filter reference from any Recipe objects.
+                List<RecipeData> recipes = RecipeDAO.GetRecipeDataByFilter(filter);
+                foreach (RecipeData recipe in recipes)
+                {
+                    recipe.Filter = null;
+                    AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe);
+                }
 
-            //Delete Filter
-            AbstractDAO.DeleteRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, filter.Id);
+                //Delete Filter
+                AbstractDAO.DeleteRecordById<RecipeFilterData>(CollectionLabels.RecipeFilters, filter.Id);
+            }
         }
 
         /// <summary>
@@ -95,8 +101,8 @@ namespace CraftingCalculator.Service
         /// <param name="data"></param>
         private static void CopyToData(RecipeFilter filter, RecipeFilterData data)
         {
-            data.Name = filter.Name;
-            data.Description = filter.Description;
+            data.Name = filter.Name ?? "";
+            data.Description = filter.Description ?? "";
         }
     }
 }

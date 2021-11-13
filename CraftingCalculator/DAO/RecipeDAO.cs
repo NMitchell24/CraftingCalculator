@@ -30,7 +30,7 @@ namespace CraftingCalculator.DAO
             {
                 ret.AddRange(col.Include(x => x.Ingredients)
                 .Include(x => x.Filter)
-                .Find(x => x.Filter.Id == filter.Id)
+                .Find(x => x.Filter != null && x.Filter.Id == filter.Id)
                 .OrderBy(x => x.Name));
             }
             

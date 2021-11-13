@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CraftingCalculator.ViewModel.Recipes;
 using CraftingCalculator.ViewModel.Ingredients;
@@ -18,11 +17,11 @@ namespace CraftingCalculator.ViewModel
         private IDialogCoordinator dialogCoordinator;
         public IReadOnlyList<DataType> DataTypeList { get; }
         public int SwitchView { get; set; }
-        public IBaseDataRecord ItemForUpdate { get; set; }   
+        public IBaseDataRecord? ItemForUpdate { get; set; }   
         public bool ShowProgressRing { get; set; }
         public bool EnableDisableWindow { get; set; }
 
-        public ObservableCollection<IBaseDataRecord> DataRecords { get; set; }
+        public ObservableCollection<IBaseDataRecord>? DataRecords { get; set; }
 
         public ConfigureRecipesViewModel(IDialogCoordinator instance)
         {
@@ -54,23 +53,26 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner SaveItemCommand { get; set; }
         private void SaveItem(object obj)
         {
-            string name = ItemForUpdate.Name;
-            if (ItemForUpdate.Type == DataType.Ingredient)
+            if (ItemForUpdate != null)
             {
-                IngredientService.SaveIngredient(ItemForUpdate as Ingredient);
-            }
-            else if (ItemForUpdate.Type == DataType.RecipeFilter)
-            {
-                RecipeFilterService.SaveRecipeFilter(ItemForUpdate as RecipeFilter);
-            }
-            else if (ItemForUpdate.Type == DataType.Recipe)
-            {
-                RecipeService.SaveRecipe(ItemForUpdate as Recipe);
-            }
+                string name = ItemForUpdate.Name ?? "";
+                if (ItemForUpdate.Type == DataType.Ingredient)
+                {
+                    IngredientService.SaveIngredient(ItemForUpdate as Ingredient);
+                }
+                else if (ItemForUpdate.Type == DataType.RecipeFilter)
+                {
+                    RecipeFilterService.SaveRecipeFilter(ItemForUpdate as RecipeFilter);
+                }
+                else if (ItemForUpdate.Type == DataType.Recipe)
+                {
+                    RecipeService.SaveRecipe(ItemForUpdate as Recipe);
+                }
 
-            SelectedType = ItemForUpdate.Type;
-            IBaseDataRecord rec = DataRecords.Where(x => x.Name == name).FirstOrDefault();
-            SelectedItem = rec;
+                SelectedType = ItemForUpdate.Type;
+                IBaseDataRecord rec = DataRecords.Where(x => x.Name == name).FirstOrDefault();
+                SelectedItem = rec;
+            }
         }
 
         public CommandRunner ResetItemCommand { get; set; } 
@@ -96,58 +98,64 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner AddNewItemCommand { get; set; }
         private void AddItem(object obj)
         {
-            SelectedItem = SelectedType.GetDataRecord();
-            SelectedType = ItemForUpdate.Type;
+            if (ItemForUpdate != null)
+            {
+                SelectedItem = SelectedType.GetDataRecord();
+                SelectedType = ItemForUpdate.Type;
 
-            RaisePropertyChanged(nameof(SelectedItem));
-            RaisePropertyChanged(nameof(DataRecords));
-            RaisePropertyChanged(nameof(ItemForUpdate));
+                RaisePropertyChanged(nameof(SelectedItem));
+                RaisePropertyChanged(nameof(DataRecords));
+                RaisePropertyChanged(nameof(ItemForUpdate));
+            }
         }
 
         public CommandRunner DeleteItemCommand { get; set; }
         private async void DeleteItem(object obj)
         {
-            bool doDelete = false;
-
-            var settings = new MetroDialogSettings { AffirmativeButtonText = "Delete", NegativeButtonText = "Cancel" };
-            var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Delete " + SelectedType.GetDescription(),
-            "This " + SelectedType.GetDescription() + " will be deleted forever and removed from any recipes " +
-            (SelectedType == DataType.Recipe ? "or recipe favorites " : "") +
-            "where it is used.  " +
-            Environment.NewLine + Environment.NewLine +
-            "Are you sure you would like to continue?",
-            MessageDialogStyle.AffirmativeAndNegative,
-            settings);
-
-            doDelete = yesNo == MessageDialogResult.Affirmative;
-
-            if (doDelete)
+            if (ItemForUpdate != null)
             {
-                ShowHideProgress();
-                await Task.Factory.StartNew(() =>
-                {
-                    if (ItemForUpdate.Type == DataType.Ingredient)
-                    {
-                        IngredientService.DeleteIngredient(ItemForUpdate as Ingredient);
-                    }
-                    else if (ItemForUpdate.Type == DataType.RecipeFilter)
-                    {
-                        RecipeFilterService.DeleteRecipeFilter(ItemForUpdate as RecipeFilter);
-                    }
-                    else if (ItemForUpdate.Type == DataType.Recipe)
-                    {
-                        RecipeService.DeleteRecipe(ItemForUpdate as Recipe);
-                    }
-                    ItemForUpdate = SelectedType.GetDataRecord();
-                    SelectedType = ItemForUpdate.Type;
+                bool doDelete = false;
 
-                    RaisePropertyChanged(nameof(ItemForUpdate));
-                    RaisePropertyChanged(nameof(DataRecords));
-                    RaisePropertyChanged(nameof(SelectedItem));
-                }).ContinueWith(Task =>
+                var settings = new MetroDialogSettings { AffirmativeButtonText = "Delete", NegativeButtonText = "Cancel" };
+                var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Delete " + SelectedType.GetDescription(),
+                "This " + SelectedType.GetDescription() + " will be deleted forever and removed from any recipes " +
+                (SelectedType == DataType.Recipe ? "or recipe favorites " : "") +
+                "where it is used.  " +
+                Environment.NewLine + Environment.NewLine +
+                "Are you sure you would like to continue?",
+                MessageDialogStyle.AffirmativeAndNegative,
+                settings);
+
+                doDelete = yesNo == MessageDialogResult.Affirmative;
+
+                if (doDelete)
                 {
                     ShowHideProgress();
-                });              
+                    await Task.Factory.StartNew(() =>
+                    {
+                        if (ItemForUpdate.Type == DataType.Ingredient)
+                        {
+                            IngredientService.DeleteIngredient(ItemForUpdate as Ingredient);
+                        }
+                        else if (ItemForUpdate.Type == DataType.RecipeFilter)
+                        {
+                            RecipeFilterService.DeleteRecipeFilter(ItemForUpdate as RecipeFilter);
+                        }
+                        else if (ItemForUpdate.Type == DataType.Recipe)
+                        {
+                            RecipeService.DeleteRecipe(ItemForUpdate as Recipe);
+                        }
+                        ItemForUpdate = SelectedType.GetDataRecord();
+                        SelectedType = ItemForUpdate.Type;
+
+                        RaisePropertyChanged(nameof(ItemForUpdate));
+                        RaisePropertyChanged(nameof(DataRecords));
+                        RaisePropertyChanged(nameof(SelectedItem));
+                    }).ContinueWith(Task =>
+                    {
+                        ShowHideProgress();
+                    });
+                }
             }
         }
 
@@ -190,11 +198,14 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner CopyItemCommand { get; set; }
         private void CopyItem(object obj)
         {
-            IBaseDataRecord record = ItemForUpdate.CopyForSave();
-            SelectedType = record.Type;
-            SelectedItem = record.Clone();
+            if (ItemForUpdate != null)
+            {
+                IBaseDataRecord record = ItemForUpdate.CopyForSave();
+                SelectedType = record.Type;
+                SelectedItem = record.Clone();
 
-            RaisePropertyChanged(nameof(DataRecords));
+                RaisePropertyChanged(nameof(DataRecords));
+            }
         }
 
         private DataType _selectedType;
@@ -231,8 +242,8 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
-        private IBaseDataRecord _selectedItem;
-        public IBaseDataRecord SelectedItem
+        private IBaseDataRecord? _selectedItem;
+        public IBaseDataRecord? SelectedItem
         {
             get => _selectedItem;
             set
@@ -280,7 +291,7 @@ namespace CraftingCalculator.ViewModel
             RecipeFilters.RemoveAt(0);
             RaisePropertyChanged(nameof(RecipeFilters));
 
-            if (ItemForUpdate.Id > 0)
+            if (ItemForUpdate?.Id > 0)
             {
                 UpdateSelectedFilter();
             }           
@@ -304,22 +315,22 @@ namespace CraftingCalculator.ViewModel
 
         private void UpdateSelectedFilter()
         {
-            if (ItemForUpdate.Type == DataType.Recipe)
+            if (ItemForUpdate?.Type == DataType.Recipe)
             {
                 //Make sure selected Recipe Filter matches from Recipe
-                Recipe recipe = ItemForUpdate as Recipe;
-                if (recipe.Filter != null)
+                Recipe? recipe = ItemForUpdate as Recipe;
+                if (recipe?.Filter != null)
                 {
-                    SelectedFilter = RecipeFilters.Where(x => x.Name == recipe.Filter.Name).FirstOrDefault();
+                    SelectedFilter = RecipeFilters.FirstOrDefault(x => x.Name == recipe.Filter.Name);
                     RaisePropertyChanged(nameof(SelectedFilter));
                 }
             }
         }
 
-        public List<RecipeFilter> RecipeFilters { get; set; }
+        public List<RecipeFilter>? RecipeFilters { get; set; }
 
-        private RecipeFilter _selectedFilter;
-        public RecipeFilter SelectedFilter
+        private RecipeFilter? _selectedFilter;
+        public RecipeFilter? SelectedFilter
         {
             get => _selectedFilter;
             set
@@ -327,8 +338,10 @@ namespace CraftingCalculator.ViewModel
                 _selectedFilter = value;
                 if(_selectedFilter != null)
                 {
-                    Recipe recipe = ItemForUpdate as Recipe;
-                    recipe.Filter = _selectedFilter;
+                    if (ItemForUpdate is Recipe recipe)
+                    {
+                        recipe.Filter = _selectedFilter;
+                    }
                 }
             }
         }
@@ -349,7 +362,7 @@ namespace CraftingCalculator.ViewModel
                 {
                     RecipeIngredientValues = new ObservableCollection<IBaseDataRecord>(RecipeService.GetAllRecipes());
                     // Remove the current item that's being edited to prevent an infinite loop scenario when calculating ingredients.
-                    IBaseDataRecord current = RecipeIngredientValues.FirstOrDefault(x => x.Id == ItemForUpdate.Id);
+                    IBaseDataRecord current = RecipeIngredientValues.FirstOrDefault(x => x.Id == ItemForUpdate?.Id);
                     RecipeIngredientValues.Remove(current);
                 }
                 ResetQuantity();
@@ -357,9 +370,9 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
-        public ObservableCollection<IBaseDataRecord> RecipeIngredientValues { get; set; }
-        private IBaseDataRecord _recipeSelectedIngredientValue;
-        public IBaseDataRecord RecipeSelectedIngredientValue
+        public ObservableCollection<IBaseDataRecord>? RecipeIngredientValues { get; set; }
+        private IBaseDataRecord? _recipeSelectedIngredientValue;
+        public IBaseDataRecord? RecipeSelectedIngredientValue
         {
             get => _recipeSelectedIngredientValue;
             set
@@ -381,14 +394,16 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner AddRecipeValues { get; set; }
         private void AddToRecipe(object obj)
         {
-            Recipe recipe = ItemForUpdate as Recipe;
-            if (RecipeSelectedType == DataType.Ingredient)
+            if (ItemForUpdate is Recipe recipe && RecipeSelectedIngredientValue != null)
             {
-                recipe.Ingredients.Add(RecipeSelectedIngredientValue as Ingredient, QuantityToAdd);
-            }
-            else if (RecipeSelectedType == DataType.Recipe)
-            {
-                recipe.ChildRecipes.Add(RecipeSelectedIngredientValue as Recipe, QuantityToAdd);
+                if (RecipeSelectedType == DataType.Ingredient)
+                {
+                    recipe.Ingredients.Add(RecipeSelectedIngredientValue as Ingredient, QuantityToAdd);
+                }
+                else if (RecipeSelectedType == DataType.Recipe)
+                {
+                    recipe.ChildRecipes.Add(RecipeSelectedIngredientValue as Recipe, QuantityToAdd);
+                }
             }
             //Update the Recipe Quantity Values.
             UpdateRecipeQuantityValues();
@@ -397,30 +412,34 @@ namespace CraftingCalculator.ViewModel
         public CommandRunner DeleteRecipeIngredient { get; set; }
         public void DeleteIngredient(object obj)
         {
-            IBaseQuantityRecord quantity = SelectedRecipeQuantity;
-            Recipe recipe = ItemForUpdate as Recipe;
-            if (obj != null)
+            IBaseQuantityRecord? quantity = SelectedRecipeQuantity;
+            Recipe? recipe = ItemForUpdate as Recipe;
+            if (obj is IBaseQuantityRecord q)
             {
-                quantity = obj as IBaseQuantityRecord;
+                quantity = q;
             }
 
-            if (quantity.Type == DataType.Ingredient)
+            if (quantity?.Type == DataType.Ingredient)
             {
-                IngredientQuantity ingQuantity = quantity as IngredientQuantity;
-                recipe.Ingredients.Remove(ingQuantity.Ingredient, quantity.Quantity);
+                if (recipe != null && quantity is IngredientQuantity ingQuantity)
+                {
+                    recipe.Ingredients.Remove(ingQuantity.Ingredient, quantity.Quantity);
+                }
             }
-            else if (quantity.Type == DataType.Recipe)
+            else if (quantity?.Type == DataType.Recipe)
             {
-                RecipeQuantity recQuantity = quantity as RecipeQuantity;
-                recipe.ChildRecipes.Remove(recQuantity.Recipe, recQuantity.Quantity);
+                if (recipe != null && quantity is RecipeQuantity recQuantity)
+                {
+                    recipe.ChildRecipes.Remove(recQuantity.Recipe, recQuantity.Quantity);
+                }
             }
 
             UpdateRecipeQuantityValues();
         }
 
-        public ObservableCollection<IBaseQuantityRecord> RecipeQuantityValues { get; set; }
-        private IBaseQuantityRecord _selectedRecipeQuantity;
-        public IBaseQuantityRecord SelectedRecipeQuantity
+        public ObservableCollection<IBaseQuantityRecord>? RecipeQuantityValues { get; set; }
+        private IBaseQuantityRecord? _selectedRecipeQuantity;
+        public IBaseQuantityRecord? SelectedRecipeQuantity
         {
             get => _selectedRecipeQuantity;
             set
@@ -440,23 +459,25 @@ namespace CraftingCalculator.ViewModel
 
         private void UpdateRecipeQuantityValues()
         {
-            if(ItemForUpdate.Type == DataType.Recipe)
+            if(ItemForUpdate?.Type == DataType.Recipe)
             {
-                Recipe recipe = ItemForUpdate as Recipe;
-                List<IngredientQuantity> ingredients = recipe.Ingredients.IngredientList.ToList();
-                List<IBaseQuantityRecord> combinedList = new List<IBaseQuantityRecord>();
-                combinedList.AddRange(ingredients);
-
-                if (recipe.ChildRecipes != null)
+                if (ItemForUpdate is Recipe recipe)
                 {
-                    List<RecipeQuantity> childRecipes = recipe.ChildRecipes.RecipeList.ToList();
-                    combinedList.AddRange(childRecipes);
+                    List<IngredientQuantity> ingredients = recipe.Ingredients.IngredientList.ToList();
+                    List<IBaseQuantityRecord> combinedList = new List<IBaseQuantityRecord>();
+                    combinedList.AddRange(ingredients);
+
+                    if (recipe.ChildRecipes != null)
+                    {
+                        List<RecipeQuantity> childRecipes = recipe.ChildRecipes.RecipeList.ToList();
+                        combinedList.AddRange(childRecipes);
+                    }
+
+                    RecipeQuantityValues = new ObservableCollection<IBaseQuantityRecord>(combinedList.OrderBy(x => x.Type).ThenBy(x => x.Name).ToList());
+
+                    RaisePropertyChanged(nameof(RecipeQuantityValues));
+                    RaisePropertyChanged(nameof(SelectedRecipeQuantity));
                 }
-
-                RecipeQuantityValues = new ObservableCollection<IBaseQuantityRecord>(combinedList.OrderBy(x => x.Type).ThenBy(x => x.Name).ToList());
-
-                RaisePropertyChanged(nameof(RecipeQuantityValues));
-                RaisePropertyChanged(nameof(SelectedRecipeQuantity));
             }
         }
 

@@ -19,10 +19,10 @@ namespace CraftingCalculator.ViewModel.Recipes
                 _quantity = Math.Abs(value);
             }
         }
-        public string Name { get => Recipe.Name; set { } }
-        public string FilterType { get => Recipe.Filter?.Name; set { } }
+        public string Name { get => Recipe.Name ?? ""; set { } }
+        public string FilterType { get => Recipe.Filter?.Name ?? ""; set { } }
         public DataType Type { get => Recipe.Type; set { } }
-        public string Description { get => Recipe.Description; set { } }
+        public string Description { get => Recipe.Description ?? ""; set { } }
         public double TotalValue { get => Recipe.Value * Quantity; set { } }
         public string Tooltip
         {

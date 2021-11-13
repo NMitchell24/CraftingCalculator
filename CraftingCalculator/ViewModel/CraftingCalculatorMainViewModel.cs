@@ -1,12 +1,10 @@
 ﻿using CraftingCalculator.Utilities;
-using MahApps.Metro;
 using System.ComponentModel;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
 using System.Reflection;
 using System.Text;
 using System;
-using System.Windows.Controls;
 using ControlzEx.Theming;
 
 namespace CraftingCalculator.ViewModel
@@ -14,7 +12,7 @@ namespace CraftingCalculator.ViewModel
     public class CraftingCalculatorMainViewModel : AbstractPropertyChanged
     {
         private IDialogCoordinator dialogCoordinator;
-        public string ConfirmOnCloseHeader { get; set; }
+        public string? ConfirmOnCloseHeader { get; set; }
         public CommandRunner TopMostCommand { get; set; }
         public CommandRunner ChangeThemeCommand { get; set; }
         public CommandRunner ChangeAccentCommand { get; set; }
@@ -116,9 +114,12 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private void ChangeTheme(object obj)
         {
-            ThemeManager.Current.ChangeThemeBaseColor(Application.Current, obj as string);
+            if (obj is string s)
+            {
+                ThemeManager.Current.ChangeThemeBaseColor(Application.Current, s);
 
-            Properties.Settings.Default["Theme"] = obj;
+                Properties.Settings.Default["Theme"] = obj;
+            }
         }
 
         /// <summary>
@@ -127,9 +128,12 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private void ChangeAccent(object obj)
         {
-            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, obj as string);
+            if (obj is string s)
+            {
+                ThemeManager.Current.ChangeThemeColorScheme(Application.Current, s);
 
-            Properties.Settings.Default["Accent"] = obj;
+                Properties.Settings.Default["Accent"] = obj;
+            }
         }
 
         /// <summary>
@@ -184,7 +188,7 @@ namespace CraftingCalculator.ViewModel
         /// <param name="obj"></param>
         private async void ShowAboutDialog(object obj)
         {
-            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            string? version = Assembly.GetExecutingAssembly().GetName()?.Version?.ToString();
             DateTime now = DateTime.Now;
             StringBuilder sb = new StringBuilder();
 

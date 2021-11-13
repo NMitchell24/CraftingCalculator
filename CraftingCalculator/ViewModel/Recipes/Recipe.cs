@@ -1,7 +1,5 @@
 ﻿using CraftingCalculator.ViewModel.Ingredients;
 using CraftingCalculator.Utilities;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System;
 
@@ -14,10 +12,10 @@ namespace CraftingCalculator.ViewModel.Recipes
     {
         public IngredientMap Ingredients { get; set; }
         public RecipeMap ChildRecipes { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int Id { get; set; }
-        public string Description { get; set; }
-        public RecipeFilter Filter { get; set; }
+        public string? Description { get; set; }
+        public RecipeFilter? Filter { get; set; }
         public double Value { get; set; }
 
         public string Tooltip
@@ -151,7 +149,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         public IBaseDataRecord CopyForSave()
         {
             Recipe ret = (Recipe)Clone();
-            ret.Name = ret.Name + " - Copy";
+            ret.Name += " - Copy";
             ret.Id = 0;
             ret.Ingredients = this.Ingredients.CloneForSave();
             ret.ChildRecipes = this.ChildRecipes.CloneForSave();

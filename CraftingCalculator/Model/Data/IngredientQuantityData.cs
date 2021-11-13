@@ -9,5 +9,12 @@ namespace CraftingCalculator.Model.Data
         public IngredientData Ingredient { get; set; }
 
         public long Quantity { get; set; }
+
+        public IngredientQuantityData()
+        {
+            Id = default!;
+            Ingredient = default!;
+            Quantity = default!; 
+        }
     }
 }

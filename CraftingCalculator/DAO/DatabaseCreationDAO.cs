@@ -1,6 +1,4 @@
 ﻿using CraftingCalculator.Model.Data;
-using LiteDB;
-using System;
 
 namespace CraftingCalculator.DAO
 {
@@ -27,20 +25,20 @@ namespace CraftingCalculator.DAO
             //Ingredient Quantity objects.
             var ingQ = _data.GetCollectionByType<IngredientQuantityData>(CollectionLabels.IngredientQuantities);
             ingQ.EnsureIndex(x => x.Id);
-            ingQ.EnsureIndex(x => x.Ingredient.Id);
+            ingQ.EnsureIndex(x => x.Ingredient);
 
             //recipe objects.
             var rec = _data.GetCollectionByType<RecipeData>(CollectionLabels.Recipes);
             rec.EnsureIndex(x => x.Id);
-            rec.EnsureIndex(x => x.Filter.Id);
+            rec.EnsureIndex(x => x.Filter);
             rec.EnsureIndex(x => x.Name);
-            rec.EnsureIndex(x => x.Ingredients[0].Id);
+            rec.EnsureIndex(x => x.Ingredients);
 
             //Recipe quantities
             var recQ = _data.GetCollectionByType<RecipeQuantityData>(CollectionLabels.RecipeQuantities);
             recQ.EnsureIndex(x => x.Id);
-            recQ.EnsureIndex(x => x.ChildRecipe.Id);
-            recQ.EnsureIndex(x => x.ParentRecipe.Id);
+            recQ.EnsureIndex(x => x.ChildRecipe);
+            recQ.EnsureIndex(x => x.ParentRecipe);
 
             //Recipe Favorites
             var favs = _data.GetCollectionByType<RecipeFavoritesData>(CollectionLabels.RecipeFavorites);
@@ -50,8 +48,8 @@ namespace CraftingCalculator.DAO
             //Favorites Recipe Quantities
             var favRecs = _data.GetCollectionByType<FavoriteRecipeQuantitiesData>(CollectionLabels.FavoriteRecipeQuantities);
             favRecs.EnsureIndex(x => x.Id);
-            favRecs.EnsureIndex(x => x.Favorite.Id);
-            favRecs.EnsureIndex(x => x.Recipe.Id);
+            favRecs.EnsureIndex(x => x.Favorite);
+            favRecs.EnsureIndex(x => x.Recipe);
         }
 
         public static void UpdateRecipeQuantitiesToLong()

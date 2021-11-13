@@ -43,16 +43,23 @@ namespace CraftingCalculator.ViewModel.Ingredients
         /// </summary>
         /// <param name="ingredient"></param>
         /// <param name="quantity"></param>
-        public void Add(Ingredient ingredient, long quantity)
+        public void Add(Ingredient? ingredient, long quantity)
         {
-            Add(ingredient, quantity, 0);
+            if (ingredient != null)
+            {
+                Add(ingredient, quantity, 0);
+            }
         }
 
         public void Add(Ingredient ingredient, long quantity, int id)
         {
             if (_internalList.Any(i => i.Name == ingredient.Name))
             {
-                _internalList.Find(i => i.Name == ingredient.Name).Quantity += quantity;
+                IngredientQuantity? iq = _internalList.Find(i => i.Name == ingredient.Name);
+                if (iq != null)
+                {
+                    iq.Quantity += quantity;
+                }
             }
             else
             {
@@ -88,8 +95,12 @@ namespace CraftingCalculator.ViewModel.Ingredients
         {
             if (_internalList.Any(i => i.Name == ingredient.Name))
             {
-                RemovedIngredients.Add(_internalList.Find(i => i.Name == ingredient.Name));
-                _internalList.Remove(_internalList.Find(i => i.Name == ingredient.Name));
+                IngredientQuantity? iq = _internalList.Find(i => i.Name == ingredient.Name);
+                if (iq != null)
+                {
+                    RemovedIngredients.Add(iq);
+                    _internalList.Remove(iq);
+                }
             }
         }
 
