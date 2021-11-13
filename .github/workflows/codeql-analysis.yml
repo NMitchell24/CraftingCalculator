@@ -13,11 +13,12 @@ on:
     branches: [master]
   schedule:
     - cron: '0 7 * * 0'
+  workflow_dispatch:
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     strategy:
       fail-fast: false
