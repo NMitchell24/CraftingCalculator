@@ -40,56 +40,62 @@ namespace CraftingCalculator.Service
         /// Saves or adds the Ingredient.  If the ID value is 0 a new one will be added, otherwise the existing record will be updated.
         /// </summary>
         /// <param name="ing"></param>
-        public static void SaveIngredient(Ingredient ing)
+        public static void SaveIngredient(Ingredient? ing)
         {
-            IngredientData data;
-            if (ing.Id > 0)
+            if (ing != null)
             {
-                data = AbstractDAO.GetRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
-            }
-            else
-            {
-                data = new IngredientData();
-            }
+                IngredientData data;
+                if (ing.Id > 0)
+                {
+                    data = AbstractDAO.GetRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
+                }
+                else
+                {
+                    data = new IngredientData();
+                }
 
-            CopyToData(ing, data);
+                CopyToData(ing, data);
 
-            AbstractDAO.AddOrUpdateRecord<IngredientData>(CollectionLabels.Ingredients, data);          
+                AbstractDAO.AddOrUpdateRecord<IngredientData>(CollectionLabels.Ingredients, data);
+            }
         }
 
         /// <summary>
         /// Deletes the provided Ingredient.
         /// </summary>
         /// <param name="ing"></param>
-        public static void DeleteIngredient(Ingredient ing)
+        public static void DeleteIngredient(Ingredient? ing)
         {
-            //First look up any IngredientQuantityData that uses this Ingredient.
-            List<IngredientQuantityData> recipeIngredients = IngredientDAO.GetIngredientQuantitiesForIngredient(ing);
-
-            foreach(IngredientQuantityData ingredientQuantity in recipeIngredients.ToList())
+            if (ing != null)
             {
-                //Lookup the recipes associated with this data.
-                List<RecipeData> recipes = RecipeDAO.GetRecipeByIngredient(ingredientQuantity);
+                //First look up any IngredientQuantityData that uses this Ingredient.
+                List<IngredientQuantityData> recipeIngredients = IngredientDAO.GetIngredientQuantitiesForIngredient(ing);
 
-                //Loop through recipes and remove associations.
-                foreach(RecipeData recipe in recipes)
+                foreach (IngredientQuantityData ingredientQuantity in recipeIngredients.ToList())
                 {
-                    foreach(IngredientQuantityData recipeIngredient in recipe.Ingredients.ToList())
+                    //Lookup the recipes associated with this data.
+                    List<RecipeData> recipes = RecipeDAO.GetRecipeByIngredient(ingredientQuantity);
+
+                    //Loop through recipes and remove associations.
+                    foreach (RecipeData recipe in recipes)
                     {
-                        if(recipeIngredient.Id == ingredientQuantity.Id)
+                        foreach (IngredientQuantityData recipeIngredient in recipe.Ingredients.ToList())
                         {
-                            recipe.Ingredients.Remove(recipeIngredient);
+                            if (recipeIngredient.Id == ingredientQuantity.Id)
+                            {
+                                recipe.Ingredients.Remove(recipeIngredient);
+                            }
                         }
+                        AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe);
                     }
-                    AbstractDAO.AddOrUpdateRecord<RecipeData>(CollectionLabels.Recipes, recipe);
+
+                    //Delete the Ingredient Quantity
+                    AbstractDAO.DeleteRecordById<IngredientQuantityData>(CollectionLabels.IngredientQuantities, ingredientQuantity.Id);
                 }
 
-                //Delete the Ingredient Quantity
-                AbstractDAO.DeleteRecordById<IngredientQuantityData>(CollectionLabels.IngredientQuantities, ingredientQuantity.Id);
+                //Now delete ingredient.
+                AbstractDAO.DeleteRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
             }
-
-            //Now delete ingredient.
-            AbstractDAO.DeleteRecordById<IngredientData>(CollectionLabels.Ingredients, ing.Id);
         }
 
         /// <summary>
@@ -99,8 +105,8 @@ namespace CraftingCalculator.Service
         /// <param name="data"></param>
         private static void CopyToData(Ingredient ing, IngredientData data)
         {
-            data.Name = ing.Name;
-            data.Description = ing.Description;
+            data.Name = ing.Name ?? "";
+            data.Description = ing.Description ?? "";
             data.Cost = ing.Cost;
         }
 

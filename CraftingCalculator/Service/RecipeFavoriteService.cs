@@ -38,7 +38,7 @@ namespace CraftingCalculator.Service
 
             RecipeFavoritesData data = new RecipeFavoritesData()
             {
-                Name = fav.Name
+                Name = fav.Name ?? ""
             };
 
             if (fav.Id > 0)
@@ -77,7 +77,7 @@ namespace CraftingCalculator.Service
         /// <param name="fav"></param>
         public static void DeleteFavoriteData(RecipeFavorite fav)
         {
-            RecipeFavoritesData data = RecipeFavoritesDAO.GetFavoriteByName(fav.Name);
+            RecipeFavoritesData? data = RecipeFavoritesDAO.GetFavoriteByName(fav.Name);
 
             RecipeFavoritesDAO.DeleteFavoritesData(data);
         }
@@ -97,21 +97,25 @@ namespace CraftingCalculator.Service
         /// </summary>
         /// <param name="fav"></param>
         /// <returns></returns>
-        public static List<RecipeQuantity> GetRecipeQuantitiesForFavorite(RecipeFavorite fav)
+        public static List<RecipeQuantity> GetRecipeQuantitiesForFavorite(RecipeFavorite? fav)
         {
             List<RecipeQuantity> ret = new List<RecipeQuantity>();
-
-            List<FavoriteRecipeQuantitiesData> data = RecipeFavoritesDAO.GetRecipeQuantitesForFavoriteId(fav.Id);
-
-            foreach (FavoriteRecipeQuantitiesData favRecData in data)
+            if (fav != null)
             {
-                Recipe rec = RecipeService.GetRecipeForId(favRecData.Recipe.Id);
-                if(rec != null)
+                List<FavoriteRecipeQuantitiesData> data = RecipeFavoritesDAO.GetRecipeQuantitesForFavoriteId(fav.Id);
+
+                foreach (FavoriteRecipeQuantitiesData favRecData in data)
                 {
-                    ret.Add(new RecipeQuantity(rec, favRecData.Quantity, 0));
+                    if (favRecData.Recipe != null)
+                    {
+                        Recipe rec = RecipeService.GetRecipeForId(favRecData.Recipe.Id);
+                        if (rec != null)
+                        {
+                            ret.Add(new RecipeQuantity(rec, favRecData.Quantity, 0));
+                        }
+                    }
                 }
             }
-
             return ret;
         }
     }

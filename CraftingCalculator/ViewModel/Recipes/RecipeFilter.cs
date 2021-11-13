@@ -7,10 +7,10 @@ namespace CraftingCalculator.ViewModel.Recipes
     public class RecipeFilter : IBaseDataRecord
     {
         public const string ALL = "All";
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int Id { get; set; }
-        public string Description { get; set; }
-        public string Tooltip { get => Description; set { } }
+        public string? Description { get; set; }
+        public string Tooltip { get => Description ?? ""; set { } }
         public DataType Type
         {
             get
@@ -36,7 +36,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         public IBaseDataRecord CopyForSave()
         {
             RecipeFilter ret = (RecipeFilter)Clone();
-            ret.Name = ret.Name + " - Copy";
+            ret.Name += " - Copy";
             ret.Id = 0;
 
             return ret;

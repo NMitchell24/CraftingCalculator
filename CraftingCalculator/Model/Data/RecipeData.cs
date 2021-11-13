@@ -11,9 +11,18 @@ namespace CraftingCalculator.Model.Data
         public double Value { get; set; }
 
         [BsonRef(CollectionLabels.RecipeFilters)]
-        public RecipeFilterData Filter { get; set; }
+        public RecipeFilterData? Filter { get; set; }
 
         [BsonRef(CollectionLabels.IngredientQuantities)]
         public List<IngredientQuantityData> Ingredients { get; set; }
+
+        public RecipeData()
+        {
+            Id = default!;
+            Name = default!;
+            Description = default!;
+            Value = default!;
+            Ingredients = default!;
+        }
     }
 }

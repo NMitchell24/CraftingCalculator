@@ -11,6 +11,7 @@ namespace CraftingCalculator.Utilities
         public CommandRunner(Action<object> executeMethod)
         {
             _TargetExecuteMethod = executeMethod;
+            _TargetCanExecuteMethod = () => true;
         }
 
         public CommandRunner(Action<object> executeMethod, Func<bool> canExecuteMethod)

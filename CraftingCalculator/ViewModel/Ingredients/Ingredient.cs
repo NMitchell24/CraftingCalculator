@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CraftingCalculator.ViewModel.Ingredients
 {
     public class Ingredient : IBaseDataRecord
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
         public double Cost { get; set; }
         public string Tooltip
         {
             get
             {
-                string ret = Description;
+                string ret = Description ?? "";
                 if (Cost > 0)
                 {
                     ret = ret +
@@ -53,7 +49,7 @@ namespace CraftingCalculator.ViewModel.Ingredients
         public IBaseDataRecord CopyForSave()
         {
             Ingredient ret = (Ingredient)Clone();
-            ret.Name = ret.Name + " - Copy";
+            ret.Name += " - Copy";
             ret.Id = 0;
 
             return ret;

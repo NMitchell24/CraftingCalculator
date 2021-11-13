@@ -42,9 +42,12 @@ namespace CraftingCalculator.ViewModel.Recipes
         /// </summary>
         /// <param name="recipe"></param>
         /// <param name="quantity"></param>
-        public void Add(Recipe recipe, long quantity)
+        public void Add(Recipe? recipe, long quantity)
         {
-            Add(recipe, quantity, 0);
+            if (recipe != null)
+            {
+                Add(recipe, quantity, 0);
+            }
         }
 
         /// <summary>
@@ -57,7 +60,11 @@ namespace CraftingCalculator.ViewModel.Recipes
         {
             if (_internalList.Any(i => i.Recipe.Name == recipe.Name))
             {
-                _internalList.Find(i => i.Recipe.Name == recipe.Name).Quantity += quantity;
+                RecipeQuantity? rq = _internalList.Find(i => i.Recipe.Name == recipe.Name);
+                if (rq != null)
+                {
+                    rq.Quantity += quantity;
+                }
             }
             else
             {
@@ -92,8 +99,12 @@ namespace CraftingCalculator.ViewModel.Recipes
         public void RemoveAll(Recipe recipe)
         {
             if(_internalList.Any(i => i.Recipe.Name == recipe.Name)) {
-                RemovedRecipes.AddRange(_internalList.FindAll(i => i.Recipe.Name == recipe.Name));
-                _internalList.Remove(_internalList.Find(i => i.Recipe.Name == recipe.Name));
+                RecipeQuantity? rq = _internalList.Find(i => i.Recipe.Name == recipe.Name);
+                if (rq != null)
+                {
+                    RemovedRecipes.AddRange(_internalList.FindAll(i => i.Recipe.Name == recipe.Name));
+                    _internalList.Remove(rq);
+                }
             }
         }
 
