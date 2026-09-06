@@ -1,0 +1,14 @@
+<linker>
+	<!-- Preserve MudBlazor -->
+	<assembly fullname="MudBlazor" preserve="all" />
+
+	<!-- Preserve EF Core -->
+	<assembly fullname="Microsoft.EntityFrameworkCore" preserve="all" />
+	<assembly fullname="Microsoft.EntityFrameworkCore.Sqlite" preserve="all" />
+
+	<!-- Preserve our own assemblies -->
+	<assembly fullname="CraftingCalculator.Domain" preserve="all" />
+	<assembly fullname="CraftingCalculator.Application" preserve="all" />
+	<assembly fullname="CraftingCalculator.Infrastructure" preserve="all" />
+	<assembly fullname="CraftingCalculator.UI" preserve="all" />
+</linker>

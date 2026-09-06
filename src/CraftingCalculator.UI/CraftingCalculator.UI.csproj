@@ -1,0 +1,109 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <!-- Single source of truth for each platform's TFM - the TargetFrameworks list below and any
+         future per-configuration Condition reference these, so nothing needs editing in lockstep. -->
+    <AndroidTargetFramework>net10.0-android</AndroidTargetFramework>
+    <IosTargetFramework>net10.0-ios</IosTargetFramework>
+    <WindowsTargetFramework>net10.0-windows10.0.19041.0</WindowsTargetFramework>
+
+    <!-- iOS always (the Mac is where it's built/tested); Android everywhere except macOS (no Android
+         SDK/JDK there by design); Windows only on Windows. -->
+    <TargetFrameworks>$(IosTargetFramework)</TargetFrameworks>
+    <TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);$(AndroidTargetFramework)</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);$(WindowsTargetFramework)</TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CraftingCalculator.UI</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <ApplicationTitle>Crafting Calculator</ApplicationTitle>
+    <ApplicationId>com.nathanmitchell.craftingcalculator</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+
+    <!-- 15.0: the BlazorWebView surface this app is built on is annotated [SupportedOSPlatform("ios15.0")]
+         as of .NET 10, so declaring anything lower claims support that cannot run and raises CA1416. -->
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|$(WindowsTargetFramework)|AnyCPU'">
+    <!-- Run unpackaged (plain .exe) for local Debug so IDEs can launch/debug it directly instead of
+         hanging on MSIX deployment. Release uses the SDK default Windows packaging settings. -->
+    <WindowsPackageType>None</WindowsPackageType>
+  </PropertyGroup>
+
+  <!-- iOS Release: interpreter instead of NativeAOT - see docs/dev-environment.md and the plan's
+       "iOS Release settings" note. NativeAOT is not a supported combination with EF Core. -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
+    <UseInterpreter>true</UseInterpreter>
+    <MtouchInterpreter>all</MtouchInterpreter>
+    <PublishAot>false</PublishAot>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <LinkDescription Include="LinkDescription.xml" />
+  </ItemGroup>
+
+  <!-- iOS signing split by configuration: Debug uses automatic provisioning for on-device debugging;
+       Release keeps manual provisioning for distribution. Gated to device builds (RID ios-arm64) so
+       Simulator builds and design-time/restore skip codesigning and need no Apple account. -->
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|$(IosTargetFramework)' and '$(RuntimeIdentifier)' != '' and !$(RuntimeIdentifier.StartsWith('iossimulator'))">
+    <ProvisioningType>automatic</ProvisioningType>
+    <CodesignKey>Apple Development</CodesignKey>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|$(IosTargetFramework)'">
+    <ProvisioningType>manual</ProvisioningType>
+    <CodesignKey>iPhone Distribution</CodesignKey>
+    <CodesignProvision></CodesignProvision>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- App Icon -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+    <!-- Splash Screen -->
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+
+    <!-- Custom Fonts -->
+    <MauiFont Include="Resources\Fonts\*" />
+
+    <!-- Raw Assets -->
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+
+  <!-- Android and iOS carry SQLite in their own native payload packages, not the desktop
+       SQLitePCLRaw.lib.e_sqlite3 pinned in CraftingCalculator.Infrastructure - repeated per platform
+       here for the same CVE-2025-6965 reason (see the comment in that csproj).
+       ExcludeAssets on the desktop package is load-bearing: it flows in transitively from
+       Infrastructure, and on Android it would otherwise race the platform-native e_sqlite3.so and
+       fail to load at runtime (DllNotFoundException). -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" ExcludeAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.ios" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" ExcludeAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CraftingCalculator.Infrastructure\CraftingCalculator.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+@page "/"
+
+<PageTitle>Calculate</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudText Typo="Typo.h5" GutterBottom="true">Calculate</MudText>
+
+    @if (_loading)
+    {
+        <MudText>Loading…</MudText>
+    }
+    else
+    {
+        <MudText>Filters: @string.Join(", ", _filterNames)</MudText>
+        <MudText>Ingredients in library: @_ingredientCount</MudText>
+        <MudText>Recipes in library: @_recipeCount</MudText>
+    }
+</MudContainer>
