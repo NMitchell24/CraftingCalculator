@@ -1,4 +1,4 @@
-﻿using CraftingCalculator.Model.Data;
+﻿using CraftingCalculator.Domain.Entities;
 
 namespace CraftingCalculator.DAO
 {

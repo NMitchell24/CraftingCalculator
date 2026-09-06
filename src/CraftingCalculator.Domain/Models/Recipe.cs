@@ -1,14 +1,13 @@
-﻿using CraftingCalculator.ViewModel.Ingredients;
-using CraftingCalculator.Utilities;
+﻿using CraftingCalculator.Domain.Enums;
 using System.Text;
 using System;
 
-namespace CraftingCalculator.ViewModel.Recipes
+namespace CraftingCalculator.Domain.Models
 {
     /// <summary>
     /// Represents an individual UI Model for the Recipes
     /// </summary>
-    public class Recipe : AbstractPropertyChanged, IBaseDataRecord
+    public class Recipe : IBaseDataRecord
     {
         public IngredientMap Ingredients { get; set; }
         public RecipeMap ChildRecipes { get; set; }
@@ -118,17 +117,7 @@ namespace CraftingCalculator.ViewModel.Recipes
             return ret;
         }
 
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get => _isSelected;
-
-            set
-            {
-                _isSelected = value;
-                RaisePropertyChanged("IsSelected");
-            }
-        }
+        public bool IsSelected { get; set; }
 
         public IBaseDataRecord Clone()
         {

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Multi-targeted for as long as the WPF app (netcoreapp3.1) still references this project:
+         NuGet refuses a netcoreapp3.1 consumer -> net10.0-only project reference (NU1201), and the
+         WPF project isn't deleted until the last PR of the migration. Drop the netcoreapp3.1 leg
+         then, leaving net10.0 as the sole target per the plan's solution layout. -->
+    <TargetFrameworks>net10.0;netcoreapp3.1</TargetFrameworks>
+    <!-- netcoreapp3.1's default LangVersion (8.0) predates ImplicitUsings/global usings (C# 10).
+         LangVersion is compile-time only and doesn't require runtime support, so pinning it high is
+         safe for both targets. -->
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CraftingCalculator.Domain</RootNamespace>
+    <!-- Opted out of the repo-root Directory.Packages.props: the LiteDB reference below is
+         transitional (see the comment on it) and not worth centralizing alongside the real stack. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Transitional: the entities under Entities/ still use LiteDB's [BsonRef] to stay compatible
+         with the WPF app's LiteDB persistence layer. Dropped once Infrastructure/EF Core replaces
+         DAO/ and these become real EF entities with integer FKs. -->
+    <PackageReference Include="LiteDB" Version="5.0.11" />
+  </ItemGroup>
+
+</Project>

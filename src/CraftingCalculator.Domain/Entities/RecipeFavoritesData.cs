@@ -1,4 +1,4 @@
-﻿namespace CraftingCalculator.Model.Data
+﻿namespace CraftingCalculator.Domain.Entities
 {
     public class RecipeFavoritesData
     {

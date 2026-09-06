@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using CraftingCalculator.DAO;
-using CraftingCalculator.Model.Data;
-using CraftingCalculator.ViewModel.Ingredients;
-using CraftingCalculator.ViewModel.Recipes;
+using CraftingCalculator.Domain.Entities;
+using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Service
 {

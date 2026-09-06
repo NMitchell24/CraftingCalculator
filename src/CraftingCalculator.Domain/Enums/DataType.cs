@@ -1,10 +1,9 @@
-﻿using CraftingCalculator.ViewModel.Ingredients;
-using CraftingCalculator.ViewModel.Recipes;
+﻿using CraftingCalculator.Domain.Models;
 using System;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace CraftingCalculator.ViewModel
+namespace CraftingCalculator.Domain.Enums
 {
     public enum DataType
     {

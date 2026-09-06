@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using CraftingCalculator.ViewModel.Recipes;
-using CraftingCalculator.ViewModel.Ingredients;
+using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.ViewModel
 {

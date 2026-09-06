@@ -1,4 +1,6 @@
-﻿namespace CraftingCalculator.ViewModel
+﻿using CraftingCalculator.Domain.Enums;
+
+namespace CraftingCalculator.Domain.Models
 {
     public interface IBaseDataRecord
     {

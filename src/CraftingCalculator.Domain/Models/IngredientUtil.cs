@@ -1,6 +1,4 @@
-﻿using CraftingCalculator.ViewModel.Ingredients;
-
-namespace CraftingCalculator.Utilities
+﻿namespace CraftingCalculator.Domain.Models
 {
     public static class IngredientUtil
     {

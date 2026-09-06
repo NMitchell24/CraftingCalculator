@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CraftingCalculator.ViewModel.Ingredients
+namespace CraftingCalculator.Domain.Models
 {
     public class IngredientMap
     {

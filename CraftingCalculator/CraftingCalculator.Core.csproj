@@ -23,6 +23,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\src\CraftingCalculator.Domain\CraftingCalculator.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="LiteDB">
       <Version>5.0.11</Version>
     </PackageReference>

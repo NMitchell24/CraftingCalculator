@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CraftingCalculator.Model.Data;
+using CraftingCalculator.Domain.Entities;
 using LiteDB;
-using CraftingCalculator.ViewModel.Recipes;
+using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.DAO
 {

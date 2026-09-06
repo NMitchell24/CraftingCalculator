@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using LiteDB;
 
-namespace CraftingCalculator.Model.Data
+namespace CraftingCalculator.Domain.Entities
 {
     public class RecipeData
     {

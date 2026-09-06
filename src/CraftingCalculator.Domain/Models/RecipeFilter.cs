@@ -1,5 +1,6 @@
-﻿
-namespace CraftingCalculator.ViewModel.Recipes
+﻿using CraftingCalculator.Domain.Enums;
+
+namespace CraftingCalculator.Domain.Models
 {
     /// <summary>
     /// Simple Class to define the UI Model for RecipeFilters

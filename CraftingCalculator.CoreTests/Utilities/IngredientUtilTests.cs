@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CraftingCalculator.ViewModel.Ingredients;
+using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Utilities.Tests
 {

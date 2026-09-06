@@ -1,10 +1,11 @@
-﻿
-namespace CraftingCalculator.ViewModel.Ingredients
+﻿using CraftingCalculator.Domain.Enums;
+
+namespace CraftingCalculator.Domain.Models
 {
     /// <summary>
     /// Represents an ingredient and quantity.
     /// </summary>
-    public class IngredientQuantity : AbstractPropertyChanged, IBaseQuantityRecord
+    public class IngredientQuantity : IBaseQuantityRecord
     {
         public int Id { get; set; }
         public Ingredient Ingredient { get; set; }

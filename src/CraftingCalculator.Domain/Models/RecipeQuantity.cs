@@ -1,12 +1,12 @@
-﻿using CraftingCalculator.ViewModel.Ingredients;
+﻿using CraftingCalculator.Domain.Enums;
 using System;
 
-namespace CraftingCalculator.ViewModel.Recipes
+namespace CraftingCalculator.Domain.Models
 {
     /// <summary>
     /// A class that represents a recipe and quantity
     /// </summary>
-    public class RecipeQuantity : AbstractPropertyChanged, IBaseQuantityRecord
+    public class RecipeQuantity : IBaseQuantityRecord
     {
         public int Id { get; set; }
         public Recipe Recipe { get; set; }
@@ -35,16 +35,7 @@ namespace CraftingCalculator.ViewModel.Recipes
         }
         public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
 
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set
-            {
-                _isSelected = value;
-                RaisePropertyChanged("IsSelected");
-            }
-        }
+        public bool IsSelected { get; set; }
 
         public RecipeQuantity(Recipe recipe, long quantity, int id)
         {

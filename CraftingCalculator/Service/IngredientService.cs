@@ -1,6 +1,6 @@
 ﻿using CraftingCalculator.DAO;
-using CraftingCalculator.Model.Data;
-using CraftingCalculator.ViewModel.Ingredients;
+using CraftingCalculator.Domain.Entities;
+using CraftingCalculator.Domain.Models;
 using System.Collections.Generic;
 using System.Linq;
 

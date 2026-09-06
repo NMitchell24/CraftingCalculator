@@ -1,5 +1,5 @@
-﻿using CraftingCalculator.Model.Data;
-using CraftingCalculator.ViewModel.Recipes;
+﻿using CraftingCalculator.Domain.Entities;
+using CraftingCalculator.Domain.Models;
 using LiteDB;
 using System.Collections.Generic;
 using System.Linq;

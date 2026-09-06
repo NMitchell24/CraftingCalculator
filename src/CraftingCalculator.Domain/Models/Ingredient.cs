@@ -1,6 +1,7 @@
-﻿using System;
+﻿using CraftingCalculator.Domain.Enums;
+using System;
 
-namespace CraftingCalculator.ViewModel.Ingredients
+namespace CraftingCalculator.Domain.Models
 {
     public class Ingredient : IBaseDataRecord
     {
