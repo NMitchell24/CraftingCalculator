@@ -1,0 +1,56 @@
+<Project>
+
+  <!-- Central Package Management: every NuGet version for the solution lives here, and the
+       PackageReference entries in each .csproj carry only the package id. Adding a package still means
+       adding a PackageReference to the project that needs it — this file only decides which version
+       that reference resolves to.
+
+       Non-version metadata (PrivateAssets, IncludeAssets, ExcludeAssets) stays on the PackageReference,
+       because it is per-project: the same package is consumed differently by different projects. -->
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!-- MAUI app host + Blazor WebView (CraftingCalculator.UI) -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.90" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="10.0.90" />
+    <PackageVersion Include="MudBlazor" Version="9.7.0" />
+  </ItemGroup>
+
+  <!-- EF Core + Microsoft.Extensions -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.10" />
+  </ItemGroup>
+
+  <!-- SQLite native payload. Pinned forward off GHSA-2m69-gcr7-jv3q / CVE-2025-6965 (memory corruption
+       in SQLite before 3.50.2). The advisory range "(, 2.1.11]" is inclusive and EF Core 10.0.10 resolves
+       exactly 2.1.11, so its own resolution is still affected and these pins are required. See the
+       comments on the PackageReference entries in CraftingCalculator.Infrastructure.csproj and
+       CraftingCalculator.UI.csproj for why the native libs are pinned rather than bundle_e_sqlite3, and
+       why Android/iOS need their own per-platform references. -->
+  <ItemGroup>
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.12" />
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3.ios" Version="2.1.12" />
+  </ItemGroup>
+
+  <!-- Test stack -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageVersion Include="NUnit" Version="4.6.1" />
+    <PackageVersion Include="NUnit.Analyzers" Version="4.14.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="6.2.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="9.5.0" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <!-- Opted out of the repo-root Directory.Packages.props: this project is deleted at the end of
+         the MAUI migration, so its legacy package versions (netcoreapp3.1-era LiteDB/MahApps) are not
+         worth centralizing alongside the new stack. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
 	<RootNamespace>CraftingCalculator</RootNamespace>
     <AssemblyName>CraftingCalculator</AssemblyName>
 	<ApplicationIcon>atom_512_0zL_icon.ico</ApplicationIcon>

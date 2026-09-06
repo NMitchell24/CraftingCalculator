@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+    <!-- Opted out of the repo-root Directory.Packages.props: this project is retargeted to
+         CraftingCalculator.Application.UnitTests (NUnit) during the migration, so its legacy MSTest
+         versions are not worth centralizing alongside the new stack. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
