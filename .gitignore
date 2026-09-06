@@ -260,3 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 /MigrationBackup
+
+# MudMCP local docs index (machine-local, registered via `claude mcp add -s local`)
+/data/

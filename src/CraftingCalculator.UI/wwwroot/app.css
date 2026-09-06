@@ -7,8 +7,67 @@ html, body {
     height: 100%;
 }
 
-.status-bar-safe-area {
-    height: env(safe-area-inset-top);
+/* Safe-area insets. On iOS these stay 0 and env() (used directly below) does the work; on Android
+   env() maps to the display cutout, not the system bars, and reads 0 there - MainPage.xaml.cs /
+   SafeAreaInsetsInjector injects the real system-bar inset pixels into these variables instead.
+   max(env, var) picks whichever platform actually supplies a non-zero value. */
+:root {
+    --safe-area-inset-top: 0px;
+    --safe-area-inset-bottom: 0px;
+}
+
+/* Compensates MudMainContent's own top offset (which only accounts for the app bar's nominal toolbar
+   height) for the extra padding-top MainLayout.razor puts on the app bar to clear the status bar. */
+.mud-layout .mud-main-content {
+    margin-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));
+}
+
+/* Same compensation as .mud-main-content above, for the side rail (sm+: MudDrawer Mini/Persistent,
+   ClipMode.Always in MainLayout.razor) - MudBlazor's own clipped-drawer rule offsets `top` by the app
+   bar's nominal height only, so without this the rail's first item renders underneath the taller bar.
+   Matches MudBlazor's own selector (including the .mud-appbar-dense sibling variant - MainLayout's app
+   bar is Dense) so this wins on specificity rather than source order alone. */
+.mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-mini:not(.mud-drawer-clipped-never),
+.mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-persistent:not(.mud-drawer-clipped-never) {
+    top: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    height: calc(100% - var(--mud-appbar-height) + var(--mud-appbar-height) / 4 - max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+.page-content {
+    padding: 16px;
+    padding-bottom: calc(16px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+.page-content-with-bottom-nav {
+    padding-bottom: calc(72px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+/* MainLayout.razor's bottom navigation bar (xs breakpoint only). Not CSS-isolated (see MainLayout.razor
+   for why) - .razor.css scoped-bundle output never gets produced for this project's TFMs, so isolated
+   rules silently never load. Global rules here are the same fix Schmeg.UI settled on for the same gap. */
+.bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1300;
+    padding-bottom: max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom));
+}
+
+.bottom-nav-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.bottom-nav-menu a {
+    flex: 1 1 0;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 #blazor-error-ui {
