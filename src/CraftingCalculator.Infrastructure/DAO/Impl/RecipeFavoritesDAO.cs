@@ -11,12 +11,19 @@ public class RecipeFavoritesDAO(IDbContextFactory<CraftingDataContext> contextFa
     public async Task<List<RecipeFavorite>> GetAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        List<FavoriteEntity> entities = await context.Favorites
+
+        // Projected rather than materialised through ToModel: the list screen shows a per-favorite
+        // recipe count, and counting in the query avoids loading every FavoriteRecipes row to get it.
+        return await context.Favorites
             .AsNoTracking()
             .OrderBy(f => f.Name)
+            .Select(f => new RecipeFavorite
+            {
+                Id = f.Id,
+                Name = f.Name,
+                RecipeCount = f.FavoriteRecipes.Count
+            })
             .ToListAsync();
-
-        return [.. entities.Select(ToModel)];
     }
 
     public async Task<RecipeFavorite?> GetByNameAsync(string? name)
@@ -66,6 +73,14 @@ public class RecipeFavoritesDAO(IDbContextFactory<CraftingDataContext> contextFa
         await context.SaveChangesAsync();
 
         return ToModel(entity);
+    }
+
+    public async Task RenameAsync(int id, string name)
+    {
+        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await context.Favorites
+            .Where(f => f.Id == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(f => f.Name, name));
     }
 
     public async Task DeleteAsync(int id)

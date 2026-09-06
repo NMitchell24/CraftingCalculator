@@ -11,6 +11,8 @@ public class FavoriteService(IRecipeFavoritesDAO dao) : IFavoriteService
     public Task SaveFavoriteAsync(RecipeFavorite favorite, List<RecipeQuantity> quantities)
         => dao.SaveAsync(favorite, quantities);
 
+    public Task RenameFavoriteAsync(RecipeFavorite favorite, string newName) => dao.RenameAsync(favorite.Id, newName);
+
     public Task DeleteFavoriteAsync(RecipeFavorite favorite) => dao.DeleteAsync(favorite.Id);
 
     public async Task<bool> DoesFavoriteExistAsync(string? name) => await dao.GetByNameAsync(name) != null;

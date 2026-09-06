@@ -32,6 +32,16 @@ public class FavoriteServiceTests
     }
 
     [Test]
+    public async Task RenameFavoriteAsync_RenamesByIdThroughDAO()
+    {
+        RecipeFavorite favorite = new RecipeFavorite { Id = 4, Name = "Old" };
+
+        await _service.RenameFavoriteAsync(favorite, "New");
+
+        _dao.Verify(d => d.RenameAsync(4, "New"), Times.Once);
+    }
+
+    [Test]
     public async Task DoesFavoriteExistAsync_KnownName_ReturnsTrue()
     {
         _dao.Setup(d => d.GetByNameAsync("My Batch")).ReturnsAsync(new RecipeFavorite { Name = "My Batch" });

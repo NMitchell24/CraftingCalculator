@@ -34,7 +34,7 @@ public partial class Calculate : ComponentBase, IDisposable
     protected override void OnInitialized()
     {
         State.Changed += StateHasChanged;
-        AppBarState.Configure("Calculate",
+        AppBarState.Configure(this, "Calculate",
         [
             new AppBarMenuItem("Clear batch", Icons.Material.Filled.ClearAll, ClearBatchAsync),
             new AppBarMenuItem("Copy materials", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
@@ -75,41 +75,11 @@ public partial class Calculate : ComponentBase, IDisposable
         Snackbar.Add("Copied materials to clipboard", Severity.Success);
     }
 
-    private async Task SaveAsFavoriteAsync()
-    {
-        if (State.RecipeQuantities.Count == 0)
-        {
-            return;
-        }
-
-        DialogParameters parameters = new() { ["Label"] = "Favorite name" };
-        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Save as Favorite", parameters);
-        DialogResult? result = await dialogRef.Result;
-
-        if (result is null || result.Canceled || result.Data is not string name || string.IsNullOrWhiteSpace(name))
-        {
-            return;
-        }
-
-        if (await State.FavoriteExistsAsync(name))
-        {
-            bool? overwrite = await DialogService.ShowMessageBoxAsync(
-                "Overwrite?", $"A favorite named '{name}' already exists. Overwrite it?",
-                yesText: "Overwrite", cancelText: "Cancel");
-
-            if (overwrite != true)
-            {
-                return;
-            }
-        }
-
-        await State.SaveAsFavoriteAsync(name);
-        Snackbar.Add($"Saved '{name}'", Severity.Success);
-    }
+    private Task SaveAsFavoriteAsync() => FavoritePrompts.SaveBatchAsync(DialogService, Snackbar, State);
 
     public void Dispose()
     {
         State.Changed -= StateHasChanged;
-        AppBarState.Reset();
+        AppBarState.Reset(this);
     }
 }

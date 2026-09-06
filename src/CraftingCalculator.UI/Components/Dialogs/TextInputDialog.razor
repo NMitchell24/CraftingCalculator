@@ -1,6 +1,10 @@
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="_value" Label="@Label" Variant="Variant.Outlined" FullWidth="true" AutoFocus="true" />
+        @* Immediate is load-bearing, not a nicety: without it the value only reaches _value on blur, so
+           the OK button below stays disabled until the field loses focus - making the first tap on OK a
+           no-op that merely enables it, and the second the one that submits. *@
+        <MudTextField @bind-Value="_value" Label="@Label" Variant="Variant.Outlined" FullWidth="true"
+                      AutoFocus="true" Immediate="true" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>

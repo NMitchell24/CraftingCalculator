@@ -16,8 +16,8 @@
                 <MudListItem T="RecipeQuantity">
                     <div class="batch-row">
                         <div class="batch-row-info">
-                            <MudText Class="batch-row-name">@rq.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="batch-row-name">@rq.FilterType</MudText>
+                            <MudText Class="list-row-name">@rq.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="list-row-name">@rq.FilterType</MudText>
                         </div>
                         <div class="batch-row-stepper">
                             <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity - 1))" />

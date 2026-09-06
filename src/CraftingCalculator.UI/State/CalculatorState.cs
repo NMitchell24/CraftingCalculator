@@ -29,6 +29,12 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     public double TotalValue { get; private set; }
     public double Profit => TotalValue - TotalCost;
 
+    /// <summary>
+    /// The favorite the current batch came from, or null when it was built by hand or cleared. Drives
+    /// the "update or create new" branch of the save flow (see Components/Dialogs/FavoritePrompts).
+    /// </summary>
+    public string? LoadedFavoriteName { get; private set; }
+
     public void AddRecipes(IEnumerable<Recipe> recipes)
     {
         foreach (Recipe recipe in recipes)
@@ -63,6 +69,7 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     public void Clear()
     {
         _recipeMap.Reset();
+        LoadedFavoriteName = null;
         Recalculate();
     }
 
@@ -75,13 +82,41 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
             _recipeMap.Add(quantity.Recipe, quantity.Quantity);
         }
 
+        LoadedFavoriteName = favorite.Name;
         Recalculate();
     }
 
     public Task<bool> FavoriteExistsAsync(string? name) => favoriteService.DoesFavoriteExistAsync(name);
 
-    public Task SaveAsFavoriteAsync(string name) =>
-        favoriteService.SaveFavoriteAsync(new RecipeFavorite { Name = name }, [.. _recipeMap.RecipeList]);
+    public async Task SaveAsFavoriteAsync(string name)
+    {
+        await favoriteService.SaveFavoriteAsync(new RecipeFavorite { Name = name }, [.. _recipeMap.RecipeList]);
+        LoadedFavoriteName = name;
+    }
+
+    /// <summary>Keeps <see cref="LoadedFavoriteName"/> in step when the loaded favorite is renamed.</summary>
+    public void OnFavoriteRenamed(string previousName, string newName)
+    {
+        if (LoadedFavoriteName != previousName)
+        {
+            return;
+        }
+
+        LoadedFavoriteName = newName;
+        Changed?.Invoke();
+    }
+
+    /// <summary>Keeps <see cref="LoadedFavoriteName"/> in step when the loaded favorite is deleted.</summary>
+    public void OnFavoriteDeleted(string name)
+    {
+        if (LoadedFavoriteName != name)
+        {
+            return;
+        }
+
+        LoadedFavoriteName = null;
+        Changed?.Invoke();
+    }
 
     public bool IsExpanded(string path) => _expandedPaths.Contains(path);
 

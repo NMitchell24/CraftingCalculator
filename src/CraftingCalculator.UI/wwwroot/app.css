@@ -125,6 +125,15 @@ html, body {
     }
 }
 
+/* Without this, a name too long for the available width overflows its container (flexbox and grid
+   don't clip by default) and visually bleeds onto whatever follows it in the row. */
+.list-row-name {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 .pane-empty-state {
     display: flex;
     flex-direction: column;
@@ -139,6 +148,7 @@ html, body {
 /* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
    regardless of the icon button's own visual (smaller) padding. */
 .batch-row .mud-icon-button,
+.favorites-row .mud-icon-button,
 .materials-list-header .mud-icon-button,
 .steps-tree-header .mud-button-root {
     min-width: 44px;
@@ -155,15 +165,6 @@ html, body {
 .batch-row-info {
     flex: 1 1 auto;
     min-width: 0;
-}
-
-/* Without this, a name too long for the available width overflows its container (flexbox doesn't
-   clip by default) and visually bleeds onto the stepper/delete buttons that follow it in the row. */
-.batch-row-name {
-    display: block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .batch-row-stepper {
@@ -201,9 +202,6 @@ html, body {
 
 .materials-row-name {
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .materials-row-cost {
@@ -232,6 +230,27 @@ html, body {
     .steps-tree-view .mud-treeview-group {
         margin-left: 12px;
     }
+}
+
+/* Favorites screen (Components/Pages/Favorites.razor) */
+
+/* Clears the floating .page-fab (56px tall, sitting 64px above the bottom nav) so the last row is
+   never trapped under it. The bottom nav's own clearance already comes from
+   .page-content-with-bottom-nav (MainLayout). */
+.favorites-page {
+    padding-bottom: 120px;
+}
+
+.favorites-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.favorites-row-info {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .picker-chip-row {
@@ -302,7 +321,7 @@ html, body {
     }
 }
 
-.calculate-fab {
+.page-fab {
     position: fixed;
     right: 16px;
     bottom: calc(64px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
@@ -310,7 +329,7 @@ html, body {
 }
 
 @media (max-width: 599.98px) {
-    .calculate-fab {
+    .page-fab {
         bottom: calc(72px + 64px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
     }
 }
