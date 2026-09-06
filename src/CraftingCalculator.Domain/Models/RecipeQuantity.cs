@@ -33,8 +33,6 @@ namespace CraftingCalculator.Domain.Models
 
             set { }
         }
-        public IngredientMap Ingredients { get => Recipe.GetIngredients(); private set { } }
-
         public bool IsSelected { get; set; }
 
         public RecipeQuantity(Recipe recipe, long quantity, int id)

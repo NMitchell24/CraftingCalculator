@@ -1,5 +1,7 @@
 ﻿using System.Windows.Controls;
+using CraftingCalculator.Application.Common.Interfaces;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CraftingCalculator.Views
 {
@@ -11,7 +13,11 @@ namespace CraftingCalculator.Views
         public RecipesView()
         {
             InitializeComponent();
-            DataContext = new ViewModel.RecipesViewModel(DialogCoordinator.Instance);
+            DataContext = new ViewModel.RecipesViewModel(
+                DialogCoordinator.Instance,
+                App.Services.GetRequiredService<IRecipeFilterService>(),
+                App.Services.GetRequiredService<IRecipeService>(),
+                App.Services.GetRequiredService<IFavoriteService>());
         }
     }
 }

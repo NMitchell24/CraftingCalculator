@@ -116,7 +116,7 @@ namespace CraftingCalculator.ViewModel
         {
             if (obj is string s)
             {
-                ThemeManager.Current.ChangeThemeBaseColor(Application.Current, s);
+                ThemeManager.Current.ChangeThemeBaseColor(System.Windows.Application.Current, s);
 
                 Properties.Settings.Default["Theme"] = obj;
             }
@@ -130,7 +130,7 @@ namespace CraftingCalculator.ViewModel
         {
             if (obj is string s)
             {
-                ThemeManager.Current.ChangeThemeColorScheme(Application.Current, s);
+                ThemeManager.Current.ChangeThemeColorScheme(System.Windows.Application.Current, s);
 
                 Properties.Settings.Default["Accent"] = obj;
             }
@@ -157,7 +157,7 @@ namespace CraftingCalculator.ViewModel
 
             if(!confirmOnClose)
             {
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
             }
 
             e.Cancel = !_doClose;
@@ -173,13 +173,13 @@ namespace CraftingCalculator.ViewModel
 
             if (_doClose)
             {
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
             }
         }
 
         private void Close(object obj)
         {
-            Application.Current.MainWindow.Close();
+            System.Windows.Application.Current.MainWindow.Close();
         }
 
         /// <summary>

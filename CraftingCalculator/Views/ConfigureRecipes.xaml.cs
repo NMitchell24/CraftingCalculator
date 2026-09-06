@@ -1,4 +1,6 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using CraftingCalculator.Application.Common.Interfaces;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,12 @@ namespace CraftingCalculator.Views
         public ConfigureRecipes()
         {
             InitializeComponent();
-            DataContext = new ViewModel.ConfigureRecipesViewModel(DialogCoordinator.Instance);
+            DataContext = new ViewModel.ConfigureRecipesViewModel(
+                DialogCoordinator.Instance,
+                App.Services.GetRequiredService<IIngredientService>(),
+                App.Services.GetRequiredService<IRecipeFilterService>(),
+                App.Services.GetRequiredService<IRecipeService>(),
+                App.Services.GetRequiredService<IDatabaseAdminService>());
         }
     }
 }

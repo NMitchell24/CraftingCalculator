@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- Retargeted from netcoreapp3.1 in PR4 (ahead of the plan's original PR9 timeline): NuGet
+         refuses a netcoreapp3.1 project referencing a net10.0-only project (NU1201), and this PR
+         wires WPF onto CraftingCalculator.Application/.Infrastructure, both net10.0-only. TFM
+         compatibility is one-directional - a net10.0 consumer can still reference the netcoreapp3.1-
+         targeted MahApps.Metro packages below, so bumping only the consumer resolves it. -->
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <!-- Opted out of the repo-root Directory.Packages.props: this project is deleted at the end of
-         the MAUI migration, so its legacy package versions (netcoreapp3.1-era LiteDB/MahApps) are not
-         worth centralizing alongside the new stack. -->
+         the MAUI migration, so its legacy package versions (MahApps) are not worth centralizing
+         alongside the new stack. -->
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
 	<RootNamespace>CraftingCalculator</RootNamespace>
     <AssemblyName>CraftingCalculator</AssemblyName>
@@ -19,15 +24,16 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Resources\CraftingCalculator.db" />
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\CraftingCalculator.Domain\CraftingCalculator.Domain.csproj" />
+    <ProjectReference Include="..\src\CraftingCalculator.Application\CraftingCalculator.Application.csproj" />
+    <ProjectReference Include="..\src\CraftingCalculator.Infrastructure\CraftingCalculator.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LiteDB">
-      <Version>5.0.11</Version>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
+      <Version>10.0.10</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro">
       <Version>2.4.9</Version>

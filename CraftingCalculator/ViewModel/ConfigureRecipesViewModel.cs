@@ -1,5 +1,6 @@
-﻿using CraftingCalculator.Utilities;
-using CraftingCalculator.Service;
+using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Application.Common.Utils;
+using CraftingCalculator.Utilities;
 using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,30 @@ namespace CraftingCalculator.ViewModel
     {
         // Class level Variables used by multiple methods.
         private IDialogCoordinator dialogCoordinator;
+        private readonly IIngredientService _ingredientService;
+        private readonly IRecipeFilterService _recipeFilterService;
+        private readonly IRecipeService _recipeService;
+        private readonly IDatabaseAdminService _databaseAdminService;
         public IReadOnlyList<DataType> DataTypeList { get; }
         public int SwitchView { get; set; }
-        public IBaseDataRecord? ItemForUpdate { get; set; }   
+        public IBaseDataRecord? ItemForUpdate { get; set; }
         public bool ShowProgressRing { get; set; }
         public bool EnableDisableWindow { get; set; }
 
         public ObservableCollection<IBaseDataRecord>? DataRecords { get; set; }
 
-        public ConfigureRecipesViewModel(IDialogCoordinator instance)
+        public ConfigureRecipesViewModel(
+            IDialogCoordinator instance,
+            IIngredientService ingredientService,
+            IRecipeFilterService recipeFilterService,
+            IRecipeService recipeService,
+            IDatabaseAdminService databaseAdminService)
         {
             dialogCoordinator = instance;
+            _ingredientService = ingredientService;
+            _recipeFilterService = recipeFilterService;
+            _recipeService = recipeService;
+            _databaseAdminService = databaseAdminService;
             DataTypeList = DataTypeUtil.GetDataTypeList().ToArray();
             SelectedType = DataTypeList[0];
             RecipeSubTypes = new List<DataType>()
@@ -58,15 +72,15 @@ namespace CraftingCalculator.ViewModel
                 string name = ItemForUpdate.Name ?? "";
                 if (ItemForUpdate.Type == DataType.Ingredient)
                 {
-                    IngredientService.SaveIngredient(ItemForUpdate as Ingredient);
+                    _ingredientService.SaveIngredientAsync(ItemForUpdate as Ingredient).GetAwaiter().GetResult();
                 }
                 else if (ItemForUpdate.Type == DataType.RecipeFilter)
                 {
-                    RecipeFilterService.SaveRecipeFilter(ItemForUpdate as RecipeFilter);
+                    _recipeFilterService.SaveRecipeFilterAsync(ItemForUpdate as RecipeFilter).GetAwaiter().GetResult();
                 }
                 else if (ItemForUpdate.Type == DataType.Recipe)
                 {
-                    RecipeService.SaveRecipe(ItemForUpdate as Recipe);
+                    _recipeService.SaveRecipeAsync(ItemForUpdate as Recipe).GetAwaiter().GetResult();
                 }
 
                 SelectedType = ItemForUpdate.Type;
@@ -75,7 +89,7 @@ namespace CraftingCalculator.ViewModel
             }
         }
 
-        public CommandRunner ResetItemCommand { get; set; } 
+        public CommandRunner ResetItemCommand { get; set; }
         private void ResetItem(object obj)
         {
             if(SelectedItem != null)
@@ -131,30 +145,27 @@ namespace CraftingCalculator.ViewModel
                 if (doDelete)
                 {
                     ShowHideProgress();
-                    await Task.Factory.StartNew(() =>
-                    {
-                        if (ItemForUpdate.Type == DataType.Ingredient)
-                        {
-                            IngredientService.DeleteIngredient(ItemForUpdate as Ingredient);
-                        }
-                        else if (ItemForUpdate.Type == DataType.RecipeFilter)
-                        {
-                            RecipeFilterService.DeleteRecipeFilter(ItemForUpdate as RecipeFilter);
-                        }
-                        else if (ItemForUpdate.Type == DataType.Recipe)
-                        {
-                            RecipeService.DeleteRecipe(ItemForUpdate as Recipe);
-                        }
-                        ItemForUpdate = SelectedType.GetDataRecord();
-                        SelectedType = ItemForUpdate.Type;
 
-                        RaisePropertyChanged(nameof(ItemForUpdate));
-                        RaisePropertyChanged(nameof(DataRecords));
-                        RaisePropertyChanged(nameof(SelectedItem));
-                    }).ContinueWith(Task =>
+                    if (ItemForUpdate.Type == DataType.Ingredient)
                     {
-                        ShowHideProgress();
-                    });
+                        await _ingredientService.DeleteIngredientAsync(ItemForUpdate as Ingredient);
+                    }
+                    else if (ItemForUpdate.Type == DataType.RecipeFilter)
+                    {
+                        await _recipeFilterService.DeleteRecipeFilterAsync(ItemForUpdate as RecipeFilter);
+                    }
+                    else if (ItemForUpdate.Type == DataType.Recipe)
+                    {
+                        await _recipeService.DeleteRecipeAsync(ItemForUpdate as Recipe);
+                    }
+                    ItemForUpdate = SelectedType.GetDataRecord();
+                    SelectedType = ItemForUpdate.Type;
+
+                    RaisePropertyChanged(nameof(ItemForUpdate));
+                    RaisePropertyChanged(nameof(DataRecords));
+                    RaisePropertyChanged(nameof(SelectedItem));
+
+                    ShowHideProgress();
                 }
             }
         }
@@ -178,20 +189,17 @@ namespace CraftingCalculator.ViewModel
             if(doDelete)
             {
                 ShowHideProgress();
-                await Task.Factory.StartNew(() =>
-                {
-                    DatabaseCreationService.DeleteAllData();
 
-                    ItemForUpdate = SelectedType.GetDataRecord();
-                    SelectedType = ItemForUpdate.Type;
+                await _databaseAdminService.DeleteAllDataAsync();
 
-                    RaisePropertyChanged(nameof(ItemForUpdate));
-                    RaisePropertyChanged(nameof(DataRecords));
-                    RaisePropertyChanged(nameof(SelectedItem));
-                }).ContinueWith(Task =>
-                {
-                    ShowHideProgress();
-                });
+                ItemForUpdate = SelectedType.GetDataRecord();
+                SelectedType = ItemForUpdate.Type;
+
+                RaisePropertyChanged(nameof(ItemForUpdate));
+                RaisePropertyChanged(nameof(DataRecords));
+                RaisePropertyChanged(nameof(SelectedItem));
+
+                ShowHideProgress();
             }
         }
 
@@ -217,20 +225,20 @@ namespace CraftingCalculator.ViewModel
                 _selectedType = value;
                 if(_selectedType == DataType.Ingredient)
                 {
-                    DataRecords = new ObservableCollection<IBaseDataRecord>(IngredientService.GetAllIngredients());
+                    DataRecords = new ObservableCollection<IBaseDataRecord>(_ingredientService.GetAllIngredientsAsync().GetAwaiter().GetResult());
                     SwitchView = 0;
                 }
                 else if(_selectedType == DataType.RecipeFilter)
                 {
                     //Need to remove All from the list so that it cannot be edited.
-                    List<RecipeFilter> filterList = RecipeFilterService.GetRecipeFilters();
+                    List<RecipeFilter> filterList = _recipeFilterService.GetRecipeFiltersAsync().GetAwaiter().GetResult();
                     filterList.RemoveAt(0);
                     DataRecords = new ObservableCollection<IBaseDataRecord>(filterList);
                     SwitchView = 1;
                 }
                 else if (_selectedType == DataType.Recipe)
                 {
-                    DataRecords = new ObservableCollection<IBaseDataRecord>(RecipeService.GetAllRecipes());
+                    DataRecords = new ObservableCollection<IBaseDataRecord>(_recipeService.GetAllRecipesAsync().GetAwaiter().GetResult());
                     InitializeRecipeValues();
                     SwitchView = 2;
                 }
@@ -286,7 +294,7 @@ namespace CraftingCalculator.ViewModel
 
         private void InitializeRecipeValues()
         {
-            RecipeFilters = RecipeFilterService.GetRecipeFilters();
+            RecipeFilters = _recipeFilterService.GetRecipeFiltersAsync().GetAwaiter().GetResult();
             //Remove ALL from the list as it is not a valid filter to set on Recipes
             RecipeFilters.RemoveAt(0);
             RaisePropertyChanged(nameof(RecipeFilters));
@@ -294,7 +302,7 @@ namespace CraftingCalculator.ViewModel
             if (ItemForUpdate?.Id > 0)
             {
                 UpdateSelectedFilter();
-            }           
+            }
         }
 
         private void ResetRecipeValues()
@@ -356,11 +364,11 @@ namespace CraftingCalculator.ViewModel
                 _recipeSelectedType = value;
                 if(_recipeSelectedType == DataType.Ingredient)
                 {
-                    RecipeIngredientValues = new ObservableCollection<IBaseDataRecord>(IngredientService.GetAllIngredients());
+                    RecipeIngredientValues = new ObservableCollection<IBaseDataRecord>(_ingredientService.GetAllIngredientsAsync().GetAwaiter().GetResult());
                 }
                 else if (_recipeSelectedType == DataType.Recipe)
                 {
-                    RecipeIngredientValues = new ObservableCollection<IBaseDataRecord>(RecipeService.GetAllRecipes());
+                    RecipeIngredientValues = new ObservableCollection<IBaseDataRecord>(_recipeService.GetAllRecipesAsync().GetAwaiter().GetResult());
                     // Remove the current item that's being edited to prevent an infinite loop scenario when calculating ingredients.
                     IBaseDataRecord current = RecipeIngredientValues.FirstOrDefault(x => x.Id == ItemForUpdate?.Id);
                     RecipeIngredientValues.Remove(current);

@@ -74,49 +74,6 @@ namespace CraftingCalculator.Domain.Models
             this.ChildRecipes = new RecipeMap();
         }
 
-        public IngredientMap GetIngredients()
-        {
-            IngredientMap NewIngredients = new IngredientMap(Ingredients, false);
-
-            if(ChildRecipes != null)
-            {
-                foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
-                {
-                    IngredientMap RecipeIngredients = new IngredientMap(recipe.Ingredients, false);
-
-                    NewIngredients = IngredientUtil.CombineIngredients(RecipeIngredients, NewIngredients, recipe.Quantity);
-                }
-            }
-
-            return NewIngredients;
-        }
-
-  
-        public RecipeTree GetRecipeNodes(long quantity)
-        {
-            RecipeTree ret = new RecipeTree
-            {
-                Name = Name + " x" + quantity,
-                Id = Name,
-                Tooltip = Tooltip
-            };
-
-            foreach (IngredientQuantity i in Ingredients.IngredientList)
-            {
-                ret.AddRecipeNode(new RecipeTree(i.Name + " x" + (i.Quantity * quantity), i.Tooltip));
-            }
-
-            if(ChildRecipes != null)
-            {
-                foreach (RecipeQuantity r in ChildRecipes.RecipeList)
-                {
-                    ret.AddRecipeNode(r.Recipe.GetRecipeNodes(r.Quantity * quantity));
-                }
-            }
-
-            return ret;
-        }
-
         public bool IsSelected { get; set; }
 
         public IBaseDataRecord Clone()

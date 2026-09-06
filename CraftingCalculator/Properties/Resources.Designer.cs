@@ -59,24 +59,5 @@ namespace CraftingCalculator.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] CraftingCalculator {
-            get {
-                object obj = ResourceManager.GetObject("CraftingCalculator", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to CraftingCalculator.db.
-        /// </summary>
-        internal static string dbName {
-            get {
-                return ResourceManager.GetString("dbName", resourceCulture);
-            }
-        }
     }
 }

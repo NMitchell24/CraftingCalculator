@@ -1,4 +1,5 @@
-﻿using CraftingCalculator.Domain.Models;
+using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Utilities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
-using CraftingCalculator.Service;
 
 namespace CraftingCalculator.ViewModel
 {
@@ -16,6 +16,9 @@ namespace CraftingCalculator.ViewModel
         #region class-definition
         // Class level Variables used by multiple methods.
         private IDialogCoordinator dialogCoordinator;
+        private readonly IRecipeFilterService _recipeFilterService;
+        private readonly IRecipeService _recipeService;
+        private readonly IFavoriteService _favoriteService;
         private RecipeMap _recipeMap = new RecipeMap();
         private IngredientMap _ingredientMap = new IngredientMap();
 
@@ -33,9 +36,16 @@ namespace CraftingCalculator.ViewModel
         /// Constructor
         /// </summary>
         /// <param name="instance"></param>
-        public RecipesViewModel(IDialogCoordinator instance)
+        public RecipesViewModel(
+            IDialogCoordinator instance,
+            IRecipeFilterService recipeFilterService,
+            IRecipeService recipeService,
+            IFavoriteService favoriteService)
         {
             dialogCoordinator = instance;
+            _recipeFilterService = recipeFilterService;
+            _recipeService = recipeService;
+            _favoriteService = favoriteService;
 
             AddRecipeCommand = new CommandRunner(AddRecipes, CanAddRecipes);
             RemoveRecipeCommand = new CommandRunner(RemoveRecipes, CanRemoveRecipes);
@@ -46,12 +56,12 @@ namespace CraftingCalculator.ViewModel
             DeleteFavoriteCommand = new CommandRunner(DeleteSelectedFavorite, CanDeleteFavorite);
             ExpandAllCommand = new CommandRunner(ExpandAllRecipes, CanExpandCollapseAll);
             CollapseAllCommand = new CommandRunner(CollapseAllRecipes, CanExpandCollapseAll);
-            
-            RecipeFilters = RecipeFilterService.GetRecipeFilters();
+
+            RecipeFilters = _recipeFilterService.GetRecipeFiltersAsync().GetAwaiter().GetResult();
             SelectedFilter = RecipeFilters[0];
 
-            RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(SelectedFilter));
-            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
+            RecipesList = new ObservableCollection<Recipe>(_recipeService.GetRecipesByFilterAsync(SelectedFilter).GetAwaiter().GetResult());
+            RecipeFavorites = new ObservableCollection<RecipeFavorite>(_favoriteService.GetAllFavoritesAsync().GetAwaiter().GetResult());
             RecipeTotals = new ObservableCollection<RecipeTree>();
         }
         #endregion
@@ -70,7 +80,7 @@ namespace CraftingCalculator.ViewModel
             {
                 // Add the recipe or increase the quantity.
                 _recipeMap.Add(recipe, 1);
-                 
+
                 // need to deselect recipe so that the ListBox does not leave them selected when they are out of view.
                 recipe.IsSelected = false;
             }
@@ -110,7 +120,7 @@ namespace CraftingCalculator.ViewModel
             {
                 foreach (RecipeQuantity q in RecipeQuantities)
                 {
-                    foreach (IngredientQuantity i in q.Ingredients.IngredientList)
+                    foreach (IngredientQuantity i in _recipeService.GetFlattenedIngredients(q.Recipe).IngredientList)
                     {
                         _ingredientMap.Add(i.Ingredient, (i.Quantity * q.Quantity));
                         _totalCost += i.TotalCost * q.Quantity;
@@ -182,7 +192,7 @@ namespace CraftingCalculator.ViewModel
                 if (name == null)
                     return;
 
-                if (RecipeFavoriteService.DoesFavoriteExist(name))
+                if (await _favoriteService.DoesFavoriteExistAsync(name))
                 {
                     var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
                     var yesNo = await dialogCoordinator.ShowMessageAsync(this, "Confirm",
@@ -199,10 +209,10 @@ namespace CraftingCalculator.ViewModel
                 {
                     Name = name
                 };
-                RecipeFavoriteService.SaveRecipeFavorite(fav, RecipeQuantities.ToList());
+                await _favoriteService.SaveFavoriteAsync(fav, RecipeQuantities.ToList());
             }
 
-            RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
+            RecipeFavorites = new ObservableCollection<RecipeFavorite>(await _favoriteService.GetAllFavoritesAsync());
             SelectedFav = RecipeFavorites.Where(x => x.Name == name).FirstOrDefault();
 
             RaiseChanged();
@@ -229,9 +239,9 @@ namespace CraftingCalculator.ViewModel
 
             if (doDelete && SelectedFav != null)
             {
-                RecipeFavoriteService.DeleteFavoriteData(SelectedFav);
+                await _favoriteService.DeleteFavoriteAsync(SelectedFav);
                 SelectedFav = null;
-                RecipeFavorites = new ObservableCollection<RecipeFavorite>(RecipeFavoriteService.GetAllRecipeFavorites());
+                RecipeFavorites = new ObservableCollection<RecipeFavorite>(await _favoriteService.GetAllFavoritesAsync());
                 RaiseChanged();
             }
         }
@@ -248,7 +258,7 @@ namespace CraftingCalculator.ViewModel
         {
             ExpandCollapseAll(true);
         }
-        
+
         private void CollapseAllRecipes(object obj)
         {
             ExpandCollapseAll(false);
@@ -284,7 +294,7 @@ namespace CraftingCalculator.ViewModel
                 if (value != null)
                 {
                     _recipeMap.Reset();
-                    List<RecipeQuantity> quans = RecipeFavoriteService.GetRecipeQuantitiesForFavorite(_selectedFav);
+                    List<RecipeQuantity> quans = _favoriteService.GetRecipeQuantitiesForFavoriteAsync(_selectedFav).GetAwaiter().GetResult();
                     foreach (RecipeQuantity q in quans)
                     {
                         _recipeMap.Add(q.Recipe, q.Quantity);
@@ -324,7 +334,7 @@ namespace CraftingCalculator.ViewModel
                 RaiseChanged();
             }
         }
-        
+
         private int _selectedRecipeIndex;
         public int SelectedRecipeIndex
         {
@@ -402,7 +412,7 @@ namespace CraftingCalculator.ViewModel
                 List<RecipeTree> temp = new List<RecipeTree>();
                 foreach (RecipeQuantity q in RecipeQuantities)
                 {
-                    RecipeTree tree = q.Recipe.GetRecipeNodes(q.Quantity);
+                    RecipeTree tree = _recipeService.GetRecipeTree(q.Recipe, q.Quantity);
                     RecipeTree oldTree = RecipeTotals.Where(x => x.Id == tree.Id).FirstOrDefault();
                     if (oldTree != null)
                     {
@@ -429,7 +439,7 @@ namespace CraftingCalculator.ViewModel
         {
             if (filter != null)
             {
-                RecipesList = new ObservableCollection<Recipe>(RecipeService.GetRecipesByFilter(filter));
+                RecipesList = new ObservableCollection<Recipe>(_recipeService.GetRecipesByFilterAsync(filter).GetAwaiter().GetResult());
                 RaiseChanged();
             }
         }
