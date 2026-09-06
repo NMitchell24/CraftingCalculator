@@ -147,36 +147,37 @@ html, body {
 
 /* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
    regardless of the icon button's own visual (smaller) padding. */
-.batch-row .mud-icon-button,
-.favorites-row .mud-icon-button,
+.list-row .mud-icon-button,
 .materials-list-header .mud-icon-button,
 .steps-tree-header .mud-button-root {
     min-width: 44px;
     min-height: 44px;
 }
 
-.batch-row {
+/* One shared row shape for every name-plus-actions list in the app: the Calculate batch, Favorites,
+   the Library list, and the recipe editor's components. Same dedupe as .list-row-name. */
+.list-row {
     display: flex;
     align-items: center;
     gap: 4px;
     width: 100%;
 }
 
-.batch-row-info {
+.list-row-info {
     flex: 1 1 auto;
     min-width: 0;
 }
 
-.batch-row-stepper {
+.list-row-stepper {
     display: flex;
     align-items: center;
 }
 
-.batch-qty-field {
+.list-row-qty-field {
     width: 56px;
 }
 
-.batch-qty-field input {
+.list-row-qty-field input {
     text-align: center;
 }
 
@@ -232,25 +233,61 @@ html, body {
     }
 }
 
-/* Favorites screen (Components/Pages/Favorites.razor) */
+/* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor) screens */
 
 /* Clears the floating .page-fab (56px tall, sitting 64px above the bottom nav) so the last row is
    never trapped under it. The bottom nav's own clearance already comes from
    .page-content-with-bottom-nav (MainLayout). */
-.favorites-page {
+.favorites-page,
+.library-page {
     padding-bottom: 120px;
 }
 
-.favorites-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.library-toggle {
     width: 100%;
+    margin-bottom: 8px;
 }
 
-.favorites-row-info {
-    flex: 1 1 auto;
-    min-width: 0;
+/* Library editor (Components/Pages/LibraryEditor.razor + Components/Controls/*Editor.razor) */
+
+/* Capped rather than full-bleed: a single column of form fields stretched across a tablet or desktop
+   window is far harder to scan than the same column at phone width. */
+.library-editor {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: 120px;
+}
+
+.recipe-add-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recipe-add-qty {
+    width: 96px;
+}
+
+/* Thumb-reachable Cancel/Save, pinned the same way .totals-bar is - above the bottom nav on xs and
+   clear of the gesture-nav area everywhere. */
+.editor-action-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1250;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px 16px;
+    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+@media (max-width: 599.98px) {
+    .editor-action-bar {
+        bottom: calc(72px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        padding-bottom: 8px;
+    }
 }
 
 .picker-chip-row {

@@ -17,8 +17,8 @@
             @foreach (RecipeFavorite favorite in _favorites)
             {
                 <MudListItem T="RecipeFavorite" OnClick="@(() => LoadAsync(favorite))">
-                    <div class="favorites-row">
-                        <div class="favorites-row-info">
+                    <div class="list-row">
+                        <div class="list-row-info">
                             <MudText Class="list-row-name">@favorite.Name</MudText>
                             <MudText Typo="Typo.caption" Class="list-row-name">
                                 @favorite.RecipeCount recipe@(favorite.RecipeCount == 1 ? "" : "s")

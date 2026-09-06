@@ -1,0 +1,74 @@
+<MudTextField @bind-Value="Model.Name" @bind-Value:after="NotifyChangedAsync" Label="Name" Variant="Variant.Outlined"
+              FullWidth="true" Required="true" RequiredError="Name is required" Immediate="true" Class="mb-4" />
+
+<MudNumericField @bind-Value="Model.Value" @bind-Value:after="NotifyChangedAsync" Label="Value per item"
+                 Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" />
+
+@* Bound on the category's id rather than the RecipeFilter itself: the model has no value equality and
+   Model.Filter comes from a different load than _filters, so MudSelect's reference comparison would
+   never preselect the recipe's current category. *@
+<MudSelect T="int?" Value="_filterId" ValueChanged="OnFilterChangedAsync" Label="Category" Variant="Variant.Outlined"
+           FullWidth="true" Clearable="true" Class="mb-4">
+    @foreach (RecipeFilter filter in _filters)
+    {
+        <MudSelectItem T="int?" Value="@filter.Id">@filter.Name</MudSelectItem>
+    }
+</MudSelect>
+
+<MudTextField @bind-Value="Model.Description" @bind-Value:after="NotifyChangedAsync" Label="Description"
+              Variant="Variant.Outlined" FullWidth="true" Lines="3" Sizing="InputSizing.Auto" MaxLines="10" Class="mb-4" />
+
+<MudExpansionPanels Elevation="1" Class="mb-2">
+    <MudExpansionPanel Text="Add component">
+        <MudToggleGroup T="DataType" Value="_componentType" ValueChanged="OnComponentTypeChanged"
+                        Delimiters="false" Class="mb-3">
+            <MudToggleItem Value="DataType.Ingredient">Ingredient</MudToggleItem>
+            <MudToggleItem Value="DataType.Recipe">Recipe</MudToggleItem>
+        </MudToggleGroup>
+
+        <MudAutocomplete T="IBaseDataRecord" @bind-Value="_selectedComponent" SearchFunc="SearchAsync"
+                         ToStringFunc="@(record => record?.Name ?? "")" Label="@($"{_componentType.GetDescription()} to add")"
+                         Variant="Variant.Outlined" FullWidth="true" Clearable="true" ResetValueOnEmptyText="true"
+                         Class="mb-3" />
+
+        <div class="recipe-add-row">
+            <MudNumericField T="long" @bind-Value="_quantityToAdd" Label="Quantity" Min="1"
+                             Variant="Variant.Outlined" Class="recipe-add-qty" />
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                       Disabled="@(_selectedComponent is null)" OnClick="AddComponentAsync">Add</MudButton>
+        </div>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@if (Components.Count == 0)
+{
+    <div class="pane-empty-state">
+        <MudText Typo="Typo.body1">No components yet</MudText>
+        <MudText Typo="Typo.caption">Open "Add component" above to add an ingredient or another recipe.</MudText>
+    </div>
+}
+else
+{
+    <MudList T="IBaseQuantityRecord">
+        @foreach (IBaseQuantityRecord component in Components)
+        {
+            <MudListItem T="IBaseQuantityRecord">
+                <div class="list-row">
+                    <div class="list-row-info">
+                        <MudText Class="list-row-name">@component.Name</MudText>
+                        <MudText Typo="Typo.caption" Class="list-row-name">@component.Type.GetDescription()</MudText>
+                    </div>
+                    <div class="list-row-stepper">
+                        <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                       OnClick="@(() => SetQuantityAsync(component, component.Quantity - 1))" />
+                        <MudNumericField T="long" Value="component.Quantity" ValueChanged="@(v => SetQuantityAsync(component, v))"
+                                         Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                       OnClick="@(() => SetQuantityAsync(component, component.Quantity + 1))" />
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(component))" />
+                </div>
+            </MudListItem>
+        }
+    </MudList>
+}

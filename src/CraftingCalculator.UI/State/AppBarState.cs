@@ -17,20 +17,26 @@ public sealed class AppBarState
     public string Title { get; private set; } = DefaultTitle;
     public IReadOnlyList<AppBarMenuItem> MenuItems { get; private set; } = [];
 
+    /// <summary>
+    /// Where the app bar's back arrow navigates, or null on a page that should not show one.
+    /// </summary>
+    public string? BackHref { get; private set; }
+
     public event Action? Changed;
 
-    /// <summary>Puts <paramref name="owner"/>'s title and menu on the shared app bar.</summary>
-    public void Configure(object owner, string title, IReadOnlyList<AppBarMenuItem>? menuItems = null)
+    /// <summary>Puts <paramref name="owner"/>'s title, menu, and back arrow on the shared app bar.</summary>
+    public void Configure(object owner, string title, IReadOnlyList<AppBarMenuItem>? menuItems = null, string? backHref = null)
     {
         _owner = owner;
         Title = title;
         MenuItems = menuItems ?? [];
+        BackHref = backHref;
         Changed?.Invoke();
     }
 
     /// <summary>
-    /// Restores the default title and drops the menu, unless another page has taken the bar over in
-    /// the meantime.
+    /// Restores the default title and drops the menu and back arrow, unless another page has taken
+    /// the bar over in the meantime.
     /// </summary>
     public void Reset(object owner)
     {
@@ -44,6 +50,7 @@ public sealed class AppBarState
         _owner = null;
         Title = DefaultTitle;
         MenuItems = [];
+        BackHref = null;
         Changed?.Invoke();
     }
 }

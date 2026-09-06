@@ -9,7 +9,7 @@ namespace CraftingCalculator.Domain.Enums
     {
         [Description("Ingredient")]
         Ingredient = 0,
-        [Description("Recipe Category")]
+        [Description("Category")]
         RecipeFilter = 1,
         [Description("Recipe")]
         Recipe = 2

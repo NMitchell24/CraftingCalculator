@@ -1,0 +1,16 @@
+<MudDialog>
+    <DialogContent>
+        <MudText>@Message</MudText>
+        @* Immediate for the same reason as TextInputDialog: the confirm button below is disabled off
+           this field's value, and without it the value only reaches _value on blur - making the first
+           tap on the button a no-op that merely enables it. *@
+        <MudTextField @bind-Value="_value" Label="@($"Type {ConfirmWord} to confirm")" Variant="Variant.Outlined"
+                      FullWidth="true" Immediate="true" Class="mt-4" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" Disabled="@(_value != ConfirmWord)" OnClick="Confirm">
+            @ConfirmText
+        </MudButton>
+    </DialogActions>
+</MudDialog>

@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
+        services.AddScoped<ILibraryService, LibraryService>();
 
         return services;
     }

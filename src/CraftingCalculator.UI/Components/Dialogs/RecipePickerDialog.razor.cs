@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -26,10 +27,12 @@ public partial class RecipePickerDialog : ComponentBase
     {
         _recipes = await RecipeService.GetAllRecipesAsync();
 
-        // The seeded "All" row (RecipeFilter.ALL) is the sentinel this dialog already renders as its
-        // own first chip, not a real category - excluded here the same way WPF dropped it positionally
-        // from ConfigureRecipesViewModel's filter list.
-        _filters = [.. (await RecipeFilterService.GetRecipeFiltersAsync()).Where(f => f.Name != RecipeFilter.ALL)];
+        // The seeded "All" row is the sentinel this dialog already renders as its own first chip, not
+        // a real category - excluded here the same way WPF dropped it positionally from
+        // ConfigureRecipesViewModel's filter list. Matched on id rather than name so a user category
+        // of their own called "All" (which the Library screen lets them create) still shows up.
+        _filters = [.. (await RecipeFilterService.GetRecipeFiltersAsync())
+            .Where(f => f.Id != DatabaseSeedConstants.AllFilterId)];
     }
 
     private void OnFilterChanged(string filterName) => _selectedFilterName = filterName;
