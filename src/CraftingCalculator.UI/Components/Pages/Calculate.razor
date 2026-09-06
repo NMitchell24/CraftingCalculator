@@ -1,18 +1,31 @@
 @page "/"
+@implements IDisposable
 
-<PageTitle>Calculate</PageTitle>
+<div class="calculate-page">
+    <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="calculate-toggle" Delimiters="false">
+        <MudToggleItem Value="CalculateView.Batch">Batch (@State.RecipeQuantities.Count)</MudToggleItem>
+        <MudToggleItem Value="CalculateView.Materials">Materials (@State.TotalIngredients.Count)</MudToggleItem>
+        <MudToggleItem Value="CalculateView.Steps">Steps</MudToggleItem>
+    </MudToggleGroup>
 
-<MudContainer MaxWidth="MaxWidth.Small">
-    <MudText Typo="Typo.h5" GutterBottom="true">Calculate</MudText>
+    @* All three panes stay mounted at every breakpoint - a CSS media query (see app.css) picks between
+       showing only the active one (phones, and landscape phones/small tablets - too little room to
+       combine all three) or all of them side by side (large tablets and up only). Keeping them mounted
+       either way means BatchList/MaterialsList/StepsTree each subscribe to CalculatorState.Changed once,
+       not on every tab switch or every breakpoint change. *@
+    <div class="calculate-content">
+        <div class="calculate-pane @(_view == CalculateView.Batch ? "calculate-pane-active" : "")">
+            <BatchList />
+        </div>
+        <div class="calculate-pane @(_view == CalculateView.Materials ? "calculate-pane-active" : "")">
+            <MaterialsList />
+        </div>
+        <div class="calculate-pane @(_view == CalculateView.Steps ? "calculate-pane-active" : "")">
+            <StepsTree />
+        </div>
+    </div>
+</div>
 
-    @if (_loading)
-    {
-        <MudText>Loading…</MudText>
-    }
-    else
-    {
-        <MudText>Filters: @string.Join(", ", _filterNames)</MudText>
-        <MudText>Ingredients in library: @_ingredientCount</MudText>
-        <MudText>Recipes in library: @_recipeCount</MudText>
-    }
-</MudContainer>
+<TotalsBar />
+
+<MudFab Class="calculate-fab" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Label="Add recipes" OnClick="OpenPickerAsync" />

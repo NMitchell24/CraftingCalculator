@@ -20,4 +20,6 @@ public class RecipeService(IRecipeDAO dao) : IRecipeService
     public IngredientMap GetFlattenedIngredients(Recipe recipe) => RecipeProcessor.Flatten(recipe);
 
     public RecipeTree GetRecipeTree(Recipe recipe, long quantity) => RecipeProcessor.BuildTree(recipe, quantity);
+
+    public RecipeNode GetRecipeNode(Recipe recipe, long quantity) => RecipeProcessor.BuildNode(recipe, quantity);
 }

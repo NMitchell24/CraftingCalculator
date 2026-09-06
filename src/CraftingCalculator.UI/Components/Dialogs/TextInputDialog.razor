@@ -1,0 +1,9 @@
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_value" Label="@Label" Variant="Variant.Outlined" FullWidth="true" AutoFocus="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@string.IsNullOrWhiteSpace(_value)" OnClick="Submit">OK</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,29 +1,115 @@
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.Components.Dialogs;
+using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
 
-/// <summary>
-/// Stub for the future Calculate screen (PR 6). Its job right now is to prove the full stack -
-/// Razor page -&gt; Application service -&gt; Infrastructure DAO -&gt; SQLite - actually works end to
-/// end before any real screen is built on top of the shell.
-/// </summary>
-public partial class Calculate : ComponentBase
+public partial class Calculate : ComponentBase, IDisposable
 {
-    [Inject] private IRecipeFilterService RecipeFilterService { get; set; } = null!;
-    [Inject] private IIngredientService IngredientService { get; set; } = null!;
-    [Inject] private IRecipeService RecipeService { get; set; } = null!;
-
-    private bool _loading = true;
-    private List<string> _filterNames = [];
-    private int _ingredientCount;
-    private int _recipeCount;
-
-    protected override async Task OnInitializedAsync()
+    private enum CalculateView
     {
-        _filterNames = [.. (await RecipeFilterService.GetRecipeFiltersAsync()).Select(f => f.Name ?? "")];
-        _ingredientCount = (await IngredientService.GetAllIngredientsAsync()).Count;
-        _recipeCount = (await RecipeService.GetAllRecipesAsync()).Count;
-        _loading = false;
+        Batch,
+        Materials,
+        Steps
+    }
+
+    [CascadingParameter] private Breakpoint Breakpoint { get; set; }
+
+    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IClipboardService ClipboardService { get; set; } = null!;
+
+    private CalculateView _view = CalculateView.Batch;
+
+    // Only drives the Add Recipes dialog's FullScreen vs. side-drawer choice now - the pane layout
+    // itself (single active pane vs. all three side by side) is a pure CSS media query (app.css),
+    // since it needs both width and height to tell a landscape phone apart from a real tablet.
+    private bool IsXs => Breakpoint == Breakpoint.Xs;
+
+    protected override void OnInitialized()
+    {
+        State.Changed += StateHasChanged;
+        AppBarState.Configure("Calculate",
+        [
+            new AppBarMenuItem("Clear batch", Icons.Material.Filled.ClearAll, ClearBatchAsync),
+            new AppBarMenuItem("Copy materials", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
+            new AppBarMenuItem("Save as favorite", Icons.Material.Filled.Star, SaveAsFavoriteAsync)
+        ]);
+    }
+
+    private void OnViewChanged(CalculateView view) => _view = view;
+
+    private async Task OpenPickerAsync()
+    {
+        DialogOptions options = new()
+        {
+            FullScreen = IsXs,
+            MaxWidth = MaxWidth.Small,
+            CloseOnEscapeKey = true
+        };
+
+        IDialogReference dialogRef = await DialogService.ShowAsync<RecipePickerDialog>("Add Recipes", options);
+        DialogResult? result = await dialogRef.Result;
+
+        if (result is { Canceled: false } && result.Data is IReadOnlyCollection<Recipe> selected)
+        {
+            State.AddRecipes(selected);
+        }
+    }
+
+    private Task ClearBatchAsync()
+    {
+        State.Clear();
+        return Task.CompletedTask;
+    }
+
+    private async Task CopyMaterialsAsync()
+    {
+        string text = string.Join(Environment.NewLine, State.TotalIngredients.Select(i => i.DisplayName));
+        await ClipboardService.SetTextAsync(text);
+        Snackbar.Add("Copied materials to clipboard", Severity.Success);
+    }
+
+    private async Task SaveAsFavoriteAsync()
+    {
+        if (State.RecipeQuantities.Count == 0)
+        {
+            return;
+        }
+
+        DialogParameters parameters = new() { ["Label"] = "Favorite name" };
+        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Save as Favorite", parameters);
+        DialogResult? result = await dialogRef.Result;
+
+        if (result is null || result.Canceled || result.Data is not string name || string.IsNullOrWhiteSpace(name))
+        {
+            return;
+        }
+
+        if (await State.FavoriteExistsAsync(name))
+        {
+            bool? overwrite = await DialogService.ShowMessageBoxAsync(
+                "Overwrite?", $"A favorite named '{name}' already exists. Overwrite it?",
+                yesText: "Overwrite", cancelText: "Cancel");
+
+            if (overwrite != true)
+            {
+                return;
+            }
+        }
+
+        await State.SaveAsFavoriteAsync(name);
+        Snackbar.Add($"Saved '{name}'", Severity.Success);
+    }
+
+    public void Dispose()
+    {
+        State.Changed -= StateHasChanged;
+        AppBarState.Reset();
     }
 }

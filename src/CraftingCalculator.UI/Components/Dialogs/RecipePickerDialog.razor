@@ -1,0 +1,40 @@
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_search" Placeholder="Search recipes" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mb-2" />
+
+        <div class="picker-chip-row mb-2">
+            <MudChipSet T="string" SelectedValue="@_selectedFilterName" SelectedValueChanged="OnFilterChanged"
+                        SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
+                <MudChip Text="@RecipeFilter.ALL" Value="@RecipeFilter.ALL" />
+                @foreach (Domain.Models.RecipeFilter filter in _filters)
+                {
+                    <MudChip Text="@filter.Name" Value="@filter.Name" />
+                }
+            </MudChipSet>
+        </div>
+
+        @if (_filteredRecipes.Count == 0)
+        {
+            <MudText Class="pa-4" Align="Align.Center">No recipes match.</MudText>
+        }
+        else
+        {
+            <MudList T="Recipe" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
+                @foreach (Recipe recipe in _filteredRecipes)
+                {
+                    <MudListItem T="Recipe" Value="@recipe">
+                        <MudText>@recipe.Name</MudText>
+                        <MudText Typo="Typo.caption">@recipe.Filter?.Name</MudText>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@(_selected.Count == 0)" OnClick="Confirm">
+            Add @_selected.Count recipe@(_selected.Count == 1 ? "" : "s")
+        </MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,6 +1,7 @@
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Infrastructure;
 using CraftingCalculator.UI.Platform;
+using CraftingCalculator.UI.State;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -24,6 +25,9 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IClipboardService, ClipboardService>();
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
+
+        builder.Services.AddScoped<CalculatorState>();
+        builder.Services.AddScoped<AppBarState>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

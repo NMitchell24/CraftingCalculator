@@ -70,6 +70,251 @@ html, body {
     text-align: center;
 }
 
+/* Calculate screen (Components/Pages/Calculate.razor + Components/Controls/*) */
+
+.calculate-page {
+    padding-bottom: calc(56px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+@media (max-width: 599.98px) {
+    .calculate-page {
+        padding-bottom: calc(72px + 56px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    }
+}
+
+.calculate-toggle {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+/* Default (small/cramped): one pane at a time, picked by the toggle group. This covers portrait
+   phones AND landscape phones/small tablets - a width-only breakpoint (e.g. MudBlazor's Md) can't
+   tell those apart from a real tablet, since a landscape phone is wide but short, and the side rail
+   (MainLayout, shown at every non-xs breakpoint) eats into that width further. All three panes stay
+   mounted (so BatchList/MaterialsList/StepsTree don't re-subscribe to CalculatorState on every tab
+   switch) - only which one is visible changes. */
+.calculate-content {
+    display: block;
+}
+
+.calculate-pane {
+    display: none;
+}
+
+.calculate-pane-active {
+    display: block;
+}
+
+/* Large tablets and up only - both dimensions ample, which a landscape phone never satisfies at the
+   same time as a genuine tablet does. Show every pane side by side and drop the now-redundant toggle. */
+@media (min-width: 960px) and (min-height: 600px) {
+    .calculate-toggle {
+        display: none;
+    }
+
+    .calculate-content {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .calculate-pane {
+        display: block !important;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+.pane-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 32px 16px;
+    text-align: center;
+    opacity: 0.7;
+}
+
+/* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
+   regardless of the icon button's own visual (smaller) padding. */
+.batch-row .mud-icon-button,
+.materials-list-header .mud-icon-button,
+.steps-tree-header .mud-button-root {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.batch-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.batch-row-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Without this, a name too long for the available width overflows its container (flexbox doesn't
+   clip by default) and visually bleeds onto the stepper/delete buttons that follow it in the row. */
+.batch-row-name {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.batch-row-stepper {
+    display: flex;
+    align-items: center;
+}
+
+.batch-qty-field {
+    width: 56px;
+}
+
+.batch-qty-field input {
+    text-align: center;
+}
+
+.materials-list-header,
+.steps-tree-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+/* Fixed-width qty/cost columns so they line up across rows regardless of how long each ingredient's
+   name is - the flex+space-between this replaced positioned each column based on that row's own
+   content width instead of a shared column width. */
+.materials-row {
+    display: grid;
+    grid-template-columns: 1fr 3rem 4.5rem;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.materials-row-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.materials-row-cost {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+}
+
+.materials-row-cost-label {
+    opacity: 0.7;
+}
+
+/* Tree on a narrow screen: cap MudBlazor's fixed 17px-per-level indent (Styles/components/_treeview.scss)
+   and let long names wrap instead of truncating or forcing horizontal scroll of the whole page. */
+.steps-tree-view {
+    overflow-x: auto;
+}
+
+.steps-tree-view .mud-treeview-item-label {
+    white-space: normal;
+    word-break: break-word;
+}
+
+@media (max-width: 599.98px) {
+    .steps-tree-view .mud-treeview-group {
+        margin-left: 12px;
+    }
+}
+
+.picker-chip-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+    padding-bottom: 4px;
+}
+
+.totals-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom));
+    z-index: 1200;
+    padding: 8px 16px;
+}
+
+@media (max-width: 599.98px) {
+    .totals-bar {
+        bottom: calc(72px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    }
+}
+
+/* A FullScreen MudDialog (RecipePickerDialog on xs - Components/Dialogs/RecipePickerDialog.razor)
+   draws from y=0 same as the app bar, so its title needs the same safe-area clearance. A normal
+   (non-fullscreen) dialog is centered with margin and never reaches the real top of the screen, so
+   this is scoped to .mud-dialog-fullscreen only. */
+.mud-dialog-fullscreen .mud-dialog-title {
+    padding-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+.mud-dialog-fullscreen .mud-dialog-title .mud-button-close {
+    top: calc(8px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+/* Same reasoning as the title above, for the bottom action bar (Cancel/Confirm) - it otherwise sits
+   flush against the gesture nav bar's swipe area. */
+.mud-dialog-fullscreen .mud-dialog-actions {
+    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+.totals-bar-line {
+    display: flex;
+    justify-content: space-around;
+    font-variant-numeric: tabular-nums;
+}
+
+.totals-bar-label {
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.totals-bar-line-compact {
+    display: none;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Short landscape phones: collapse the three-column totals line to one abbreviated line. */
+@media (max-height: 480px) {
+    .totals-bar-line-full {
+        display: none;
+    }
+
+    .totals-bar-line-compact {
+        display: flex;
+    }
+}
+
+.calculate-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(64px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    z-index: 1250;
+}
+
+@media (max-width: 599.98px) {
+    .calculate-fab {
+        bottom: calc(72px + 64px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    }
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

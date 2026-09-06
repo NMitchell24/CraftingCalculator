@@ -1,0 +1,35 @@
+@implements IDisposable
+
+<div class="batch-list">
+    @if (State.RecipeQuantities.Count == 0)
+    {
+        <div class="pane-empty-state">
+            <MudText Typo="Typo.body1">No recipes yet</MudText>
+            <MudText Typo="Typo.caption">Tap "Add recipes" to get started.</MudText>
+        </div>
+    }
+    else
+    {
+        <MudList T="RecipeQuantity">
+            @foreach (RecipeQuantity rq in State.RecipeQuantities)
+            {
+                <MudListItem T="RecipeQuantity">
+                    <div class="batch-row">
+                        <div class="batch-row-info">
+                            <MudText Class="batch-row-name">@rq.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="batch-row-name">@rq.FilterType</MudText>
+                        </div>
+                        <div class="batch-row-stepper">
+                            <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity - 1))" />
+                            <MudNumericField T="long" Value="rq.Quantity" ValueChanged="@(v => State.SetQuantity(rq, v))"
+                                             Min="0" DebounceInterval="300" HideSpinButtons="true" Class="batch-qty-field" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity + 1))" />
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="@(() => ShowInfoAsync(rq))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => State.Remove(rq))" />
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    }
+</div>

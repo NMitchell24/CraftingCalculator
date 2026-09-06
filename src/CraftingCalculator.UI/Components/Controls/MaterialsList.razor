@@ -1,0 +1,33 @@
+@implements IDisposable
+
+<div class="materials-list">
+    <div class="materials-list-header">
+        <MudText Typo="Typo.subtitle1">Materials</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Disabled="@(State.TotalIngredients.Count == 0)" OnClick="CopyAllAsync" />
+    </div>
+
+    @if (State.TotalIngredients.Count == 0)
+    {
+        <div class="pane-empty-state">
+            <MudText Typo="Typo.body1">No materials yet</MudText>
+        </div>
+    }
+    else
+    {
+        <MudList T="IngredientQuantity">
+            @foreach (IngredientQuantity iq in State.TotalIngredients)
+            {
+                <MudListItem T="IngredientQuantity">
+                    <div class="materials-row">
+                        <MudText Class="materials-row-name">@iq.Name</MudText>
+                        <MudText Class="materials-row-qty" Align="Align.Right">x@(iq.Quantity)</MudText>
+                        <div class="materials-row-cost">
+                            <MudText Typo="Typo.caption" Class="materials-row-cost-label">Cost</MudText>
+                            <MudText Align="Align.Right">@string.Format(FormatConstants.CurrencyFormat, iq.TotalCost)</MudText>
+                        </div>
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    }
+</div>
