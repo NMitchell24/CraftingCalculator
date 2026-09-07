@@ -33,10 +33,12 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     public long TotalComponentCount { get; private set; }
 
     /// <summary>
-    /// How many craft operations the breakdown implies - every blueprint in the tree, at every depth.
-    /// Component leaves are not steps: they are gathered, not crafted.
+    /// How many craft operations the breakdown implies: every blueprint in the tree, at every depth,
+    /// counted once per unit rather than once per row - four Frames that each need two Brackets are
+    /// eight Bracket crafts plus four Frame crafts. Component leaves are not steps: they are
+    /// gathered, not crafted.
     /// </summary>
-    public int CraftingStepCount { get; private set; }
+    public long CraftingStepCount { get; private set; }
 
     /// <summary>
     /// The favorite the current batch came from, or null when it was built by hand or cleared. Drives
@@ -155,8 +157,8 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         Changed?.Invoke();
     }
 
-    private static int CountBlueprints(IReadOnlyList<BlueprintNode> nodes) =>
-        nodes.Sum(node => (node.IsComponent ? 0 : 1) + CountBlueprints(node.Children));
+    private static long CountCrafts(IReadOnlyList<BlueprintNode> nodes) =>
+        nodes.Sum(node => (node.IsComponent ? 0 : node.Quantity) + CountCrafts(node.Children));
 
     private static void CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
     {
@@ -180,7 +182,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         // Computed here rather than as expression-bodied properties: both walk the whole batch, and the
         // summary card reads them on every render.
         TotalComponentCount = TotalComponents.Sum(i => i.Quantity);
-        CraftingStepCount = CountBlueprints(TreeRoots);
+        CraftingStepCount = CountCrafts(TreeRoots);
 
         Changed?.Invoke();
     }

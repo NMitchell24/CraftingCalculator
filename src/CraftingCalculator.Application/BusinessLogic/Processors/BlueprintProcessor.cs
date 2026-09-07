@@ -49,7 +49,9 @@ public static class BlueprintProcessor
 
         foreach (ComponentQuantity i in blueprint.Components.ComponentList)
         {
-            children.Add(new BlueprintNode(i.Name + " x" + (i.Quantity * quantity), i.Name, i.Tooltip, true, []));
+            long componentQuantity = i.Quantity * quantity;
+            children.Add(new BlueprintNode(
+                i.Name + " x" + componentQuantity, i.Name, i.Tooltip, true, componentQuantity, []));
         }
 
         foreach (BlueprintQuantity r in blueprint.ChildBlueprints.BlueprintList)
@@ -57,7 +59,8 @@ public static class BlueprintProcessor
             children.Add(BuildNode(r.Blueprint, r.Quantity * quantity, depth + 1));
         }
 
-        return new BlueprintNode(blueprint.Name + " x" + quantity, blueprint.Name, blueprint.Tooltip, false, children);
+        return new BlueprintNode(
+            blueprint.Name + " x" + quantity, blueprint.Name, blueprint.Tooltip, false, quantity, children);
     }
 
     private static void ThrowIfTooDeep(Blueprint blueprint, int depth)

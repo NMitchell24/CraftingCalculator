@@ -113,6 +113,25 @@ public class BlueprintProcessorTests
     }
 
     [Test]
+    public void BuildNode_CarriesTheEffectiveQuantityThroughEveryLevel()
+    {
+        Blueprint child = NewBlueprint("Bracket");
+        child.Components.Add(NewComponent("Screw"), 3);
+
+        Blueprint parent = NewBlueprint("Frame");
+        parent.ChildBlueprints.Add(child, 2);
+
+        // Four Frames, each needing two Brackets, each needing three Screws.
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 4);
+
+        tree.Quantity.Should().Be(4);
+        BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
+        childNode.Quantity.Should().Be(8);
+        BlueprintNode componentNode = childNode.Children.Should().ContainSingle().Subject;
+        componentNode.Quantity.Should().Be(24);
+    }
+
+    [Test]
     public void BuildNode_Cycle_ThrowsInsteadOfOverflowingTheStack()
     {
         Blueprint blueprint = NewBlueprint("Self Referencing");
