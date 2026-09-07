@@ -13,9 +13,9 @@ public static class LibraryPrompts
     /// <summary>Returns true only if the user confirmed the delete.</summary>
     public static async Task<bool> ConfirmDeleteAsync(IDialogService dialogs, IBaseDataRecord record)
     {
-        // Ports the warning from ConfigureRecipesViewModel.DeleteItem: a deleted record disappears
-        // from every recipe that used it, and a deleted recipe from every favorite as well.
-        string alsoFavorites = record.Type == DataType.Recipe ? "or blueprint favorites " : "";
+        // Ports the warning from ConfigureBlueprintsViewModel.DeleteItem: a deleted record disappears
+        // from every blueprint that used it, and a deleted blueprint from every favorite as well.
+        string alsoFavorites = record.Type == DataType.Blueprint ? "or blueprint favorites " : "";
 
         bool? confirmed = await dialogs.ShowMessageBoxAsync(
             $"Delete {record.Type.GetDescription()}?",

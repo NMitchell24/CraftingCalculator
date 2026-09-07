@@ -13,11 +13,11 @@
             case Component component:
                 <ComponentEditor @key="_record" Model="component" OnChanged="MarkDirty" />
                 break;
-            case RecipeFilter filter:
+            case BlueprintFilter filter:
                 <CategoryEditor @key="_record" Model="filter" OnChanged="MarkDirty" />
                 break;
-            case Recipe recipe:
-                <RecipeEditor @key="_record" Model="recipe" OnChanged="MarkDirty" />
+            case Blueprint blueprint:
+                <BlueprintEditor @key="_record" Model="blueprint" OnChanged="MarkDirty" />
                 break;
         }
     </div>

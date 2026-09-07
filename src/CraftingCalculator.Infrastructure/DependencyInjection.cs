@@ -30,9 +30,9 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IComponentDAO, ComponentDAO>();
-        services.AddScoped<IRecipeFilterDAO, RecipeFilterDAO>();
-        services.AddScoped<IRecipeDAO, RecipeDAO>();
-        services.AddScoped<IRecipeFavoritesDAO, RecipeFavoritesDAO>();
+        services.AddScoped<IBlueprintFilterDAO, BlueprintFilterDAO>();
+        services.AddScoped<IBlueprintDAO, BlueprintDAO>();
+        services.AddScoped<IBlueprintFavoritesDAO, BlueprintFavoritesDAO>();
         services.AddScoped<IDatabaseAdminDAO, DatabaseAdminDAO>();
     }
 }

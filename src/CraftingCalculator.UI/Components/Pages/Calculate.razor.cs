@@ -25,7 +25,7 @@ public partial class Calculate : ComponentBase, IDisposable
 
     private CalculateView _view = CalculateView.Materials;
 
-    // Only drives the Add Recipes dialog's FullScreen vs. side-drawer choice now - the pane layout
+    // Only drives the Add Blueprints dialog's FullScreen vs. side-drawer choice now - the pane layout
     // itself (single active pane vs. all three side by side) is a pure CSS media query (app.css),
     // since it needs both width and height to tell a landscape phone apart from a real tablet.
     private bool IsXs => Breakpoint == Breakpoint.Xs;
@@ -56,12 +56,12 @@ public partial class Calculate : ComponentBase, IDisposable
             CloseOnEscapeKey = true
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<RecipePickerDialog>("Select Blueprints to Craft", options);
+        IDialogReference dialogRef = await DialogService.ShowAsync<BlueprintPickerDialog>("Select Blueprints to Craft", options);
         DialogResult? result = await dialogRef.Result;
 
-        if (result is { Canceled: false } && result.Data is IReadOnlyCollection<Recipe> selected)
+        if (result is { Canceled: false } && result.Data is IReadOnlyCollection<Blueprint> selected)
         {
-            State.AddRecipes(selected);
+            State.AddBlueprints(selected);
         }
     }
 

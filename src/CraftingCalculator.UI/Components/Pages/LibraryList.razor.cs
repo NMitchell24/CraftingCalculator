@@ -51,7 +51,7 @@ public partial class LibraryList : ComponentBase, IDisposable
 
     private static string TitleFor(DataType type) => type switch
     {
-        DataType.Recipe => "Blueprints",
+        DataType.Blueprint => "Blueprints",
         DataType.Component => "Components",
         _ => "Categories"
     };
@@ -84,16 +84,16 @@ public partial class LibraryList : ComponentBase, IDisposable
     private static string CaptionFor(IBaseDataRecord record) => record switch
     {
         Component component => string.Format(FormatConstants.CurrencyFormat, component.Cost),
-        Recipe recipe => RecipeCaption(recipe),
+        Blueprint blueprint => BlueprintCaption(blueprint),
         _ => record.Description ?? ""
     };
 
-    private static string RecipeCaption(Recipe recipe)
+    private static string BlueprintCaption(Blueprint blueprint)
     {
-        int components = recipe.Components.ComponentList.Count + recipe.ChildRecipes.RecipeList.Count;
+        int components = blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count;
         string summary = $"{components} component{(components == 1 ? "" : "s")}";
 
-        return string.IsNullOrWhiteSpace(recipe.Filter?.Name) ? summary : $"{recipe.Filter.Name} · {summary}";
+        return string.IsNullOrWhiteSpace(blueprint.Filter?.Name) ? summary : $"{blueprint.Filter.Name} · {summary}";
     }
 
     public void Dispose() => AppBarState.Reset(this);

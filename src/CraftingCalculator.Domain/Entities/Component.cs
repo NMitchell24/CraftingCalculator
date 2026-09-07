@@ -7,5 +7,5 @@ public class Component
     public string Description { get; set; } = string.Empty;
     public double Cost { get; set; }
 
-    public List<RecipeComponent> RecipeComponents { get; set; } = [];
+    public List<BlueprintComponent> BlueprintComponents { get; set; } = [];
 }

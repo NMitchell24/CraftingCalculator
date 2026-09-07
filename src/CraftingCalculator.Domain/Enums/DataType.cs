@@ -12,9 +12,9 @@ public enum DataType
     [Description("Component")]
     Component = 0,
     [Description("Category")]
-    RecipeFilter = 1,
+    BlueprintFilter = 1,
     [Description("Blueprint")]
-    Recipe = 2
+    Blueprint = 2
 }
 
 public static class DataTypeExtensions
@@ -42,8 +42,8 @@ public static class DataTypeExtensions
         return value switch
         {
             DataType.Component => new Component(),
-            DataType.Recipe => new Recipe(),
-            DataType.RecipeFilter => new RecipeFilter(),
+            DataType.Blueprint => new Blueprint(),
+            DataType.BlueprintFilter => new BlueprintFilter(),
             _ => new Component(),
         };
     }

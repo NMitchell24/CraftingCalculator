@@ -183,7 +183,7 @@ html, body {
 }
 
 /* A row inside a card is already inset by the card's own padding, so MudListItem's default 16px sides
-   are paid twice - and the name column is what gives up the width, truncating recipe names that fit
+   are paid twice - and the name column is what gives up the width, truncating blueprint names that fit
    before these lists moved into cards. */
 .app-card .mud-list > .mud-list-item {
     padding-left: 8px;
@@ -282,7 +282,7 @@ html, body {
 }
 
 /* :not() above matters as much as the fill does - a muted text-secondary label left on the selected
-   pill reads as a disabled control, the same way PR 8b's dimmed Add Recipes button did. */
+   pill reads as a disabled control, the same way PR 8b's dimmed Add Blueprints button did. */
 
 /* The pill shares the surface token with the card it sits on, so the recessed track behind it is what
    makes it read as raised; the border and shadow keep its edges legible where pill and card meet. */
@@ -352,7 +352,7 @@ html, body {
 }
 
 /* Dimming goes on the text, not the container: opacity on the container composites the whole subtree
-   as one group, so a child cannot opt back out of it - which would leave BatchList's Add Recipes
+   as one group, so a child cannot opt back out of it - which would leave BatchList's Add Blueprints
    call-to-action reading as disabled. */
 .pane-empty-state .mud-typography {
     opacity: 0.7;
@@ -366,7 +366,7 @@ html, body {
 }
 
 /* One shared row shape for every name-plus-actions list in the app: the Calculate batch, Favorites,
-   the Library list, and the recipe editor's components. Same dedupe as .list-row-name. */
+   the Library list, and the blueprint editor's components. Same dedupe as .list-row-name. */
 .list-row {
     display: flex;
     align-items: center;
@@ -388,7 +388,7 @@ html, body {
 /* MudSelect and MudMenu build their dropdowns out of the same .mud-list / .mud-list-item markup, so the
    rule above turns each option into a spaced card floating inside the popover - a panel of cards where
    a plain option list belongs. Dialogs are deliberately not excluded here: their lists are real content
-   (the recipe picker's rows) and should keep the cards. */
+   (the blueprint picker's rows) and should keep the cards. */
 .mud-popover .mud-list > .mud-list-item {
     background-color: transparent;
     border: none;
@@ -548,13 +548,13 @@ html, body {
     padding-bottom: 72px;
 }
 
-.recipe-add-row {
+.blueprint-add-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.recipe-add-qty {
+.blueprint-add-qty {
     width: 96px;
 }
 
@@ -631,7 +631,7 @@ html, body {
     letter-spacing: 0.02em;
 }
 
-/* A FullScreen MudDialog (RecipePickerDialog on xs - Components/Dialogs/RecipePickerDialog.razor)
+/* A FullScreen MudDialog (BlueprintPickerDialog on xs - Components/Dialogs/BlueprintPickerDialog.razor)
    draws from y=0 same as the app bar, so its title needs the same safe-area clearance. A normal
    (non-fullscreen) dialog is centered with margin and never reaches the real top of the screen, so
    this is scoped to .mud-dialog-fullscreen only. */

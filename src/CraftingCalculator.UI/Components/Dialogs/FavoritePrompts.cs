@@ -15,7 +15,7 @@ public static class FavoritePrompts
     /// </summary>
     public static async Task<string?> SaveBatchAsync(IDialogService dialogs, ISnackbar snackbar, CalculatorState state)
     {
-        if (state.RecipeQuantities.Count == 0)
+        if (state.BlueprintQuantities.Count == 0)
         {
             return null;
         }
@@ -41,7 +41,7 @@ public static class FavoritePrompts
         }
 
         // Only the create-new path checks for a name collision - updating the loaded favorite is
-        // already an overwrite by definition. Mirrors RecipesViewModel.SaveRecipes.
+        // already an overwrite by definition. Mirrors BlueprintsViewModel.SaveBlueprints.
         if (name is null)
         {
             DialogParameters parameters = new() { ["Label"] = "Favorite name" };

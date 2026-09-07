@@ -1,20 +1,20 @@
 @implements IDisposable
 
 <div class="batch-list">
-    @if (State.RecipeQuantities.Count == 0)
+    @if (State.BlueprintQuantities.Count == 0)
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No blueprints selected yet</MudText>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
-                       OnClick="OnAddRecipes" Class="mt-2">Craft Blueprint</MudButton>
+                       OnClick="OnAddBlueprints" Class="mt-2">Craft Blueprint</MudButton>
         </div>
     }
     else
     {
-        <MudList T="RecipeQuantity">
-            @foreach (RecipeQuantity rq in State.RecipeQuantities)
+        <MudList T="BlueprintQuantity">
+            @foreach (BlueprintQuantity rq in State.BlueprintQuantities)
             {
-                <MudListItem T="RecipeQuantity">
+                <MudListItem T="BlueprintQuantity">
                     <div class="list-row">
                         <div class="list-row-info">
                             <MudText Class="list-row-name">@rq.Name</MudText>

@@ -5,26 +5,26 @@ using CraftingCalculator.Domain.Models;
 namespace CraftingCalculator.UI.State;
 
 /// <summary>
-/// The batch of recipes currently being priced out on the Calculate screen. Scoped and shared across
+/// The batch of blueprints currently being priced out on the Calculate screen. Scoped and shared across
 /// pages (Favorites/Library can load into or read from it) - the one exception to "state rides in the
 /// route", since this is genuine cross-page session state. Components subscribe to <see cref="Changed"/>
 /// in <c>OnInitialized</c> and unsubscribe in <c>Dispose</c>.
 /// </summary>
-public sealed class CalculatorState(IRecipeService recipeService, IFavoriteService favoriteService)
+public sealed class CalculatorState(IBlueprintService blueprintService, IFavoriteService favoriteService)
 {
-    private readonly RecipeMap _recipeMap = new();
+    private readonly BlueprintMap _blueprintMap = new();
 
-    // Keyed by each node's full path from the tree root (see RecipeTreeNode.Path), not by RecipeNode.Id
-    // alone - the same recipe/component can appear more than once in one tree (e.g. a recipe used both
-    // standalone in the batch and nested inside another batch recipe), and keying by Id alone made every
+    // Keyed by each node's full path from the tree root (see BlueprintTreeNode.Path), not by BlueprintNode.Id
+    // alone - the same blueprint/component can appear more than once in one tree (e.g. a blueprint used both
+    // standalone in the batch and nested inside another batch blueprint), and keying by Id alone made every
     // occurrence share one expansion state instead of each position remembering its own.
     private readonly HashSet<string> _expandedPaths = [];
 
     public event Action? Changed;
 
-    public IReadOnlyList<RecipeQuantity> RecipeQuantities => _recipeMap.RecipeList;
+    public IReadOnlyList<BlueprintQuantity> BlueprintQuantities => _blueprintMap.BlueprintList;
     public IReadOnlyList<ComponentQuantity> TotalComponents { get; private set; } = [];
-    public IReadOnlyList<RecipeNode> TreeRoots { get; private set; } = [];
+    public IReadOnlyList<BlueprintNode> TreeRoots { get; private set; } = [];
     public double TotalCost { get; private set; }
     public double TotalValue { get; private set; }
     public double Profit => TotalValue - TotalCost;
@@ -33,7 +33,7 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     public long TotalComponentCount { get; private set; }
 
     /// <summary>
-    /// How many craft operations the breakdown implies - every recipe in the tree, at every depth.
+    /// How many craft operations the breakdown implies - every blueprint in the tree, at every depth.
     /// Component leaves are not steps: they are gathered, not crafted.
     /// </summary>
     public int CraftingStepCount { get; private set; }
@@ -44,22 +44,22 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     /// </summary>
     public string? LoadedFavoriteName { get; private set; }
 
-    public void AddRecipes(IEnumerable<Recipe> recipes)
+    public void AddBlueprints(IEnumerable<Blueprint> blueprints)
     {
-        foreach (Recipe recipe in recipes)
+        foreach (Blueprint blueprint in blueprints)
         {
-            _recipeMap.Add(recipe, 1);
+            _blueprintMap.Add(blueprint, 1);
         }
 
         Recalculate();
     }
 
-    /// <summary>Setting a quantity of 0 or less removes the recipe from the batch entirely.</summary>
-    public void SetQuantity(RecipeQuantity target, long quantity)
+    /// <summary>Setting a quantity of 0 or less removes the blueprint from the batch entirely.</summary>
+    public void SetQuantity(BlueprintQuantity target, long quantity)
     {
         if (quantity <= 0)
         {
-            _recipeMap.RemoveAll(target.Recipe);
+            _blueprintMap.RemoveAll(target.Blueprint);
         }
         else
         {
@@ -69,26 +69,26 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
         Recalculate();
     }
 
-    public void Remove(RecipeQuantity target)
+    public void Remove(BlueprintQuantity target)
     {
-        _recipeMap.RemoveAll(target.Recipe);
+        _blueprintMap.RemoveAll(target.Blueprint);
         Recalculate();
     }
 
     public void Clear()
     {
-        _recipeMap.Reset();
+        _blueprintMap.Reset();
         LoadedFavoriteName = null;
         Recalculate();
     }
 
-    public async Task LoadFavoriteAsync(RecipeFavorite favorite)
+    public async Task LoadFavoriteAsync(BlueprintFavorite favorite)
     {
-        _recipeMap.Reset();
+        _blueprintMap.Reset();
 
-        foreach (RecipeQuantity quantity in await favoriteService.GetRecipeQuantitiesForFavoriteAsync(favorite))
+        foreach (BlueprintQuantity quantity in await favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite))
         {
-            _recipeMap.Add(quantity.Recipe, quantity.Quantity);
+            _blueprintMap.Add(quantity.Blueprint, quantity.Quantity);
         }
 
         LoadedFavoriteName = favorite.Name;
@@ -99,7 +99,7 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
 
     public async Task SaveAsFavoriteAsync(string name)
     {
-        await favoriteService.SaveFavoriteAsync(new RecipeFavorite { Name = name }, [.. _recipeMap.RecipeList]);
+        await favoriteService.SaveFavoriteAsync(new BlueprintFavorite { Name = name }, [.. _blueprintMap.BlueprintList]);
         LoadedFavoriteName = name;
     }
 
@@ -151,12 +151,12 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
         Changed?.Invoke();
     }
 
-    private static int CountRecipes(IReadOnlyList<RecipeNode> nodes) =>
-        nodes.Sum(node => (node.IsComponent ? 0 : 1) + CountRecipes(node.Children));
+    private static int CountBlueprints(IReadOnlyList<BlueprintNode> nodes) =>
+        nodes.Sum(node => (node.IsComponent ? 0 : 1) + CountBlueprints(node.Children));
 
-    private static void CollectPaths(IReadOnlyList<RecipeNode> nodes, string parentPath, HashSet<string> into)
+    private static void CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
     {
-        foreach (RecipeNode node in nodes)
+        foreach (BlueprintNode node in nodes)
         {
             string path = $"{parentPath}/{node.Id ?? node.Name}";
             into.Add(path);
@@ -166,17 +166,17 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
 
     private void Recalculate()
     {
-        (double totalCost, double totalValue, ComponentMap materials) = BatchProcessor.CalculateTotals(_recipeMap.RecipeList);
+        (double totalCost, double totalValue, ComponentMap materials) = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList);
 
         TotalCost = totalCost;
         TotalValue = totalValue;
         TotalComponents = [.. materials.ComponentList.OrderBy(i => i.Name)];
-        TreeRoots = [.. _recipeMap.RecipeList.Select(rq => recipeService.GetRecipeNode(rq.Recipe, rq.Quantity))];
+        TreeRoots = [.. _blueprintMap.BlueprintList.Select(rq => blueprintService.GetBlueprintNode(rq.Blueprint, rq.Quantity))];
 
         // Computed here rather than as expression-bodied properties: both walk the whole batch, and the
         // summary card reads them on every render.
         TotalComponentCount = TotalComponents.Sum(i => i.Quantity);
-        CraftingStepCount = CountRecipes(TreeRoots);
+        CraftingStepCount = CountBlueprints(TreeRoots);
 
         Changed?.Invoke();
     }

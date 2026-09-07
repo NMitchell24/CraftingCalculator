@@ -3,7 +3,7 @@ using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Entities;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using RecipeFilterModel = CraftingCalculator.Domain.Models.RecipeFilter;
+using BlueprintFilterModel = CraftingCalculator.Domain.Models.BlueprintFilter;
 
 namespace CraftingCalculator.Infrastructure.UnitTests;
 
@@ -27,13 +27,13 @@ public class MigrationTests
 
             await using (CraftingDataContext context = new(options))
             {
-                List<RecipeFilter> filters = await context.RecipeFilters.ToListAsync();
+                List<BlueprintFilter> filters = await context.BlueprintFilters.ToListAsync();
                 filters.Should().ContainSingle();
                 filters[0].Id.Should().Be(DatabaseSeedConstants.AllFilterId);
-                filters[0].Name.Should().Be(RecipeFilterModel.ALL);
+                filters[0].Name.Should().Be(BlueprintFilterModel.ALL);
 
                 (await context.Components.CountAsync()).Should().Be(0);
-                (await context.Recipes.CountAsync()).Should().Be(0);
+                (await context.Blueprints.CountAsync()).Should().Be(0);
                 (await context.Favorites.CountAsync()).Should().Be(0);
             }
         }

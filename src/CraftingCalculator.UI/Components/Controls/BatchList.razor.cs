@@ -7,8 +7,8 @@ namespace CraftingCalculator.UI.Components.Controls;
 
 public partial class BatchList : ComponentBase, IDisposable
 {
-    /// <summary>Invoked by the empty state's Add Recipes button; opens the owner's recipe picker.</summary>
-    [Parameter] public EventCallback OnAddRecipes { get; set; }
+    /// <summary>Invoked by the empty state's Add Blueprints button; opens the owner's blueprint picker.</summary>
+    [Parameter] public EventCallback OnAddBlueprints { get; set; }
 
     [Inject] private CalculatorState State { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -18,7 +18,7 @@ public partial class BatchList : ComponentBase, IDisposable
         State.Changed += StateHasChanged;
     }
 
-    private Task ShowInfoAsync(RecipeQuantity rq) =>
+    private Task ShowInfoAsync(BlueprintQuantity rq) =>
         DialogService.ShowMessageBoxAsync(rq.Name, rq.Tooltip);
 
     public void Dispose()

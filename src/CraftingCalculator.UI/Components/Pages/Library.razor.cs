@@ -40,15 +40,15 @@ public partial class Library : ComponentBase, IDisposable
         await ReloadAsync();
     }
 
-    // Ordered the way the records have to be created: a recipe needs components, and an component is
+    // Ordered the way the records have to be created: a blueprint needs components, and an component is
     // filed under a category, so the landing page reads top to bottom as the path a new user takes.
     // Both noun forms are spelled out rather than derived from the heading: "Categories" does not
     // singularise by trimming an s, and it does not pluralise by adding one either.
     private static readonly (DataType Type, string Title, string Singular, string Plural)[] SectionSpecs =
     [
-        (DataType.RecipeFilter, "Categories", "category", "categories"),
+        (DataType.BlueprintFilter, "Categories", "category", "categories"),
         (DataType.Component, "Components", "component", "components"),
-        (DataType.Recipe, "Blueprints", "blueprint", "blueprints")
+        (DataType.Blueprint, "Blueprints", "blueprint", "blueprints")
     ];
 
     // Counting means loading each type in full, since ILibraryService exposes no count. That is the same
@@ -94,8 +94,8 @@ public partial class Library : ComponentBase, IDisposable
         {
             await DatabaseAdminService.DeleteAllDataAsync();
 
-            // The batch on the Calculate screen holds Recipe models that no longer exist in the
-            // database - left alone it would keep pricing out deleted recipes.
+            // The batch on the Calculate screen holds Blueprint models that no longer exist in the
+            // database - left alone it would keep pricing out deleted blueprints.
             State.Clear();
 
             await ReloadAsync();

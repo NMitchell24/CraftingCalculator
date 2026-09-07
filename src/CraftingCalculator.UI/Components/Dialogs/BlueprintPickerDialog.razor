@@ -1,0 +1,40 @@
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_search" Placeholder="Search blueprints" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mb-2" />
+
+        <div class="picker-chip-row mb-2">
+            <MudChipSet T="string" SelectedValue="@_selectedFilterName" SelectedValueChanged="OnFilterChanged"
+                        SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
+                <MudChip Text="@BlueprintFilter.ALL" Value="@BlueprintFilter.ALL" />
+                @foreach (Domain.Models.BlueprintFilter filter in _filters)
+                {
+                    <MudChip Text="@filter.Name" Value="@filter.Name" />
+                }
+            </MudChipSet>
+        </div>
+
+        @if (_filteredBlueprints.Count == 0)
+        {
+            <MudText Class="pa-4" Align="Align.Center">No blueprints match.</MudText>
+        }
+        else
+        {
+            <MudList T="Blueprint" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
+                @foreach (Blueprint blueprint in _filteredBlueprints)
+                {
+                    <MudListItem T="Blueprint" Value="@blueprint">
+                        <MudText>@blueprint.Name</MudText>
+                        <MudText Typo="Typo.caption">@blueprint.Filter?.Name</MudText>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@(_selected.Count == 0)" OnClick="Confirm">
+            Craft @_selected.Count blueprint@(_selected.Count == 1 ? "" : "s")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
