@@ -40,7 +40,7 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
 - **Layered call flow:** Razor page (`@inject IXxxService`) → Service (`Application/Common/Services/Impl`)
   → DAO (`Infrastructure/DAO/Impl`) → `CraftingDataContext`. Services orchestrate; DAOs do data access
   only; pure transformation logic goes in `Application/BusinessLogic/Processors` (e.g.
-  `IngredientProcessor`, static methods).
+  `ComponentProcessor`, static methods).
 - **DI registration is manual** and split:
   - Services: `src/CraftingCalculator.Application/DependencyInjection.cs` → `AddApplicationServices()`
     (all `AddScoped`).
@@ -51,21 +51,21 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
 - **DbContext access:** DAOs inject `IDbContextFactory<CraftingDataContext>` and use
   `await using var context = await contextFactory.CreateDbContextAsync();` per operation (short-lived
   contexts — MAUI/Blazor pattern), primary-constructor style
-  (`class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory)`).
+  (`class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)`).
   **Never register the `DbContext` itself** — only `AddPooledDbContextFactory<CraftingDataContext>`.
   `BlazorWebView` creates exactly one `IServiceScope` for the WebView's whole lifetime, so a `Scoped`
   `DbContext` would live for the entire session (unbounded change tracker, stale first-level cache,
   `InvalidOperationException` on overlapping async handlers).
 - **Naming:** interfaces `IXxxService` / `IXxxDAO`; impls in `Impl/` folders. Models in
   `Domain/Models`, entities in `Domain/Entities`, magic strings/enums in `Domain/Constants` and
-  `Domain/Enums` (e.g. `RecipeFilter.ALL`, the currency format string).
-- **Domain models vs. EF entities share names** (`Recipe`, `Ingredient`, `RecipeFilter`) but live in
+  `Domain/Enums` (e.g. `Category.ALL`, the currency format string).
+- **Domain models vs. EF entities share names** (`Blueprint`, `Component`, `Category`) but live in
   different namespaces — `CraftingCalculator.Domain.Entities` vs. `CraftingCalculator.Domain.Models`.
   Alias at the few call sites (DAO impls) that need both in one file.
 - **Read queries use `AsNoTracking()`.** Tracking is confined to the save path inside one
   factory-created context.
-- **State a destination page needs rides in the route** (`/library/{type}/{id}`), not a shared mutable
-  holder. The one exception is the working batch on the Calculate screen, which is genuine cross-page
+- **State a destination page needs rides in the route** (`/dataset/{type}/{id}`), not a shared mutable
+  holder. The one exception is the working batch on the Craft screen, which is genuine cross-page
   session state (`CalculatorState`, scoped, `UI/State`) — components subscribe to its `Changed` event
   in `OnInitialized` and unsubscribe in `Dispose`.
 - C# style: `Nullable` and `ImplicitUsings` enabled everywhere; file-scoped namespaces; collection
@@ -80,8 +80,10 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   `ApplyConfigurationsFromAssembly` in `CraftingDataContext.OnModelCreating`.
 - **Seed data is SQL**, not C#: `src/CraftingCalculator.Infrastructure/Data/Seed/*.sql`, embedded as
   resources (`<EmbeddedResource Include="Data\**\*.sql" />`) and executed once by the `InsertSeedData`
-  migration via `migrationBuilder.Sql(...)`. The seed is intentionally minimal — just the `RecipeFilter`
-  row `(Id 1, Name 'All')` that the filter dropdown and `RecipeFilter.ALL` depend on. **Once released,
+  migration via `migrationBuilder.Sql(...)`. The seed is intentionally minimal — just the one category
+  row `(Id 1, Name 'All')` that the category dropdown and `Category.ALL` depend on. The `.sql` still
+  inserts into `RecipeFilters`, the table's pre-rename name, because it runs as applied history —
+  `RenameToCraftingVocabulary` renames that table to `Categories` afterwards. **Once released,
   the seed is final — never edit the `.sql` or re-run the seed.** Any data change now ships as a **new
   migration** that Inserts/Updates/Deletes rows on top of the seeded baseline (and never edit an
   already-applied migration).
@@ -93,6 +95,17 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   using an in-memory SQLite DB) lets EF build the context from this project alone. Tools are
   referenced (`Microsoft.EntityFrameworkCore.Design`/`.Tools`). The DB auto-migrates at app launch; no
   manual `database update` needed for the app.
+- **Renaming a table or column: never ship the scaffold as generated.** The model differ matches
+  entities by *table name*, so a rename reads to it as one table dropped and an unrelated one
+  created — `migrations add` emits `DropTable`+`CreateTable` and prints "An operation was scaffolded
+  that may result in the loss of data", which on a real device empties the table. Replace the
+  `Up`/`Down` bodies with `RenameTable`/`RenameColumn`/`RenameIndex` (all supported on SQLite; the
+  provider rewrites `RenameIndex` as a drop/create of the index, not of the data) and keep the
+  generated `.Designer.cs` and snapshot, which describe the resulting model either way. See
+  `20260907184851_RenameToCraftingVocabulary`, and
+  `MigrationTests.Migrate_FromThePreRenameSchema_PreservesExistingData` for how to cover it: migrate
+  to the previous migration by name, insert through the *old* names in raw SQL, migrate up, and read
+  the rows back through the new model.
 - **Delete behavior is configured explicitly** (cascade / SetNull) per relationship in the entity
   configurations — see the delete-behavior table in the migration plan history / PR description for
   the full list. `Microsoft.Data.Sqlite` enables `PRAGMA foreign_keys` per connection so DB-side
@@ -108,8 +121,8 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   `Components/_Imports.razor`.
 - **Mobile-first.** Phone portrait is the design target; desktop is the widened case reached by
   breakpoints. Every interactive target is ≥ 44×44 px; no action is reachable only by hover or
-  right-click. See the three-destination bottom-nav/side-rail shell (`Calculate` `/`, `Favorites`
-  `/favorites`, `Library` `/library`) before adding new navigation.
+  right-click. See the three-destination bottom-nav/side-rail shell (`Craft` `/`, `Favorites`
+  `/favorites`, `Dataset` `/dataset`) before adding new navigation.
 
 ### MudBlazor docs MCP server (`mudblazor` / MudMCP)
 
