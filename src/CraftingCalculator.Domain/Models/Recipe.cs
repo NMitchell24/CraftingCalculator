@@ -52,7 +52,9 @@ public class Recipe : IBaseDataRecord
 
             return sb.ToString();
         }
-        set { Tooltip = value; }
+        //Computed from Name/Description/Ingredients - the setter exists only to satisfy
+        //IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
+        set { }
     }
 
     public DataType Type
