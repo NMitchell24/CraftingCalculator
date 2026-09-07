@@ -3,8 +3,26 @@ namespace CraftingCalculator.UI.State;
 public sealed record AppBarMenuItem(string Text, string Icon, Func<Task> OnClick);
 
 /// <summary>
-/// Drives <c>MainLayout</c>'s single shared app bar - title and an optional overflow menu - so each
-/// page controls its own header without adding a second app bar row. Scoped; pages call
+/// A page's single most important action, shown as an icon button on the app bar.
+/// </summary>
+public sealed record AppBarAction(string Label, string Icon, Func<Task> OnClick, bool Disabled = false);
+
+/// <summary>
+/// Everything a page puts on the shared app bar. Only <see cref="Title"/> is required.
+/// </summary>
+public sealed record AppBarConfig(string Title)
+{
+    public IReadOnlyList<AppBarMenuItem> MenuItems { get; init; } = [];
+
+    /// <summary>Where the app bar's back arrow navigates, or null on a page that should not show one.</summary>
+    public string? BackHref { get; init; }
+
+    public AppBarAction? PrimaryAction { get; init; }
+}
+
+/// <summary>
+/// Drives <c>MainLayout</c>'s single shared app bar - title, primary action, and an optional overflow
+/// menu - so each page controls its own header without adding a second app bar row. Scoped; pages call
 /// <see cref="Configure"/> in <c>OnInitialized</c> passing themselves as the owner, and
 /// <see cref="Reset"/> with the same owner in <c>Dispose</c>.
 /// </summary>
@@ -12,31 +30,25 @@ public sealed class AppBarState
 {
     public const string DefaultTitle = "Crafting Calculator";
 
+    private static readonly AppBarConfig Default = new(DefaultTitle);
+
     private object? _owner;
 
-    public string Title { get; private set; } = DefaultTitle;
-    public IReadOnlyList<AppBarMenuItem> MenuItems { get; private set; } = [];
-
-    /// <summary>
-    /// Where the app bar's back arrow navigates, or null on a page that should not show one.
-    /// </summary>
-    public string? BackHref { get; private set; }
+    public AppBarConfig Config { get; private set; } = Default;
 
     public event Action? Changed;
 
-    /// <summary>Puts <paramref name="owner"/>'s title, menu, and back arrow on the shared app bar.</summary>
-    public void Configure(object owner, string title, IReadOnlyList<AppBarMenuItem>? menuItems = null, string? backHref = null)
+    /// <summary>Puts <paramref name="owner"/>'s configuration on the shared app bar.</summary>
+    public void Configure(object owner, AppBarConfig config)
     {
         _owner = owner;
-        Title = title;
-        MenuItems = menuItems ?? [];
-        BackHref = backHref;
+        Config = config;
         Changed?.Invoke();
     }
 
     /// <summary>
-    /// Restores the default title and drops the menu and back arrow, unless another page has taken
-    /// the bar over in the meantime.
+    /// Restores the default title and drops the menu, primary action, and back arrow, unless another
+    /// page has taken the bar over in the meantime.
     /// </summary>
     public void Reset(object owner)
     {
@@ -48,9 +60,7 @@ public sealed class AppBarState
         }
 
         _owner = null;
-        Title = DefaultTitle;
-        MenuItems = [];
-        BackHref = null;
+        Config = Default;
         Changed?.Invoke();
     }
 }

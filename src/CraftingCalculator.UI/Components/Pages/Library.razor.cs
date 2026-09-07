@@ -32,11 +32,6 @@ public partial class Library : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        AppBarState.Configure(this, "Library",
-        [
-            new AppBarMenuItem("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
-        ]);
-
         // The editor sends the tab back on its return link, so reopening Library from an ingredient
         // lands on Ingredients rather than resetting to Recipes.
         if (Enum.TryParse(TypeQuery, ignoreCase: true, out DataType type))
@@ -44,8 +39,20 @@ public partial class Library : ComponentBase, IDisposable
             _type = type;
         }
 
+        ConfigureAppBar();
         await ReloadAsync();
     }
+
+    // The primary action names the type it creates, so this re-runs whenever the selected tab changes.
+    private void ConfigureAppBar() =>
+        AppBarState.Configure(this, new AppBarConfig("Library")
+        {
+            PrimaryAction = new AppBarAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync),
+            MenuItems =
+            [
+                new AppBarMenuItem("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
+            ]
+        });
 
     private async Task ReloadAsync() => _records = await LibraryService.GetRecordsAsync(_type);
 
@@ -53,6 +60,7 @@ public partial class Library : ComponentBase, IDisposable
     {
         _type = type;
         _search = "";
+        ConfigureAppBar();
         await ReloadAsync();
 
         // Replace rather than push, so tab taps don't stack up history entries. This keeps the tab in
@@ -61,7 +69,11 @@ public partial class Library : ComponentBase, IDisposable
         Navigation.NavigateTo($"/library?type={_type}", replace: true);
     }
 
-    private void CreateNew() => Navigation.NavigateTo($"/library/{_type}/0");
+    private Task CreateNewAsync()
+    {
+        Navigation.NavigateTo($"/library/{_type}/0");
+        return Task.CompletedTask;
+    }
 
     private void Edit(IBaseDataRecord record) => Navigation.NavigateTo($"/library/{record.Type}/{record.Id}");
 

@@ -23,7 +23,13 @@ public partial class Favorites : ComponentBase, IDisposable
     // navigates away to "/" immediately afterwards.
     protected override async Task OnInitializedAsync()
     {
-        AppBarState.Configure(this, "Favorites");
+        AppBarState.Configure(this, new AppBarConfig("Favorites")
+        {
+            // The batch cannot change while this page is on screen - the only thing that mutates it is
+            // LoadAsync, which navigates away - so this snapshot stays accurate for the page's life.
+            PrimaryAction = new AppBarAction("Save current batch", Icons.Material.Filled.Save,
+                SaveCurrentBatchAsync, Disabled: State.RecipeQuantities.Count == 0)
+        });
         await ReloadAsync();
     }
 

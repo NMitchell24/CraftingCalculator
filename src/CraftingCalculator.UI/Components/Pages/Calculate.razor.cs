@@ -34,12 +34,16 @@ public partial class Calculate : ComponentBase, IDisposable
     protected override void OnInitialized()
     {
         State.Changed += StateHasChanged;
-        AppBarState.Configure(this, "Calculate",
-        [
-            new AppBarMenuItem("Clear batch", Icons.Material.Filled.ClearAll, ClearBatchAsync),
-            new AppBarMenuItem("Copy materials", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
-            new AppBarMenuItem("Save as favorite", Icons.Material.Filled.Star, SaveAsFavoriteAsync)
-        ]);
+        AppBarState.Configure(this, new AppBarConfig("Calculate")
+        {
+            PrimaryAction = new AppBarAction("Add recipes", Icons.Material.Filled.Add, OpenPickerAsync),
+            MenuItems =
+            [
+                new AppBarMenuItem("Clear batch", Icons.Material.Filled.ClearAll, ClearBatchAsync),
+                new AppBarMenuItem("Copy materials", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
+                new AppBarMenuItem("Save as favorite", Icons.Material.Filled.Star, SaveAsFavoriteAsync)
+            ]
+        });
     }
 
     private void OnViewChanged(CalculateView view) => _view = view;

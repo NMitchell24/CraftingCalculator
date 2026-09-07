@@ -1,0 +1,34 @@
+@page "/settings"
+@implements IDisposable
+
+<PageTitle>Settings</PageTitle>
+
+<div class="settings-page">
+    <MudText Typo="Typo.subtitle1" Class="settings-section-title">Appearance</MudText>
+
+    <MudRadioGroup T="ThemeMode" Value="@ThemeState.Mode" ValueChanged="ThemeState.SetMode">
+        <MudRadio T="ThemeMode" Value="ThemeMode.System">Follow system</MudRadio>
+        <MudRadio T="ThemeMode" Value="ThemeMode.Light">Light</MudRadio>
+        <MudRadio T="ThemeMode" Value="ThemeMode.Dark">Dark</MudRadio>
+    </MudRadioGroup>
+
+    <MudDivider Class="my-4" />
+
+    <MudText Typo="Typo.subtitle1" Class="settings-section-title">About</MudText>
+
+    <MudText Typo="Typo.body1">Crafting Calculator</MudText>
+    <MudText Typo="Typo.body2">Version @Version</MudText>
+    <MudText Typo="Typo.body2" Class="mb-4">Copyright &copy; @DateTime.Now.Year Sterling Turd Productions, LLC</MudText>
+
+    <MudText Typo="Typo.body2" Class="mb-2">Licensed under GPL 2.0</MudText>
+    <MudText Typo="Typo.caption" Class="settings-license">
+        This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU General Public License as published by the Free Software Foundation; either version 2 of
+        the License, or any later version.
+    </MudText>
+    <MudText Typo="Typo.caption" Class="settings-license">
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+        without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+        the GNU General Public License for more details.
+    </MudText>
+</div>

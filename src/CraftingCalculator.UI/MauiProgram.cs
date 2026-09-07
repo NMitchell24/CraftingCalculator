@@ -28,6 +28,7 @@ public static class MauiProgram
 
         builder.Services.AddScoped<CalculatorState>();
         builder.Services.AddScoped<AppBarState>();
+        builder.Services.AddScoped<ThemeState>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

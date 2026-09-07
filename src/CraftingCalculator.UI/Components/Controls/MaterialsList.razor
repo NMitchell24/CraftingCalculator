@@ -2,8 +2,11 @@
 
 <div class="materials-list">
     <div class="materials-list-header">
-        <MudText Typo="Typo.subtitle1">Materials</MudText>
-        <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Disabled="@(State.TotalIngredients.Count == 0)" OnClick="CopyAllAsync" />
+        <MudText Typo="Typo.subtitle1" Class="pane-title">Materials</MudText>
+        <div class="pane-header-actions">
+            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Disabled="@(State.TotalIngredients.Count == 0)"
+                           OnClick="CopyAllAsync" title="Copy materials" aria-label="Copy materials" />
+        </div>
     </div>
 
     @if (State.TotalIngredients.Count == 0)

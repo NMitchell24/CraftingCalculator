@@ -2,9 +2,13 @@
 
 <div class="steps-tree">
     <div class="steps-tree-header">
-        <MudText Typo="Typo.subtitle1">Steps</MudText>
-        <MudButton Size="Size.Small" OnClick="@State.ExpandAll">Expand All</MudButton>
-        <MudButton Size="Size.Small" OnClick="@State.CollapseAll">Collapse All</MudButton>
+        <MudText Typo="Typo.subtitle1" Class="pane-title">Steps</MudText>
+        <div class="pane-header-actions">
+            <MudIconButton Icon="@Icons.Material.Filled.UnfoldMore" OnClick="@State.ExpandAll"
+                           title="Expand all" aria-label="Expand all" />
+            <MudIconButton Icon="@Icons.Material.Filled.UnfoldLess" OnClick="@State.CollapseAll"
+                           title="Collapse all" aria-label="Collapse all" />
+        </div>
     </div>
 
     @if (State.TreeRoots.Count == 0)

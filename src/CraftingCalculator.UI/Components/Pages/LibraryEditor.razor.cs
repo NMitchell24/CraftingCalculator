@@ -58,7 +58,11 @@ public partial class LibraryEditor : ComponentBase, IDisposable
             return;
         }
 
-        AppBarState.Configure(this, Title(), MenuItems(), ListHref);
+        AppBarState.Configure(this, new AppBarConfig(Title())
+        {
+            MenuItems = MenuItems(),
+            BackHref = ListHref
+        });
     }
 
     private string Title() => Id > 0 ? _record?.Name ?? "" : $"New {_type.GetDescription()}";

@@ -14,6 +14,42 @@ html, body {
 :root {
     --safe-area-inset-top: 0px;
     --safe-area-inset-bottom: 0px;
+    /* The xs bottom nav's exact height, pinned rather than left to grow with its content: every bar
+       that docks above it (.totals-bar, .editor-action-bar) offsets by this, and any drift between
+       the real height and the offset shows up as a strip of scrolling page content between them. */
+    --bottom-nav-height: 56px;
+    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Sized for
+       the widest the action side ever gets: primary action + settings + overflow, at 44px each. */
+    --app-bar-side-width: 132px;
+}
+
+/* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
+   screen and not merely on whatever space the icons leave. Equal fixed side tracks are what makes it
+   exact - 1fr sides would each floor at their own min-content width, and the heavier action side
+   would win. */
+.mud-appbar .mud-toolbar {
+    display: grid;
+    grid-template-columns: var(--app-bar-side-width) minmax(0, 1fr) var(--app-bar-side-width);
+    align-items: center;
+}
+
+.app-bar-start {
+    justify-self: start;
+}
+
+.app-bar-end {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+}
+
+/* minmax(0, 1fr) above lets this track shrink below its content; without these rules a long title
+   would instead widen the track and push the action icons off the bar. */
+.app-bar-title {
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 /* Compensates MudMainContent's own top offset (which only accounts for the app bar's nominal toolbar
@@ -39,7 +75,7 @@ html, body {
 }
 
 .page-content-with-bottom-nav {
-    padding-bottom: calc(72px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    padding-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
 /* MainLayout.razor's bottom navigation bar (xs breakpoint only). Not CSS-isolated (see MainLayout.razor
@@ -62,12 +98,24 @@ html, body {
 
 .bottom-nav-menu a {
     flex: 1 1 0;
-    min-height: 44px;
+    height: var(--bottom-nav-height);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+/* Icons only on the bottom bar - the three destinations are self-explanatory and the labels cost
+   vertical space a phone does not have. Hidden visually rather than with display:none, which would
+   drop the label from the accessibility tree; it is the link's accessible name. The side rail's
+   Persistent variant is untouched and keeps its labels. */
+.bottom-nav-menu .mud-nav-link-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
 }
 
 /* Calculate screen (Components/Pages/Calculate.razor + Components/Controls/*) */
@@ -78,7 +126,7 @@ html, body {
 
 @media (max-width: 599.98px) {
     .calculate-page {
-        padding-bottom: calc(72px + 56px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        padding-bottom: calc(var(--bottom-nav-height) + 56px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
     }
 }
 
@@ -105,11 +153,29 @@ html, body {
     display: block;
 }
 
+/* Redundant with the toggle group, which already names the visible pane. Restored below in the
+   side-by-side layout, where there is no toggle and these are the only pane labels. */
+.pane-title {
+    display: none;
+}
+
+/* margin-left rather than the headers' justify-content, which puts a lone child at the start once
+   .pane-title above is hidden. */
+.pane-header-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
 /* Large tablets and up only - both dimensions ample, which a landscape phone never satisfies at the
    same time as a genuine tablet does. Show every pane side by side and drop the now-redundant toggle. */
 @media (min-width: 960px) and (min-height: 600px) {
     .calculate-toggle {
         display: none;
+    }
+
+    .pane-title {
+        display: block;
     }
 
     .calculate-content {
@@ -185,9 +251,13 @@ html, body {
 .steps-tree-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
-    padding: 8px 0;
+}
+
+/* MudList and MudTreeView both pad themselves vertically, which reads as a gap under the header row
+   rather than as spacing between items. */
+.materials-list .mud-list {
+    padding-top: 0;
 }
 
 /* Fixed-width qty/cost columns so they line up across rows regardless of how long each ingredient's
@@ -220,6 +290,7 @@ html, body {
    and let long names wrap instead of truncating or forcing horizontal scroll of the whole page. */
 .steps-tree-view {
     overflow-x: auto;
+    padding-top: 0;
 }
 
 .steps-tree-view .mud-treeview-item-label {
@@ -235,17 +306,28 @@ html, body {
 
 /* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor) screens */
 
-/* Clears the floating .page-fab (56px tall, sitting 64px above the bottom nav) so the last row is
-   never trapped under it. The bottom nav's own clearance already comes from
-   .page-content-with-bottom-nav (MainLayout). */
-.favorites-page,
-.library-page {
-    padding-bottom: 120px;
-}
-
 .library-toggle {
     width: 100%;
     margin-bottom: 8px;
+}
+
+/* Settings (Components/Pages/Settings.razor) */
+
+/* Capped for the same reason as .library-editor: a single column of controls and body text stretched
+   across a desktop window is far harder to scan than the same column at phone width. */
+.settings-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.settings-section-title {
+    margin-bottom: 8px;
+}
+
+.settings-license {
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.7;
 }
 
 /* Library editor (Components/Pages/LibraryEditor.razor + Components/Controls/*Editor.razor) */
@@ -255,7 +337,8 @@ html, body {
 .library-editor {
     max-width: 720px;
     margin: 0 auto;
-    padding-bottom: 120px;
+    /* Clears the fixed .editor-action-bar so the last field is never trapped under it. */
+    padding-bottom: 72px;
 }
 
 .recipe-add-row {
@@ -285,7 +368,7 @@ html, body {
 
 @media (max-width: 599.98px) {
     .editor-action-bar {
-        bottom: calc(72px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
         padding-bottom: 8px;
     }
 }
@@ -301,15 +384,26 @@ html, body {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom));
+    bottom: 0;
     z-index: 1200;
     padding: 8px 16px;
+    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
 @media (max-width: 599.98px) {
     .totals-bar {
-        bottom: calc(72px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        padding-bottom: 8px;
     }
+}
+
+/* House style is set on MudDialogProvider (MainLayout.razor); these are the two things it cannot
+   express. Without the margin a FullWidth dialog sits flush against both screen edges on a phone, and
+   without the max-height long content (an ingredient description, a long delete warning) grows the
+   dialog past the viewport instead of scrolling inside it. */
+.mud-dialog:not(.mud-dialog-fullscreen) {
+    margin: 16px;
+    max-height: calc(100dvh - 32px);
 }
 
 /* A FullScreen MudDialog (RecipePickerDialog on xs - Components/Dialogs/RecipePickerDialog.razor)
@@ -339,36 +433,6 @@ html, body {
 .totals-bar-label {
     font-weight: 600;
     margin-right: 4px;
-}
-
-.totals-bar-line-compact {
-    display: none;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Short landscape phones: collapse the three-column totals line to one abbreviated line. */
-@media (max-height: 480px) {
-    .totals-bar-line-full {
-        display: none;
-    }
-
-    .totals-bar-line-compact {
-        display: flex;
-    }
-}
-
-.page-fab {
-    position: fixed;
-    right: 16px;
-    bottom: calc(64px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-    z-index: 1250;
-}
-
-@media (max-width: 599.98px) {
-    .page-fab {
-        bottom: calc(72px + 64px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-    }
 }
 
 #blazor-error-ui {

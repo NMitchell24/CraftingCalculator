@@ -8,7 +8,7 @@
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No saved batches</MudText>
-            <MudText Typo="Typo.caption">Build a batch on the Calculate screen, then save it with the button below.</MudText>
+            <MudText Typo="Typo.caption">Build a batch on the Calculate screen, then save it with the button above.</MudText>
         </div>
     }
     else
@@ -28,7 +28,8 @@
                            the event before it bubbles. @onclick:stopPropagation can only be applied to
                            an element, never a component tag, hence the wrapper div. *@
                         <div @onclick="() => { }" @onclick:stopPropagation="true">
-                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="@($"Actions for {favorite.Name}")">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+                                     AriaLabel="@($"Actions for {favorite.Name}")">
                                 <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="@(() => RenameAsync(favorite))">Rename</MudMenuItem>
                                 <MudMenuItem Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteAsync(favorite))">Delete</MudMenuItem>
                             </MudMenu>
@@ -39,6 +40,3 @@
         </MudList>
     }
 </div>
-
-<MudFab Class="page-fab" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Label="Save current batch"
-        Disabled="@(State.RecipeQuantities.Count == 0)" OnClick="SaveCurrentBatchAsync" />

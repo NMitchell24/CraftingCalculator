@@ -1,29 +1,51 @@
 @inherits LayoutComponentBase
 
-<MudThemeProvider @ref="_themeProvider" @bind-IsDarkMode="_isDarkMode" ObserveSystemDarkModeChange="true" />
+@* ObserveSystemDarkModeChange is what installs MudBlazor's own media-query watch, so binding it to the
+   System mode is all that is needed: in System mode the provider writes the OS value into _isDarkMode
+   itself, and in Light/Dark it stops watching and OnThemeChanged sets the value outright. *@
+<MudThemeProvider @ref="_themeProvider" @bind-IsDarkMode="_isDarkMode"
+                  ObserveSystemDarkModeChange="@(ThemeState.Mode == ThemeMode.System)" />
 <MudPopoverProvider />
-<MudDialogProvider />
+@* The app's dialog house style, set once here rather than in every ShowAsync/ShowMessageBoxAsync call.
+   RecipePickerDialog is the only dialog that overrides it (FullScreen on xs). *@
+<MudDialogProvider MaxWidth="MaxWidth.Small" FullWidth="true" CloseOnEscapeKey="true" BackdropClick="true" />
 <MudSnackbarProvider />
 
 <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged">
     <MudLayout>
+        @* Three tracks with equal-width sides (app.css) so the title is centred on the viewport no
+           matter how many icons each side holds - a MudSpacer would push it off-centre, since the
+           action side is always heavier than the back-arrow side. *@
         <MudAppBar Dense="true" Elevation="1" Style="padding-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));">
-            @if (AppBarState.BackHref is string backHref)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Inherit" Href="@backHref"
-                               Class="mr-2" aria-label="Back" />
-            }
-            <MudText Typo="Typo.h6">@AppBarState.Title</MudText>
-            <MudSpacer />
-            @if (AppBarState.MenuItems.Count > 0)
-            {
-                <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit">
-                    @foreach (AppBarMenuItem item in AppBarState.MenuItems)
-                    {
-                        <MudMenuItem Icon="@item.Icon" OnClick="@(() => item.OnClick())">@item.Text</MudMenuItem>
-                    }
-                </MudMenu>
-            }
+            <div class="app-bar-start">
+                @if (AppBarState.Config.BackHref is string backHref)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Inherit" Href="@backHref"
+                                   aria-label="Back" />
+                }
+            </div>
+
+            <MudText Typo="Typo.h6" Class="app-bar-title">@AppBarState.Config.Title</MudText>
+
+            <div class="app-bar-end">
+                @if (AppBarState.Config.PrimaryAction is AppBarAction action)
+                {
+                    <MudIconButton Icon="@action.Icon" Color="Color.Inherit" Disabled="@action.Disabled"
+                                   OnClick="@(() => action.OnClick())" title="@action.Label" aria-label="@action.Label" />
+                }
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Href="/settings"
+                               title="Settings" aria-label="Settings" />
+                @if (AppBarState.Config.MenuItems.Count > 0)
+                {
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" AriaLabel="More actions"
+                             AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                        @foreach (AppBarMenuItem item in AppBarState.Config.MenuItems)
+                        {
+                            <MudMenuItem Icon="@item.Icon" OnClick="@(() => item.OnClick())">@item.Text</MudMenuItem>
+                        }
+                    </MudMenu>
+                }
+            </div>
         </MudAppBar>
 
         @if (ShowSideRail)
