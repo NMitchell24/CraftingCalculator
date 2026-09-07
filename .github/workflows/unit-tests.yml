@@ -2,7 +2,7 @@ name: Unit Tests
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -15,7 +15,7 @@ jobs:
   # MAUI workloads and no platform SDKs, so it is fast enough to gate every PR. Add any new non-MAUI
   # project to the .slnf or it silently stops being built here.
   core:
-    name: Core
+    name: Unit Tests
     runs-on: ubuntu-latest
 
     steps:
