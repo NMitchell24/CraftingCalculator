@@ -2,7 +2,7 @@
               FullWidth="true" Required="true" RequiredError="Name is required" Immediate="true" Class="mb-4" />
 
 <MudNumericField @bind-Value="Model.Value" @bind-Value:after="NotifyChangedAsync" Label="Value per item"
-                 Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" />
+                 Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" onfocus="this.select()" />
 
 @* Bound on the category's id rather than the Category itself: the model has no value equality and
    Model.Category comes from a different load than _categories, so MudSelect's reference comparison would
