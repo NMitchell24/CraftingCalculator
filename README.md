@@ -8,7 +8,7 @@ A **.NET 10 MAUI Blazor Hybrid** app for Android, iOS and Windows, built with **
 **EF Core + SQLite**. Everything is stored in a local database on the device: no account, no network
 calls, no personal information collected.
 
-[![Build](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/build.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/build.yml)
+[![Unit Tests](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/unit-tests.yml)
 [![CodeQL](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml)
 
 ### Screens
@@ -37,8 +37,8 @@ SQLite database).
 ### Building
 
 `CraftingCalculator.Tests.slnf` filters the solution down to everything except the MAUI head, so it
-restores, builds and tests on a machine with no MAUI workloads or platform SDKs. It is what CI's
-`core` job and CodeQL build.
+restores, builds and tests on a machine with no MAUI workloads or platform SDKs. It is what the
+`Unit Tests` workflow and CodeQL build.
 
 ```bash
 dotnet build CraftingCalculator.Tests.slnf

@@ -1,64 +1,18 @@
 name: Build
 
+# Manual only, on purpose. These jobs install platform workloads and SDKs and take minutes each,
+# which is not what every PR should pay for - `unit-tests.yml` is the PR gate. Once the app is
+# finished these become the automated build/release pipeline and trigger on a version tag.
 on:
-  push:
-    branches: [master]
-  # No branch filter: this runs on a PR into any base, so the stacked migration PRs and everything
-  # after them are covered without naming a branch that gets deleted when it merges.
-  pull_request:
-  schedule:
-    - cron: '0 6 * * *'
   workflow_dispatch:
 
-# The workflow this replaced had push + pull_request + a nightly cron with no guard, so pushing to an
-# open PR's branch ran the whole matrix twice.
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+# Every head builds -c Release on purpose: trimming, linker and interpreter failures do not exist in
+# Debug, so a Debug-only build stays green while the shipped app crashes on launch.
 jobs:
-
-  # Domain / Application / Infrastructure + both test suites, via CraftingCalculator.Tests.slnf. No
-  # MAUI workloads and no platform SDKs, so it is the fast job that gates every PR. Add any new
-  # non-MAUI project to the .slnf or it silently stops being built here.
-  core:
-    name: Core
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Install .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-
-      - name: Restore
-        run: dotnet restore CraftingCalculator.Tests.slnf
-
-      - name: Verify formatting
-        run: dotnet format CraftingCalculator.Tests.slnf --verify-no-changes --no-restore
-
-      - name: Build
-        run: dotnet build CraftingCalculator.Tests.slnf -c Release --no-restore
-
-      # No LogFileName: both test projects write into the same results directory, and the default trx
-      # name is unique per assembly and run where a fixed one would have the second overwrite the first.
-      - name: Test
-        run: >
-          dotnet test CraftingCalculator.Tests.slnf -c Release --no-build
-          --logger trx --results-directory artifacts/test-results
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: artifacts/test-results
-
-  # Every head below builds -c Release on purpose: trimming, linker and interpreter failures do not
-  # exist in Debug, so a Debug-only CI stays green while the shipped app crashes on launch.
 
   windows:
     name: Windows

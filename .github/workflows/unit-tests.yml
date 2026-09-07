@@ -1,0 +1,51 @@
+name: Unit Tests
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # Domain / Application / Infrastructure + both test suites, via CraftingCalculator.Tests.slnf. No
+  # MAUI workloads and no platform SDKs, so it is fast enough to gate every PR. Add any new non-MAUI
+  # project to the .slnf or it silently stops being built here.
+  core:
+    name: Core
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore CraftingCalculator.Tests.slnf
+
+      - name: Verify formatting
+        run: dotnet format CraftingCalculator.Tests.slnf --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build CraftingCalculator.Tests.slnf -c Release --no-restore
+
+      # No LogFileName: both test projects write into the same results directory, and the default trx
+      # name is unique per assembly and run where a fixed one would have the second overwrite the first.
+      - name: Test
+        run: >
+          dotnet test CraftingCalculator.Tests.slnf -c Release --no-build
+          --logger trx --results-directory artifacts/test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: artifacts/test-results

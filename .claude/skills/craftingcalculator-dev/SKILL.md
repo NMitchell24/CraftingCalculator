@@ -160,15 +160,17 @@ semantic search).
   Use it (`dotnet build CraftingCalculator.Tests.slnf`, `dotnet test CraftingCalculator.Tests.slnf`)
   on any machine without the MAUI workloads, and in CI. **Add every new non-MAUI project to it** as
   well as to the .sln, or CI silently stops building it.
-- **`.editorconfig` conformance is a CI gate.** The `core` job runs
+- **`.editorconfig` conformance is a CI gate.** The `Unit Tests` workflow runs
   `dotnet format CraftingCalculator.Tests.slnf --verify-no-changes` before it builds, so anything
   `dotnet format` would rewrite — file-scoped namespaces, a UTF-8 BOM, whitespace — fails the build.
   Run `dotnet format CraftingCalculator.Tests.slnf` before pushing. **EF-generated migrations are in
   scope:** `dotnet ef migrations add` emits a BOM and a block-scoped namespace, so format the new
   migration (its `Up`/`Down` operations are untouched by that) rather than excluding it.
-- **CI is `.github/workflows/build.yml`:** the `core` job above on `ubuntu-latest`, plus one Release
-  build per platform head (`windows`, `android` → APK artifact, `ios` → compile check with
-  `-p:CodesignKey=""`). Mobile jobs build `-c Release` on purpose — trimming, linker and interpreter
+- **CI is three workflows.** `unit-tests.yml` is the `core` job above on `ubuntu-latest`, triggered
+  by every PR into `master` — the only automatic gate. `build.yml` holds one Release build per platform
+  head (`windows`, `android` → APK artifact, `ios` → compile check with `-p:CodesignKey=""`) and is
+  **`workflow_dispatch` only** until the app is finished, when it becomes a tag-triggered
+  build/release pipeline; those jobs build `-c Release` on purpose — trimming, linker and interpreter
   failures do not exist in Debug. `codeql-analysis.yml` builds the same `.slnf` with `build-mode:
   manual`, because CodeQL autobuild does not handle the MAUI head.
 - **Test stack:** NUnit + Moq + AwesomeAssertions (`result.Should()...`; the Apache-2.0 community fork
