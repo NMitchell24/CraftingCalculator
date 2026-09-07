@@ -3,7 +3,7 @@ using System;
 
 namespace CraftingCalculator.Domain.Models;
 
-public class Ingredient : IBaseDataRecord
+public class Component : IBaseDataRecord
 {
     public int Id { get; set; }
     public string? Name { get; set; }
@@ -28,7 +28,7 @@ public class Ingredient : IBaseDataRecord
     {
         get
         {
-            return DataType.Ingredient;
+            return DataType.Component;
         }
         //Don't allow this to be changed as it should remain static.
         set { }
@@ -36,7 +36,7 @@ public class Ingredient : IBaseDataRecord
 
     public IBaseDataRecord Clone()
     {
-        Ingredient clone = new Ingredient()
+        Component clone = new Component()
         {
             Id = this.Id,
             Name = this.Name,
@@ -49,7 +49,7 @@ public class Ingredient : IBaseDataRecord
 
     public IBaseDataRecord CopyForSave()
     {
-        Ingredient ret = (Ingredient)Clone();
+        Component ret = (Component)Clone();
         ret.Name += " - Copy";
         ret.Id = 0;
 

@@ -19,10 +19,10 @@ public interface IRecipeService
     Task DeleteRecipeAsync(Recipe? recipe);
 
     /// <summary>
-    /// Flattens the recipe's own ingredients and every (recursively) nested child recipe's
-    /// ingredients into one combined <see cref="IngredientMap"/>.
+    /// Flattens the recipe's own components and every (recursively) nested child recipe's
+    /// components into one combined <see cref="ComponentMap"/>.
     /// </summary>
-    IngredientMap GetFlattenedIngredients(Recipe recipe);
+    ComponentMap GetFlattenedComponents(Recipe recipe);
 
     /// <summary>
     /// Builds the recipe's component breakdown as a <see cref="RecipeNode"/> tree, scaled by

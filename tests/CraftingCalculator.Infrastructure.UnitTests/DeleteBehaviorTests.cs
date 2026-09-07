@@ -21,11 +21,11 @@ public class DeleteBehaviorTests
     public void TearDown() => _fixture.Dispose();
 
     [Test]
-    public async Task DeletingRecipe_CascadesItsOwnIngredients()
+    public async Task DeletingRecipe_CascadesItsOwnComponents()
     {
         await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();
         Recipe recipe = new() { Name = "Plank" };
-        recipe.Ingredients.Add(new RecipeIngredient { Ingredient = new Ingredient { Name = "Wood" }, Quantity = 2 });
+        recipe.Components.Add(new RecipeComponent { Component = new Component { Name = "Wood" }, Quantity = 2 });
         seed.Recipes.Add(recipe);
         await seed.SaveChangesAsync();
 
@@ -33,24 +33,24 @@ public class DeleteBehaviorTests
         await act.Recipes.Where(r => r.Id == recipe.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        (await verify.RecipeIngredients.CountAsync(ri => ri.RecipeId == recipe.Id)).Should().Be(0);
+        (await verify.RecipeComponents.CountAsync(ri => ri.RecipeId == recipe.Id)).Should().Be(0);
     }
 
     [Test]
-    public async Task DeletingIngredient_CascadesRecipeIngredientsReferencingIt()
+    public async Task DeletingComponent_CascadesRecipeComponentsReferencingIt()
     {
         await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();
-        Ingredient ingredient = new() { Name = "Wood" };
+        Component component = new() { Name = "Wood" };
         Recipe recipe = new() { Name = "Plank" };
-        recipe.Ingredients.Add(new RecipeIngredient { Ingredient = ingredient, Quantity = 2 });
+        recipe.Components.Add(new RecipeComponent { Component = component, Quantity = 2 });
         seed.Recipes.Add(recipe);
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Ingredients.Where(i => i.Id == ingredient.Id).ExecuteDeleteAsync();
+        await act.Components.Where(i => i.Id == component.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        (await verify.RecipeIngredients.CountAsync(ri => ri.IngredientId == ingredient.Id)).Should().Be(0);
+        (await verify.RecipeComponents.CountAsync(ri => ri.ComponentId == component.Id)).Should().Be(0);
     }
 
     [Test]

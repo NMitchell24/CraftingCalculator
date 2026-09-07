@@ -32,7 +32,7 @@ public class MigrationTests
                 filters[0].Id.Should().Be(DatabaseSeedConstants.AllFilterId);
                 filters[0].Name.Should().Be(RecipeFilterModel.ALL);
 
-                (await context.Ingredients.CountAsync()).Should().Be(0);
+                (await context.Components.CountAsync()).Should().Be(0);
                 (await context.Recipes.CountAsync()).Should().Be(0);
                 (await context.Favorites.CountAsync()).Should().Be(0);
             }

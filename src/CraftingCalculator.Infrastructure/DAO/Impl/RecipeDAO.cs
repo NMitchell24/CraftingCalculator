@@ -2,11 +2,11 @@ using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using IngredientEntity = CraftingCalculator.Domain.Entities.Ingredient;
+using ComponentEntity = CraftingCalculator.Domain.Entities.Component;
 using RecipeChildEntity = CraftingCalculator.Domain.Entities.RecipeChild;
 using RecipeEntity = CraftingCalculator.Domain.Entities.Recipe;
 using RecipeFilterEntity = CraftingCalculator.Domain.Entities.RecipeFilter;
-using RecipeIngredientEntity = CraftingCalculator.Domain.Entities.RecipeIngredient;
+using RecipeComponentEntity = CraftingCalculator.Domain.Entities.RecipeComponent;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
@@ -42,7 +42,7 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
         RecipeEntity entity = recipe.Id > 0
-            ? await context.Recipes.Include(r => r.Ingredients).FirstAsync(r => r.Id == recipe.Id)
+            ? await context.Recipes.Include(r => r.Components).FirstAsync(r => r.Id == recipe.Id)
             : new RecipeEntity();
 
         entity.Name = recipe.Name ?? "";
@@ -55,25 +55,25 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
             context.Recipes.Add(entity);
         }
 
-        foreach (IngredientQuantity removed in recipe.Ingredients.RemovedIngredients.Where(i => i.Id > 0))
+        foreach (ComponentQuantity removed in recipe.Components.RemovedComponents.Where(i => i.Id > 0))
         {
-            RecipeIngredientEntity? toRemove = entity.Ingredients.FirstOrDefault(ri => ri.Id == removed.Id);
+            RecipeComponentEntity? toRemove = entity.Components.FirstOrDefault(ri => ri.Id == removed.Id);
             if (toRemove != null)
             {
-                context.RecipeIngredients.Remove(toRemove);
-                entity.Ingredients.Remove(toRemove);
+                context.RecipeComponents.Remove(toRemove);
+                entity.Components.Remove(toRemove);
             }
         }
 
-        foreach (IngredientQuantity iq in recipe.Ingredients.IngredientList)
+        foreach (ComponentQuantity iq in recipe.Components.ComponentList)
         {
             if (iq.Id > 0)
             {
-                entity.Ingredients.First(ri => ri.Id == iq.Id).Quantity = iq.Quantity;
+                entity.Components.First(ri => ri.Id == iq.Id).Quantity = iq.Quantity;
             }
             else
             {
-                entity.Ingredients.Add(new RecipeIngredientEntity { IngredientId = iq.Ingredient.Id, Quantity = iq.Quantity });
+                entity.Components.Add(new RecipeComponentEntity { ComponentId = iq.Component.Id, Quantity = iq.Quantity });
             }
         }
 
@@ -117,7 +117,7 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
     }
 
     /// <summary>
-    /// Loads every recipe, ingredient, filter, and component link in five queries so the component
+    /// Loads every recipe, component, filter, and component link in five queries so the component
     /// graph can be stitched together in memory instead of one query per node (the shape the old
     /// LiteDB-backed recursive loader used, which the plan calls out as the wrong fit for EF Core).
     /// </summary>
@@ -125,22 +125,22 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        Dictionary<int, IngredientEntity> ingredientsById =
-            await context.Ingredients.AsNoTracking().ToDictionaryAsync(i => i.Id);
+        Dictionary<int, ComponentEntity> componentsById =
+            await context.Components.AsNoTracking().ToDictionaryAsync(i => i.Id);
         Dictionary<int, RecipeFilterEntity> filtersById =
             await context.RecipeFilters.AsNoTracking().ToDictionaryAsync(f => f.Id);
         Dictionary<int, RecipeEntity> recipesById =
             await context.Recipes.AsNoTracking().ToDictionaryAsync(r => r.Id);
-        ILookup<int, RecipeIngredientEntity> ingredientsByRecipeId =
-            (await context.RecipeIngredients.AsNoTracking().ToListAsync()).ToLookup(ri => ri.RecipeId);
+        ILookup<int, RecipeComponentEntity> componentsByRecipeId =
+            (await context.RecipeComponents.AsNoTracking().ToListAsync()).ToLookup(ri => ri.RecipeId);
         ILookup<int, RecipeChildEntity> childrenByParentId =
             (await context.RecipeChildren.AsNoTracking().ToListAsync()).ToLookup(rc => rc.ParentRecipeId);
 
-        return new RecipeGraph(recipesById, ingredientsById, filtersById, ingredientsByRecipeId, childrenByParentId);
+        return new RecipeGraph(recipesById, componentsById, filtersById, componentsByRecipeId, childrenByParentId);
     }
 
     /// <summary>
-    /// Recursively hydrates a full <see cref="Recipe"/> model (ingredients and, recursively, child
+    /// Recursively hydrates a full <see cref="Recipe"/> model (components and, recursively, child
     /// recipes) from the in-memory graph. The app does not otherwise detect a cycle in the recipe
     /// graph (see the "no cycle guard" parity issue), so an A -> B -> A pair would recurse
     /// indefinitely; the shared <see cref="RecipeProcessor.MaxRecipeDepth"/> bound turns that into a
@@ -167,11 +167,11 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
             model.Filter = ToFilterModel(filterEntity);
         }
 
-        foreach (RecipeIngredientEntity ri in graph.IngredientsByRecipeId[entity.Id])
+        foreach (RecipeComponentEntity ri in graph.ComponentsByRecipeId[entity.Id])
         {
-            if (graph.IngredientsById.TryGetValue(ri.IngredientId, out IngredientEntity? ingredientEntity))
+            if (graph.ComponentsById.TryGetValue(ri.ComponentId, out ComponentEntity? componentEntity))
             {
-                model.Ingredients.Add(ToIngredientModel(ingredientEntity), ri.Quantity, ri.Id);
+                model.Components.Add(ToComponentModel(componentEntity), ri.Quantity, ri.Id);
             }
         }
 
@@ -193,7 +193,7 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
         Description = entity.Description
     };
 
-    private static Ingredient ToIngredientModel(IngredientEntity entity) => new()
+    private static Component ToComponentModel(ComponentEntity entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
@@ -203,8 +203,8 @@ public class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory) : 
 
     private sealed record RecipeGraph(
         Dictionary<int, RecipeEntity> RecipesById,
-        Dictionary<int, IngredientEntity> IngredientsById,
+        Dictionary<int, ComponentEntity> ComponentsById,
         Dictionary<int, RecipeFilterEntity> FiltersById,
-        ILookup<int, RecipeIngredientEntity> IngredientsByRecipeId,
+        ILookup<int, RecipeComponentEntity> ComponentsByRecipeId,
         ILookup<int, RecipeChildEntity> ChildrenByParentId);
 }

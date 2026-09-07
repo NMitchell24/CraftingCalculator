@@ -3,9 +3,9 @@ using CraftingCalculator.Domain.Models;
 namespace CraftingCalculator.Application.BusinessLogic.Processors;
 
 /// <summary>
-/// Flattens a recipe's (already-loaded) component graph into its combined raw ingredients, or into
+/// Flattens a recipe's (already-loaded) component graph into its combined raw components, or into
 /// a breakdown tree. Ports the recursive walk that used to live on the Recipe model itself
-/// (Recipe.GetIngredients / Recipe.GetRecipeNodes) now that models stay dumb.
+/// (Recipe.GetComponents / Recipe.GetRecipeNodes) now that models stay dumb.
 /// </summary>
 public static class RecipeProcessor
 {
@@ -17,18 +17,18 @@ public static class RecipeProcessor
     /// </summary>
     public const int MaxRecipeDepth = 64;
 
-    public static IngredientMap Flatten(Recipe recipe) => Flatten(recipe, 0);
+    public static ComponentMap Flatten(Recipe recipe) => Flatten(recipe, 0);
 
-    private static IngredientMap Flatten(Recipe recipe, int depth)
+    private static ComponentMap Flatten(Recipe recipe, int depth)
     {
         ThrowIfTooDeep(recipe, depth);
 
-        IngredientMap combined = new IngredientMap(recipe.Ingredients, false);
+        ComponentMap combined = new ComponentMap(recipe.Components, false);
 
         foreach (RecipeQuantity child in recipe.ChildRecipes.RecipeList)
         {
-            IngredientMap childIngredients = Flatten(child.Recipe, depth + 1);
-            combined = IngredientProcessor.CombineIngredients(childIngredients, combined, child.Quantity);
+            ComponentMap childComponents = Flatten(child.Recipe, depth + 1);
+            combined = ComponentProcessor.CombineComponents(childComponents, combined, child.Quantity);
         }
 
         return combined;
@@ -36,7 +36,7 @@ public static class RecipeProcessor
 
     /// <summary>
     /// Builds the recipe's component breakdown as a <see cref="RecipeNode"/> tree, scaled by
-    /// <paramref name="quantity"/>: one child node per ingredient and per nested child recipe,
+    /// <paramref name="quantity"/>: one child node per component and per nested child recipe,
     /// recursively.
     /// </summary>
     public static RecipeNode BuildNode(Recipe recipe, long quantity) => BuildNode(recipe, quantity, 0);
@@ -47,7 +47,7 @@ public static class RecipeProcessor
 
         List<RecipeNode> children = [];
 
-        foreach (IngredientQuantity i in recipe.Ingredients.IngredientList)
+        foreach (ComponentQuantity i in recipe.Components.ComponentList)
         {
             children.Add(new RecipeNode(i.Name + " x" + (i.Quantity * quantity), i.Name, i.Tooltip, true, []));
         }

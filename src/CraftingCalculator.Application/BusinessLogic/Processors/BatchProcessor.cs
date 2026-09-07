@@ -8,19 +8,19 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 /// </summary>
 public static class BatchProcessor
 {
-    public static (double TotalCost, double TotalValue, IngredientMap Materials) CalculateTotals(
+    public static (double TotalCost, double TotalValue, ComponentMap Materials) CalculateTotals(
         IReadOnlyCollection<RecipeQuantity> batch)
     {
-        IngredientMap materials = new();
+        ComponentMap materials = new();
         double totalValue = 0;
 
         foreach (RecipeQuantity rq in batch)
         {
-            materials = IngredientProcessor.CombineIngredients(RecipeProcessor.Flatten(rq.Recipe), materials, rq.Quantity);
+            materials = ComponentProcessor.CombineComponents(RecipeProcessor.Flatten(rq.Recipe), materials, rq.Quantity);
             totalValue += rq.TotalValue;
         }
 
-        double totalCost = materials.IngredientList.Sum(i => i.TotalCost);
+        double totalCost = materials.ComponentList.Sum(i => i.TotalCost);
 
         return (totalCost, totalValue, materials);
     }

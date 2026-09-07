@@ -60,25 +60,25 @@ public class RecipeServiceTests
     }
 
     [Test]
-    public void GetFlattenedIngredients_CombinesNestedChildIngredients()
+    public void GetFlattenedComponents_CombinesNestedChildComponents()
     {
         Recipe child = new Recipe { Name = "Bracket" };
-        child.Ingredients.Add(new Ingredient { Name = "Screw" }, 3);
+        child.Components.Add(new Component { Name = "Screw" }, 3);
 
         Recipe parent = new Recipe { Name = "Frame" };
         parent.ChildRecipes.Add(child, 2);
 
-        IngredientMap result = _service.GetFlattenedIngredients(parent);
+        ComponentMap result = _service.GetFlattenedComponents(parent);
 
-        result.IngredientList.Should().ContainSingle();
-        result.IngredientList[0].Quantity.Should().Be(6);
+        result.ComponentList.Should().ContainSingle();
+        result.ComponentList[0].Quantity.Should().Be(6);
     }
 
     [Test]
     public void GetRecipeNode_BuildsNodePerComponent()
     {
         Recipe recipe = new Recipe { Name = "Widget" };
-        recipe.Ingredients.Add(new Ingredient { Name = "Screw" }, 1);
+        recipe.Components.Add(new Component { Name = "Screw" }, 1);
 
         RecipeNode tree = _service.GetRecipeNode(recipe, 3);
 

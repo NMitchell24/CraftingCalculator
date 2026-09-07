@@ -32,7 +32,7 @@
                     @if (_view == CalculateView.Materials)
                     {
                         <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.ContentCopy"
-                                   Disabled="@(State.TotalIngredients.Count == 0)" OnClick="CopyMaterialsAsync">Copy</MudButton>
+                                   Disabled="@(State.TotalComponents.Count == 0)" OnClick="CopyMaterialsAsync">Copy</MudButton>
                     }
                     else
                     {

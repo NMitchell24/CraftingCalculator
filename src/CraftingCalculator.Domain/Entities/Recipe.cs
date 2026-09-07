@@ -10,7 +10,7 @@ public class Recipe
     public int? FilterId { get; set; }
     public RecipeFilter? Filter { get; set; }
 
-    public List<RecipeIngredient> Ingredients { get; set; } = [];
+    public List<RecipeComponent> Components { get; set; } = [];
 
     /// <summary>Component links where this recipe is the parent.</summary>
     public List<RecipeChild> Children { get; set; } = [];

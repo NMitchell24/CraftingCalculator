@@ -4,7 +4,7 @@
 @if (Node.Children.Count > 0)
 {
     <MudTreeViewItem T="RecipeNode" Value="Node" Text="@Node.Name"
-                     Icon="@(Node.IsIngredient ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
+                     Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
                      Expanded="@State.IsExpanded(Path)" ExpandedChanged="@(_ => State.ToggleExpanded(Path))">
         @foreach (RecipeNode child in Node.Children)
         {
@@ -15,5 +15,5 @@
 else
 {
     <MudTreeViewItem T="RecipeNode" Value="Node" Text="@Node.Name"
-                     Icon="@(Node.IsIngredient ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)" />
+                     Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)" />
 }

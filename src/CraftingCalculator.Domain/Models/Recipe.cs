@@ -9,7 +9,7 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class Recipe : IBaseDataRecord
 {
-    public IngredientMap Ingredients { get; set; }
+    public ComponentMap Components { get; set; }
     public RecipeMap ChildRecipes { get; set; }
     public string? Name { get; set; }
     public int Id { get; set; }
@@ -35,11 +35,11 @@ public class Recipe : IBaseDataRecord
                 sb.AppendLine(Description);
                 sb.Append(Environment.NewLine);
             }
-            sb.AppendLine("Ingredients:");
+            sb.AppendLine("Components:");
 
-            foreach (IngredientQuantity ingredient in Ingredients.IngredientList)
+            foreach (ComponentQuantity component in Components.ComponentList)
             {
-                sb.AppendLine(ingredient.Name + " x" + ingredient.Quantity);
+                sb.AppendLine(component.Name + " x" + component.Quantity);
             }
 
             if (ChildRecipes != null)
@@ -52,7 +52,7 @@ public class Recipe : IBaseDataRecord
 
             return sb.ToString();
         }
-        //Computed from Name/Description/Ingredients - the setter exists only to satisfy
+        //Computed from Name/Description/Components - the setter exists only to satisfy
         //IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
         set { }
     }
@@ -72,7 +72,7 @@ public class Recipe : IBaseDataRecord
     /// </summary>
     public Recipe()
     {
-        this.Ingredients = new IngredientMap();
+        this.Components = new ComponentMap();
         this.ChildRecipes = new RecipeMap();
     }
 
@@ -87,7 +87,7 @@ public class Recipe : IBaseDataRecord
             Description = this.Description,
             Filter = this.Filter,
             Value = this.Value,
-            Ingredients = this.Ingredients.Clone(),
+            Components = this.Components.Clone(),
             ChildRecipes = this.ChildRecipes.Clone()
         };
 
@@ -99,7 +99,7 @@ public class Recipe : IBaseDataRecord
         Recipe ret = (Recipe)Clone();
         ret.Name += " - Copy";
         ret.Id = 0;
-        ret.Ingredients = this.Ingredients.CloneForSave();
+        ret.Components = this.Components.CloneForSave();
         ret.ChildRecipes = this.ChildRecipes.CloneForSave();
 
         return ret;

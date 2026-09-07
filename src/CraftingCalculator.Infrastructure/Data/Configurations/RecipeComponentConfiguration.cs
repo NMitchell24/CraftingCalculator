@@ -4,23 +4,23 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CraftingCalculator.Infrastructure.Data.Configurations;
 
-public class RecipeIngredientConfiguration : IEntityTypeConfiguration<RecipeIngredient>
+public class RecipeComponentConfiguration : IEntityTypeConfiguration<RecipeComponent>
 {
-    public void Configure(EntityTypeBuilder<RecipeIngredient> builder)
+    public void Configure(EntityTypeBuilder<RecipeComponent> builder)
     {
-        builder.ToTable("RecipeIngredients");
+        builder.ToTable("RecipeComponents");
         builder.HasKey(ri => ri.Id);
         builder.HasIndex(ri => ri.RecipeId);
-        builder.HasIndex(ri => ri.IngredientId);
+        builder.HasIndex(ri => ri.ComponentId);
 
         builder.HasOne(ri => ri.Recipe)
-            .WithMany(r => r.Ingredients)
+            .WithMany(r => r.Components)
             .HasForeignKey(ri => ri.RecipeId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(ri => ri.Ingredient)
-            .WithMany(i => i.RecipeIngredients)
-            .HasForeignKey(ri => ri.IngredientId)
+        builder.HasOne(ri => ri.Component)
+            .WithMany(i => i.RecipeComponents)
+            .HasForeignKey(ri => ri.ComponentId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -15,7 +15,7 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     private readonly RecipeMap _recipeMap = new();
 
     // Keyed by each node's full path from the tree root (see RecipeTreeNode.Path), not by RecipeNode.Id
-    // alone - the same recipe/ingredient can appear more than once in one tree (e.g. a recipe used both
+    // alone - the same recipe/component can appear more than once in one tree (e.g. a recipe used both
     // standalone in the batch and nested inside another batch recipe), and keying by Id alone made every
     // occurrence share one expansion state instead of each position remembering its own.
     private readonly HashSet<string> _expandedPaths = [];
@@ -23,18 +23,18 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     public event Action? Changed;
 
     public IReadOnlyList<RecipeQuantity> RecipeQuantities => _recipeMap.RecipeList;
-    public IReadOnlyList<IngredientQuantity> TotalIngredients { get; private set; } = [];
+    public IReadOnlyList<ComponentQuantity> TotalComponents { get; private set; } = [];
     public IReadOnlyList<RecipeNode> TreeRoots { get; private set; } = [];
     public double TotalCost { get; private set; }
     public double TotalValue { get; private set; }
     public double Profit => TotalValue - TotalCost;
 
-    /// <summary>Total units of raw material the batch needs, summed across every distinct ingredient.</summary>
+    /// <summary>Total units of raw material the batch needs, summed across every distinct component.</summary>
     public long TotalComponentCount { get; private set; }
 
     /// <summary>
     /// How many craft operations the breakdown implies - every recipe in the tree, at every depth.
-    /// Ingredient leaves are not steps: they are gathered, not crafted.
+    /// Component leaves are not steps: they are gathered, not crafted.
     /// </summary>
     public int CraftingStepCount { get; private set; }
 
@@ -152,7 +152,7 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     }
 
     private static int CountRecipes(IReadOnlyList<RecipeNode> nodes) =>
-        nodes.Sum(node => (node.IsIngredient ? 0 : 1) + CountRecipes(node.Children));
+        nodes.Sum(node => (node.IsComponent ? 0 : 1) + CountRecipes(node.Children));
 
     private static void CollectPaths(IReadOnlyList<RecipeNode> nodes, string parentPath, HashSet<string> into)
     {
@@ -166,16 +166,16 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
 
     private void Recalculate()
     {
-        (double totalCost, double totalValue, IngredientMap materials) = BatchProcessor.CalculateTotals(_recipeMap.RecipeList);
+        (double totalCost, double totalValue, ComponentMap materials) = BatchProcessor.CalculateTotals(_recipeMap.RecipeList);
 
         TotalCost = totalCost;
         TotalValue = totalValue;
-        TotalIngredients = [.. materials.IngredientList.OrderBy(i => i.Name)];
+        TotalComponents = [.. materials.ComponentList.OrderBy(i => i.Name)];
         TreeRoots = [.. _recipeMap.RecipeList.Select(rq => recipeService.GetRecipeNode(rq.Recipe, rq.Quantity))];
 
         // Computed here rather than as expression-bodied properties: both walk the whole batch, and the
         // summary card reads them on every render.
-        TotalComponentCount = TotalIngredients.Sum(i => i.Quantity);
+        TotalComponentCount = TotalComponents.Sum(i => i.Quantity);
         CraftingStepCount = CountRecipes(TreeRoots);
 
         Changed?.Invoke();

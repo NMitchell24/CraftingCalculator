@@ -12,7 +12,7 @@ namespace CraftingCalculator.Application.UnitTests.Common.Services;
 [TestFixture]
 public class LibraryServiceTests
 {
-    private Mock<IIngredientService> _ingredientService = null!;
+    private Mock<IComponentService> _componentService = null!;
     private Mock<IRecipeFilterService> _recipeFilterService = null!;
     private Mock<IRecipeService> _recipeService = null!;
     private LibraryService _service = null!;
@@ -20,19 +20,19 @@ public class LibraryServiceTests
     [SetUp]
     public void SetUp()
     {
-        _ingredientService = new Mock<IIngredientService>();
+        _componentService = new Mock<IComponentService>();
         _recipeFilterService = new Mock<IRecipeFilterService>();
         _recipeService = new Mock<IRecipeService>();
-        _service = new LibraryService(_ingredientService.Object, _recipeFilterService.Object, _recipeService.Object);
+        _service = new LibraryService(_componentService.Object, _recipeFilterService.Object, _recipeService.Object);
     }
 
     [Test]
-    public async Task GetRecordsAsync_Ingredient_ReturnsIngredients()
+    public async Task GetRecordsAsync_Component_ReturnsComponents()
     {
-        _ingredientService.Setup(s => s.GetAllIngredientsAsync())
-            .ReturnsAsync([new Ingredient { Id = 1, Name = "Screw" }]);
+        _componentService.Setup(s => s.GetAllComponentsAsync())
+            .ReturnsAsync([new Component { Id = 1, Name = "Screw" }]);
 
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Ingredient);
+        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Component);
 
         records.Should().ContainSingle().Which.Name.Should().Be("Screw");
     }
@@ -84,17 +84,17 @@ public class LibraryServiceTests
         IBaseDataRecord? record = await _service.GetRecordAsync(DataType.Recipe, 5);
 
         record!.Name.Should().Be("Widget");
-        _ingredientService.Verify(s => s.GetIngredientByIdAsync(It.IsAny<int>()), Times.Never);
+        _componentService.Verify(s => s.GetComponentByIdAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Test]
-    public async Task SaveRecordAsync_Ingredient_SavesThroughTheIngredientService()
+    public async Task SaveRecordAsync_Component_SavesThroughTheComponentService()
     {
-        Ingredient ingredient = new Ingredient { Id = 3, Name = "Screw" };
+        Component component = new Component { Id = 3, Name = "Screw" };
 
-        await _service.SaveRecordAsync(ingredient);
+        await _service.SaveRecordAsync(component);
 
-        _ingredientService.Verify(s => s.SaveIngredientAsync(ingredient), Times.Once);
+        _componentService.Verify(s => s.SaveComponentAsync(component), Times.Once);
     }
 
     [Test]
@@ -125,7 +125,7 @@ public class LibraryServiceTests
         await _service.DeleteRecordAsync(recipe);
 
         _recipeService.Verify(s => s.DeleteRecipeAsync(recipe), Times.Once);
-        _ingredientService.Verify(s => s.DeleteIngredientAsync(It.IsAny<Ingredient>()), Times.Never);
+        _componentService.Verify(s => s.DeleteComponentAsync(It.IsAny<Component>()), Times.Never);
     }
 
     [Test]
@@ -134,7 +134,7 @@ public class LibraryServiceTests
         await _service.SaveRecordAsync(null);
         await _service.DeleteRecordAsync(null);
 
-        _ingredientService.VerifyNoOtherCalls();
+        _componentService.VerifyNoOtherCalls();
         _recipeFilterService.VerifyNoOtherCalls();
         _recipeService.VerifyNoOtherCalls();
     }

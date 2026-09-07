@@ -17,7 +17,7 @@ public class RecipeService(IRecipeDAO dao) : IRecipeService
 
     public Task DeleteRecipeAsync(Recipe? recipe) => recipe != null ? dao.DeleteAsync(recipe.Id) : Task.CompletedTask;
 
-    public IngredientMap GetFlattenedIngredients(Recipe recipe) => RecipeProcessor.Flatten(recipe);
+    public ComponentMap GetFlattenedComponents(Recipe recipe) => RecipeProcessor.Flatten(recipe);
 
     public RecipeNode GetRecipeNode(Recipe recipe, long quantity) => RecipeProcessor.BuildNode(recipe, quantity);
 }

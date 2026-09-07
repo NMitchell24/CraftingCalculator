@@ -1,16 +1,16 @@
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using IngredientEntity = CraftingCalculator.Domain.Entities.Ingredient;
+using ComponentEntity = CraftingCalculator.Domain.Entities.Component;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
-public class IngredientDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IIngredientDAO
+public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IComponentDAO
 {
-    public async Task<List<Ingredient>> GetAllAsync()
+    public async Task<List<Component>> GetAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        List<IngredientEntity> entities = await context.Ingredients
+        List<ComponentEntity> entities = await context.Components
             .AsNoTracking()
             .OrderBy(i => i.Name)
             .ToListAsync();
@@ -18,30 +18,30 @@ public class IngredientDAO(IDbContextFactory<CraftingDataContext> contextFactory
         return [.. entities.Select(ToModel)];
     }
 
-    public async Task<Ingredient?> GetByIdAsync(int id)
+    public async Task<Component?> GetByIdAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        IngredientEntity? entity = await context.Ingredients.AsNoTracking()
+        ComponentEntity? entity = await context.Components.AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == id);
 
         return entity != null ? ToModel(entity) : null;
     }
 
-    public async Task<Ingredient> SaveAsync(Ingredient ingredient)
+    public async Task<Component> SaveAsync(Component component)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        IngredientEntity entity = ingredient.Id > 0
-            ? await context.Ingredients.FirstAsync(i => i.Id == ingredient.Id)
-            : new IngredientEntity();
+        ComponentEntity entity = component.Id > 0
+            ? await context.Components.FirstAsync(i => i.Id == component.Id)
+            : new ComponentEntity();
 
-        entity.Name = ingredient.Name ?? "";
-        entity.Description = ingredient.Description ?? "";
-        entity.Cost = ingredient.Cost;
+        entity.Name = component.Name ?? "";
+        entity.Description = component.Description ?? "";
+        entity.Cost = component.Cost;
 
         if (entity.Id == 0)
         {
-            context.Ingredients.Add(entity);
+            context.Components.Add(entity);
         }
 
         await context.SaveChangesAsync();
@@ -52,10 +52,10 @@ public class IngredientDAO(IDbContextFactory<CraftingDataContext> contextFactory
     public async Task DeleteAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.Ingredients.Where(i => i.Id == id).ExecuteDeleteAsync();
+        await context.Components.Where(i => i.Id == id).ExecuteDeleteAsync();
     }
 
-    private static Ingredient ToModel(IngredientEntity entity) => new()
+    private static Component ToModel(ComponentEntity entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,

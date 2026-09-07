@@ -8,7 +8,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<IIngredientService, IngredientService>();
+        services.AddScoped<IComponentService, ComponentService>();
         services.AddScoped<IRecipeFilterService, RecipeFilterService>();
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IFavoriteService, FavoriteService>();

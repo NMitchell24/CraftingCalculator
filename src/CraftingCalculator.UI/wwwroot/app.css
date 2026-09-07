@@ -614,7 +614,7 @@ html, body {
 
 /* House style is set on MudDialogProvider (MainLayout.razor); these are the two things it cannot
    express. Without the margin a FullWidth dialog sits flush against both screen edges on a phone, and
-   without the max-height long content (an ingredient description, a long delete warning) grows the
+   without the max-height long content (an component description, a long delete warning) grows the
    dialog past the viewport instead of scrolling inside it. */
 .mud-dialog:not(.mud-dialog-fullscreen) {
     margin: 16px;

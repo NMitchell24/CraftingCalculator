@@ -10,8 +10,8 @@
            ILibraryService instead, which is why there is no matching switch for load/save/delete. *@
         @switch (_record)
         {
-            case Ingredient ingredient:
-                <IngredientEditor @key="_record" Model="ingredient" OnChanged="MarkDirty" />
+            case Component component:
+                <ComponentEditor @key="_record" Model="component" OnChanged="MarkDirty" />
                 break;
             case RecipeFilter filter:
                 <CategoryEditor @key="_record" Model="filter" OnChanged="MarkDirty" />

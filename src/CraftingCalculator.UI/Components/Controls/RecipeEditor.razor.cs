@@ -16,24 +16,24 @@ public partial class RecipeEditor : ComponentBase
     [Inject] private ILibraryService LibraryService { get; set; } = null!;
 
     private List<RecipeFilter> _filters = [];
-    private List<IBaseDataRecord> _ingredients = [];
+    private List<IBaseDataRecord> _components = [];
     private List<IBaseDataRecord> _childRecipeCandidates = [];
 
-    private DataType _componentType = DataType.Ingredient;
-    private IBaseDataRecord? _selectedComponent;
+    private DataType _partType = DataType.Component;
+    private IBaseDataRecord? _selectedPart;
     private long _quantityToAdd = 1;
     private int? _filterId;
 
-    private List<IBaseQuantityRecord> Components => RecipeComponentProcessor.GetComponents(Model);
+    private List<IBaseQuantityRecord> Parts => RecipePartProcessor.GetParts(Model);
 
     protected override async Task OnInitializedAsync()
     {
         _filterId = Model.Filter?.Id;
 
         _filters = [.. (await LibraryService.GetRecordsAsync(DataType.RecipeFilter)).Cast<RecipeFilter>()];
-        _ingredients = await LibraryService.GetRecordsAsync(DataType.Ingredient);
+        _components = await LibraryService.GetRecordsAsync(DataType.Component);
 
-        // Ports ConfigureRecipesViewModel.RecipeSelectedType: a recipe cannot be its own component.
+        // Ports ConfigureRecipesViewModel.RecipeSelectedType: a recipe cannot be its own part.
         // Nothing guards a longer A -> B -> A cycle here either, matching the WPF app - the depth cap
         // in RecipeProcessor is what keeps that catchable.
         _childRecipeCandidates =
@@ -42,16 +42,16 @@ public partial class RecipeEditor : ComponentBase
 
     private Task<IEnumerable<IBaseDataRecord>> SearchAsync(string? search, CancellationToken cancellationToken)
     {
-        List<IBaseDataRecord> source = _componentType == DataType.Recipe ? _childRecipeCandidates : _ingredients;
+        List<IBaseDataRecord> source = _partType == DataType.Recipe ? _childRecipeCandidates : _components;
 
         return Task.FromResult<IEnumerable<IBaseDataRecord>>(source.Where(r =>
             string.IsNullOrWhiteSpace(search) || (r.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false)));
     }
 
-    private void OnComponentTypeChanged(DataType type)
+    private void OnPartTypeChanged(DataType type)
     {
-        _componentType = type;
-        _selectedComponent = null;
+        _partType = type;
+        _selectedPart = null;
         _quantityToAdd = 1;
     }
 
@@ -65,23 +65,23 @@ public partial class RecipeEditor : ComponentBase
 
     private async Task AddComponentAsync()
     {
-        RecipeComponentProcessor.Add(Model, _selectedComponent, _quantityToAdd);
+        RecipePartProcessor.Add(Model, _selectedPart, _quantityToAdd);
 
-        _selectedComponent = null;
+        _selectedPart = null;
         _quantityToAdd = 1;
 
         await NotifyChangedAsync();
     }
 
-    private async Task SetQuantityAsync(IBaseQuantityRecord component, long quantity)
+    private async Task SetQuantityAsync(IBaseQuantityRecord part, long quantity)
     {
-        RecipeComponentProcessor.SetQuantity(Model, component, quantity);
+        RecipePartProcessor.SetQuantity(Model, part, quantity);
         await NotifyChangedAsync();
     }
 
-    private async Task RemoveAsync(IBaseQuantityRecord component)
+    private async Task RemoveAsync(IBaseQuantityRecord part)
     {
-        RecipeComponentProcessor.Remove(Model, component);
+        RecipePartProcessor.Remove(Model, part);
         await NotifyChangedAsync();
     }
 

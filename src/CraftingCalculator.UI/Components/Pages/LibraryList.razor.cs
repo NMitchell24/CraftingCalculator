@@ -52,7 +52,7 @@ public partial class LibraryList : ComponentBase, IDisposable
     private static string TitleFor(DataType type) => type switch
     {
         DataType.Recipe => "Blueprints",
-        DataType.Ingredient => "Components",
+        DataType.Component => "Components",
         _ => "Categories"
     };
 
@@ -83,14 +83,14 @@ public partial class LibraryList : ComponentBase, IDisposable
 
     private static string CaptionFor(IBaseDataRecord record) => record switch
     {
-        Ingredient ingredient => string.Format(FormatConstants.CurrencyFormat, ingredient.Cost),
+        Component component => string.Format(FormatConstants.CurrencyFormat, component.Cost),
         Recipe recipe => RecipeCaption(recipe),
         _ => record.Description ?? ""
     };
 
     private static string RecipeCaption(Recipe recipe)
     {
-        int components = recipe.Ingredients.IngredientList.Count + recipe.ChildRecipes.RecipeList.Count;
+        int components = recipe.Components.ComponentList.Count + recipe.ChildRecipes.RecipeList.Count;
         string summary = $"{components} component{(components == 1 ? "" : "s")}";
 
         return string.IsNullOrWhiteSpace(recipe.Filter?.Name) ? summary : $"{recipe.Filter.Name} · {summary}";

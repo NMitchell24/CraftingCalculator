@@ -9,27 +9,27 @@ public class RecipeDAOTests
 {
     private SqliteTestFixture _fixture = null!;
     private RecipeDAO _recipeDAO = null!;
-    private IngredientDAO _ingredientDAO = null!;
+    private ComponentDAO _componentDAO = null!;
 
     [SetUp]
     public void SetUp()
     {
         _fixture = new SqliteTestFixture();
         _recipeDAO = new RecipeDAO(_fixture.Factory);
-        _ingredientDAO = new IngredientDAO(_fixture.Factory);
+        _componentDAO = new ComponentDAO(_fixture.Factory);
     }
 
     [TearDown]
     public void TearDown() => _fixture.Dispose();
 
     [Test]
-    public async Task SaveAsync_NewRecipeWithIngredientAndChildRecipe_PersistsTheFullGraph()
+    public async Task SaveAsync_NewRecipeWithComponentAndChildRecipe_PersistsTheFullGraph()
     {
-        Ingredient wood = await _ingredientDAO.SaveAsync(new Ingredient { Name = "Wood", Cost = 1 });
+        Component wood = await _componentDAO.SaveAsync(new Component { Name = "Wood", Cost = 1 });
         Recipe plank = await _recipeDAO.SaveAsync(new Recipe { Name = "Plank" });
 
         Recipe table = new() { Name = "Table", Value = 10 };
-        table.Ingredients.Add(wood, 2);
+        table.Components.Add(wood, 2);
         table.ChildRecipes.Add(plank, 4);
 
         Recipe saved = await _recipeDAO.SaveAsync(table);
@@ -37,44 +37,44 @@ public class RecipeDAOTests
 
         Recipe? reloaded = await _recipeDAO.GetByIdAsync(saved.Id);
         reloaded.Should().NotBeNull();
-        reloaded!.Ingredients.IngredientList.Should().ContainSingle(i => i.Ingredient.Name == "Wood" && i.Quantity == 2);
+        reloaded!.Components.ComponentList.Should().ContainSingle(i => i.Component.Name == "Wood" && i.Quantity == 2);
         reloaded.ChildRecipes.RecipeList.Should().ContainSingle(r => r.Recipe.Name == "Plank" && r.Quantity == 4);
     }
 
     [Test]
-    public async Task SaveAsync_UpdatingExistingIngredientQuantity_UpdatesInPlaceRatherThanDuplicating()
+    public async Task SaveAsync_UpdatingExistingComponentQuantity_UpdatesInPlaceRatherThanDuplicating()
     {
-        Ingredient wood = await _ingredientDAO.SaveAsync(new Ingredient { Name = "Wood", Cost = 1 });
+        Component wood = await _componentDAO.SaveAsync(new Component { Name = "Wood", Cost = 1 });
         Recipe table = new() { Name = "Table" };
-        table.Ingredients.Add(wood, 2);
+        table.Components.Add(wood, 2);
         Recipe saved = await _recipeDAO.SaveAsync(table);
 
         Recipe reloaded = (await _recipeDAO.GetByIdAsync(saved.Id))!;
-        IngredientQuantity existingIngredient = reloaded.Ingredients.IngredientList.Single();
-        existingIngredient.Quantity = 9;
+        ComponentQuantity existingComponent = reloaded.Components.ComponentList.Single();
+        existingComponent.Quantity = 9;
 
         await _recipeDAO.SaveAsync(reloaded);
 
         Recipe reloadedAgain = (await _recipeDAO.GetByIdAsync(saved.Id))!;
-        reloadedAgain.Ingredients.IngredientList.Should().ContainSingle();
-        reloadedAgain.Ingredients.IngredientList[0].Quantity.Should().Be(9);
+        reloadedAgain.Components.ComponentList.Should().ContainSingle();
+        reloadedAgain.Components.ComponentList[0].Quantity.Should().Be(9);
     }
 
     [Test]
-    public async Task SaveAsync_RemovedIngredient_DeletesItsRowRatherThanLeavingItOrphaned()
+    public async Task SaveAsync_RemovedComponent_DeletesItsRowRatherThanLeavingItOrphaned()
     {
-        Ingredient wood = await _ingredientDAO.SaveAsync(new Ingredient { Name = "Wood", Cost = 1 });
+        Component wood = await _componentDAO.SaveAsync(new Component { Name = "Wood", Cost = 1 });
         Recipe table = new() { Name = "Table" };
-        table.Ingredients.Add(wood, 2);
+        table.Components.Add(wood, 2);
         Recipe saved = await _recipeDAO.SaveAsync(table);
 
         Recipe reloaded = (await _recipeDAO.GetByIdAsync(saved.Id))!;
-        reloaded.Ingredients.Remove(wood, reloaded.Ingredients.IngredientList[0].Quantity);
+        reloaded.Components.Remove(wood, reloaded.Components.ComponentList[0].Quantity);
 
         await _recipeDAO.SaveAsync(reloaded);
 
         Recipe reloadedAgain = (await _recipeDAO.GetByIdAsync(saved.Id))!;
-        reloadedAgain.Ingredients.IngredientList.Should().BeEmpty();
+        reloadedAgain.Components.ComponentList.Should().BeEmpty();
     }
 
     [Test]

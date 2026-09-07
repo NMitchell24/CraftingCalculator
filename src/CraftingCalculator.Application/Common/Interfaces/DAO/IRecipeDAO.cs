@@ -7,13 +7,13 @@ public interface IRecipeDAO
     /// <summary>
     /// Returns every recipe matching <paramref name="filter"/>, or all recipes when
     /// <paramref name="filter"/> is the <see cref="RecipeFilter.ALL"/> filter. Each recipe is
-    /// returned with its <see cref="Recipe.Ingredients"/> and <see cref="Recipe.ChildRecipes"/>
+    /// returned with its <see cref="Recipe.Components"/> and <see cref="Recipe.ChildRecipes"/>
     /// populated.
     /// </summary>
     Task<List<Recipe>> GetByFilterAsync(RecipeFilter filter);
 
     /// <summary>
-    /// Returns the recipe with its full component graph populated (ingredients and, recursively,
+    /// Returns the recipe with its full component graph populated (components and, recursively,
     /// child recipes), or null if no recipe with this id exists.
     /// </summary>
     Task<Recipe?> GetByIdAsync(int id);
@@ -25,7 +25,7 @@ public interface IRecipeDAO
 
     /// <summary>
     /// Adds the recipe if <see cref="Recipe.Id"/> is 0, otherwise updates the existing record
-    /// (including its ingredient and child-recipe components). Returns the saved recipe with its
+    /// (including its component and child-recipe components). Returns the saved recipe with its
     /// assigned <see cref="Recipe.Id"/>.
     /// </summary>
     Task<Recipe> SaveAsync(Recipe recipe);

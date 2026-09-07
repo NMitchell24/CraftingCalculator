@@ -20,14 +20,14 @@
 
 <MudExpansionPanels Elevation="1" Class="mb-2">
     <MudExpansionPanel Text="Add component">
-        <MudToggleGroup T="DataType" Value="_componentType" ValueChanged="OnComponentTypeChanged"
+        <MudToggleGroup T="DataType" Value="_partType" ValueChanged="OnPartTypeChanged"
                         Delimiters="false" Class="mb-3">
-            <MudToggleItem Value="DataType.Ingredient">Component</MudToggleItem>
+            <MudToggleItem Value="DataType.Component">Component</MudToggleItem>
             <MudToggleItem Value="DataType.Recipe">Blueprint</MudToggleItem>
         </MudToggleGroup>
 
-        <MudAutocomplete T="IBaseDataRecord" @bind-Value="_selectedComponent" SearchFunc="SearchAsync"
-                         ToStringFunc="@(record => record?.Name ?? "")" Label="@($"{_componentType.GetDescription()} to add")"
+        <MudAutocomplete T="IBaseDataRecord" @bind-Value="_selectedPart" SearchFunc="SearchAsync"
+                         ToStringFunc="@(record => record?.Name ?? "")" Label="@($"{_partType.GetDescription()} to add")"
                          Variant="Variant.Outlined" FullWidth="true" Clearable="true" ResetValueOnEmptyText="true"
                          Class="mb-3" />
 
@@ -35,12 +35,12 @@
             <MudNumericField T="long" @bind-Value="_quantityToAdd" Label="Quantity" Min="1"
                              Variant="Variant.Outlined" Class="recipe-add-qty" />
             <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
-                       Disabled="@(_selectedComponent is null)" OnClick="AddComponentAsync">Add</MudButton>
+                       Disabled="@(_selectedPart is null)" OnClick="AddComponentAsync">Add</MudButton>
         </div>
     </MudExpansionPanel>
 </MudExpansionPanels>
 
-@if (Components.Count == 0)
+@if (Parts.Count == 0)
 {
     <div class="pane-empty-state">
         <MudText Typo="Typo.body1">No components yet</MudText>
@@ -50,23 +50,23 @@
 else
 {
     <MudList T="IBaseQuantityRecord">
-        @foreach (IBaseQuantityRecord component in Components)
+        @foreach (IBaseQuantityRecord part in Parts)
         {
             <MudListItem T="IBaseQuantityRecord">
                 <div class="list-row">
                     <div class="list-row-info">
-                        <MudText Class="list-row-name">@component.Name</MudText>
-                        <MudText Typo="Typo.caption" Class="list-row-name">@component.Type.GetDescription()</MudText>
+                        <MudText Class="list-row-name">@part.Name</MudText>
+                        <MudText Typo="Typo.caption" Class="list-row-name">@part.Type.GetDescription()</MudText>
                     </div>
                     <div class="list-row-stepper">
                         <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
-                                       OnClick="@(() => SetQuantityAsync(component, component.Quantity - 1))" />
-                        <MudNumericField T="long" Value="component.Quantity" ValueChanged="@(v => SetQuantityAsync(component, v))"
+                                       OnClick="@(() => SetQuantityAsync(part, part.Quantity - 1))" />
+                        <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
                                          Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
                         <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
-                                       OnClick="@(() => SetQuantityAsync(component, component.Quantity + 1))" />
+                                       OnClick="@(() => SetQuantityAsync(part, part.Quantity + 1))" />
                     </div>
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(component))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(part))" />
                 </div>
             </MudListItem>
         }

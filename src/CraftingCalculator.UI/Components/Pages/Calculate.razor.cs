@@ -73,7 +73,7 @@ public partial class Calculate : ComponentBase, IDisposable
 
     private async Task CopyMaterialsAsync()
     {
-        string text = string.Join(Environment.NewLine, State.TotalIngredients.Select(i => i.DisplayName));
+        string text = string.Join(Environment.NewLine, State.TotalComponents.Select(i => i.DisplayName));
         await ClipboardService.SetTextAsync(text);
         Snackbar.Add("Copied components to clipboard", Severity.Success);
     }
