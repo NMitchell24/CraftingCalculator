@@ -4,11 +4,14 @@
 <PageTitle>Library</PageTitle>
 
 <div class="library-page">
-    <MudToggleGroup T="DataType" Value="_type" ValueChanged="OnTypeChangedAsync" Class="library-toggle" Delimiters="false">
-        <MudToggleItem Value="DataType.Recipe">Recipes</MudToggleItem>
-        <MudToggleItem Value="DataType.Ingredient">Ingredients</MudToggleItem>
-        <MudToggleItem Value="DataType.RecipeFilter">Categories</MudToggleItem>
-    </MudToggleGroup>
+    <div class="pane-toolbar">
+        <MudToggleGroup T="DataType" Value="_type" ValueChanged="OnTypeChangedAsync" Class="segmented"
+                        SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+            <MudToggleItem Value="DataType.Recipe">Recipes</MudToggleItem>
+            <MudToggleItem Value="DataType.Ingredient">Ingredients</MudToggleItem>
+            <MudToggleItem Value="DataType.RecipeFilter">Categories</MudToggleItem>
+        </MudToggleGroup>
+    </div>
 
     <MudTextField @bind-Value="_search" Placeholder="Search" Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true" Class="mb-2" />

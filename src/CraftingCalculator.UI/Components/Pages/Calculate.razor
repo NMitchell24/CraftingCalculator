@@ -2,11 +2,28 @@
 @implements IDisposable
 
 <div class="calculate-page">
-    <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="calculate-toggle" Delimiters="false">
-        <MudToggleItem Value="CalculateView.Batch">Batch (@State.RecipeQuantities.Count)</MudToggleItem>
-        <MudToggleItem Value="CalculateView.Materials">Materials (@State.TotalIngredients.Count)</MudToggleItem>
-        <MudToggleItem Value="CalculateView.Steps">Steps</MudToggleItem>
-    </MudToggleGroup>
+    @* Tabs and the active pane's actions on one row. Exactly one of this and the per-pane .pane-header
+       blocks below is on screen at a time (app.css), so each action fragment mounts once. *@
+    <div class="pane-toolbar">
+        <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
+                        SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+            <MudToggleItem Value="CalculateView.Batch">Batch (@State.RecipeQuantities.Count)</MudToggleItem>
+            <MudToggleItem Value="CalculateView.Materials">Materials (@State.TotalIngredients.Count)</MudToggleItem>
+            <MudToggleItem Value="CalculateView.Steps">Steps</MudToggleItem>
+        </MudToggleGroup>
+
+        <div class="pane-header-actions">
+            @switch (_view)
+            {
+                case CalculateView.Materials:
+                    @MaterialsActions
+                    break;
+                case CalculateView.Steps:
+                    @StepsActions
+                    break;
+            }
+        </div>
+    </div>
 
     @* All three panes stay mounted at every breakpoint - a CSS media query (see app.css) picks between
        showing only the active one (phones, and landscape phones/small tablets - too little room to
@@ -15,15 +32,45 @@
        not on every tab switch or every breakpoint change. *@
     <div class="calculate-content">
         <div class="calculate-pane @(_view == CalculateView.Batch ? "calculate-pane-active" : "")">
+            @* Visible only in the side-by-side layout, which has no tab row to name each column. *@
+            <div class="pane-header">
+                <MudText Typo="Typo.subtitle1" Class="display-title">Batch</MudText>
+            </div>
             <BatchList OnAddRecipes="OpenPickerAsync" />
         </div>
         <div class="calculate-pane @(_view == CalculateView.Materials ? "calculate-pane-active" : "")">
+            <div class="pane-header">
+                <MudText Typo="Typo.subtitle1" Class="display-title">Materials</MudText>
+                <div class="pane-header-actions">@MaterialsActions</div>
+            </div>
             <MaterialsList />
         </div>
         <div class="calculate-pane @(_view == CalculateView.Steps ? "calculate-pane-active" : "")">
+            <div class="pane-header">
+                <MudText Typo="Typo.subtitle1" Class="display-title">Steps</MudText>
+                <div class="pane-header-actions">@StepsActions</div>
+            </div>
             <StepsTree />
         </div>
     </div>
 </div>
 
 <TotalsBar />
+
+@code {
+
+    // Defined once and rendered into whichever layout is visible, so the two never drift apart.
+    private RenderFragment MaterialsActions => @<MudIconButton Icon="@Icons.Material.Filled.ContentCopy"
+                                                               Disabled="@(State.TotalIngredients.Count == 0)"
+                                                               OnClick="CopyMaterialsAsync"
+                                                               title="Copy materials" aria-label="Copy materials" />;
+
+    private RenderFragment StepsActions =>
+        @<text>
+            <MudIconButton Icon="@Icons.Material.Filled.UnfoldMore" OnClick="@State.ExpandAll"
+                           title="Expand all" aria-label="Expand all" />
+            <MudIconButton Icon="@Icons.Material.Filled.UnfoldLess" OnClick="@State.CollapseAll"
+                           title="Collapse all" aria-label="Collapse all" />
+        </text>;
+
+}

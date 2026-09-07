@@ -4,7 +4,7 @@
 <PageTitle>Settings</PageTitle>
 
 <div class="settings-page">
-    <MudText Typo="Typo.subtitle1" Class="settings-section-title">Appearance</MudText>
+    <MudText Typo="Typo.subtitle1" Class="settings-section-title display-title">Appearance</MudText>
 
     <MudRadioGroup T="ThemeMode" Value="@ThemeState.Mode" ValueChanged="ThemeState.SetMode">
         <MudRadio T="ThemeMode" Value="ThemeMode.System">Follow system</MudRadio>
@@ -14,7 +14,7 @@
 
     <MudDivider Class="my-4" />
 
-    <MudText Typo="Typo.subtitle1" Class="settings-section-title">About</MudText>
+    <MudText Typo="Typo.subtitle1" Class="settings-section-title display-title">About</MudText>
 
     <MudText Typo="Typo.body1">Crafting Calculator</MudText>
     <MudText Typo="Typo.body2">Version @Version</MudText>
@@ -30,5 +30,12 @@
         This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
         without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
         the GNU General Public License for more details.
+    </MudText>
+
+    <MudText Typo="Typo.body2" Class="mb-2">Fonts</MudText>
+    <MudText Typo="Typo.caption" Class="settings-license">
+        Inter, copyright &copy; The Inter Project Authors. Jersey 20, copyright &copy; The Soft Type
+        Project Authors. Both are licensed under the SIL Open Font License, Version 1.1, and are
+        bundled with this app so it renders identically offline.
     </MudText>
 </div>

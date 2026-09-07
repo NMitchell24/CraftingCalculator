@@ -3,7 +3,7 @@
 @* ObserveSystemDarkModeChange is what installs MudBlazor's own media-query watch, so binding it to the
    System mode is all that is needed: in System mode the provider writes the OS value into _isDarkMode
    itself, and in Light/Dark it stops watching and OnThemeChanged sets the value outright. *@
-<MudThemeProvider @ref="_themeProvider" @bind-IsDarkMode="_isDarkMode"
+<MudThemeProvider Theme="AppTheme.Theme" @ref="_themeProvider" @bind-IsDarkMode="_isDarkMode"
                   ObserveSystemDarkModeChange="@(ThemeState.Mode == ThemeMode.System)" />
 <MudPopoverProvider />
 @* The app's dialog house style, set once here rather than in every ShowAsync/ShowMessageBoxAsync call.
@@ -25,7 +25,7 @@
                 }
             </div>
 
-            <MudText Typo="Typo.h6" Class="app-bar-title">@AppBarState.Config.Title</MudText>
+            <MudText Typo="Typo.h6" Class="@AppBarTitleClass">@AppBarState.Config.Title</MudText>
 
             <div class="app-bar-end">
                 @if (AppBarState.Config.PrimaryAction is AppBarAction action)
@@ -65,7 +65,7 @@
 
         @if (ShowBottomNav)
         {
-            <MudPaper Class="bottom-nav" Elevation="8" Square="true">
+            <MudPaper Class="bottom-nav" Elevation="3" Square="true">
                 <MudNavMenu Class="bottom-nav-menu" Color="Color.Primary">
                     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Calculate">Calculate</MudNavLink>
                     <MudNavLink Href="/favorites" Icon="@Icons.Material.Filled.Star">Favorites</MudNavLink>

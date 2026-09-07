@@ -61,7 +61,8 @@ public partial class LibraryEditor : ComponentBase, IDisposable
         AppBarState.Configure(this, new AppBarConfig(Title())
         {
             MenuItems = MenuItems(),
-            BackHref = ListHref
+            BackHref = ListHref,
+            TitleIsUserContent = Id > 0
         });
     }
 

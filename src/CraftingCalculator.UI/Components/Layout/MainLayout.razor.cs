@@ -1,4 +1,5 @@
 using CraftingCalculator.UI.State;
+using CraftingCalculator.UI.Theme;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -22,6 +23,11 @@ public partial class MainLayout : IDisposable
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     private bool ShowBottomNav => _breakpoint == Breakpoint.Xs;
     private bool ShowSideRail => !ShowBottomNav;
+
+    // The display face is reserved for the app's own screen names; a record's own name renders in the
+    // body face, which is both the honest signal and the legible choice for text the app never wrote.
+    private string AppBarTitleClass =>
+        AppBarState.Config.TitleIsUserContent ? "app-bar-title" : "app-bar-title display-title";
 
     protected override void OnInitialized()
     {

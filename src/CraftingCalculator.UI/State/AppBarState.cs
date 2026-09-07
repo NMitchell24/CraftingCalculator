@@ -18,6 +18,13 @@ public sealed record AppBarConfig(string Title)
     public string? BackHref { get; init; }
 
     public AppBarAction? PrimaryAction { get; init; }
+
+    /// <summary>
+    /// True when <see cref="Title"/> is user-entered data - a saved record's own name - rather than one
+    /// of the app's own screen names. The layout renders its own titles in the display face and user
+    /// content in the body face.
+    /// </summary>
+    public bool TitleIsUserContent { get; init; }
 }
 
 /// <summary>
