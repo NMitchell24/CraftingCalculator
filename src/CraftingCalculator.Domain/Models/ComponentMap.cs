@@ -68,7 +68,7 @@ public class ComponentMap
     }
 
     /// <summary>
-    /// Decrement an ComponentQuantity by the provided amount.  
+    /// Decrement a ComponentQuantity by the provided amount.  
     /// If the current Quantity - the provided quantity would be less than or equal to 0
     /// Then the Component will be removed.
     /// </summary>
@@ -88,7 +88,7 @@ public class ComponentMap
     }
 
     /// <summary>
-    /// Remove an ComponentType from the list entirely if it exists.
+    /// Remove a Component from the list entirely if it exists.
     /// </summary>
     /// <param name="component"></param>
     public void RemoveAll(Component component)

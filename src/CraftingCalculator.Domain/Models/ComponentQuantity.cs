@@ -3,7 +3,7 @@ using CraftingCalculator.Domain.Enums;
 namespace CraftingCalculator.Domain.Models;
 
 /// <summary>
-/// Represents an component and quantity.
+/// Represents a component and quantity.
 /// </summary>
 public class ComponentQuantity : IBaseQuantityRecord
 {
@@ -22,9 +22,9 @@ public class ComponentQuantity : IBaseQuantityRecord
         private set { }
     }
 
-    public ComponentQuantity(Component ing, long quantity, int id)
+    public ComponentQuantity(Component component, long quantity, int id)
     {
-        Component = ing;
+        Component = component;
         Quantity = quantity;
         Id = id;
     }

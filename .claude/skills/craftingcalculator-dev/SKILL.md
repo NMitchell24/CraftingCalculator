@@ -66,7 +66,7 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   factory-created context.
 - **State a destination page needs rides in the route** (`/dataset/{type}/{id}`), not a shared mutable
   holder. The one exception is the working batch on the Craft screen, which is genuine cross-page
-  session state (`CalculatorState`, scoped, `UI/State`) — components subscribe to its `Changed` event
+  session state (`CraftState`, scoped, `UI/State`) — components subscribe to its `Changed` event
   in `OnInitialized` and unsubscribe in `Dispose`.
 - C# style: `Nullable` and `ImplicitUsings` enabled everywhere; file-scoped namespaces; collection
   expressions (`[]`, `[.. x]`). Match the file you're editing.
