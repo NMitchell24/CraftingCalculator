@@ -15,10 +15,13 @@
                 <MudListItem T="IngredientQuantity">
                     <div class="materials-row">
                         <MudText Class="list-row-name materials-row-name">@iq.Name</MudText>
-                        <MudText Class="materials-row-qty" Align="Align.Right">x@(iq.Quantity)</MudText>
-                        <div class="materials-row-cost">
-                            <MudText Typo="Typo.caption" Class="materials-row-cost-label">Cost</MudText>
-                            <MudText Align="Align.Right">@string.Format(FormatConstants.CurrencyFormat, iq.TotalCost)</MudText>
+                        @* Labels and values are siblings in one grid rather than a column per stat, so
+                           the two value cells share a baseline no matter how the labels wrap. *@
+                        <div class="materials-row-stats">
+                            <MudText Typo="Typo.caption" Class="materials-row-label">Quantity</MudText>
+                            <MudText Typo="Typo.caption" Class="materials-row-label materials-row-end">Cost</MudText>
+                            <MudText>x@(iq.Quantity)</MudText>
+                            <MudText Class="materials-row-end">@string.Format(FormatConstants.CurrencyFormat, iq.TotalCost)</MudText>
                         </div>
                     </div>
                 </MudListItem>
