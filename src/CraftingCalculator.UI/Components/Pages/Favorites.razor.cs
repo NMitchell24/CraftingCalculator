@@ -27,7 +27,7 @@ public partial class Favorites : ComponentBase, IDisposable
         {
             // The batch cannot change while this page is on screen - the only thing that mutates it is
             // LoadAsync, which navigates away - so this snapshot stays accurate for the page's life.
-            PrimaryAction = new AppBarAction("Save current batch", Icons.Material.Filled.Save,
+            PrimaryAction = new AppBarAction("Save current selection", Icons.Material.Filled.Save,
                 SaveCurrentBatchAsync, Disabled: State.RecipeQuantities.Count == 0)
         });
         await ReloadAsync();
@@ -42,8 +42,8 @@ public partial class Favorites : ComponentBase, IDisposable
         if (State.RecipeQuantities.Count > 0)
         {
             bool? replace = await DialogService.ShowMessageBoxAsync(
-                "Replace current batch?",
-                $"Loading '{favorite.Name}' will discard the recipes currently in your batch.",
+                "Replace current selection?",
+                $"Loading '{favorite.Name}' will discard the blueprints you have selected.",
                 yesText: "Load", cancelText: "Cancel");
 
             if (replace != true)

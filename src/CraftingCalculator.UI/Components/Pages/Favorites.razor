@@ -7,8 +7,8 @@
     @if (_favorites.Count == 0)
     {
         <div class="pane-empty-state">
-            <MudText Typo="Typo.body1">No saved batches</MudText>
-            <MudText Typo="Typo.caption">Build a batch on the Calculate screen, then save it with the button above.</MudText>
+            <MudText Typo="Typo.body1">No saved selections</MudText>
+            <MudText Typo="Typo.caption">Build a selection on the Craft screen, then save it with the button above.</MudText>
         </div>
     }
     else
@@ -21,7 +21,7 @@
                         <div class="list-row-info">
                             <MudText Class="list-row-name">@favorite.Name</MudText>
                             <MudText Typo="Typo.caption" Class="list-row-name">
-                                @favorite.RecipeCount recipe@(favorite.RecipeCount == 1 ? "" : "s")
+                                @favorite.RecipeCount blueprint@(favorite.RecipeCount == 1 ? "" : "s")
                             </MudText>
                         </div>
                         @* The row itself loads the favorite on click, so the overflow menu has to stop

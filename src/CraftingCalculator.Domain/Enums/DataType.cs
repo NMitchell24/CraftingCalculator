@@ -7,11 +7,11 @@ namespace CraftingCalculator.Domain.Enums
 {
     public enum DataType
     {
-        [Description("Ingredient")]
+        [Description("Component")]
         Ingredient = 0,
         [Description("Category")]
         RecipeFilter = 1,
-        [Description("Recipe")]
+        [Description("Blueprint")]
         Recipe = 2
     }
 

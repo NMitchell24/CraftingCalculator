@@ -8,7 +8,7 @@
     <div class="calculate-columns">
         <div class="calculate-column">
             <MudPaper Class="app-card" Elevation="0">
-                <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Batch</MudText>
+                <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Selected Blueprints</MudText>
                 <BatchList OnAddRecipes="OpenPickerAsync" />
             </MudPaper>
 
@@ -22,8 +22,8 @@
                    action and Steps has two. Both tabs have actions, so neither row ever empties. *@
                 <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
                                 SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
-                    <MudToggleItem Value="CalculateView.Materials">Materials</MudToggleItem>
-                    <MudToggleItem Value="CalculateView.Steps">Steps</MudToggleItem>
+                    <MudToggleItem Value="CalculateView.Materials">Components</MudToggleItem>
+                    <MudToggleItem Value="CalculateView.Steps">Crafting Steps</MudToggleItem>
                 </MudToggleGroup>
 
                 @* Labelled rather than icon-only: PR 8b shrank these to bare icons only because they were

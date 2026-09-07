@@ -33,13 +33,13 @@ public partial class Calculate : ComponentBase, IDisposable
     protected override void OnInitialized()
     {
         State.Changed += StateHasChanged;
-        AppBarState.Configure(this, new AppBarConfig("Calculate")
+        AppBarState.Configure(this, new AppBarConfig("Craft")
         {
-            PrimaryAction = new AppBarAction("Add recipes", Icons.Material.Filled.Add, OpenPickerAsync),
+            PrimaryAction = new AppBarAction("Add blueprints", Icons.Material.Filled.Add, OpenPickerAsync),
             MenuItems =
             [
-                new AppBarMenuItem("Clear batch", Icons.Material.Filled.ClearAll, ClearBatchAsync),
-                new AppBarMenuItem("Copy materials", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
+                new AppBarMenuItem("Clear selection", Icons.Material.Filled.ClearAll, ClearBatchAsync),
+                new AppBarMenuItem("Copy components", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
                 new AppBarMenuItem("Save as favorite", Icons.Material.Filled.Star, SaveAsFavoriteAsync)
             ]
         });
@@ -56,7 +56,7 @@ public partial class Calculate : ComponentBase, IDisposable
             CloseOnEscapeKey = true
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<RecipePickerDialog>("Add Recipes", options);
+        IDialogReference dialogRef = await DialogService.ShowAsync<RecipePickerDialog>("Select Blueprints to Craft", options);
         DialogResult? result = await dialogRef.Result;
 
         if (result is { Canceled: false } && result.Data is IReadOnlyCollection<Recipe> selected)
@@ -75,7 +75,7 @@ public partial class Calculate : ComponentBase, IDisposable
     {
         string text = string.Join(Environment.NewLine, State.TotalIngredients.Select(i => i.DisplayName));
         await ClipboardService.SetTextAsync(text);
-        Snackbar.Add("Copied materials to clipboard", Severity.Success);
+        Snackbar.Add("Copied components to clipboard", Severity.Success);
     }
 
     private Task SaveAsFavoriteAsync() => FavoritePrompts.SaveBatchAsync(DialogService, Snackbar, State);

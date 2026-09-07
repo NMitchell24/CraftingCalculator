@@ -1,6 +1,6 @@
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="_search" Placeholder="Search recipes" Adornment="Adornment.Start"
+        <MudTextField @bind-Value="_search" Placeholder="Search blueprints" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mb-2" />
 
         <div class="picker-chip-row mb-2">
@@ -16,7 +16,7 @@
 
         @if (_filteredRecipes.Count == 0)
         {
-            <MudText Class="pa-4" Align="Align.Center">No recipes match.</MudText>
+            <MudText Class="pa-4" Align="Align.Center">No blueprints match.</MudText>
         }
         else
         {
@@ -34,7 +34,7 @@
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@(_selected.Count == 0)" OnClick="Confirm">
-            Add @_selected.Count recipe@(_selected.Count == 1 ? "" : "s")
+            Craft @_selected.Count blueprint@(_selected.Count == 1 ? "" : "s")
         </MudButton>
     </DialogActions>
 </MudDialog>

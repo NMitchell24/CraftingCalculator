@@ -22,8 +22,8 @@
     <MudExpansionPanel Text="Add component">
         <MudToggleGroup T="DataType" Value="_componentType" ValueChanged="OnComponentTypeChanged"
                         Delimiters="false" Class="mb-3">
-            <MudToggleItem Value="DataType.Ingredient">Ingredient</MudToggleItem>
-            <MudToggleItem Value="DataType.Recipe">Recipe</MudToggleItem>
+            <MudToggleItem Value="DataType.Ingredient">Component</MudToggleItem>
+            <MudToggleItem Value="DataType.Recipe">Blueprint</MudToggleItem>
         </MudToggleGroup>
 
         <MudAutocomplete T="IBaseDataRecord" @bind-Value="_selectedComponent" SearchFunc="SearchAsync"
@@ -44,7 +44,7 @@
 {
     <div class="pane-empty-state">
         <MudText Typo="Typo.body1">No components yet</MudText>
-        <MudText Typo="Typo.caption">Open "Add component" above to add an ingredient or another recipe.</MudText>
+        <MudText Typo="Typo.caption">Open "Add component" above to add a component or another blueprint.</MudText>
     </div>
 }
 else

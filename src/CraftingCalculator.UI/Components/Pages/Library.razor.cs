@@ -29,7 +29,7 @@ public partial class Library : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        AppBarState.Configure(this, new AppBarConfig("Library")
+        AppBarState.Configure(this, new AppBarConfig("Dataset")
         {
             MenuItems =
             [
@@ -47,8 +47,8 @@ public partial class Library : ComponentBase, IDisposable
     private static readonly (DataType Type, string Title, string Singular, string Plural)[] SectionSpecs =
     [
         (DataType.RecipeFilter, "Categories", "category", "categories"),
-        (DataType.Ingredient, "Ingredients", "ingredient", "ingredients"),
-        (DataType.Recipe, "Recipes", "recipe", "recipes")
+        (DataType.Ingredient, "Components", "component", "components"),
+        (DataType.Recipe, "Blueprints", "blueprint", "blueprints")
     ];
 
     // Counting means loading each type in full, since ILibraryService exposes no count. That is the same
@@ -73,7 +73,7 @@ public partial class Library : ComponentBase, IDisposable
     {
         DialogParameters parameters = new()
         {
-            ["Message"] = "This removes every favorite, recipe, category, and ingredient from the app. "
+            ["Message"] = "This removes every favorite, blueprint, category, and component from the app. "
                           + "It cannot be undone.",
             ["ConfirmWord"] = "DELETE",
             ["ConfirmText"] = "Delete everything"

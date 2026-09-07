@@ -51,8 +51,8 @@ public partial class LibraryList : ComponentBase, IDisposable
 
     private static string TitleFor(DataType type) => type switch
     {
-        DataType.Recipe => "Recipes",
-        DataType.Ingredient => "Ingredients",
+        DataType.Recipe => "Blueprints",
+        DataType.Ingredient => "Components",
         _ => "Categories"
     };
 

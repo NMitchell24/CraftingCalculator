@@ -1,14 +1,14 @@
 @implements IDisposable
 
 <MudPaper Class="app-card" Elevation="0">
-    <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Calculation Summary</MudText>
+    <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Crafting Summary</MudText>
 
     <dl class="summary-grid">
         <dt>Components Needed</dt>
         <dd>@State.TotalComponentCount total</dd>
 
-        <dt>Crafting Path</dt>
-        <dd>@State.CraftingStepCount @(State.CraftingStepCount == 1 ? "step" : "steps")</dd>
+        <dt>Crafting Steps</dt>
+        <dd>@State.CraftingStepCount</dd>
 
         <dt>Cost</dt>
         <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
