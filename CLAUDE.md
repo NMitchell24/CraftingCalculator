@@ -254,3 +254,11 @@ while doing other work, **do not silently refactor it.** Instead:
 
 The goal is to keep the catalog from turning every task into an unbounded refactor, and to keep
 refactor scope and timing decisions with the user.
+
+---
+
+## Additional Guidance
+
+- **Commits** All commits need to go through Rider's precommit checks to enforce code quality and formatting rules
+  If Claude cannot access tools through the Intellij MCP server to run these precommit checks, then all commits need to
+  to be performed by the user so that these checks are enforced.
