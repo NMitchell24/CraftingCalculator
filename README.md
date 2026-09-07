@@ -10,6 +10,7 @@ calls, no personal information collected.
 
 [![Unit Tests](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/unit-tests.yml)
 [![CodeQL](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml)
+[![Dependencies](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/dependencies.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/dependencies.yml)
 
 ### Screens
 
