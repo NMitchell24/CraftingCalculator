@@ -33,8 +33,8 @@
                     <MudIconButton Icon="@action.Icon" Color="Color.Inherit" Disabled="@action.Disabled"
                                    OnClick="@(() => action.OnClick())" title="@action.Label" aria-label="@action.Label" />
                 }
-                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Href="/settings"
-                               title="Settings" aria-label="Settings" />
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" OnClick="ToggleSettings"
+                               title="@SettingsActionLabel" aria-label="@SettingsActionLabel" />
                 @if (AppBarState.Config.MenuItems.Count > 0)
                 {
                     <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" AriaLabel="More actions"

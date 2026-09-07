@@ -15,7 +15,7 @@
        not on every tab switch or every breakpoint change. *@
     <div class="calculate-content">
         <div class="calculate-pane @(_view == CalculateView.Batch ? "calculate-pane-active" : "")">
-            <BatchList />
+            <BatchList OnAddRecipes="OpenPickerAsync" />
         </div>
         <div class="calculate-pane @(_view == CalculateView.Materials ? "calculate-pane-active" : "")">
             <MaterialsList />

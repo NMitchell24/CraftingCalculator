@@ -5,7 +5,8 @@
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No recipes yet</MudText>
-            <MudText Typo="Typo.caption">Tap "Add recipes" to get started.</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="OnAddRecipes" Class="mt-2">Add Recipes</MudButton>
         </div>
     }
     else

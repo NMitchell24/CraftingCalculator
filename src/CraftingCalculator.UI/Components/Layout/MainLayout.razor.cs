@@ -8,10 +8,16 @@ public partial class MainLayout : IDisposable
 {
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private ThemeState ThemeState { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
+
+    private const string SettingsRoute = "settings";
 
     private MudThemeProvider _themeProvider = null!;
     private bool _isDarkMode;
     private Breakpoint _breakpoint = Breakpoint.Md;
+
+    // Where Settings was opened from, so the gear closes back to it rather than to a fixed route.
+    private string? _preSettingsUri;
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     private bool ShowBottomNav => _breakpoint == Breakpoint.Xs;
@@ -50,6 +56,24 @@ public partial class MainLayout : IDisposable
             ThemeMode.Dark => true,
             _ => await _themeProvider.GetSystemDarkModeAsync()
         };
+    }
+
+    private bool IsSettingsOpen =>
+        Navigation.ToBaseRelativePath(Navigation.Uri).TrimStart('/')
+            .StartsWith(SettingsRoute, StringComparison.OrdinalIgnoreCase);
+
+    private string SettingsActionLabel => IsSettingsOpen ? "Close settings" : "Settings";
+
+    private void ToggleSettings()
+    {
+        if (IsSettingsOpen)
+        {
+            Navigation.NavigateTo(_preSettingsUri ?? "/");
+            return;
+        }
+
+        _preSettingsUri = Navigation.Uri;
+        Navigation.NavigateTo($"/{SettingsRoute}");
     }
 
     private void OnBreakpointChanged(Breakpoint breakpoint)
