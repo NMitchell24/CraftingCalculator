@@ -360,7 +360,8 @@ html, body {
 
 /* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
    regardless of the icon button's own visual (smaller) padding. */
-.list-row .mud-icon-button {
+.list-row .mud-icon-button,
+.batch-row .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
 }
@@ -417,6 +418,49 @@ html, body {
 
 /* MudList and MudTreeView both pad themselves vertically, which reads as a gap under the toolbar row
    rather than as spacing between items. */
+/* The Craft screen's batch row is two lines rather than the one-line .list-row shape: the name gets a
+   full line to itself, so a long blueprint name has the whole card width before it ellipsizes, which
+   it was doing constantly in phone portrait. Deliberately its own family rather than a change to
+   .list-row, which Favorites, the Dataset list and the blueprint editor also use. Mirrors
+   .materials-row so the two cards on the Craft screen read as the same kind of object. */
+.batch-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.batch-row-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+.batch-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 500;
+}
+
+/* Intrinsic width, so the name is what gives way when the two cannot both fit. */
+.batch-row-category {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.batch-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.batch-row-icons {
+    display: flex;
+    align-items: center;
+}
+
 .materials-list .mud-list {
     padding-top: 0;
 }

@@ -15,20 +15,32 @@
             @foreach (BlueprintQuantity rq in State.BlueprintQuantities)
             {
                 <MudListItem T="BlueprintQuantity">
-                    <div class="list-row">
-                        <div class="list-row-info">
-                            <MudText Class="list-row-name">@rq.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="list-row-name">@rq.CategoryName</MudText>
+                    @* Two lines rather than the one-line .list-row shape: the name gets a line of its
+                       own so a long blueprint name has the full card width before it ellipsizes. *@
+                    <div class="batch-row">
+                        <div class="batch-row-header">
+                            <MudText Class="list-row-name batch-row-name">@rq.Name</MudText>
+                            @if (!string.IsNullOrWhiteSpace(rq.CategoryName))
+                            {
+                                @* Outlined primary rather than the default grey, which disappeared against the light card.
+                                   Color.Primary is themed for both palettes, so it follows dark mode too. *@
+                                <MudChip T="string" Text="@rq.CategoryName" Size="Size.Small" Variant="Variant.Outlined"
+                                         Color="Color.Primary" Ripple="false" Class="batch-row-category" />
+                            }
                         </div>
-                        <div class="list-row-stepper">
-                            <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity - 1))" />
-                            <MudNumericField T="long" Value="rq.Quantity" ValueChanged="@(v => State.SetQuantity(rq, v))"
-                                             Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field"
-                                             onfocus="this.select()" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity + 1))" />
+                        <div class="batch-row-actions">
+                            <div class="list-row-stepper">
+                                <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity - 1))" />
+                                <MudNumericField T="long" Value="rq.Quantity" ValueChanged="@(v => State.SetQuantity(rq, v))"
+                                                 Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field"
+                                                 onfocus="this.select()" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity + 1))" />
+                            </div>
+                            <div class="batch-row-icons">
+                                <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="@(() => ShowInfoAsync(rq))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => State.Remove(rq))" />
+                            </div>
                         </div>
-                        <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="@(() => ShowInfoAsync(rq))" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => State.Remove(rq))" />
                     </div>
                 </MudListItem>
             }
