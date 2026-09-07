@@ -6,7 +6,7 @@
 <div class="dataset-page">
     @foreach (DatasetSection section in Sections)
     {
-        <MudPaper Class="app-card dataset-summary-card" Elevation="0" @key="section.Type">
+        <MudPaper Class="app-card dataset-summary-card" Elevation="0" @key="section.Type" onclick="@(() => OpenList(section.Type))">
             <div class="dataset-summary-row">
                 <div class="dataset-summary-info">
                     <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">@section.Title</MudText>
