@@ -1,0 +1,658 @@
+/* Both faces are bundled locally (wwwroot/Fonts) rather than pulled from a CDN, so the app renders
+   identically with no network - it is an offline-first tool. Inter is the body face and is wired into
+   the MudTheme (Theme/AppTheme.cs); Jersey 20 is the display face and is applied only through
+   .display-title below. */
+@font-face {
+    font-family: 'Inter';
+    src: url('Fonts/Inter.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Jersey 20';
+    src: url('Fonts/Jersey20.ttf') format('truetype');
+    font-display: block;
+}
+
+/* The single home for the display face - the app's own screen and section titles, never user data or
+   body copy. Both values below come from the font's measured metrics rather than taste:
+
+   line-height: its ascent (1026) + descent (266) is exactly its 1292 unit em, so 1 reproduces the
+   font's own line box; MudBlazor's 1.35 would leave it floating low in the fixed-height app bar.
+
+   font-size: its cap height is 760/1292 = .588em against Inter's 1490/2048 = .728em, so at equal
+   font-size its capitals render ~19% shorter and read as an accidental step down. The em unit keeps
+   this a ratio, so the class corrects itself against whichever Typo variant it is applied to.
+
+   Jersey 20 is drawn on a 34-design-pixel em (38 units per pixel), so it is only truly grid-crisp at
+   font sizes that are whole multiples of 34px. That is impractical for UI text, and it antialiases
+   acceptably in between - but it is why display type here is checked on-device rather than by eye in
+   a desktop browser. */
+.display-title {
+    font-family: 'Jersey 20', 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.24em;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#app {
+    height: 100%;
+}
+
+/* Safe-area insets. On iOS these stay 0 and env() (used directly below) does the work; on Android
+   env() maps to the display cutout, not the system bars, and reads 0 there - MainPage.xaml.cs /
+   SafeAreaInsetsInjector injects the real system-bar inset pixels into these variables instead.
+   max(env, var) picks whichever platform actually supplies a non-zero value. */
+:root {
+    --safe-area-inset-top: 0px;
+    --safe-area-inset-bottom: 0px;
+    /* The xs bottom nav's exact height, pinned rather than left to grow with its content: every bar
+       that docks above it (.editor-action-bar, the snackbars) offsets by this, and any drift between
+       the real height and the offset shows up as a strip of scrolling page content between them. */
+    --bottom-nav-height: 56px;
+    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Sized for
+       the widest the action side ever gets: primary action + settings + overflow, at 44px each. */
+    --app-bar-side-width: 132px;
+}
+
+/* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
+   screen and not merely on whatever space the icons leave. Equal fixed side tracks are what makes it
+   exact - 1fr sides would each floor at their own min-content width, and the heavier action side
+   would win. */
+.mud-appbar .mud-toolbar {
+    display: grid;
+    grid-template-columns: var(--app-bar-side-width) minmax(0, 1fr) var(--app-bar-side-width);
+    align-items: center;
+}
+
+.app-bar-start {
+    justify-self: start;
+}
+
+.app-bar-end {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+}
+
+/* minmax(0, 1fr) above lets this track shrink below its content; without these rules a long title
+   would instead widen the track and push the action icons off the bar. */
+.app-bar-title {
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* Guarantees clear air between the title and the action icons at any text zoom. Android's WebView
+       scales px text by the OS "Font size" setting, so at its maximum a title that merely fits the
+       track ends up butting straight against the +. Reserving the gutter here makes the ellipsis kick
+       in a little sooner instead. */
+    padding: 0 8px;
+}
+
+/* Two jobs. First, compensate MudMainContent's own top offset (which only accounts for the app bar's
+   nominal toolbar height) for the extra padding-top MainLayout.razor puts on the app bar to clear the
+   status bar. Second, supply the 16px gap under the bar: MudBlazor offsets the bar with `padding-top`
+   on .mud-main-content at two classes of specificity (_main.scss), so .page-content's one-class
+   `padding: 16px` shorthand never won the top edge and page content sat flush against the bar. The gap
+   goes here, on the rule that does win, rather than by out-specifying MudBlazor's. */
+.mud-layout .mud-main-content {
+    margin-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+/* Same compensation as .mud-main-content above, for the side rail (sm+: MudDrawer Mini/Persistent,
+   ClipMode.Always in MainLayout.razor) - MudBlazor's own clipped-drawer rule offsets `top` by the app
+   bar's nominal height only, so without this the rail's first item renders underneath the taller bar.
+   Matches MudBlazor's own selector (including the .mud-appbar-dense sibling variant - MainLayout's app
+   bar is Dense) so this wins on specificity rather than source order alone. */
+.mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-mini:not(.mud-drawer-clipped-never),
+.mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-persistent:not(.mud-drawer-clipped-never) {
+    top: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    height: calc(100% - var(--mud-appbar-height) + var(--mud-appbar-height) / 4 - max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+.page-content {
+    padding: 16px;
+    padding-bottom: calc(16px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+.page-content-with-bottom-nav {
+    padding-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+/* MainLayout.razor's bottom navigation bar (xs breakpoint only). Not CSS-isolated (see MainLayout.razor
+   for why) - .razor.css scoped-bundle output never gets produced for this project's TFMs, so isolated
+   rules silently never load. Global rules here are the same fix Schmeg.UI settled on for the same gap. */
+.bottom-nav {
+    position: fixed;
+    border-top: 1px solid var(--mud-palette-lines-default);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1300;
+    padding-bottom: max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom));
+}
+
+.bottom-nav-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.bottom-nav-menu a {
+    flex: 1 1 0;
+    height: var(--bottom-nav-height);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Icons only on the bottom bar - the three destinations are self-explanatory and the labels cost
+   vertical space a phone does not have. Hidden visually rather than with display:none, which would
+   drop the label from the accessibility tree; it is the link's accessible name. The side rail's
+   Persistent variant is untouched and keeps its labels. */
+.bottom-nav-menu .mud-nav-link-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+/* Cards. One shared shape for every panel on Calculate and the Library landing, so a "card" means the
+   same thing everywhere: surface fill, hairline, the theme's radius, and its own padding. Elevation is
+   deliberately 0 - the border is what separates a card from the page ground in both themes, and stacked
+   shadows on a scrolling page of cards read as clutter. */
+.app-card {
+    background-color: var(--mud-palette-surface);
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: var(--mud-default-borderradius);
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.app-card-title {
+    margin-bottom: 8px;
+}
+
+/* A row inside a card is already inset by the card's own padding, so MudListItem's default 16px sides
+   are paid twice - and the name column is what gives up the width, truncating recipe names that fit
+   before these lists moved into cards. */
+.app-card .mud-list > .mud-list-item {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+/* Calculate screen (Components/Pages/Calculate.razor + Components/Controls/*) */
+
+/* Stacked by default; two columns only where both dimensions are ample (see the media query below). */
+.calculate-columns {
+    display: block;
+}
+
+/* The batch and summary cards fill the page width on a phone, so the list inside the batch card needs
+   no separate scroll container - the page itself scrolls. */
+.calculate-column {
+    min-width: 0;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.summary-grid dt {
+    color: var(--mud-palette-text-secondary);
+}
+
+.summary-grid dd {
+    margin: 0;
+    text-align: right;
+}
+
+.summary-profit {
+    font-weight: 600;
+    color: var(--mud-palette-text-primary);
+}
+
+/* The tab row's own row, holding nothing else. Sharing it with the pane actions sized the tab bar by
+   whatever they left over, so it changed width whenever the active pane's action count changed. */
+.pane-toolbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Segmented control, replacing MudToggleGroup's default bordered box: a recessed track holding one
+   raised pill. The group is already display:grid (MudBlazor _togglegroup.scss), so equal-width
+   segments come free. */
+.segmented {
+    width: 100%;
+    /* MudBlazor spells this one "gray", not "grey" (MudThemeProvider emits --mud-palette-background-gray).
+       The misspelling made the declaration invalid, so the track painted transparent and simply showed
+       whatever was behind it - which is why it looked like it had no fill at all. */
+    background-color: var(--mud-palette-background-gray);
+    border: 1px solid var(--mud-palette-lines-default);
+    padding: 3px;
+    gap: 3px;
+    border-radius: 10px;
+}
+
+/* MudToggleItem renders as a MudButton whose Variant flips to Filled and whose Color is the group's
+   (Primary by default), so a selected item arrives already styled by .mud-button-filled.mud-button-
+   filled-primary - two classes. Every rule below has to outrank that, which is why they are qualified
+   by .segmented rather than left as the bare SelectedClass MudToggleGroup applies. */
+.segmented .mud-toggle-item {
+    border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* MudBlazor's .mud-toggle-item sets `border-style: none !important`, so a plain border on the
+       selected pill below would never paint. Re-declaring the style here with the same weight is what
+       lets that rule's border-color and width take effect. */
+    border-style: solid !important;
+    border-width: 0;
+    border-color: transparent;
+}
+
+/* The truncation has to live on the label, not just the item: .mud-button-label is a flex child that
+   will not shrink below its content, so at large text zoom it overflows the button and gets clipped at
+   both edges mid-glyph rather than ellipsised at the end. */
+.segmented .mud-toggle-item .mud-button-label {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.segmented .mud-toggle-item:not(.segmented-selected) {
+    background-color: transparent;
+    color: var(--mud-palette-text-secondary);
+}
+
+/* :not() above matters as much as the fill does - a muted text-secondary label left on the selected
+   pill reads as a disabled control, the same way PR 8b's dimmed Add Recipes button did. */
+
+/* The pill shares the surface token with the card it sits on, so the recessed track behind it is what
+   makes it read as raised; the border and shadow keep its edges legible where pill and card meet. */
+.segmented .mud-toggle-item.segmented-selected {
+    background-color: var(--mud-palette-surface);
+    border: 1px solid var(--mud-palette-lines-default);
+    color: var(--mud-palette-primary);
+    box-shadow: var(--mud-elevation-3);
+}
+
+/* Both tabs carry actions, so this row is always populated and never collapses to zero height - the
+   content below it does not shift when the tab changes. Wraps rather than truncates, because at large
+   text zoom two labelled buttons will not fit one phone row. */
+.pane-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 44px;
+    margin-bottom: 4px;
+}
+
+.pane-actions .mud-button-root {
+    min-height: 44px;
+}
+
+.calculate-pane {
+    display: none;
+}
+
+.calculate-pane-active {
+    display: block;
+}
+
+/* Large tablets and up only - both dimensions ample, which a landscape phone never satisfies at the
+   same time as a genuine tablet does. The batch and summary move beside the content card rather than
+   above it, so the whole screen fits without scrolling. */
+@media (min-width: 960px) and (min-height: 600px) {
+    .calculate-columns {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .calculate-column {
+        flex: 1 1 0;
+    }
+}
+
+/* Without this, a name too long for the available width overflows its container (flexbox and grid
+   don't clip by default) and visually bleeds onto whatever follows it in the row. */
+.list-row-name {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.pane-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 32px 16px;
+    text-align: center;
+}
+
+/* Dimming goes on the text, not the container: opacity on the container composites the whole subtree
+   as one group, so a child cannot opt back out of it - which would leave BatchList's Add Recipes
+   call-to-action reading as disabled. */
+.pane-empty-state .mud-typography {
+    opacity: 0.7;
+}
+
+/* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
+   regardless of the icon button's own visual (smaller) padding. */
+.list-row .mud-icon-button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* One shared row shape for every name-plus-actions list in the app: the Calculate batch, Favorites,
+   the Library list, and the recipe editor's components. Same dedupe as .list-row-name. */
+.list-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+/* Surface separation for every list in the app, applied to MudListItem rather than to .list-row so
+   that MaterialsList (.materials-row) gets it from the same rule. Rows read as discrete cards instead
+   of undifferentiated text on one flat sheet. MudListItem carries its own padding, so only the fill,
+   border and rhythm are set here. */
+.mud-list > .mud-list-item {
+    background-color: var(--mud-palette-surface);
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: var(--mud-default-borderradius);
+    margin-bottom: 6px;
+}
+
+/* MudSelect and MudMenu build their dropdowns out of the same .mud-list / .mud-list-item markup, so the
+   rule above turns each option into a spaced card floating inside the popover - a panel of cards where
+   a plain option list belongs. Dialogs are deliberately not excluded here: their lists are real content
+   (the recipe picker's rows) and should keep the cards. */
+.mud-popover .mud-list > .mud-list-item {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.list-row-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.list-row-stepper {
+    display: flex;
+    align-items: center;
+}
+
+.list-row-qty-field {
+    width: 56px;
+}
+
+.list-row-qty-field input {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* MudList and MudTreeView both pad themselves vertically, which reads as a gap under the toolbar row
+   rather than as spacing between items. */
+.materials-list .mud-list {
+    padding-top: 0;
+}
+
+/* Fixed-width qty/cost columns so they line up across rows regardless of how long each ingredient's
+   name is - the flex+space-between this replaced positioned each column based on that row's own
+   content width instead of a shared column width. tabular-nums keeps the digits themselves from
+   shifting the alignment as quantities and costs change. */
+.materials-row {
+    display: grid;
+    grid-template-columns: 1fr 3rem 4.5rem;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    font-variant-numeric: tabular-nums;
+}
+
+.materials-row-name {
+    min-width: 0;
+}
+
+.materials-row-cost {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1;
+}
+
+.materials-row-cost-label {
+    opacity: 0.7;
+}
+
+/* Tree on a narrow screen: cap MudBlazor's fixed 17px-per-level indent (Styles/components/_treeview.scss)
+   and let long names wrap instead of truncating or forcing horizontal scroll of the whole page. */
+.steps-tree-view {
+    overflow-x: auto;
+    padding-top: 0;
+}
+
+.steps-tree-view .mud-treeview-item-label {
+    white-space: normal;
+    word-break: break-word;
+}
+
+@media (max-width: 599.98px) {
+    .steps-tree-view .mud-treeview-group {
+        margin-left: 12px;
+    }
+}
+
+/* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor +
+   LibraryList.razor) screens. The Library landing is one card per record type; the sub-tabs it used to
+   carry are gone, replaced by a card each opening that type's own list page. */
+
+/* Capped for the same reason as .library-editor: a single column of cards stretched across a desktop
+   window is far harder to scan than the same column at phone width. */
+.library-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.library-summary-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.library-summary-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* The count is the point of the card, so it carries the weight its heading does not. */
+.library-summary-count {
+    color: var(--mud-palette-text-secondary);
+}
+
+/* The card itself is the target, so its own title needs no bottom gap above the count. */
+.library-summary-card .app-card-title {
+    margin-bottom: 2px;
+}
+
+.library-summary-card .mud-icon-button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Settings (Components/Pages/Settings.razor) */
+
+/* Capped for the same reason as .library-editor: a single column of controls and body text stretched
+   across a desktop window is far harder to scan than the same column at phone width. */
+.settings-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+/* margin-top because .display-title sets line-height: 1, which strips the leading a section heading
+   would otherwise inherit - without it "Appearance" crowds the app bar it sits directly beneath. */
+.settings-section-title {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.settings-license {
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+/* Library editor (Components/Pages/LibraryEditor.razor + Components/Controls/*Editor.razor) */
+
+/* Capped rather than full-bleed: a single column of form fields stretched across a tablet or desktop
+   window is far harder to scan than the same column at phone width. */
+.library-editor {
+    max-width: 720px;
+    margin: 0 auto;
+    /* Clears the fixed .editor-action-bar so the last field is never trapped under it. */
+    padding-bottom: 72px;
+}
+
+.recipe-add-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recipe-add-qty {
+    width: 96px;
+}
+
+/* Thumb-reachable Cancel/Save - above the bottom nav on xs and clear of the gesture-nav area
+   everywhere. The only fixed bar left in the app now that the totals bar is a card. */
+.editor-action-bar {
+    position: fixed;
+    border-top: 1px solid var(--mud-palette-lines-default);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1250;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px 16px;
+    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+@media (max-width: 599.98px) {
+    .editor-action-bar {
+        bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        padding-bottom: 8px;
+    }
+}
+
+.picker-chip-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+    padding-bottom: 4px;
+}
+
+/* Snackbars (configured in MauiProgram.cs). MudBlazor's own rule for this position is a flat
+   `bottom: 24px`, which on Android lands on the gesture bar; and its default position is TopRight,
+   which lands squarely on the app bar's +/settings/overflow cluster - at z-index 1500 over every bar
+   in this file, for eight seconds, swallowing the taps meant for the + underneath. Docking arithmetic
+   matches .editor-action-bar, the one fixed bar left. The 56px is that bar's height, held constant on
+   the screens that do not show it: a slightly high toast there is cheaper than making this position
+   depend on which page is mounted. */
+.mud-snackbar-location-bottom-center {
+    bottom: calc(56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+@media (max-width: 599.98px) {
+    .mud-snackbar-location-bottom-center {
+        bottom: calc(var(--bottom-nav-height) + 56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    }
+}
+
+/* #mud-snackbar-container is pointer-events:none, but each .mud-snackbar re-enables it for
+   click-to-close - so a tap aimed at a control beneath a toast hits the toast instead. Dismissal is by
+   timeout only now, which is also why ShowCloseIcon is off (MauiProgram.cs). */
+.mud-snackbar {
+    pointer-events: none;
+}
+
+/* House style is set on MudDialogProvider (MainLayout.razor); these are the two things it cannot
+   express. Without the margin a FullWidth dialog sits flush against both screen edges on a phone, and
+   without the max-height long content (an ingredient description, a long delete warning) grows the
+   dialog past the viewport instead of scrolling inside it. */
+.mud-dialog:not(.mud-dialog-fullscreen) {
+    margin: 16px;
+    max-height: calc(100dvh - 32px);
+}
+
+/* Every dialog title in the app is a literal passed to ShowAsync, so it is always the app's own voice
+   and never user data - which makes this a house-style rule alongside the ones above rather than
+   something to repeat at each call site. Mirrors .display-title; see it for why these values. */
+.mud-dialog-title .mud-typography {
+    font-family: 'Jersey 20', 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.24em;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+/* A FullScreen MudDialog (RecipePickerDialog on xs - Components/Dialogs/RecipePickerDialog.razor)
+   draws from y=0 same as the app bar, so its title needs the same safe-area clearance. A normal
+   (non-fullscreen) dialog is centered with margin and never reaches the real top of the screen, so
+   this is scoped to .mud-dialog-fullscreen only. */
+.mud-dialog-fullscreen .mud-dialog-title {
+    padding-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+.mud-dialog-fullscreen .mud-dialog-title .mud-button-close {
+    top: calc(8px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+}
+
+/* Same reasoning as the title above, for the bottom action bar (Cancel/Confirm) - it otherwise sits
+   flush against the gesture nav bar's swipe area. */
+.mud-dialog-fullscreen .mud-dialog-actions {
+    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1400;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

@@ -1,0 +1,25 @@
+@page "/library"
+@implements IDisposable
+
+<PageTitle>Dataset</PageTitle>
+
+<div class="library-page">
+    @foreach (LibrarySection section in Sections)
+    {
+        <MudPaper Class="app-card library-summary-card" Elevation="0" @key="section.Type">
+            <div class="library-summary-row">
+                <div class="library-summary-info">
+                    <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">@section.Title</MudText>
+                    <MudText Typo="Typo.body2" Class="library-summary-count">@section.Caption</MudText>
+                </div>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                               OnClick="@(() => OpenList(section.Type))"
+                               title="@($"Edit {section.Title}")" aria-label="@($"Edit {section.Title}")" />
+            </div>
+        </MudPaper>
+    }
+</div>
+
+<MudOverlay Visible="_busy" DarkBackground="true" ZIndex="9999">
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+</MudOverlay>

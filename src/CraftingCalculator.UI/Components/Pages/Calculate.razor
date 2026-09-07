@@ -1,0 +1,57 @@
+@page "/"
+@implements IDisposable
+
+<div class="calculate-page">
+    @* Two columns only at >=960x600 (app.css); everything stacks below that. The batch and the summary
+       ride together because both describe the whole batch, while the content card is the one thing that
+       switches. *@
+    <div class="calculate-columns">
+        <div class="calculate-column">
+            <MudPaper Class="app-card" Elevation="0">
+                <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Selected Blueprints</MudText>
+                <BatchList OnAddRecipes="OpenPickerAsync" />
+            </MudPaper>
+
+            <SummaryCard />
+        </div>
+
+        <div class="calculate-column">
+            <MudPaper Class="app-card" Elevation="0">
+                @* Tabs and actions are separate rows on purpose. Sharing one row sized the tab bar by
+                   whatever the actions left over, so it changed width on every switch - Materials has one
+                   action and Steps has two. Both tabs have actions, so neither row ever empties. *@
+                <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
+                                SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+                    <MudToggleItem Value="CalculateView.Materials">Components</MudToggleItem>
+                    <MudToggleItem Value="CalculateView.Steps">Crafting Steps</MudToggleItem>
+                </MudToggleGroup>
+
+                @* Labelled rather than icon-only: PR 8b shrank these to bare icons only because they were
+                   sharing the tab row. On their own row there is space to say what they do. *@
+                <div class="pane-actions">
+                    @if (_view == CalculateView.Materials)
+                    {
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.ContentCopy"
+                                   Disabled="@(State.TotalIngredients.Count == 0)" OnClick="CopyMaterialsAsync">Copy</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.UnfoldMore"
+                                   OnClick="@State.ExpandAll">Expand all</MudButton>
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.UnfoldLess"
+                                   OnClick="@State.CollapseAll">Collapse all</MudButton>
+                    }
+                </div>
+
+                @* Both panes stay mounted and are shown or hidden by class, so MaterialsList and StepsTree
+                   each subscribe to CalculatorState.Changed once rather than on every tab switch. *@
+                <div class="calculate-pane @(_view == CalculateView.Materials ? "calculate-pane-active" : "")">
+                    <MaterialsList />
+                </div>
+                <div class="calculate-pane @(_view == CalculateView.Steps ? "calculate-pane-active" : "")">
+                    <StepsTree />
+                </div>
+            </MudPaper>
+        </div>
+    </div>
+</div>

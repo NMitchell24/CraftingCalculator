@@ -1,0 +1,202 @@
+---
+name: craftingcalculator-dev
+description: Architecture, conventions, and workflows for the CraftingCalculator .NET MAUI Blazor Hybrid app. Use whenever working on this codebase — adding/editing features, services, DAOs, entities, Blazor pages/components, EF Core migrations, seed data, or tests in the CraftingCalculator.Domain / CraftingCalculator.Application / CraftingCalculator.Infrastructure / CraftingCalculator.UI projects.
+---
+
+# CraftingCalculator — Developer Skill
+
+Helper app for survival crafting games: users maintain ingredients and recipes (recipes can nest
+other recipes), pick recipes with quantities, and see total raw materials, cost, value, and profit.
+**.NET 10 MAUI Blazor Hybrid** app using **MudBlazor** for UI and **EF Core + SQLite** for local
+storage. Organized as a Clean-Architecture-style solution.
+
+> **Running/launching the app (Rider/VS), plus Android & Apple/iOS device setup:** see
+> [`docs/dev-environment.md`](../../../docs/dev-environment.md) — covers the JDK/Android SDK gotchas,
+> the iOS signing Debug/Release split, and building on the Mac.
+
+## Solution layout (`CraftingCalculator.sln`)
+
+Four source projects under `src/` + two mirror test projects under `tests/`.
+
+| Project | TFM | Role |
+|---|---|---|
+| `CraftingCalculator.Domain` | net10.0 | Entities, Enums, Models, Constants. No deps except EF Core. The core; depends on nothing internal. |
+| `CraftingCalculator.Application` | net10.0 | Business logic, services, **all interfaces** (Service + DAO), Processors. References Domain. |
+| `CraftingCalculator.Infrastructure` | net10.0 | EF Core `DbContext`, DAO implementations, migrations, SQL seed data. References Application. |
+| `CraftingCalculator.UI` | net10.0-android/ios/windows | MAUI Blazor host: Razor pages/components (MudBlazor), DI wiring, platform code. References Infrastructure. |
+
+**Dependency direction:** Domain ← Application ← Infrastructure ← UI. Interfaces (both `IXxxService`
+and `IXxxDAO`) live in `Application/Common/Interfaces`; DAO implementations live in
+`Infrastructure/DAO/Impl`. Don't put DAO interfaces in Infrastructure.
+
+**Adding a project to `CraftingCalculator.sln`:** `dotnet sln add` stamps the **legacy** C#
+project-type GUID `{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}`; after adding, change it in
+`CraftingCalculator.sln` to the **SDK-style** `{9A19103F-16F7-4668-BE54-9A1E7A4F7556}` that every
+other project uses (the *type* GUID — the first one on the `Project(...)` line — not the project's own
+trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite the .sln.
+
+## Key conventions & patterns
+
+- **Layered call flow:** Razor page (`@inject IXxxService`) → Service (`Application/Common/Services/Impl`)
+  → DAO (`Infrastructure/DAO/Impl`) → `CraftingDataContext`. Services orchestrate; DAOs do data access
+  only; pure transformation logic goes in `Application/BusinessLogic/Processors` (e.g.
+  `IngredientProcessor`, static methods).
+- **DI registration is manual** and split:
+  - Services: `src/CraftingCalculator.Application/DependencyInjection.cs` → `AddApplicationServices()`
+    (all `AddScoped`).
+  - DAOs + DbContext: `src/CraftingCalculator.Infrastructure/DependencyInjection.cs` →
+    `AddDatabaseServices(dbPath)`.
+  - Both are called from `src/CraftingCalculator.UI/MauiProgram.cs`. **When you add a service or DAO,
+    register it in the matching file.**
+- **DbContext access:** DAOs inject `IDbContextFactory<CraftingDataContext>` and use
+  `await using var context = await contextFactory.CreateDbContextAsync();` per operation (short-lived
+  contexts — MAUI/Blazor pattern), primary-constructor style
+  (`class RecipeDAO(IDbContextFactory<CraftingDataContext> contextFactory)`).
+  **Never register the `DbContext` itself** — only `AddPooledDbContextFactory<CraftingDataContext>`.
+  `BlazorWebView` creates exactly one `IServiceScope` for the WebView's whole lifetime, so a `Scoped`
+  `DbContext` would live for the entire session (unbounded change tracker, stale first-level cache,
+  `InvalidOperationException` on overlapping async handlers).
+- **Naming:** interfaces `IXxxService` / `IXxxDAO`; impls in `Impl/` folders. Models in
+  `Domain/Models`, entities in `Domain/Entities`, magic strings/enums in `Domain/Constants` and
+  `Domain/Enums` (e.g. `RecipeFilter.ALL`, the currency format string).
+- **Domain models vs. EF entities share names** (`Recipe`, `Ingredient`, `RecipeFilter`) but live in
+  different namespaces — `CraftingCalculator.Domain.Entities` vs. `CraftingCalculator.Domain.Models`.
+  Alias at the few call sites (DAO impls) that need both in one file.
+- **Read queries use `AsNoTracking()`.** Tracking is confined to the save path inside one
+  factory-created context.
+- **State a destination page needs rides in the route** (`/library/{type}/{id}`), not a shared mutable
+  holder. The one exception is the working batch on the Calculate screen, which is genuine cross-page
+  session state (`CalculatorState`, scoped, `UI/State`) — components subscribe to its `Changed` event
+  in `OnInitialized` and unsubscribe in `Dispose`.
+- C# style: `Nullable` and `ImplicitUsings` enabled everywhere; file-scoped namespaces; collection
+  expressions (`[]`, `[.. x]`). Match the file you're editing.
+
+## Database, migrations & seed data
+
+- SQLite DB in `FileSystem.AppDataDirectory`. `MauiProgram.CreateMauiApp()` runs
+  `db.Database.Migrate()` on startup.
+- Migrations in `src/CraftingCalculator.Infrastructure/Migrations/`. Entity config via one
+  `IEntityTypeConfiguration<T>` per entity under `Infrastructure/Data/Configurations`, applied with
+  `ApplyConfigurationsFromAssembly` in `CraftingDataContext.OnModelCreating`.
+- **Seed data is SQL**, not C#: `src/CraftingCalculator.Infrastructure/Data/Seed/*.sql`, embedded as
+  resources (`<EmbeddedResource Include="Data\**\*.sql" />`) and executed once by the `InsertSeedData`
+  migration via `migrationBuilder.Sql(...)`. The seed is intentionally minimal — just the `RecipeFilter`
+  row `(Id 1, Name 'All')` that the filter dropdown and `RecipeFilter.ALL` depend on. **Once released,
+  the seed is final — never edit the `.sql` or re-run the seed.** Any data change now ships as a **new
+  migration** that Inserts/Updates/Deletes rows on top of the seeded baseline (and never edit an
+  already-applied migration).
+- **Creating a migration** (run from `src/CraftingCalculator.Infrastructure`):
+  ```
+  dotnet ef migrations add <Name>
+  ```
+  No `--startup-project` is needed: `CraftingDataContextFactory` (an `IDesignTimeDbContextFactory`
+  using an in-memory SQLite DB) lets EF build the context from this project alone. Tools are
+  referenced (`Microsoft.EntityFrameworkCore.Design`/`.Tools`). The DB auto-migrates at app launch; no
+  manual `database update` needed for the app.
+- **Delete behavior is configured explicitly** (cascade / SetNull) per relationship in the entity
+  configurations — see the delete-behavior table in the migration plan history / PR description for
+  the full list. `Microsoft.Data.Sqlite` enables `PRAGMA foreign_keys` per connection so DB-side
+  cascade actually fires; don't reintroduce hand-written cleanup loops in services.
+
+## UI (Blazor + MudBlazor)
+
+- Pages in `src/CraftingCalculator.UI/Components/Pages` (`@page "/..."`), reusable controls in
+  `Components/Controls`, dialogs in `Components/Dialogs`, layout in `Components/Layout`.
+- **Code-behind pattern:** `Foo.razor` (markup) + `Foo.razor.cs` (`public partial class Foo`). Put
+  logic in the `.razor.cs`. Inject services with `@inject IXxxService _name`.
+- All UI is **MudBlazor** components; registered via `AddMudServices()`. Global usings in
+  `Components/_Imports.razor`.
+- **Mobile-first.** Phone portrait is the design target; desktop is the widened case reached by
+  breakpoints. Every interactive target is ≥ 44×44 px; no action is reachable only by hover or
+  right-click. See the three-destination bottom-nav/side-rail shell (`Calculate` `/`, `Favorites`
+  `/favorites`, `Library` `/library`) before adding new navigation.
+
+### MudBlazor docs MCP server (`mudblazor` / MudMCP)
+
+A local [MudMCP](https://github.com/mcbodge/MudMCP) server can index the **MudBlazor 9.7.0** source
+and serve component docs, code examples, and API reference (component list, prop/parameter lookup,
+semantic search).
+
+- **Use it for any MudBlazor question** — prefer it over recalled knowledge for component parameters,
+  slots, enums, and breaking changes between MudBlazor major versions. Keep the version in sync with
+  the `MudBlazor` entry in [Directory.Packages.props](../../../Directory.Packages.props) (currently
+  `9.7.0`) — versions are centrally managed, so that file is the single source of truth. **Re-index
+  after a MudBlazor bump**, otherwise the server answers from the old version.
+- Its tools usually arrive as **deferred tools**: load their schemas with `ToolSearch` (query
+  `mudblazor`) before calling them. If they aren't present at all, the server just needs registering
+  (see below) and a Claude Code restart — a skill can't start an MCP server itself.
+- **Setup / maintenance** (machine-local, not committed): repo at `Z:/Repos/MudMCP`, binary at
+  `publish/win-x64/MudBlazor.Mcp.exe`.
+  - **Registration is machine-local** (`claude mcp add -s local`), never a committed `.mcp.json` — the
+    binary path differs from machine to machine. Register it **from `cmd.exe`**, not PowerShell:
+    ```
+    claude mcp add mudblazor -s local -- "Z:/Repos/MudMCP/publish/win-x64/MudBlazor.Mcp.exe" --stdio --version 9.7.0
+    ```
+    **This fails in PowerShell** — including Rider's and IntelliJ's integrated terminals — with
+    `unknown option --stdio`. PowerShell does not honor a bare `--` as a POSIX end-of-options
+    separator, so `claude` keeps parsing the arguments meant for the server (`--version` is a real
+    `claude` flag, which is the likely trigger). It is not a server problem: the published binary reads
+    `args.Contains("--stdio")` and strips it before handing the rest to the host builder, and its own
+    usage text advertises `--stdio`. Verified working in `cmd.exe`. To run it from PowerShell anyway,
+    use the stop-parsing token:
+    ```powershell
+    claude --% mcp add mudblazor -s local -- "Z:/Repos/MudMCP/publish/win-x64/MudBlazor.Mcp.exe" --stdio --version 9.7.0
+    ```
+  - Check status: `claude mcp list` (expect `mudblazor: … ✓ Connected`) after restarting Claude Code.
+  - MudMCP also runs as an HTTP server on `http://localhost:8000/mcp` if the stdio route gives trouble.
+  - First launch of a new `--version` clones MudBlazor + builds an index (slow); warm it once by
+    running the exe directly before relying on it via MCP.
+  - On the Mac the path differs — register it there separately, with the same version.
+
+## Building & testing
+
+- Build a specific testable project (faster than the MAUI head, which needs platform workloads):
+  ```
+  dotnet build src/CraftingCalculator.Application/CraftingCalculator.Application.csproj
+  ```
+- Run tests: `dotnet test` (or target `tests/CraftingCalculator.Application.UnitTests/...`).
+- **`CraftingCalculator.Tests.slnf`** filters the solution down to Domain / Application /
+  Infrastructure plus the two test projects — everything except the `CraftingCalculator.UI` MAUI head.
+  Use it (`dotnet build CraftingCalculator.Tests.slnf`, `dotnet test CraftingCalculator.Tests.slnf`)
+  on any machine without the MAUI workloads, and in CI. **Add every new non-MAUI project to it** as
+  well as to the .sln, or CI silently stops building it.
+- **`.editorconfig` conformance is a CI gate.** The `Unit Tests` workflow runs
+  `dotnet format CraftingCalculator.Tests.slnf --verify-no-changes` before it builds, so anything
+  `dotnet format` would rewrite — file-scoped namespaces, a UTF-8 BOM, whitespace — fails the build.
+  Run `dotnet format CraftingCalculator.Tests.slnf` before pushing. **EF-generated migrations are in
+  scope:** `dotnet ef migrations add` emits a BOM and a block-scoped namespace, so format the new
+  migration (its `Up`/`Down` operations are untouched by that) rather than excluding it.
+- **CI is three workflows.** `unit-tests.yml` is the `core` job above on `ubuntu-latest`, triggered
+  by every PR into `master` — the only automatic gate. `build.yml` holds one Release build per platform
+  head (`windows`, `android` → APK artifact, `ios` → compile check with `-p:CodesignKey=""`) and is
+  **`workflow_dispatch` only** until the app is finished, when it becomes a tag-triggered
+  build/release pipeline; those jobs build `-c Release` on purpose — trimming, linker and interpreter
+  failures do not exist in Debug. `codeql-analysis.yml` builds the same `.slnf` with `build-mode:
+  manual`, because CodeQL autobuild does not handle the MAUI head.
+- **Test stack:** NUnit + Moq + AwesomeAssertions (`result.Should()...`; the Apache-2.0 community fork
+  of FluentAssertions, which went to a paid Xceed licence at v8 — do not add `FluentAssertions` back).
+  Tests mirror source folders. Mock DAOs and inject them into the service under test.
+- **`Infrastructure.UnitTests` uses a real SQLite database, never `UseInMemoryDatabase`.** The
+  in-memory provider enforces neither foreign keys nor cascade delete — exactly the mechanisms the
+  delete-behavior configuration relies on. Use a fixture that opens
+  `DataSource=:memory:;Cache=Shared` with a held-open connection, runs `Migrate()`, and hands back an
+  `IDbContextFactory`.
+- Building the full `CraftingCalculator.UI` MAUI head requires the MAUI workloads + platform SDKs
+  (Android/iOS/Windows). Prefer building/testing the non-MAUI projects when verifying logic changes.
+
+### Environment gotchas
+- All projects target **net10.0**, so the **.NET 10 runtime must be installed** to run tests
+  (`winget install Microsoft.DotNet.Runtime.10`). Without it the test host fails to launch (`You must
+  install or update .NET to run this application`).
+
+## When adding a feature (typical checklist)
+
+1. Entity → `Domain/Entities` (+ enum/constant if needed); domain model → `Domain/Models` if the UI
+   needs a shape distinct from the entity. 2. Add `DbSet` / an `IEntityTypeConfiguration<T>` in
+   `Infrastructure/Data/Configurations` if persisted. 3. EF migration (+ seed SQL only for the initial
+   baseline — later data changes are migrations, not seed edits). 4. DAO interface in
+   `Application/Common/Interfaces/DAO` + impl in `Infrastructure/DAO/Impl` → register in
+   `Infrastructure/DependencyInjection.cs`. 5. Service interface + impl in
+   `Application/Common/Services` → register in `Application/DependencyInjection.cs`. 6. Transformation
+   logic in a `Processor`. 7. Razor page/component in `UI/Components` injecting the service, mobile-
+   first per the design rules above. 8. Unit tests mirroring the source path.

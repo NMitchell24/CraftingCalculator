@@ -1,0 +1,42 @@
+@page "/favorites"
+@implements IDisposable
+
+<PageTitle>Favorites</PageTitle>
+
+<div class="favorites-page">
+    @if (_favorites.Count == 0)
+    {
+        <div class="pane-empty-state">
+            <MudText Typo="Typo.body1">No saved selections</MudText>
+            <MudText Typo="Typo.caption">Build a selection on the Craft screen, then save it with the button above.</MudText>
+        </div>
+    }
+    else
+    {
+        <MudList T="RecipeFavorite">
+            @foreach (RecipeFavorite favorite in _favorites)
+            {
+                <MudListItem T="RecipeFavorite" OnClick="@(() => LoadAsync(favorite))">
+                    <div class="list-row">
+                        <div class="list-row-info">
+                            <MudText Class="list-row-name">@favorite.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="list-row-name">
+                                @favorite.RecipeCount blueprint@(favorite.RecipeCount == 1 ? "" : "s")
+                            </MudText>
+                        </div>
+                        @* The row itself loads the favorite on click, so the overflow menu has to stop
+                           the event before it bubbles. @onclick:stopPropagation can only be applied to
+                           an element, never a component tag, hence the wrapper div. *@
+                        <div @onclick="() => { }" @onclick:stopPropagation="true">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+                                     AriaLabel="@($"Actions for {favorite.Name}")">
+                                <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="@(() => RenameAsync(favorite))">Rename</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteAsync(favorite))">Delete</MudMenuItem>
+                            </MudMenu>
+                        </div>
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    }
+</div>

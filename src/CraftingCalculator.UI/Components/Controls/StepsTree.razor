@@ -1,0 +1,19 @@
+@implements IDisposable
+
+<div class="steps-tree">
+    @if (State.TreeRoots.Count == 0)
+    {
+        <div class="pane-empty-state">
+            <MudText Typo="Typo.body1">Nothing to break down yet</MudText>
+        </div>
+    }
+    else
+    {
+        <MudTreeView T="RecipeNode" Class="steps-tree-view">
+            @foreach (RecipeNode root in State.TreeRoots)
+            {
+                <RecipeTreeNode Node="root" />
+            }
+        </MudTreeView>
+    }
+</div>
