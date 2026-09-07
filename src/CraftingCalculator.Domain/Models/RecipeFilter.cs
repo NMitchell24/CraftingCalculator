@@ -1,46 +1,45 @@
-﻿using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Enums;
 
-namespace CraftingCalculator.Domain.Models
+namespace CraftingCalculator.Domain.Models;
+
+/// <summary>
+/// Simple Class to define the UI Model for RecipeFilters
+/// </summary>
+public class RecipeFilter : IBaseDataRecord
 {
-    /// <summary>
-    /// Simple Class to define the UI Model for RecipeFilters
-    /// </summary>
-    public class RecipeFilter : IBaseDataRecord
+    public const string ALL = "All";
+    public string? Name { get; set; }
+    public int Id { get; set; }
+    public string? Description { get; set; }
+    public string Tooltip { get => Description ?? ""; set { } }
+    public DataType Type
     {
-        public const string ALL = "All";
-        public string? Name { get; set; }
-        public int Id { get; set; }
-        public string? Description { get; set; }
-        public string Tooltip { get => Description ?? ""; set { } }
-        public DataType Type
+        get
         {
-            get
-            {
-                return DataType.RecipeFilter;
-            }
-            //Don't allow this to be changed as it should remain static
-            set { }
+            return DataType.RecipeFilter;
         }
+        //Don't allow this to be changed as it should remain static
+        set { }
+    }
 
-        public IBaseDataRecord Clone()
+    public IBaseDataRecord Clone()
+    {
+        RecipeFilter clone = new RecipeFilter()
         {
-            RecipeFilter clone = new RecipeFilter()
-            {
-                Id = this.Id,
-                Name = this.Name,
-                Description = this.Description
-            };
+            Id = this.Id,
+            Name = this.Name,
+            Description = this.Description
+        };
 
-            return clone;
-        }
+        return clone;
+    }
 
-        public IBaseDataRecord CopyForSave()
-        {
-            RecipeFilter ret = (RecipeFilter)Clone();
-            ret.Name += " - Copy";
-            ret.Id = 0;
+    public IBaseDataRecord CopyForSave()
+    {
+        RecipeFilter ret = (RecipeFilter)Clone();
+        ret.Name += " - Copy";
+        ret.Id = 0;
 
-            return ret;
-        }
+        return ret;
     }
 }

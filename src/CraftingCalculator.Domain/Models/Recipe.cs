@@ -1,106 +1,105 @@
-﻿using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Enums;
 using System.Text;
 using System;
 
-namespace CraftingCalculator.Domain.Models
+namespace CraftingCalculator.Domain.Models;
+
+/// <summary>
+/// Represents an individual UI Model for the Recipes
+/// </summary>
+public class Recipe : IBaseDataRecord
 {
-    /// <summary>
-    /// Represents an individual UI Model for the Recipes
-    /// </summary>
-    public class Recipe : IBaseDataRecord
+    public IngredientMap Ingredients { get; set; }
+    public RecipeMap ChildRecipes { get; set; }
+    public string? Name { get; set; }
+    public int Id { get; set; }
+    public string? Description { get; set; }
+    public RecipeFilter? Filter { get; set; }
+    public double Value { get; set; }
+
+    public string Tooltip
     {
-        public IngredientMap Ingredients { get; set; }
-        public RecipeMap ChildRecipes { get; set; }
-        public string? Name { get; set; }
-        public int Id { get; set; }
-        public string? Description { get; set; }
-        public RecipeFilter? Filter { get; set; }
-        public double Value { get; set; }
-
-        public string Tooltip
+        get
         {
-            get
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(Name);
+            sb.AppendLine(Filter?.Name);
+            if (Value > 0)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine(Name);
-                sb.AppendLine(Filter?.Name);
-                if (Value > 0)
-                {
-                    sb.AppendLine("Value per Item: " + string.Format("{0:C2}", Value));
-                }
+                sb.AppendLine("Value per Item: " + string.Format("{0:C2}", Value));
+            }
+            sb.Append(Environment.NewLine);
+            if (Description != null && Description.Length > 0)
+            {
+                sb.AppendLine("Description:");
+                sb.AppendLine(Description);
                 sb.Append(Environment.NewLine);
-                if(Description != null && Description.Length > 0)
-                {
-                    sb.AppendLine("Description:");
-                    sb.AppendLine(Description);
-                    sb.Append(Environment.NewLine);
-                }
-                sb.AppendLine("Ingredients:");
-
-                foreach (IngredientQuantity ingredient in Ingredients.IngredientList)
-                {
-                    sb.AppendLine(ingredient.Name + " x" + ingredient.Quantity);
-                }
-
-                if(ChildRecipes != null)
-                {
-                    foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
-                    {
-                        sb.AppendLine(recipe.Name + " x" + recipe.Quantity);
-                    }
-                }
-               
-                return sb.ToString();
             }
-            set { Tooltip = value;}
-        }
+            sb.AppendLine("Ingredients:");
 
-        public DataType Type
-        {
-            get
+            foreach (IngredientQuantity ingredient in Ingredients.IngredientList)
             {
-                return DataType.Recipe;
+                sb.AppendLine(ingredient.Name + " x" + ingredient.Quantity);
             }
-            //Don't allow this to be changed as it should remain static.
-            set { }
-        }
 
-        /// <summary>
-        /// Default constructor.  ensures maps are initialized.
-        /// </summary>
-        public Recipe()
-        {
-            this.Ingredients = new IngredientMap();
-            this.ChildRecipes = new RecipeMap();
-        }
-
-        public bool IsSelected { get; set; }
-
-        public IBaseDataRecord Clone()
-        {
-            Recipe clone = new Recipe()
+            if (ChildRecipes != null)
             {
-                Id = this.Id,
-                Name = this.Name,
-                Description = this.Description,
-                Filter = this.Filter,
-                Value = this.Value,
-                Ingredients = this.Ingredients.Clone(),
-                ChildRecipes = this.ChildRecipes.Clone()
-            };
+                foreach (RecipeQuantity recipe in ChildRecipes.RecipeList)
+                {
+                    sb.AppendLine(recipe.Name + " x" + recipe.Quantity);
+                }
+            }
 
-            return clone;
+            return sb.ToString();
         }
+        set { Tooltip = value; }
+    }
 
-        public IBaseDataRecord CopyForSave()
+    public DataType Type
+    {
+        get
         {
-            Recipe ret = (Recipe)Clone();
-            ret.Name += " - Copy";
-            ret.Id = 0;
-            ret.Ingredients = this.Ingredients.CloneForSave();
-            ret.ChildRecipes = this.ChildRecipes.CloneForSave();
-
-            return ret;
+            return DataType.Recipe;
         }
+        //Don't allow this to be changed as it should remain static.
+        set { }
+    }
+
+    /// <summary>
+    /// Default constructor.  ensures maps are initialized.
+    /// </summary>
+    public Recipe()
+    {
+        this.Ingredients = new IngredientMap();
+        this.ChildRecipes = new RecipeMap();
+    }
+
+    public bool IsSelected { get; set; }
+
+    public IBaseDataRecord Clone()
+    {
+        Recipe clone = new Recipe()
+        {
+            Id = this.Id,
+            Name = this.Name,
+            Description = this.Description,
+            Filter = this.Filter,
+            Value = this.Value,
+            Ingredients = this.Ingredients.Clone(),
+            ChildRecipes = this.ChildRecipes.Clone()
+        };
+
+        return clone;
+    }
+
+    public IBaseDataRecord CopyForSave()
+    {
+        Recipe ret = (Recipe)Clone();
+        ret.Name += " - Copy";
+        ret.Id = 0;
+        ret.Ingredients = this.Ingredients.CloneForSave();
+        ret.ChildRecipes = this.ChildRecipes.CloneForSave();
+
+        return ret;
     }
 }

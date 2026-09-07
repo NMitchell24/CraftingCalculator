@@ -70,6 +70,9 @@ dotnet build src/CraftingCalculator.Application/CraftingCalculator.Application.c
 # Run tests (NUnit + Moq + AwesomeAssertions)
 dotnet test
 
+# Check .editorconfig conformance the way CI does — the `core` job fails on any diff
+dotnet format CraftingCalculator.Tests.slnf --verify-no-changes
+
 # Build the MAUI head for a specific platform
 dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-windows10.0.19041.0
 
@@ -86,6 +89,10 @@ dotnet ef migrations add <Name>
   component APIs before editing rather than relying on recalled knowledge. If it isn't available, ask
   the user whether they'd like to install and set it up (setup steps are in the
   `craftingcalculator-dev` skill).
+- **CI is `.github/workflows/build.yml`**: a `core` job (format + build + test via
+  `CraftingCalculator.Tests.slnf` on Linux, no MAUI workloads) plus one Release build per platform
+  head. `codeql-analysis.yml` builds the same filter. A new non-MAUI project must be added to the
+  `.slnf` or CI silently stops building it.
 - Keep the build **warning-free**. `TreatWarningsAsErrors` is intentionally `false` (blanket
   enforcement is risky across the mobile TFMs); enforce specific codes with `<WarningsAsErrors>` when
   you want to lock one in.

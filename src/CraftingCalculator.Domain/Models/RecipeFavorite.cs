@@ -1,9 +1,8 @@
-﻿namespace CraftingCalculator.Domain.Models
+namespace CraftingCalculator.Domain.Models;
+
+public class RecipeFavorite
 {
-    public class RecipeFavorite
-    {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public int RecipeCount { get; set; }
-    }
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public int RecipeCount { get; set; }
 }
