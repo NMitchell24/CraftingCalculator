@@ -60,13 +60,13 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
         // Replace the saved quantities wholesale rather than diffing them.
         await context.FavoriteBlueprints.Where(fr => fr.FavoriteId == entity.Id).ExecuteDeleteAsync();
 
-        foreach (BlueprintQuantity rq in quantities)
+        foreach (BlueprintQuantity blueprintQuantity in quantities)
         {
             context.FavoriteBlueprints.Add(new FavoriteBlueprintEntity
             {
                 FavoriteId = entity.Id,
-                BlueprintId = rq.Blueprint.Id,
-                Quantity = rq.Quantity
+                BlueprintId = blueprintQuantity.Blueprint.Id,
+                Quantity = blueprintQuantity.Quantity
             });
         }
 

@@ -17,15 +17,15 @@ public class BlueprintMap
     public BlueprintMap(BlueprintMap map, bool cloneForSave)
     {
         _internalList = new List<BlueprintQuantity>();
-        foreach (BlueprintQuantity r in map.BlueprintList)
+        foreach (BlueprintQuantity blueprintQuantity in map.BlueprintList)
         {
             if (cloneForSave)
             {
-                _internalList.Add(r.CloneForSave());
+                _internalList.Add(blueprintQuantity.CloneForSave());
             }
             else
             {
-                _internalList.Add(r.Clone());
+                _internalList.Add(blueprintQuantity.Clone());
             }
         }
     }
@@ -58,12 +58,12 @@ public class BlueprintMap
     /// <param name="id"></param>
     public void Add(Blueprint blueprint, long quantity, int id)
     {
-        if (_internalList.Any(i => i.Blueprint.Name == blueprint.Name))
+        if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name))
         {
-            BlueprintQuantity? rq = _internalList.Find(i => i.Blueprint.Name == blueprint.Name);
-            if (rq != null)
+            BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
+            if (existing != null)
             {
-                rq.Quantity += quantity;
+                existing.Quantity += quantity;
             }
         }
         else
@@ -81,7 +81,7 @@ public class BlueprintMap
     /// <param name="quantity"></param>
     public void Remove(Blueprint blueprint, long quantity)
     {
-        if (_internalList.Any(i => i.Blueprint.Name == blueprint.Name && i.Quantity - quantity > 0))
+        if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name && blueprintQuantity.Quantity - quantity > 0))
         {
             Add(blueprint, -quantity);
         }
@@ -98,13 +98,13 @@ public class BlueprintMap
     /// <param name="blueprint"></param>
     public void RemoveAll(Blueprint blueprint)
     {
-        if (_internalList.Any(i => i.Blueprint.Name == blueprint.Name))
+        if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name))
         {
-            BlueprintQuantity? rq = _internalList.Find(i => i.Blueprint.Name == blueprint.Name);
-            if (rq != null)
+            BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
+            if (existing != null)
             {
-                RemovedBlueprints.AddRange(_internalList.FindAll(i => i.Blueprint.Name == blueprint.Name));
-                _internalList.Remove(rq);
+                RemovedBlueprints.AddRange(_internalList.FindAll(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name));
+                _internalList.Remove(existing);
             }
         }
     }

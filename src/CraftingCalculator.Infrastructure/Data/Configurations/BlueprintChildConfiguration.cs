@@ -9,20 +9,20 @@ public class BlueprintChildConfiguration : IEntityTypeConfiguration<BlueprintChi
     public void Configure(EntityTypeBuilder<BlueprintChild> builder)
     {
         builder.ToTable("BlueprintChildren");
-        builder.HasKey(rc => rc.Id);
-        builder.HasIndex(rc => rc.ParentBlueprintId);
-        builder.HasIndex(rc => rc.ChildBlueprintId);
+        builder.HasKey(blueprintChild => blueprintChild.Id);
+        builder.HasIndex(blueprintChild => blueprintChild.ParentBlueprintId);
+        builder.HasIndex(blueprintChild => blueprintChild.ChildBlueprintId);
 
         // Two cascade paths into the same table (Blueprint) from BlueprintChild's two FKs - fine on
         // SQLite, which (unlike SQL Server) has no restriction against multiple cascade paths.
-        builder.HasOne(rc => rc.ParentBlueprint)
-            .WithMany(r => r.Children)
-            .HasForeignKey(rc => rc.ParentBlueprintId)
+        builder.HasOne(blueprintChild => blueprintChild.ParentBlueprint)
+            .WithMany(blueprint => blueprint.Children)
+            .HasForeignKey(blueprintChild => blueprintChild.ParentBlueprintId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(rc => rc.Child)
-            .WithMany(r => r.ParentLinks)
-            .HasForeignKey(rc => rc.ChildBlueprintId)
+        builder.HasOne(blueprintChild => blueprintChild.Child)
+            .WithMany(blueprint => blueprint.ParentLinks)
+            .HasForeignKey(blueprintChild => blueprintChild.ChildBlueprintId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

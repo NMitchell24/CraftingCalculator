@@ -14,13 +14,13 @@ public static class BatchProcessor
         ComponentMap materials = new();
         double totalValue = 0;
 
-        foreach (BlueprintQuantity rq in batch)
+        foreach (BlueprintQuantity blueprintQuantity in batch)
         {
-            materials = ComponentProcessor.CombineComponents(BlueprintProcessor.Flatten(rq.Blueprint), materials, rq.Quantity);
-            totalValue += rq.TotalValue;
+            materials = ComponentProcessor.CombineComponents(BlueprintProcessor.Flatten(blueprintQuantity.Blueprint), materials, blueprintQuantity.Quantity);
+            totalValue += blueprintQuantity.TotalValue;
         }
 
-        double totalCost = materials.ComponentList.Sum(i => i.TotalCost);
+        double totalCost = materials.ComponentList.Sum(componentQuantity => componentQuantity.TotalCost);
 
         return (totalCost, totalValue, materials);
     }

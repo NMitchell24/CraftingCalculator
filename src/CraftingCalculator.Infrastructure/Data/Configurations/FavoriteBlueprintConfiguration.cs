@@ -19,7 +19,7 @@ public class FavoriteBlueprintConfiguration : IEntityTypeConfiguration<FavoriteB
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(fr => fr.Blueprint)
-            .WithMany(r => r.FavoriteBlueprints)
+            .WithMany(blueprint => blueprint.FavoriteBlueprints)
             .HasForeignKey(fr => fr.BlueprintId)
             .OnDelete(DeleteBehavior.Cascade);
     }

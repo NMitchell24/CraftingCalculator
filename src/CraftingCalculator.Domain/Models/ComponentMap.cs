@@ -17,17 +17,17 @@ public class ComponentMap
     public ComponentMap(ComponentMap map, bool cloneForSave)
     {
         _internalList = new List<ComponentQuantity>();
-        foreach (ComponentQuantity i in map.ComponentList)
+        foreach (ComponentQuantity componentQuantity in map.ComponentList)
         {
             // Insures we don't retain references to the original ComponentQuantity object and cause those 
             // objects to get mutated elsewhere.
             if (cloneForSave)
             {
-                _internalList.Add(i.CloneForSave());
+                _internalList.Add(componentQuantity.CloneForSave());
             }
             else
             {
-                _internalList.Add(i.Clone());
+                _internalList.Add(componentQuantity.Clone());
             }
         }
     }
@@ -53,12 +53,12 @@ public class ComponentMap
 
     public void Add(Component component, long quantity, int id)
     {
-        if (_internalList.Any(i => i.Name == component.Name))
+        if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name))
         {
-            ComponentQuantity? iq = _internalList.Find(i => i.Name == component.Name);
-            if (iq != null)
+            ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Name == component.Name);
+            if (existing != null)
             {
-                iq.Quantity += quantity;
+                existing.Quantity += quantity;
             }
         }
         else
@@ -76,7 +76,7 @@ public class ComponentMap
     /// <param name="quantity"></param>
     public void Remove(Component component, long quantity)
     {
-        if (_internalList.Any(i => i.Name == component.Name && i.Quantity - quantity > 0))
+        if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name && componentQuantity.Quantity - quantity > 0))
         {
             Add(component, -quantity);
         }
@@ -93,13 +93,13 @@ public class ComponentMap
     /// <param name="component"></param>
     public void RemoveAll(Component component)
     {
-        if (_internalList.Any(i => i.Name == component.Name))
+        if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name))
         {
-            ComponentQuantity? iq = _internalList.Find(i => i.Name == component.Name);
-            if (iq != null)
+            ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Name == component.Name);
+            if (existing != null)
             {
-                RemovedComponents.Add(iq);
-                _internalList.Remove(iq);
+                RemovedComponents.Add(existing);
+                _internalList.Remove(existing);
             }
         }
     }

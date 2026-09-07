@@ -37,8 +37,8 @@ public class BlueprintDAOTests
 
         Blueprint? reloaded = await _blueprintDAO.GetByIdAsync(saved.Id);
         reloaded.Should().NotBeNull();
-        reloaded!.Components.ComponentList.Should().ContainSingle(i => i.Component.Name == "Wood" && i.Quantity == 2);
-        reloaded.ChildBlueprints.BlueprintList.Should().ContainSingle(r => r.Blueprint.Name == "Plank" && r.Quantity == 4);
+        reloaded!.Components.ComponentList.Should().ContainSingle(componentQuantity => componentQuantity.Component.Name == "Wood" && componentQuantity.Quantity == 2);
+        reloaded.ChildBlueprints.BlueprintList.Should().ContainSingle(blueprintQuantity => blueprintQuantity.Blueprint.Name == "Plank" && blueprintQuantity.Quantity == 4);
     }
 
     [Test]

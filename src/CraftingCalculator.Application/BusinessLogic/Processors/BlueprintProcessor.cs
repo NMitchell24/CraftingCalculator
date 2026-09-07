@@ -47,16 +47,16 @@ public static class BlueprintProcessor
 
         List<BlueprintNode> children = [];
 
-        foreach (ComponentQuantity i in blueprint.Components.ComponentList)
+        foreach (ComponentQuantity component in blueprint.Components.ComponentList)
         {
-            long componentQuantity = i.Quantity * quantity;
+            long componentQuantity = component.Quantity * quantity;
             children.Add(new BlueprintNode(
-                i.Name + " x" + componentQuantity, i.Name, i.Tooltip, true, componentQuantity, []));
+                component.Name + " x" + componentQuantity, component.Name, component.Tooltip, true, componentQuantity, []));
         }
 
-        foreach (BlueprintQuantity r in blueprint.ChildBlueprints.BlueprintList)
+        foreach (BlueprintQuantity child in blueprint.ChildBlueprints.BlueprintList)
         {
-            children.Add(BuildNode(r.Blueprint, r.Quantity * quantity, depth + 1));
+            children.Add(BuildNode(child.Blueprint, child.Quantity * quantity, depth + 1));
         }
 
         return new BlueprintNode(

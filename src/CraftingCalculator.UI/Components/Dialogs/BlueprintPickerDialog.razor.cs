@@ -19,9 +19,9 @@ public partial class BlueprintPickerDialog : ComponentBase
     private string _selectedCategoryName = Category.ALL;
 
     private List<Blueprint> _filteredBlueprints =>
-        [.. _blueprints.Where(r =>
-            (_selectedCategoryName == Category.ALL || r.Category?.Name == _selectedCategoryName) &&
-            (string.IsNullOrWhiteSpace(_search) || (r.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false)))];
+        [.. _blueprints.Where(blueprint =>
+            (_selectedCategoryName == Category.ALL || blueprint.Category?.Name == _selectedCategoryName) &&
+            (string.IsNullOrWhiteSpace(_search) || (blueprint.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false)))];
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,7 +32,7 @@ public partial class BlueprintPickerDialog : ComponentBase
         // ConfigureBlueprintsViewModel's category list. Matched on id rather than name so a user category
         // of their own called "All" (which the Dataset screen lets them create) still shows up.
         _categories = [.. (await CategoryService.GetCategoriesAsync())
-            .Where(f => f.Id != DatabaseSeedConstants.AllCategoryId)];
+            .Where(category => category.Id != DatabaseSeedConstants.AllCategoryId)];
     }
 
     private void OnCategoryChanged(string categoryName) => _selectedCategoryName = categoryName;

@@ -12,7 +12,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         List<ComponentEntity> entities = await context.Components
             .AsNoTracking()
-            .OrderBy(i => i.Name)
+            .OrderBy(componentEntity => componentEntity.Name)
             .ToListAsync();
 
         return [.. entities.Select(ToModel)];
@@ -22,7 +22,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         ComponentEntity? entity = await context.Components.AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(componentEntity => componentEntity.Id == id);
 
         return entity != null ? ToModel(entity) : null;
     }
@@ -32,7 +32,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
         ComponentEntity entity = component.Id > 0
-            ? await context.Components.FirstAsync(i => i.Id == component.Id)
+            ? await context.Components.FirstAsync(componentEntity => componentEntity.Id == component.Id)
             : new ComponentEntity();
 
         entity.Name = component.Name ?? "";
@@ -52,7 +52,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     public async Task DeleteAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.Components.Where(i => i.Id == id).ExecuteDeleteAsync();
+        await context.Components.Where(componentEntity => componentEntity.Id == id).ExecuteDeleteAsync();
     }
 
     private static Component ToModel(ComponentEntity entity) => new()

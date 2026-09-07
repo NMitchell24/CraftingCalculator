@@ -29,8 +29,8 @@ public partial class DatasetList : ComponentBase, IDisposable
     private string _search = "";
 
     private List<IBaseDataRecord> FilteredRecords =>
-        [.. _records.Where(r => string.IsNullOrWhiteSpace(_search)
-            || (r.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false))];
+        [.. _records.Where(record => string.IsNullOrWhiteSpace(_search)
+            || (record.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false))];
 
     protected override async Task OnParametersSetAsync()
     {

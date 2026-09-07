@@ -12,8 +12,8 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         List<CategoryEntity> entities = await context.Categories
             .AsNoTracking()
-            .OrderByDescending(f => f.Name == Category.ALL)
-            .ThenBy(f => f.Name)
+            .OrderByDescending(categoryEntity => categoryEntity.Name == Category.ALL)
+            .ThenBy(categoryEntity => categoryEntity.Name)
             .ToListAsync();
 
         return [.. entities.Select(ToModel)];
@@ -23,7 +23,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         CategoryEntity? entity = await context.Categories.AsNoTracking()
-            .FirstOrDefaultAsync(f => f.Id == id);
+            .FirstOrDefaultAsync(categoryEntity => categoryEntity.Id == id);
 
         return entity != null ? ToModel(entity) : null;
     }
@@ -33,7 +33,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
         CategoryEntity entity = category.Id > 0
-            ? await context.Categories.FirstAsync(f => f.Id == category.Id)
+            ? await context.Categories.FirstAsync(categoryEntity => categoryEntity.Id == category.Id)
             : new CategoryEntity();
 
         entity.Name = category.Name ?? "";
@@ -52,7 +52,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
     public async Task DeleteAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.Categories.Where(f => f.Id == id).ExecuteDeleteAsync();
+        await context.Categories.Where(categoryEntity => categoryEntity.Id == id).ExecuteDeleteAsync();
     }
 
     private static Category ToModel(CategoryEntity entity) => new()

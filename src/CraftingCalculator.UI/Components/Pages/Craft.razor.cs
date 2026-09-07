@@ -73,7 +73,7 @@ public partial class Craft : ComponentBase, IDisposable
 
     private async Task CopyMaterialsAsync()
     {
-        string text = string.Join(Environment.NewLine, State.TotalComponents.Select(i => i.DisplayName));
+        string text = string.Join(Environment.NewLine, State.TotalComponents.Select(componentQuantity => componentQuantity.DisplayName));
         await ClipboardService.SetTextAsync(text);
         Snackbar.Add("Copied components to clipboard", Severity.Success);
     }

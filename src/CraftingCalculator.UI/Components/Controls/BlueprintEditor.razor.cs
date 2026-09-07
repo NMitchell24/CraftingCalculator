@@ -37,15 +37,15 @@ public partial class BlueprintEditor : ComponentBase
         // Nothing guards a longer A -> B -> A cycle here either, matching the WPF app - the depth cap
         // in BlueprintProcessor is what keeps that catchable.
         _childBlueprintCandidates =
-            [.. (await DatasetService.GetRecordsAsync(DataType.Blueprint)).Where(r => r.Id != Model.Id)];
+            [.. (await DatasetService.GetRecordsAsync(DataType.Blueprint)).Where(blueprint => blueprint.Id != Model.Id)];
     }
 
     private Task<IEnumerable<IBaseDataRecord>> SearchAsync(string? search, CancellationToken cancellationToken)
     {
         List<IBaseDataRecord> source = _partType == DataType.Blueprint ? _childBlueprintCandidates : _components;
 
-        return Task.FromResult<IEnumerable<IBaseDataRecord>>(source.Where(r =>
-            string.IsNullOrWhiteSpace(search) || (r.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false)));
+        return Task.FromResult<IEnumerable<IBaseDataRecord>>(source.Where(record =>
+            string.IsNullOrWhiteSpace(search) || (record.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false)));
     }
 
     private void OnPartTypeChanged(DataType type)
@@ -58,7 +58,7 @@ public partial class BlueprintEditor : ComponentBase
     private async Task OnCategoryChangedAsync(int? categoryId)
     {
         _categoryId = categoryId;
-        Model.Category = _categories.FirstOrDefault(f => f.Id == categoryId);
+        Model.Category = _categories.FirstOrDefault(category => category.Id == categoryId);
 
         await NotifyChangedAsync();
     }

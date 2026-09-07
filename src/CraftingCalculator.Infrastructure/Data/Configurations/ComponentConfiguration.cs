@@ -9,9 +9,9 @@ public class ComponentConfiguration : IEntityTypeConfiguration<Component>
     public void Configure(EntityTypeBuilder<Component> builder)
     {
         builder.ToTable("Components");
-        builder.HasKey(i => i.Id);
-        builder.Property(i => i.Name).IsRequired();
-        builder.Property(i => i.Description).IsRequired();
-        builder.HasIndex(i => i.Name);
+        builder.HasKey(component => component.Id);
+        builder.Property(component => component.Name).IsRequired();
+        builder.Property(component => component.Description).IsRequired();
+        builder.HasIndex(component => component.Name);
     }
 }

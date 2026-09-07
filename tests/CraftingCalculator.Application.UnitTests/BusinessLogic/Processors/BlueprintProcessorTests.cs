@@ -22,8 +22,8 @@ public class BlueprintProcessorTests
         ComponentMap result = BlueprintProcessor.Flatten(blueprint);
 
         result.ComponentList.Should().HaveCount(2);
-        result.ComponentList.Single(i => i.Name == "Screw").Quantity.Should().Be(2);
-        result.ComponentList.Single(i => i.Name == "Plate").Quantity.Should().Be(1);
+        result.ComponentList.Single(componentQuantity => componentQuantity.Name == "Screw").Quantity.Should().Be(2);
+        result.ComponentList.Single(componentQuantity => componentQuantity.Name == "Plate").Quantity.Should().Be(1);
     }
 
     [Test]

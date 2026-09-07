@@ -176,12 +176,12 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
         TotalCost = totalCost;
         TotalValue = totalValue;
-        TotalComponents = [.. materials.ComponentList.OrderBy(i => i.Name)];
-        TreeRoots = [.. _blueprintMap.BlueprintList.Select(rq => blueprintService.GetBlueprintNode(rq.Blueprint, rq.Quantity))];
+        TotalComponents = [.. materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
+        TreeRoots = [.. _blueprintMap.BlueprintList.Select(blueprintQuantity => blueprintService.GetBlueprintNode(blueprintQuantity.Blueprint, blueprintQuantity.Quantity))];
 
         // Computed here rather than as expression-bodied properties: both walk the whole batch, and the
         // summary card reads them on every render.
-        TotalComponentCount = TotalComponents.Sum(i => i.Quantity);
+        TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
         CraftingStepCount = CountCrafts(TreeRoots);
 
         Changed?.Invoke();

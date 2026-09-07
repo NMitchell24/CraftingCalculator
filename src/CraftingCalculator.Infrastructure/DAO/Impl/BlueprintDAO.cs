@@ -18,9 +18,9 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
         IEnumerable<BlueprintEntity> matching = category.Name == Category.ALL
             ? graph.BlueprintsById.Values
-            : graph.BlueprintsById.Values.Where(r => r.CategoryId == category.Id);
+            : graph.BlueprintsById.Values.Where(blueprintEntity => blueprintEntity.CategoryId == category.Id);
 
-        return [.. matching.OrderBy(r => r.Name).Select(r => BuildModel(r, graph, 0))];
+        return [.. matching.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, 0))];
     }
 
     public async Task<Blueprint?> GetByIdAsync(int id)
@@ -34,7 +34,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        return [.. graph.BlueprintsById.Values.OrderBy(r => r.Name).Select(r => BuildModel(r, graph, 0))];
+        return [.. graph.BlueprintsById.Values.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, 0))];
     }
 
     public async Task<Blueprint> SaveAsync(Blueprint blueprint)
@@ -42,7 +42,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
         BlueprintEntity entity = blueprint.Id > 0
-            ? await context.Blueprints.Include(r => r.Components).FirstAsync(r => r.Id == blueprint.Id)
+            ? await context.Blueprints.Include(blueprintEntity => blueprintEntity.Components).FirstAsync(blueprintEntity => blueprintEntity.Id == blueprint.Id)
             : new BlueprintEntity();
 
         entity.Name = blueprint.Name ?? "";
@@ -55,9 +55,9 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             context.Blueprints.Add(entity);
         }
 
-        foreach (ComponentQuantity removed in blueprint.Components.RemovedComponents.Where(i => i.Id > 0))
+        foreach (ComponentQuantity removed in blueprint.Components.RemovedComponents.Where(componentQuantity => componentQuantity.Id > 0))
         {
-            BlueprintComponentEntity? toRemove = entity.Components.FirstOrDefault(ri => ri.Id == removed.Id);
+            BlueprintComponentEntity? toRemove = entity.Components.FirstOrDefault(blueprintComponent => blueprintComponent.Id == removed.Id);
             if (toRemove != null)
             {
                 context.BlueprintComponents.Remove(toRemove);
@@ -65,15 +65,15 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             }
         }
 
-        foreach (ComponentQuantity iq in blueprint.Components.ComponentList)
+        foreach (ComponentQuantity componentQuantity in blueprint.Components.ComponentList)
         {
-            if (iq.Id > 0)
+            if (componentQuantity.Id > 0)
             {
-                entity.Components.First(ri => ri.Id == iq.Id).Quantity = iq.Quantity;
+                entity.Components.First(link => link.Id == componentQuantity.Id).Quantity = componentQuantity.Quantity;
             }
             else
             {
-                entity.Components.Add(new BlueprintComponentEntity { ComponentId = iq.Component.Id, Quantity = iq.Quantity });
+                entity.Components.Add(new BlueprintComponentEntity { ComponentId = componentQuantity.Component.Id, Quantity = componentQuantity.Quantity });
             }
         }
 
@@ -81,25 +81,25 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         // (possibly newly-assigned) Id.
         await context.SaveChangesAsync();
 
-        foreach (BlueprintQuantity removed in blueprint.ChildBlueprints.RemovedBlueprints.Where(r => r.Id > 0))
+        foreach (BlueprintQuantity removed in blueprint.ChildBlueprints.RemovedBlueprints.Where(removedQuantity => removedQuantity.Id > 0))
         {
-            await context.BlueprintChildren.Where(rc => rc.Id == removed.Id).ExecuteDeleteAsync();
+            await context.BlueprintChildren.Where(link => link.Id == removed.Id).ExecuteDeleteAsync();
         }
 
-        foreach (BlueprintQuantity rq in blueprint.ChildBlueprints.BlueprintList)
+        foreach (BlueprintQuantity blueprintQuantity in blueprint.ChildBlueprints.BlueprintList)
         {
-            if (rq.Id > 0)
+            if (blueprintQuantity.Id > 0)
             {
-                BlueprintChildEntity existing = await context.BlueprintChildren.FirstAsync(rc => rc.Id == rq.Id);
-                existing.Quantity = rq.Quantity;
+                BlueprintChildEntity existing = await context.BlueprintChildren.FirstAsync(link => link.Id == blueprintQuantity.Id);
+                existing.Quantity = blueprintQuantity.Quantity;
             }
             else
             {
                 context.BlueprintChildren.Add(new BlueprintChildEntity
                 {
                     ParentBlueprintId = entity.Id,
-                    ChildBlueprintId = rq.Blueprint.Id,
-                    Quantity = rq.Quantity
+                    ChildBlueprintId = blueprintQuantity.Blueprint.Id,
+                    Quantity = blueprintQuantity.Quantity
                 });
             }
         }
@@ -113,7 +113,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     public async Task DeleteAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.Blueprints.Where(r => r.Id == id).ExecuteDeleteAsync();
+        await context.Blueprints.Where(blueprintEntity => blueprintEntity.Id == id).ExecuteDeleteAsync();
     }
 
     /// <summary>
@@ -126,15 +126,15 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
         Dictionary<int, ComponentEntity> componentsById =
-            await context.Components.AsNoTracking().ToDictionaryAsync(i => i.Id);
+            await context.Components.AsNoTracking().ToDictionaryAsync(component => component.Id);
         Dictionary<int, CategoryEntity> categoriesById =
-            await context.Categories.AsNoTracking().ToDictionaryAsync(f => f.Id);
+            await context.Categories.AsNoTracking().ToDictionaryAsync(category => category.Id);
         Dictionary<int, BlueprintEntity> blueprintsById =
-            await context.Blueprints.AsNoTracking().ToDictionaryAsync(r => r.Id);
+            await context.Blueprints.AsNoTracking().ToDictionaryAsync(blueprintEntity => blueprintEntity.Id);
         ILookup<int, BlueprintComponentEntity> componentsByBlueprintId =
-            (await context.BlueprintComponents.AsNoTracking().ToListAsync()).ToLookup(ri => ri.BlueprintId);
+            (await context.BlueprintComponents.AsNoTracking().ToListAsync()).ToLookup(blueprintComponent => blueprintComponent.BlueprintId);
         ILookup<int, BlueprintChildEntity> childrenByParentId =
-            (await context.BlueprintChildren.AsNoTracking().ToListAsync()).ToLookup(rc => rc.ParentBlueprintId);
+            (await context.BlueprintChildren.AsNoTracking().ToListAsync()).ToLookup(blueprintChild => blueprintChild.ParentBlueprintId);
 
         return new BlueprintGraph(blueprintsById, componentsById, categoriesById, componentsByBlueprintId, childrenByParentId);
     }
@@ -167,19 +167,19 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             model.Category = ToCategoryModel(categoryEntity);
         }
 
-        foreach (BlueprintComponentEntity ri in graph.ComponentsByBlueprintId[entity.Id])
+        foreach (BlueprintComponentEntity blueprintComponent in graph.ComponentsByBlueprintId[entity.Id])
         {
-            if (graph.ComponentsById.TryGetValue(ri.ComponentId, out ComponentEntity? componentEntity))
+            if (graph.ComponentsById.TryGetValue(blueprintComponent.ComponentId, out ComponentEntity? componentEntity))
             {
-                model.Components.Add(ToComponentModel(componentEntity), ri.Quantity, ri.Id);
+                model.Components.Add(ToComponentModel(componentEntity), blueprintComponent.Quantity, blueprintComponent.Id);
             }
         }
 
-        foreach (BlueprintChildEntity rc in graph.ChildrenByParentId[entity.Id])
+        foreach (BlueprintChildEntity blueprintChild in graph.ChildrenByParentId[entity.Id])
         {
-            if (graph.BlueprintsById.TryGetValue(rc.ChildBlueprintId, out BlueprintEntity? childEntity))
+            if (graph.BlueprintsById.TryGetValue(blueprintChild.ChildBlueprintId, out BlueprintEntity? childEntity))
             {
-                model.ChildBlueprints.Add(BuildModel(childEntity, graph, depth + 1), rc.Quantity, rc.Id);
+                model.ChildBlueprints.Add(BuildModel(childEntity, graph, depth + 1), blueprintChild.Quantity, blueprintChild.Id);
             }
         }
 

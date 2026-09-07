@@ -9,18 +9,18 @@ public class BlueprintComponentConfiguration : IEntityTypeConfiguration<Blueprin
     public void Configure(EntityTypeBuilder<BlueprintComponent> builder)
     {
         builder.ToTable("BlueprintComponents");
-        builder.HasKey(ri => ri.Id);
-        builder.HasIndex(ri => ri.BlueprintId);
-        builder.HasIndex(ri => ri.ComponentId);
+        builder.HasKey(blueprintComponent => blueprintComponent.Id);
+        builder.HasIndex(blueprintComponent => blueprintComponent.BlueprintId);
+        builder.HasIndex(blueprintComponent => blueprintComponent.ComponentId);
 
-        builder.HasOne(ri => ri.Blueprint)
-            .WithMany(r => r.Components)
-            .HasForeignKey(ri => ri.BlueprintId)
+        builder.HasOne(blueprintComponent => blueprintComponent.Blueprint)
+            .WithMany(blueprint => blueprint.Components)
+            .HasForeignKey(blueprintComponent => blueprintComponent.BlueprintId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(ri => ri.Component)
-            .WithMany(i => i.BlueprintComponents)
-            .HasForeignKey(ri => ri.ComponentId)
+        builder.HasOne(blueprintComponent => blueprintComponent.Component)
+            .WithMany(component => component.BlueprintComponents)
+            .HasForeignKey(blueprintComponent => blueprintComponent.ComponentId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

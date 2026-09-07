@@ -17,7 +17,7 @@ public class DatasetService(
             // Excluded by id rather than by name: a user is free to create a category of their own
             // called "All", and matching on the name would hide it here permanently - leaving it
             // impossible to rename or delete.
-            .Where(f => f.Id != DatabaseSeedConstants.AllCategoryId)],
+            .Where(category => category.Id != DatabaseSeedConstants.AllCategoryId)],
         DataType.Blueprint => [.. await blueprintService.GetAllBlueprintsAsync()],
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };

@@ -30,10 +30,10 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Blueprints.Where(r => r.Id == blueprint.Id).ExecuteDeleteAsync();
+        await act.Blueprints.Where(blueprint => blueprint.Id == blueprint.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        (await verify.BlueprintComponents.CountAsync(ri => ri.BlueprintId == blueprint.Id)).Should().Be(0);
+        (await verify.BlueprintComponents.CountAsync(blueprintComponent => blueprintComponent.BlueprintId == blueprint.Id)).Should().Be(0);
     }
 
     [Test]
@@ -47,10 +47,10 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Components.Where(i => i.Id == component.Id).ExecuteDeleteAsync();
+        await act.Components.Where(candidate => candidate.Id == component.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        (await verify.BlueprintComponents.CountAsync(ri => ri.ComponentId == component.Id)).Should().Be(0);
+        (await verify.BlueprintComponents.CountAsync(blueprintComponent => blueprintComponent.ComponentId == component.Id)).Should().Be(0);
     }
 
     [Test]
@@ -64,10 +64,10 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Blueprints.Where(r => r.Id == parent.Id).ExecuteDeleteAsync();
+        await act.Blueprints.Where(blueprint => blueprint.Id == parent.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        (await verify.BlueprintChildren.CountAsync(rc => rc.ParentBlueprintId == parent.Id)).Should().Be(0);
+        (await verify.BlueprintChildren.CountAsync(blueprintChild => blueprintChild.ParentBlueprintId == parent.Id)).Should().Be(0);
     }
 
     [Test]
@@ -81,12 +81,12 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Blueprints.Where(r => r.Id == child.Id).ExecuteDeleteAsync();
+        await act.Blueprints.Where(blueprint => blueprint.Id == child.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        (await verify.BlueprintChildren.CountAsync(rc => rc.ChildBlueprintId == child.Id)).Should().Be(0);
+        (await verify.BlueprintChildren.CountAsync(blueprintChild => blueprintChild.ChildBlueprintId == child.Id)).Should().Be(0);
         // The parent blueprint itself must survive - only the link to its now-deleted component goes.
-        (await verify.Blueprints.AnyAsync(r => r.Id == parent.Id)).Should().BeTrue();
+        (await verify.Blueprints.AnyAsync(blueprint => blueprint.Id == parent.Id)).Should().BeTrue();
     }
 
     [Test]
@@ -99,10 +99,10 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Categories.Where(f => f.Id == category.Id).ExecuteDeleteAsync();
+        await act.Categories.Where(candidate => candidate.Id == category.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
-        Blueprint? reloaded = await verify.Blueprints.FirstOrDefaultAsync(r => r.Id == blueprint.Id);
+        Blueprint? reloaded = await verify.Blueprints.FirstOrDefaultAsync(candidate => candidate.Id == blueprint.Id);
         reloaded.Should().NotBeNull();
         reloaded!.CategoryId.Should().BeNull();
     }
@@ -137,7 +137,7 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Blueprints.Where(r => r.Id == blueprint.Id).ExecuteDeleteAsync();
+        await act.Blueprints.Where(blueprint => blueprint.Id == blueprint.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
         (await verify.FavoriteBlueprints.CountAsync(fr => fr.BlueprintId == blueprint.Id)).Should().Be(0);

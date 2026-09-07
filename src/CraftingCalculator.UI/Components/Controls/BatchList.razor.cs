@@ -18,8 +18,8 @@ public partial class BatchList : ComponentBase, IDisposable
         State.Changed += StateHasChanged;
     }
 
-    private Task ShowInfoAsync(BlueprintQuantity rq) =>
-        DialogService.ShowMessageBoxAsync(rq.Name, rq.Tooltip);
+    private Task ShowInfoAsync(BlueprintQuantity blueprintQuantity) =>
+        DialogService.ShowMessageBoxAsync(blueprintQuantity.Name, blueprintQuantity.Tooltip);
 
     public void Dispose()
     {
