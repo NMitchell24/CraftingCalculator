@@ -57,7 +57,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// <summary>Setting a quantity of 0 or less removes the blueprint from the batch entirely.</summary>
     public void SetQuantity(BlueprintQuantity target, long quantity)
     {
-        if (quantity <= 0)
+        if (quantity < 0)
         {
             _blueprintMap.RemoveAll(target.Blueprint);
         }
