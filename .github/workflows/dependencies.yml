@@ -31,9 +31,6 @@ concurrency:
   group: dependencies-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write   # dependency submission API
-
 jobs:
 
   nuget:
@@ -41,6 +38,11 @@ jobs:
     # Windows is the only host where all three of the UI project's TFMs resolve: on Linux the project
     # still targets net10.0-ios, which has no workload to install there (see build.yml's android job).
     runs-on: windows-latest
+
+    # Job-scoped rather than workflow-scoped, as in codeql-analysis.yml: contents: write is what the
+    # dependency submission API needs, and nothing else added to this workflow later should inherit it.
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
