@@ -1,8 +1,0 @@
-<MudTextField @bind-Value="Model.Name" @bind-Value:after="NotifyChangedAsync" Label="Name" Variant="Variant.Outlined"
-              FullWidth="true" Required="true" RequiredError="Name is required" Immediate="true" Class="mb-4" />
-
-<MudNumericField @bind-Value="Model.Cost" @bind-Value:after="NotifyChangedAsync" Label="Cost per item"
-                 Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" />
-
-<MudTextField @bind-Value="Model.Description" @bind-Value:after="NotifyChangedAsync" Label="Description"
-              Variant="Variant.Outlined" FullWidth="true" Lines="3" Sizing="InputSizing.Auto" MaxLines="10" />

@@ -10,13 +10,13 @@ public class DatabaseAdminDAO(IDbContextFactory<CraftingDataContext> contextFact
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        // Cascade delete removes RecipeIngredients/RecipeChildren/FavoriteRecipes as their parent
-        // Recipes, Ingredients, and Favorites are removed.
-        await context.Recipes.ExecuteDeleteAsync();
-        await context.Ingredients.ExecuteDeleteAsync();
+        // Cascade delete removes BlueprintComponents/BlueprintChildren/FavoriteBlueprints as their parent
+        // Blueprints, Components, and Favorites are removed.
+        await context.Blueprints.ExecuteDeleteAsync();
+        await context.Components.ExecuteDeleteAsync();
         await context.Favorites.ExecuteDeleteAsync();
 
-        // The seeded "All" filter is preserved - only the filters a user created are removed.
-        await context.RecipeFilters.Where(f => f.Id != DatabaseSeedConstants.AllFilterId).ExecuteDeleteAsync();
+        // The seeded "All" category is preserved - only the categories a user created are removed.
+        await context.Categories.Where(category => category.Id != DatabaseSeedConstants.AllCategoryId).ExecuteDeleteAsync();
     }
 }

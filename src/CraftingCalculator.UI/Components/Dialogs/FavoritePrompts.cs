@@ -4,7 +4,7 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
-/// The prompt sequence for saving the current batch as a favorite, shared by the Calculate screen's
+/// The prompt sequence for saving the current batch as a favorite, shared by the Craft screen's
 /// app-bar menu and the Favorites screen's FAB.
 /// </summary>
 public static class FavoritePrompts
@@ -13,9 +13,9 @@ public static class FavoritePrompts
     /// Runs the save sequence and returns the name the batch was saved under, or null if the batch is
     /// empty or the user backed out at any step.
     /// </summary>
-    public static async Task<string?> SaveBatchAsync(IDialogService dialogs, ISnackbar snackbar, CalculatorState state)
+    public static async Task<string?> SaveBatchAsync(IDialogService dialogs, ISnackbar snackbar, CraftState state)
     {
-        if (state.RecipeQuantities.Count == 0)
+        if (state.BlueprintQuantities.Count == 0)
         {
             return null;
         }
@@ -41,7 +41,7 @@ public static class FavoritePrompts
         }
 
         // Only the create-new path checks for a name collision - updating the loaded favorite is
-        // already an overwrite by definition. Mirrors RecipesViewModel.SaveRecipes.
+        // already an overwrite by definition. Mirrors BlueprintsViewModel.SaveBlueprints.
         if (name is null)
         {
             DialogParameters parameters = new() { ["Label"] = "Favorite name" };

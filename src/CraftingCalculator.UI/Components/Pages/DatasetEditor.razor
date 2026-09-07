@@ -1,0 +1,30 @@
+@page "/dataset/{Type}/{Id:int}"
+@implements IDisposable
+
+<PageTitle>Dataset</PageTitle>
+
+@if (_record is not null)
+{
+    <div class="dataset-editor">
+        @* The one place this screen branches on the record type. Every data operation goes through
+           IDatasetService instead, which is why there is no matching switch for load/save/delete. *@
+        @switch (_record)
+        {
+            case Component component:
+                <ComponentEditor @key="_record" Model="component" OnChanged="MarkDirty" />
+                break;
+            case Category category:
+                <CategoryEditor @key="_record" Model="category" OnChanged="MarkDirty" />
+                break;
+            case Blueprint blueprint:
+                <BlueprintEditor @key="_record" Model="blueprint" OnChanged="MarkDirty" />
+                break;
+        }
+    </div>
+
+    <MudPaper Class="editor-action-bar" Elevation="8" Square="true">
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save"
+                   Disabled="@string.IsNullOrWhiteSpace(_record.Name)" OnClick="SaveAsync">Save</MudButton>
+    </MudPaper>
+}

@@ -3,24 +3,24 @@ using CraftingCalculator.Domain.Models;
 namespace CraftingCalculator.Application.BusinessLogic.Processors;
 
 /// <summary>
-/// Combines a batch of picked recipes (each with its own quantity) into total cost, total value, and
+/// Combines a batch of picked blueprints (each with its own quantity) into total cost, total value, and
 /// the merged raw materials needed to make all of them.
 /// </summary>
 public static class BatchProcessor
 {
-    public static (double TotalCost, double TotalValue, IngredientMap Materials) CalculateTotals(
-        IReadOnlyCollection<RecipeQuantity> batch)
+    public static (double TotalCost, double TotalValue, ComponentMap Materials) CalculateTotals(
+        IReadOnlyCollection<BlueprintQuantity> batch)
     {
-        IngredientMap materials = new();
+        ComponentMap materials = new();
         double totalValue = 0;
 
-        foreach (RecipeQuantity rq in batch)
+        foreach (BlueprintQuantity blueprintQuantity in batch)
         {
-            materials = IngredientProcessor.CombineIngredients(RecipeProcessor.Flatten(rq.Recipe), materials, rq.Quantity);
-            totalValue += rq.TotalValue;
+            materials = ComponentProcessor.CombineComponents(BlueprintProcessor.Flatten(blueprintQuantity.Blueprint), materials, blueprintQuantity.Quantity);
+            totalValue += blueprintQuantity.TotalValue;
         }
 
-        double totalCost = materials.IngredientList.Sum(i => i.TotalCost);
+        double totalCost = materials.ComponentList.Sum(componentQuantity => componentQuantity.TotalCost);
 
         return (totalCost, totalValue, materials);
     }

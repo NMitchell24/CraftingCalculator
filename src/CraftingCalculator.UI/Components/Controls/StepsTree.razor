@@ -9,10 +9,10 @@
     }
     else
     {
-        <MudTreeView T="RecipeNode" Class="steps-tree-view">
-            @foreach (RecipeNode root in State.TreeRoots)
+        <MudTreeView T="BlueprintNode" Class="steps-tree-view">
+            @foreach (BlueprintNode root in State.TreeRoots)
             {
-                <RecipeTreeNode Node="root" />
+                <BlueprintTreeNode Node="root" />
             }
         </MudTreeView>
     }

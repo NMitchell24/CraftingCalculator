@@ -10,21 +10,21 @@ namespace CraftingCalculator.Application.UnitTests.Common.Services;
 [TestFixture]
 public class FavoriteServiceTests
 {
-    private Mock<IRecipeFavoritesDAO> _dao = null!;
+    private Mock<IBlueprintFavoritesDAO> _dao = null!;
     private FavoriteService _service = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _dao = new Mock<IRecipeFavoritesDAO>();
+        _dao = new Mock<IBlueprintFavoritesDAO>();
         _service = new FavoriteService(_dao.Object);
     }
 
     [Test]
     public async Task SaveFavoriteAsync_SavesFavoriteAndItsQuantitiesThroughDAO()
     {
-        RecipeFavorite favorite = new RecipeFavorite { Name = "My Batch" };
-        List<RecipeQuantity> quantities = [new RecipeQuantity(new Recipe { Name = "Widget" }, 2, 0)];
+        BlueprintFavorite favorite = new BlueprintFavorite { Name = "My Batch" };
+        List<BlueprintQuantity> quantities = [new BlueprintQuantity(new Blueprint { Name = "Widget" }, 2, 0)];
 
         await _service.SaveFavoriteAsync(favorite, quantities);
 
@@ -34,7 +34,7 @@ public class FavoriteServiceTests
     [Test]
     public async Task RenameFavoriteAsync_RenamesByIdThroughDAO()
     {
-        RecipeFavorite favorite = new RecipeFavorite { Id = 4, Name = "Old" };
+        BlueprintFavorite favorite = new BlueprintFavorite { Id = 4, Name = "Old" };
 
         await _service.RenameFavoriteAsync(favorite, "New");
 
@@ -44,7 +44,7 @@ public class FavoriteServiceTests
     [Test]
     public async Task DoesFavoriteExistAsync_KnownName_ReturnsTrue()
     {
-        _dao.Setup(d => d.GetByNameAsync("My Batch")).ReturnsAsync(new RecipeFavorite { Name = "My Batch" });
+        _dao.Setup(d => d.GetByNameAsync("My Batch")).ReturnsAsync(new BlueprintFavorite { Name = "My Batch" });
 
         bool exists = await _service.DoesFavoriteExistAsync("My Batch");
 
@@ -54,7 +54,7 @@ public class FavoriteServiceTests
     [Test]
     public async Task DoesFavoriteExistAsync_UnknownName_ReturnsFalse()
     {
-        _dao.Setup(d => d.GetByNameAsync("Missing")).ReturnsAsync((RecipeFavorite?)null);
+        _dao.Setup(d => d.GetByNameAsync("Missing")).ReturnsAsync((BlueprintFavorite?)null);
 
         bool exists = await _service.DoesFavoriteExistAsync("Missing");
 
@@ -67,7 +67,7 @@ public class FavoriteServiceTests
         // Parity with the WPF-era bug: GetFavoriteByName(null) returns an empty favorite rather than
         // null, so a null name always reports as "exists". Reproduced deliberately - see the
         // "DoesFavoriteExist always reports true for a null name" migration issue.
-        _dao.Setup(d => d.GetByNameAsync(null)).ReturnsAsync(new RecipeFavorite());
+        _dao.Setup(d => d.GetByNameAsync(null)).ReturnsAsync(new BlueprintFavorite());
 
         bool exists = await _service.DoesFavoriteExistAsync(null);
 
@@ -75,11 +75,11 @@ public class FavoriteServiceTests
     }
 
     [Test]
-    public async Task GetRecipeQuantitiesForFavoriteAsync_NullFavorite_ReturnsEmptyListWithoutCallingDAO()
+    public async Task GetBlueprintQuantitiesForFavoriteAsync_NullFavorite_ReturnsEmptyListWithoutCallingDAO()
     {
-        List<RecipeQuantity> result = await _service.GetRecipeQuantitiesForFavoriteAsync(null);
+        List<BlueprintQuantity> result = await _service.GetBlueprintQuantitiesForFavoriteAsync(null);
 
         result.Should().BeEmpty();
-        _dao.Verify(d => d.GetRecipeQuantitiesAsync(It.IsAny<int>()), Times.Never);
+        _dao.Verify(d => d.GetBlueprintQuantitiesAsync(It.IsAny<int>()), Times.Never);
     }
 }

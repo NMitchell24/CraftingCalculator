@@ -166,7 +166,7 @@ html, body {
     clip-path: inset(50%);
 }
 
-/* Cards. One shared shape for every panel on Calculate and the Library landing, so a "card" means the
+/* Cards. One shared shape for every panel on Calculate and the Dataset landing, so a "card" means the
    same thing everywhere: surface fill, hairline, the theme's radius, and its own padding. Elevation is
    deliberately 0 - the border is what separates a card from the page ground in both themes, and stacked
    shadows on a scrolling page of cards read as clutter. */
@@ -183,23 +183,23 @@ html, body {
 }
 
 /* A row inside a card is already inset by the card's own padding, so MudListItem's default 16px sides
-   are paid twice - and the name column is what gives up the width, truncating recipe names that fit
+   are paid twice - and the name column is what gives up the width, truncating blueprint names that fit
    before these lists moved into cards. */
 .app-card .mud-list > .mud-list-item {
     padding-left: 8px;
     padding-right: 8px;
 }
 
-/* Calculate screen (Components/Pages/Calculate.razor + Components/Controls/*) */
+/* Craft screen (Components/Pages/Calculate.razor + Components/Controls/*) */
 
 /* Stacked by default; two columns only where both dimensions are ample (see the media query below). */
-.calculate-columns {
+.craft-columns {
     display: block;
 }
 
 /* The batch and summary cards fill the page width on a phone, so the list inside the batch card needs
    no separate scroll container - the page itself scrolls. */
-.calculate-column {
+.craft-column {
     min-width: 0;
 }
 
@@ -282,7 +282,7 @@ html, body {
 }
 
 /* :not() above matters as much as the fill does - a muted text-secondary label left on the selected
-   pill reads as a disabled control, the same way PR 8b's dimmed Add Recipes button did. */
+   pill reads as a disabled control, the same way PR 8b's dimmed Add Blueprints button did. */
 
 /* The pill shares the surface token with the card it sits on, so the recessed track behind it is what
    makes it read as raised; the border and shadow keep its edges legible where pill and card meet. */
@@ -309,11 +309,11 @@ html, body {
     min-height: 44px;
 }
 
-.calculate-pane {
+.craft-pane {
     display: none;
 }
 
-.calculate-pane-active {
+.craft-pane-active {
     display: block;
 }
 
@@ -321,13 +321,13 @@ html, body {
    same time as a genuine tablet does. The batch and summary move beside the content card rather than
    above it, so the whole screen fits without scrolling. */
 @media (min-width: 960px) and (min-height: 600px) {
-    .calculate-columns {
+    .craft-columns {
         display: flex;
         gap: 16px;
         align-items: flex-start;
     }
 
-    .calculate-column {
+    .craft-column {
         flex: 1 1 0;
     }
 }
@@ -352,7 +352,7 @@ html, body {
 }
 
 /* Dimming goes on the text, not the container: opacity on the container composites the whole subtree
-   as one group, so a child cannot opt back out of it - which would leave BatchList's Add Recipes
+   as one group, so a child cannot opt back out of it - which would leave BatchList's Add Blueprints
    call-to-action reading as disabled. */
 .pane-empty-state .mud-typography {
     opacity: 0.7;
@@ -360,13 +360,14 @@ html, body {
 
 /* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
    regardless of the icon button's own visual (smaller) padding. */
-.list-row .mud-icon-button {
+.list-row .mud-icon-button,
+.batch-row .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
 }
 
 /* One shared row shape for every name-plus-actions list in the app: the Calculate batch, Favorites,
-   the Library list, and the recipe editor's components. Same dedupe as .list-row-name. */
+   the Dataset list, and the blueprint editor's components. Same dedupe as .list-row-name. */
 .list-row {
     display: flex;
     align-items: center;
@@ -388,7 +389,7 @@ html, body {
 /* MudSelect and MudMenu build their dropdowns out of the same .mud-list / .mud-list-item markup, so the
    rule above turns each option into a spaced card floating inside the popover - a panel of cards where
    a plain option list belongs. Dialogs are deliberately not excluded here: their lists are real content
-   (the recipe picker's rows) and should keep the cards. */
+   (the blueprint picker's rows) and should keep the cards. */
 .mud-popover .mud-list > .mud-list-item {
     background-color: transparent;
     border: none;
@@ -417,6 +418,49 @@ html, body {
 
 /* MudList and MudTreeView both pad themselves vertically, which reads as a gap under the toolbar row
    rather than as spacing between items. */
+/* The Craft screen's batch row is two lines rather than the one-line .list-row shape: the name gets a
+   full line to itself, so a long blueprint name has the whole card width before it ellipsizes, which
+   it was doing constantly in phone portrait. Deliberately its own family rather than a change to
+   .list-row, which Favorites, the Dataset list and the blueprint editor also use. Mirrors
+   .materials-row so the two cards on the Craft screen read as the same kind of object. */
+.batch-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.batch-row-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+.batch-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 500;
+}
+
+/* Intrinsic width, so the name is what gives way when the two cannot both fit. */
+.batch-row-category {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.batch-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.batch-row-icons {
+    display: flex;
+    align-items: center;
+}
+
 .materials-list .mud-list {
     padding-top: 0;
 }
@@ -478,46 +522,52 @@ html, body {
     }
 }
 
-/* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor +
-   LibraryList.razor) screens. The Library landing is one card per record type; the sub-tabs it used to
+/* Favorites (Components/Pages/Favorites.razor) and Dataset (Components/Pages/Dataset.razor +
+   DatasetList.razor) screens. The Dataset landing is one card per record type; the sub-tabs it used to
    carry are gone, replaced by a card each opening that type's own list page. */
 
-/* Capped for the same reason as .library-editor: a single column of cards stretched across a desktop
+/* Capped for the same reason as .dataset-editor: a single column of cards stretched across a desktop
    window is far harder to scan than the same column at phone width. */
-.library-page {
+.dataset-page {
     max-width: 720px;
     margin: 0 auto;
 }
 
-.library-summary-row {
+/* The whole card is the tap target for opening a list, so signal that on the desktop head where
+   there is a cursor to signal it with. */
+.dataset-summary-target {
+    cursor: pointer;
+}
+
+.dataset-summary-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.library-summary-info {
+.dataset-summary-info {
     flex: 1 1 auto;
     min-width: 0;
 }
 
 /* The count is the point of the card, so it carries the weight its heading does not. */
-.library-summary-count {
+.dataset-summary-count {
     color: var(--mud-palette-text-secondary);
 }
 
 /* The card itself is the target, so its own title needs no bottom gap above the count. */
-.library-summary-card .app-card-title {
+.dataset-summary-card .app-card-title {
     margin-bottom: 2px;
 }
 
-.library-summary-card .mud-icon-button {
+.dataset-summary-card .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
 }
 
 /* Settings (Components/Pages/Settings.razor) */
 
-/* Capped for the same reason as .library-editor: a single column of controls and body text stretched
+/* Capped for the same reason as .dataset-editor: a single column of controls and body text stretched
    across a desktop window is far harder to scan than the same column at phone width. */
 .settings-page {
     max-width: 720px;
@@ -537,24 +587,24 @@ html, body {
     opacity: 0.7;
 }
 
-/* Library editor (Components/Pages/LibraryEditor.razor + Components/Controls/*Editor.razor) */
+/* Dataset editor (Components/Pages/DatasetEditor.razor + Components/Controls/*Editor.razor) */
 
 /* Capped rather than full-bleed: a single column of form fields stretched across a tablet or desktop
    window is far harder to scan than the same column at phone width. */
-.library-editor {
+.dataset-editor {
     max-width: 720px;
     margin: 0 auto;
     /* Clears the fixed .editor-action-bar so the last field is never trapped under it. */
     padding-bottom: 72px;
 }
 
-.recipe-add-row {
+.blueprint-add-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.recipe-add-qty {
+.blueprint-add-qty {
     width: 96px;
 }
 
@@ -614,7 +664,7 @@ html, body {
 
 /* House style is set on MudDialogProvider (MainLayout.razor); these are the two things it cannot
    express. Without the margin a FullWidth dialog sits flush against both screen edges on a phone, and
-   without the max-height long content (an ingredient description, a long delete warning) grows the
+   without the max-height long content (an component description, a long delete warning) grows the
    dialog past the viewport instead of scrolling inside it. */
 .mud-dialog:not(.mud-dialog-fullscreen) {
     margin: 16px;
@@ -631,7 +681,7 @@ html, body {
     letter-spacing: 0.02em;
 }
 
-/* A FullScreen MudDialog (RecipePickerDialog on xs - Components/Dialogs/RecipePickerDialog.razor)
+/* A FullScreen MudDialog (BlueprintPickerDialog on xs - Components/Dialogs/BlueprintPickerDialog.razor)
    draws from y=0 same as the app bar, so its title needs the same safe-area clearance. A normal
    (non-fullscreen) dialog is centered with margin and never reaches the real top of the screen, so
    this is scoped to .mud-dialog-fullscreen only. */

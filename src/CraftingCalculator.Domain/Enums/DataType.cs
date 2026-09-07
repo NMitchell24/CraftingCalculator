@@ -1,6 +1,8 @@
 using CraftingCalculator.Domain.Models;
 using System;
-using System.ComponentModel;
+// Aliased rather than importing System.ComponentModel wholesale: that namespace also has a
+// Component type, which is ambiguous with Models.Component in GetDataRecord below.
+using DescriptionAttribute = System.ComponentModel.DescriptionAttribute;
 using System.Reflection;
 
 namespace CraftingCalculator.Domain.Enums;
@@ -8,11 +10,11 @@ namespace CraftingCalculator.Domain.Enums;
 public enum DataType
 {
     [Description("Component")]
-    Ingredient = 0,
+    Component = 0,
     [Description("Category")]
-    RecipeFilter = 1,
+    Category = 1,
     [Description("Blueprint")]
-    Recipe = 2
+    Blueprint = 2
 }
 
 public static class DataTypeExtensions
@@ -39,10 +41,10 @@ public static class DataTypeExtensions
     {
         return value switch
         {
-            DataType.Ingredient => new Ingredient(),
-            DataType.Recipe => new Recipe(),
-            DataType.RecipeFilter => new RecipeFilter(),
-            _ => new Ingredient(),
+            DataType.Component => new Component(),
+            DataType.Blueprint => new Blueprint(),
+            DataType.Category => new Category(),
+            _ => new Component(),
         };
     }
 }

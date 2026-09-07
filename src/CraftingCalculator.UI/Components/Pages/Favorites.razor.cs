@@ -10,15 +10,15 @@ namespace CraftingCalculator.UI.Components.Pages;
 public partial class Favorites : ComponentBase, IDisposable
 {
     [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
-    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private CraftState State { get; set; } = null!;
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
-    private List<RecipeFavorite> _favorites = [];
+    private List<BlueprintFavorite> _favorites = [];
 
-    // Unlike the Calculate screen's panes, this page does not subscribe to CalculatorState.Changed:
+    // Unlike the Craft screen's panes, this page does not subscribe to CraftState.Changed:
     // the only thing that mutates the batch while it is on screen is its own LoadAsync, which
     // navigates away to "/" immediately afterwards.
     protected override async Task OnInitializedAsync()
@@ -28,18 +28,22 @@ public partial class Favorites : ComponentBase, IDisposable
             // The batch cannot change while this page is on screen - the only thing that mutates it is
             // LoadAsync, which navigates away - so this snapshot stays accurate for the page's life.
             PrimaryAction = new AppBarAction("Save current selection", Icons.Material.Filled.Save,
-                SaveCurrentBatchAsync, Disabled: State.RecipeQuantities.Count == 0)
+                SaveCurrentBatchAsync, Disabled: State.BlueprintQuantities.Count == 0)
         });
         await ReloadAsync();
     }
 
-    private async Task ReloadAsync() => _favorites = await FavoriteService.GetAllFavoritesAsync();
-
-    private async Task LoadAsync(RecipeFavorite favorite)
+    private async Task ReloadAsync()
     {
-        // WPF replaced the working batch silently (RecipesViewModel.SelectedFav); on a phone that is
+        _favorites = await FavoriteService.GetAllFavoritesAsync();
+        StateHasChanged();
+    }
+
+    private async Task LoadAsync(BlueprintFavorite favorite)
+    {
+        // WPF replaced the working batch silently (BlueprintsViewModel.SelectedFav); on a phone that is
         // one mis-tap from discarding unsaved work.
-        if (State.RecipeQuantities.Count > 0)
+        if (State.BlueprintQuantities.Count > 0)
         {
             bool? replace = await DialogService.ShowMessageBoxAsync(
                 "Replace current selection?",
@@ -57,7 +61,7 @@ public partial class Favorites : ComponentBase, IDisposable
         Navigation.NavigateTo("/");
     }
 
-    private async Task RenameAsync(RecipeFavorite favorite)
+    private async Task RenameAsync(BlueprintFavorite favorite)
     {
         DialogParameters parameters = new()
         {
@@ -88,7 +92,7 @@ public partial class Favorites : ComponentBase, IDisposable
         await ReloadAsync();
     }
 
-    private async Task DeleteAsync(RecipeFavorite favorite)
+    private async Task DeleteAsync(BlueprintFavorite favorite)
     {
         bool? confirmed = await DialogService.ShowMessageBoxAsync(
             "Delete favorite?",

@@ -5,7 +5,7 @@ namespace CraftingCalculator.UI.Components.Controls;
 
 public partial class MaterialsList : ComponentBase, IDisposable
 {
-    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private CraftState State { get; set; } = null!;
 
     protected override void OnInitialized()
     {

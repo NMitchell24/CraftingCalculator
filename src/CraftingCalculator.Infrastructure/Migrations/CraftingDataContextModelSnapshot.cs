@@ -16,11 +16,92 @@ namespace CraftingCalculator.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.10");
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Favorite", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Blueprint", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Blueprints", (string)null);
+                });
+
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.BlueprintChild", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ChildBlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ParentBlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildBlueprintId");
+
+                    b.HasIndex("ParentBlueprintId");
+
+                    b.ToTable("BlueprintChildren", (string)null);
+                });
+
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.BlueprintComponent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ComponentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlueprintId");
+
+                    b.HasIndex("ComponentId");
+
+                    b.ToTable("BlueprintComponents", (string)null);
+                });
+
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -30,34 +111,10 @@ namespace CraftingCalculator.Infrastructure.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Favorites", (string)null);
+                    b.ToTable("Categories", (string)null);
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteRecipe", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("FavoriteId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FavoriteId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("FavoriteRecipes", (string)null);
-                });
-
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Ingredient", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Component", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,71 +135,14 @@ namespace CraftingCalculator.Infrastructure.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Ingredients", (string)null);
+                    b.ToTable("Components", (string)null);
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Recipe", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Favorite", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("FilterId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("Value")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FilterId");
-
-                    b.HasIndex("Name");
-
-                    b.ToTable("Recipes", (string)null);
-                });
-
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.RecipeChild", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ChildRecipeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ParentRecipeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChildRecipeId");
-
-                    b.HasIndex("ParentRecipeId");
-
-                    b.ToTable("RecipeChildren", (string)null);
-                });
-
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.RecipeFilter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -152,124 +152,124 @@ namespace CraftingCalculator.Infrastructure.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("RecipeFilters", (string)null);
+                    b.ToTable("Favorites", (string)null);
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.RecipeIngredient", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteBlueprint", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IngredientId")
+                    b.Property<int>("BlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FavoriteId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId");
+                    b.HasIndex("BlueprintId");
 
-                    b.HasIndex("RecipeId");
+                    b.HasIndex("FavoriteId");
 
-                    b.ToTable("RecipeIngredients", (string)null);
+                    b.ToTable("FavoriteBlueprints", (string)null);
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteRecipe", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Blueprint", b =>
                 {
-                    b.HasOne("CraftingCalculator.Domain.Entities.Favorite", "Favorite")
-                        .WithMany("FavoriteRecipes")
-                        .HasForeignKey("FavoriteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CraftingCalculator.Domain.Entities.Recipe", "Recipe")
-                        .WithMany("FavoriteRecipes")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Favorite");
-
-                    b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Recipe", b =>
-                {
-                    b.HasOne("CraftingCalculator.Domain.Entities.RecipeFilter", "Filter")
-                        .WithMany("Recipes")
-                        .HasForeignKey("FilterId")
+                    b.HasOne("CraftingCalculator.Domain.Entities.Category", "Category")
+                        .WithMany("Blueprints")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Filter");
+                    b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.RecipeChild", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.BlueprintChild", b =>
                 {
-                    b.HasOne("CraftingCalculator.Domain.Entities.Recipe", "Child")
+                    b.HasOne("CraftingCalculator.Domain.Entities.Blueprint", "Child")
                         .WithMany("ParentLinks")
-                        .HasForeignKey("ChildRecipeId")
+                        .HasForeignKey("ChildBlueprintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CraftingCalculator.Domain.Entities.Recipe", "ParentRecipe")
+                    b.HasOne("CraftingCalculator.Domain.Entities.Blueprint", "ParentBlueprint")
                         .WithMany("Children")
-                        .HasForeignKey("ParentRecipeId")
+                        .HasForeignKey("ParentBlueprintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Child");
 
-                    b.Navigation("ParentRecipe");
+                    b.Navigation("ParentBlueprint");
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.RecipeIngredient", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.BlueprintComponent", b =>
                 {
-                    b.HasOne("CraftingCalculator.Domain.Entities.Ingredient", "Ingredient")
-                        .WithMany("RecipeIngredients")
-                        .HasForeignKey("IngredientId")
+                    b.HasOne("CraftingCalculator.Domain.Entities.Blueprint", "Blueprint")
+                        .WithMany("Components")
+                        .HasForeignKey("BlueprintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CraftingCalculator.Domain.Entities.Recipe", "Recipe")
-                        .WithMany("Ingredients")
-                        .HasForeignKey("RecipeId")
+                    b.HasOne("CraftingCalculator.Domain.Entities.Component", "Component")
+                        .WithMany("BlueprintComponents")
+                        .HasForeignKey("ComponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Ingredient");
+                    b.Navigation("Blueprint");
 
-                    b.Navigation("Recipe");
+                    b.Navigation("Component");
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Favorite", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteBlueprint", b =>
                 {
-                    b.Navigation("FavoriteRecipes");
+                    b.HasOne("CraftingCalculator.Domain.Entities.Blueprint", "Blueprint")
+                        .WithMany("FavoriteBlueprints")
+                        .HasForeignKey("BlueprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CraftingCalculator.Domain.Entities.Favorite", "Favorite")
+                        .WithMany("FavoriteBlueprints")
+                        .HasForeignKey("FavoriteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blueprint");
+
+                    b.Navigation("Favorite");
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Ingredient", b =>
-                {
-                    b.Navigation("RecipeIngredients");
-                });
-
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Recipe", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Blueprint", b =>
                 {
                     b.Navigation("Children");
 
-                    b.Navigation("FavoriteRecipes");
+                    b.Navigation("Components");
 
-                    b.Navigation("Ingredients");
+                    b.Navigation("FavoriteBlueprints");
 
                     b.Navigation("ParentLinks");
                 });
 
-            modelBuilder.Entity("CraftingCalculator.Domain.Entities.RecipeFilter", b =>
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Category", b =>
                 {
-                    b.Navigation("Recipes");
+                    b.Navigation("Blueprints");
+                });
+
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Component", b =>
+                {
+                    b.Navigation("BlueprintComponents");
+                });
+
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.Favorite", b =>
+                {
+                    b.Navigation("FavoriteBlueprints");
                 });
 #pragma warning restore 612, 618
         }

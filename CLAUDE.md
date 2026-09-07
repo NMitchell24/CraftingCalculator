@@ -49,7 +49,7 @@ Dependency direction: **Domain ← Application ← Infrastructure ← UI**. Each
   `await using var context = await contextFactory.CreateDbContextAsync();` per operation. **Never
   register the `DbContext` itself** — `BlazorWebView` holds one `IServiceScope` for the whole app
   session, so a `Scoped` `DbContext` would live for the entire session.
-- **Magic strings/enums live in `Domain/Constants` and `Domain`** (e.g. `RecipeFilter.ALL`, the
+- **Magic strings/enums live in `Domain/Constants` and `Domain`** (e.g. `Category.ALL`, the
   currency format string). Use them instead of inline literals.
 - **Seed data is SQL** (`Infrastructure/Data/Seed/*.sql`, embedded resources) run once by the initial
   migration to establish the **initial** data state. **Once released, the seed is final — never edit it
@@ -191,7 +191,7 @@ duplication *today* — not that it might someday.
   each piece named for what it does.
 - **Large Class / junk drawers.** The smell is a class accumulating *unrelated* members that changes
   for many reasons; split it along the reasons it changes. A cohesive, stateless, well-named static
-  helper (`IngredientProcessor`, `Domain/Constants`) is fine — a single known home beats scattering.
+  helper (`ComponentProcessor`, `Domain/Constants`) is fine — a single known home beats scattering.
   Don't overcorrect: a file created to hold a single static method is a Lazy Element; fold it into the
   nearest cohesive home.
 - **Long Parameter List / flag arguments.** A boolean or mode parameter that forks a method's whole
@@ -254,3 +254,11 @@ while doing other work, **do not silently refactor it.** Instead:
 
 The goal is to keep the catalog from turning every task into an unbounded refactor, and to keep
 refactor scope and timing decisions with the user.
+
+---
+
+## Additional Guidance
+
+- **Commits** All commits need to go through Rider's precommit checks to enforce code quality and formatting rules
+  If Claude cannot access tools through the Intellij MCP server to run these precommit checks, then all commits need to
+  to be performed by the user so that these checks are enforced.

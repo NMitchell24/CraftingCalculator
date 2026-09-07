@@ -8,12 +8,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<IIngredientService, IngredientService>();
-        services.AddScoped<IRecipeFilterService, RecipeFilterService>();
-        services.AddScoped<IRecipeService, RecipeService>();
+        services.AddScoped<IComponentService, ComponentService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IBlueprintService, BlueprintService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
-        services.AddScoped<ILibraryService, LibraryService>();
+        services.AddScoped<IDatasetService, DatasetService>();
 
         return services;
     }
