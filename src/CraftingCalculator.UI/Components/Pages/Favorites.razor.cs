@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
