@@ -91,7 +91,7 @@ dotnet ef migrations add <Name>
   `craftingcalculator-dev` skill).
 - **CI is three workflows.** `unit-tests.yml` (format + build + test via
   `CraftingCalculator.Tests.slnf` on Linux, no MAUI workloads) is the gate — it runs on every PR into
-  `master`. `build.yml` (one Release build per platform head) is **`workflow_dispatch` only** for now;
+  `main`. `build.yml` (one Release build per platform head) is **`workflow_dispatch` only** for now;
   it becomes the tag-triggered release pipeline once the app is finished. `codeql-analysis.yml` builds
   the same `.slnf`. A new non-MAUI project must be added to the `.slnf` or CI silently stops building
   it.

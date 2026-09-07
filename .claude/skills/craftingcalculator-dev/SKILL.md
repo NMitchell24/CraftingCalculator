@@ -167,7 +167,7 @@ semantic search).
   scope:** `dotnet ef migrations add` emits a BOM and a block-scoped namespace, so format the new
   migration (its `Up`/`Down` operations are untouched by that) rather than excluding it.
 - **CI is three workflows.** `unit-tests.yml` is the `core` job above on `ubuntu-latest`, triggered
-  by every PR into `master` — the only automatic gate. `build.yml` holds one Release build per platform
+  by every PR into `main` — the only automatic gate. `build.yml` holds one Release build per platform
   head (`windows`, `android` → APK artifact, `ios` → compile check with `-p:CodesignKey=""`) and is
   **`workflow_dispatch` only** until the app is finished, when it becomes a tag-triggered
   build/release pipeline; those jobs build `-c Release` on purpose — trimming, linker and interpreter
