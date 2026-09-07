@@ -34,47 +34,10 @@ public static class RecipeProcessor
         return combined;
     }
 
-    public static RecipeTree BuildTree(Recipe recipe, long quantity) => BuildTree(recipe, quantity, 0);
-
-    private static RecipeTree BuildTree(Recipe recipe, long quantity, int depth)
-    {
-        ThrowIfTooDeep(recipe, depth);
-
-        RecipeTree tree = new RecipeTree
-        {
-            Name = recipe.Name + " x" + quantity,
-            Id = recipe.Name,
-            Tooltip = recipe.Tooltip
-        };
-
-        foreach (IngredientQuantity i in recipe.Ingredients.IngredientList)
-        {
-            tree.AddRecipeNode(new RecipeTree(i.Name + " x" + (i.Quantity * quantity), i.Tooltip));
-        }
-
-        foreach (RecipeQuantity r in recipe.ChildRecipes.RecipeList)
-        {
-            tree.AddRecipeNode(BuildTree(r.Recipe, r.Quantity * quantity, depth + 1));
-        }
-
-        return tree;
-    }
-
-    private static void ThrowIfTooDeep(Recipe recipe, int depth)
-    {
-        if (depth > MaxRecipeDepth)
-        {
-            throw new InvalidOperationException(
-                $"Recipe graph exceeded the maximum depth of {MaxRecipeDepth}; check for a cycle involving '{recipe.Name}'.");
-        }
-    }
-
     /// <summary>
-    /// Builds the same breakdown as <see cref="BuildTree"/>, as an immutable <see cref="RecipeNode"/>
-    /// tree instead of a mutable <see cref="RecipeTree"/>. Kept alongside <see cref="BuildTree"/>
-    /// rather than replacing it - the WPF app still calls <see cref="BuildTree"/> and mutates the
-    /// result (SetExpandedNodes/SetParent/ExpandCollapseAll), which an immutable record can't support.
-    /// Delete BuildTree/RecipeTree/GetRecipeTree once WPF is gone (PR 9).
+    /// Builds the recipe's component breakdown as a <see cref="RecipeNode"/> tree, scaled by
+    /// <paramref name="quantity"/>: one child node per ingredient and per nested child recipe,
+    /// recursively.
     /// </summary>
     public static RecipeNode BuildNode(Recipe recipe, long quantity) => BuildNode(recipe, quantity, 0);
 
@@ -95,5 +58,14 @@ public static class RecipeProcessor
         }
 
         return new RecipeNode(recipe.Name + " x" + quantity, recipe.Name, recipe.Tooltip, false, children);
+    }
+
+    private static void ThrowIfTooDeep(Recipe recipe, int depth)
+    {
+        if (depth > MaxRecipeDepth)
+        {
+            throw new InvalidOperationException(
+                $"Recipe graph exceeded the maximum depth of {MaxRecipeDepth}; check for a cycle involving '{recipe.Name}'.");
+        }
     }
 }

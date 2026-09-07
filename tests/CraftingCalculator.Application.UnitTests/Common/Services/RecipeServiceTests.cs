@@ -75,14 +75,14 @@ public class RecipeServiceTests
     }
 
     [Test]
-    public void GetRecipeTree_BuildsNodePerComponent()
+    public void GetRecipeNode_BuildsNodePerComponent()
     {
         Recipe recipe = new Recipe { Name = "Widget" };
         recipe.Ingredients.Add(new Ingredient { Name = "Screw" }, 1);
 
-        RecipeTree tree = _service.GetRecipeTree(recipe, 3);
+        RecipeNode tree = _service.GetRecipeNode(recipe, 3);
 
         tree.Name.Should().Be("Widget x3");
-        tree.RecipeNodes.Should().ContainSingle();
+        tree.Children.Should().ContainSingle();
     }
 }

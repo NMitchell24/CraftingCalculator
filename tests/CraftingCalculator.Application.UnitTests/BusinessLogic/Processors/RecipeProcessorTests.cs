@@ -93,7 +93,7 @@ public class RecipeProcessorTests
     }
 
     [Test]
-    public void BuildTree_ScalesNodeNamesByQuantity()
+    public void BuildNode_ScalesNodeNamesByQuantity()
     {
         Recipe child = NewRecipe("Bracket");
         child.Ingredients.Add(NewIngredient("Screw"), 3);
@@ -101,22 +101,24 @@ public class RecipeProcessorTests
         Recipe parent = NewRecipe("Frame");
         parent.ChildRecipes.Add(child, 2);
 
-        RecipeTree tree = RecipeProcessor.BuildTree(parent, 1);
+        RecipeNode tree = RecipeProcessor.BuildNode(parent, 1);
 
         tree.Name.Should().Be("Frame x1");
-        RecipeTree childNode = tree.RecipeNodes.Should().ContainSingle().Subject;
+        RecipeNode childNode = tree.Children.Should().ContainSingle().Subject;
         childNode.Name.Should().Be("Bracket x2");
-        RecipeTree ingredientNode = childNode.RecipeNodes.Should().ContainSingle().Subject;
+        childNode.IsIngredient.Should().BeFalse();
+        RecipeNode ingredientNode = childNode.Children.Should().ContainSingle().Subject;
         ingredientNode.Name.Should().Be("Screw x6");
+        ingredientNode.IsIngredient.Should().BeTrue();
     }
 
     [Test]
-    public void BuildTree_Cycle_ThrowsInsteadOfOverflowingTheStack()
+    public void BuildNode_Cycle_ThrowsInsteadOfOverflowingTheStack()
     {
         Recipe recipe = NewRecipe("Self Referencing");
         recipe.ChildRecipes.Add(recipe, 1);
 
-        Action act = () => RecipeProcessor.BuildTree(recipe, 1);
+        Action act = () => RecipeProcessor.BuildNode(recipe, 1);
 
         act.Should().Throw<InvalidOperationException>();
     }

@@ -25,13 +25,8 @@ public interface IRecipeService
     IngredientMap GetFlattenedIngredients(Recipe recipe);
 
     /// <summary>
-    /// Builds the recipe's component breakdown as a tree, scaled by <paramref name="quantity"/>.
-    /// </summary>
-    RecipeTree GetRecipeTree(Recipe recipe, long quantity);
-
-    /// <summary>
-    /// Builds the recipe's component breakdown as an immutable <see cref="RecipeNode"/> tree, scaled
-    /// by <paramref name="quantity"/>. Use this (not <see cref="GetRecipeTree"/>) for new code.
+    /// Builds the recipe's component breakdown as a <see cref="RecipeNode"/> tree, scaled by
+    /// <paramref name="quantity"/>.
     /// </summary>
     RecipeNode GetRecipeNode(Recipe recipe, long quantity);
 }

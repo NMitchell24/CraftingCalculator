@@ -155,6 +155,11 @@ semantic search).
   dotnet build src/CraftingCalculator.Application/CraftingCalculator.Application.csproj
   ```
 - Run tests: `dotnet test` (or target `tests/CraftingCalculator.Application.UnitTests/...`).
+- **`CraftingCalculator.Tests.slnf`** filters the solution down to Domain / Application /
+  Infrastructure plus the two test projects — everything except the `CraftingCalculator.UI` MAUI head.
+  Use it (`dotnet build CraftingCalculator.Tests.slnf`, `dotnet test CraftingCalculator.Tests.slnf`)
+  on any machine without the MAUI workloads, and in CI. **Add every new non-MAUI project to it** as
+  well as to the .sln, or CI silently stops building it.
 - **Test stack:** NUnit + Moq + AwesomeAssertions (`result.Should()...`; the Apache-2.0 community fork
   of FluentAssertions, which went to a paid Xceed licence at v8 — do not add `FluentAssertions` back).
   Tests mirror source folders. Mock DAOs and inject them into the service under test.

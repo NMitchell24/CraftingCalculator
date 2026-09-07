@@ -76,11 +76,16 @@ pairing from Windows.
 
 ## No `MacOS.slnf` needed
 
-Unlike apps that keep a WPF-only companion project, CraftingCalculator's WPF app is deleted once the
-migration lands (see the migration plan / PR sequence). After that, every project in
-`CraftingCalculator.sln` builds on macOS as-is: `CraftingCalculator.UI.csproj` adds the Windows TFM
-only when `$([MSBuild]::IsOSPlatform('windows'))`, so the Mac naturally resolves `ios;android`
-without needing a solution filter to exclude anything.
+Unlike apps that keep a WPF-only companion project, CraftingCalculator's WPF app was deleted when the
+MAUI migration landed. Every project in `CraftingCalculator.sln` now builds on macOS as-is:
+`CraftingCalculator.UI.csproj` adds the Windows TFM only when
+`$([MSBuild]::IsOSPlatform('windows'))`, so the Mac naturally resolves `ios;android` without needing a
+solution filter to exclude anything.
+
+`CraftingCalculator.Tests.slnf` is a different thing and is not platform-related: it filters the
+solution down to Domain / Application / Infrastructure plus the two test projects, so CI (and anyone
+without the MAUI workloads installed) can restore, build, and test without the `CraftingCalculator.UI`
+head.
 
 ## `global.json` — SDK pin (repo root, committed)
 

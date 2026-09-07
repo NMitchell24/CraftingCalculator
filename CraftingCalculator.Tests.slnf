@@ -1,0 +1,12 @@
+{
+  "solution": {
+    "path": "CraftingCalculator.sln",
+    "projects": [
+      "src\\CraftingCalculator.Domain\\CraftingCalculator.Domain.csproj",
+      "src\\CraftingCalculator.Application\\CraftingCalculator.Application.csproj",
+      "src\\CraftingCalculator.Infrastructure\\CraftingCalculator.Infrastructure.csproj",
+      "tests\\CraftingCalculator.Application.UnitTests\\CraftingCalculator.Application.UnitTests.csproj",
+      "tests\\CraftingCalculator.Infrastructure.UnitTests\\CraftingCalculator.Infrastructure.UnitTests.csproj"
+    ]
+  }
+}
