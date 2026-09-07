@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -38,7 +38,7 @@ jobs:
       # The unpackaged win-x64 drop. `dotnet build` does not produce the MSIX - that needs an explicit
       # packaging target and a signing certificate, neither of which this job has.
       - name: Upload build output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-win-x64
           path: src/CraftingCalculator.UI/bin/Release/net10.0-windows10.0.19041.0/win-x64/
@@ -54,13 +54,13 @@ jobs:
       # JDK 17, not whatever the image defaults to: 21 fails ValidateJavaVersion (XA0034) with a
       # null-path crash. See docs/dev-environment.md.
       - name: Install JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -77,7 +77,7 @@ jobs:
       # Signed with the debug keystore the Android SDK generates - installable for testing, not a
       # release-signed artifact.
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-apk
           path: src/CraftingCalculator.UI/bin/Release/net10.0-android/publish/*.apk
@@ -98,7 +98,7 @@ jobs:
           xcode-version: latest-stable
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 

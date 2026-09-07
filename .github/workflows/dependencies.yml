@@ -1,0 +1,73 @@
+name: Dependencies
+
+# Replaces GitHub's built-in "Automatic dependency submission" for NuGet, which cannot work on this
+# repo. The hosted job restores every project file it finds on ubuntu-latest with no workload step, so
+# src/CraftingCalculator.UI fails with NETSDK1147 (maui-tizen, wasm-tools) - and its runner and steps
+# are not configurable, so the fix is to run the submission here instead. Turn the repository setting
+# off (Settings > Advanced Security > Dependency graph > Automatic dependency submission) or it keeps
+# failing on every push alongside this workflow.
+#
+# What the graph gains: Central Package Management keeps versions out of the .csproj files, so
+# GitHub's static parser resolves every package to ">= 0" and Dependabot has nothing to match
+# advisories against. This submits the restored graph - real versions, plus transitive dependencies -
+# which is what makes Dependabot alerts on this repo meaningful.
+
+on:
+  # Weekly because the snapshot is what Dependabot alerts read, and it should not go stale while main
+  # sits idle; the push trigger refreshes it immediately when a version actually changes. Off the hour
+  # and off CodeQL's Sunday slot - scheduled runs queue behind everyone else's on the hour.
+  schedule:
+    - cron: '30 8 * * 1'
+  push:
+    branches: [main]
+    paths:
+      - 'Directory.Packages.props'
+      - '**/*.csproj'
+      - 'global.json'
+      - '.github/workflows/dependencies.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: dependencies-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # dependency submission API
+
+jobs:
+
+  nuget:
+    name: NuGet dependencies
+    # Windows is the only host where all three of the UI project's TFMs resolve: on Linux the project
+    # still targets net10.0-ios, which has no workload to install there (see build.yml's android job).
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # JDK 17 for the same reason build.yml's android job pins it - see docs/dev-environment.md.
+      - name: Install JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Install MAUI workloads
+        run: dotnet workload restore src/CraftingCalculator.UI/CraftingCalculator.UI.csproj
+
+      # component-detection reads the project.assets.json files this writes, so the whole solution has
+      # to be restored - a .slnf scoped to the non-MAUI projects would silently drop MudBlazor and the
+      # MAUI packages from the snapshot.
+      - name: Restore
+        run: dotnet restore CraftingCalculator.sln
+
+      - name: Submit dependencies
+        uses: advanced-security/component-detection-dependency-submission-action@v0.1.6
+        with:
+          detectorsCategories: NuGet
