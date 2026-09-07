@@ -6,7 +6,7 @@ namespace CraftingCalculator.Application.Common.Services.Impl;
 
 public class CategoryService(ICategoryDAO dao) : ICategoryService
 {
-    public Task<List<Category>> GetCategorysAsync() => dao.GetAllAsync();
+    public Task<List<Category>> GetCategoriesAsync() => dao.GetAllAsync();
 
     public Task<Category?> GetCategoryByIdAsync(int id) => dao.GetByIdAsync(id);
 

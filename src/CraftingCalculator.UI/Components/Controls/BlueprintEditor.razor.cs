@@ -15,7 +15,7 @@ public partial class BlueprintEditor : ComponentBase
 
     [Inject] private ILibraryService LibraryService { get; set; } = null!;
 
-    private List<Category> _categorys = [];
+    private List<Category> _categories = [];
     private List<IBaseDataRecord> _components = [];
     private List<IBaseDataRecord> _childBlueprintCandidates = [];
 
@@ -30,7 +30,7 @@ public partial class BlueprintEditor : ComponentBase
     {
         _categoryId = Model.Category?.Id;
 
-        _categorys = [.. (await LibraryService.GetRecordsAsync(DataType.Category)).Cast<Category>()];
+        _categories = [.. (await LibraryService.GetRecordsAsync(DataType.Category)).Cast<Category>()];
         _components = await LibraryService.GetRecordsAsync(DataType.Component);
 
         // Ports ConfigureBlueprintsViewModel.BlueprintSelectedType: a blueprint cannot be its own part.
@@ -58,7 +58,7 @@ public partial class BlueprintEditor : ComponentBase
     private async Task OnCategoryChangedAsync(int? categoryId)
     {
         _categoryId = categoryId;
-        Model.Category = _categorys.FirstOrDefault(f => f.Id == categoryId);
+        Model.Category = _categories.FirstOrDefault(f => f.Id == categoryId);
 
         await NotifyChangedAsync();
     }

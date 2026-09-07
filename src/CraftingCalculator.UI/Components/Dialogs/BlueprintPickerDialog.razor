@@ -7,7 +7,7 @@
             <MudChipSet T="string" SelectedValue="@_selectedCategoryName" SelectedValueChanged="OnCategoryChanged"
                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
                 <MudChip Text="@Category.ALL" Value="@Category.ALL" />
-                @foreach (Domain.Models.Category category in _categorys)
+                @foreach (Domain.Models.Category category in _categories)
                 {
                     <MudChip Text="@category.Name" Value="@category.Name" />
                 }

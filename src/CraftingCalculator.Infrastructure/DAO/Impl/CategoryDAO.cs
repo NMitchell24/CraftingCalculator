@@ -10,7 +10,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
     public async Task<List<Category>> GetAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        List<CategoryEntity> entities = await context.Categorys
+        List<CategoryEntity> entities = await context.Categories
             .AsNoTracking()
             .OrderByDescending(f => f.Name == Category.ALL)
             .ThenBy(f => f.Name)
@@ -22,7 +22,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
     public async Task<Category?> GetByIdAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        CategoryEntity? entity = await context.Categorys.AsNoTracking()
+        CategoryEntity? entity = await context.Categories.AsNoTracking()
             .FirstOrDefaultAsync(f => f.Id == id);
 
         return entity != null ? ToModel(entity) : null;
@@ -33,7 +33,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
         CategoryEntity entity = category.Id > 0
-            ? await context.Categorys.FirstAsync(f => f.Id == category.Id)
+            ? await context.Categories.FirstAsync(f => f.Id == category.Id)
             : new CategoryEntity();
 
         entity.Name = category.Name ?? "";
@@ -41,7 +41,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
 
         if (entity.Id == 0)
         {
-            context.Categorys.Add(entity);
+            context.Categories.Add(entity);
         }
 
         await context.SaveChangesAsync();
@@ -52,7 +52,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
     public async Task DeleteAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.Categorys.Where(f => f.Id == id).ExecuteDeleteAsync();
+        await context.Categories.Where(f => f.Id == id).ExecuteDeleteAsync();
     }
 
     private static Category ToModel(CategoryEntity entity) => new()

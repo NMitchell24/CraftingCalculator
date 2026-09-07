@@ -13,7 +13,7 @@ public class LibraryService(
     public async Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type) => type switch
     {
         DataType.Component => [.. await componentService.GetAllComponentsAsync()],
-        DataType.Category => [.. (await categoryService.GetCategorysAsync())
+        DataType.Category => [.. (await categoryService.GetCategoriesAsync())
             // Excluded by id rather than by name: a user is free to create a category of their own
             // called "All", and matching on the name would hide it here permanently - leaving it
             // impossible to rename or delete.

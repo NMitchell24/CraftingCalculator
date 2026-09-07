@@ -51,7 +51,7 @@ public class LibraryServiceTests
     [Test]
     public async Task GetRecordsAsync_Category_ExcludesTheSeededAllCategory()
     {
-        _categoryService.Setup(s => s.GetCategorysAsync()).ReturnsAsync(
+        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
             new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL },
             new Category { Id = 2, Name = "Tools" }
@@ -65,7 +65,7 @@ public class LibraryServiceTests
     [Test]
     public async Task GetRecordsAsync_Category_KeepsAUserCategoryNamedAll()
     {
-        _categoryService.Setup(s => s.GetCategorysAsync()).ReturnsAsync(
+        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
             new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL },
             new Category { Id = 7, Name = Category.ALL }

@@ -99,7 +99,7 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Categorys.Where(f => f.Id == category.Id).ExecuteDeleteAsync();
+        await act.Categories.Where(f => f.Id == category.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
         Blueprint? reloaded = await verify.Blueprints.FirstOrDefaultAsync(r => r.Id == blueprint.Id);

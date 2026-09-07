@@ -4,7 +4,7 @@ namespace CraftingCalculator.Application.Common.Interfaces;
 
 public interface ICategoryService
 {
-    Task<List<Category>> GetCategorysAsync();
+    Task<List<Category>> GetCategoriesAsync();
 
     Task<Category?> GetCategoryByIdAsync(int id);
 

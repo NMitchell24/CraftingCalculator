@@ -13,7 +13,7 @@ public partial class BlueprintPickerDialog : ComponentBase
     [Inject] private ICategoryService CategoryService { get; set; } = null!;
 
     private List<Blueprint> _blueprints = [];
-    private List<Category> _categorys = [];
+    private List<Category> _categories = [];
     private IReadOnlyCollection<Blueprint> _selected = [];
     private string _search = "";
     private string _selectedCategoryName = Category.ALL;
@@ -31,7 +31,7 @@ public partial class BlueprintPickerDialog : ComponentBase
         // a real category - excluded here the same way WPF dropped it positionally from
         // ConfigureBlueprintsViewModel's category list. Matched on id rather than name so a user category
         // of their own called "All" (which the Library screen lets them create) still shows up.
-        _categorys = [.. (await CategoryService.GetCategorysAsync())
+        _categories = [.. (await CategoryService.GetCategoriesAsync())
             .Where(f => f.Id != DatabaseSeedConstants.AllCategoryId)];
     }
 

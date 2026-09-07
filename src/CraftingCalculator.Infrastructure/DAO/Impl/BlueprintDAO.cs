@@ -127,8 +127,8 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
         Dictionary<int, ComponentEntity> componentsById =
             await context.Components.AsNoTracking().ToDictionaryAsync(i => i.Id);
-        Dictionary<int, CategoryEntity> categorysById =
-            await context.Categorys.AsNoTracking().ToDictionaryAsync(f => f.Id);
+        Dictionary<int, CategoryEntity> categoriesById =
+            await context.Categories.AsNoTracking().ToDictionaryAsync(f => f.Id);
         Dictionary<int, BlueprintEntity> blueprintsById =
             await context.Blueprints.AsNoTracking().ToDictionaryAsync(r => r.Id);
         ILookup<int, BlueprintComponentEntity> componentsByBlueprintId =
@@ -136,7 +136,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         ILookup<int, BlueprintChildEntity> childrenByParentId =
             (await context.BlueprintChildren.AsNoTracking().ToListAsync()).ToLookup(rc => rc.ParentBlueprintId);
 
-        return new BlueprintGraph(blueprintsById, componentsById, categorysById, componentsByBlueprintId, childrenByParentId);
+        return new BlueprintGraph(blueprintsById, componentsById, categoriesById, componentsByBlueprintId, childrenByParentId);
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             Value = entity.Value
         };
 
-        if (entity.CategoryId is int categoryId && graph.CategorysById.TryGetValue(categoryId, out CategoryEntity? categoryEntity))
+        if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out CategoryEntity? categoryEntity))
         {
             model.Category = ToCategoryModel(categoryEntity);
         }
@@ -204,7 +204,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     private sealed record BlueprintGraph(
         Dictionary<int, BlueprintEntity> BlueprintsById,
         Dictionary<int, ComponentEntity> ComponentsById,
-        Dictionary<int, CategoryEntity> CategorysById,
+        Dictionary<int, CategoryEntity> CategoriesById,
         ILookup<int, BlueprintComponentEntity> ComponentsByBlueprintId,
         ILookup<int, BlueprintChildEntity> ChildrenByParentId);
 }

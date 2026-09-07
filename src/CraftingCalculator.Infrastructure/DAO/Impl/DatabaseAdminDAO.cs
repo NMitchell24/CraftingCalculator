@@ -16,7 +16,7 @@ public class DatabaseAdminDAO(IDbContextFactory<CraftingDataContext> contextFact
         await context.Components.ExecuteDeleteAsync();
         await context.Favorites.ExecuteDeleteAsync();
 
-        // The seeded "All" category is preserved - only the categorys a user created are removed.
-        await context.Categorys.Where(f => f.Id != DatabaseSeedConstants.AllCategoryId).ExecuteDeleteAsync();
+        // The seeded "All" category is preserved - only the categories a user created are removed.
+        await context.Categories.Where(f => f.Id != DatabaseSeedConstants.AllCategoryId).ExecuteDeleteAsync();
     }
 }
