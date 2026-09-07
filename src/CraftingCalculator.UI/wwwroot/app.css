@@ -533,6 +533,12 @@ html, body {
     margin: 0 auto;
 }
 
+/* The whole card is the tap target for opening a list, so signal that on the desktop head where
+   there is a cursor to signal it with. */
+.dataset-summary-target {
+    cursor: pointer;
+}
+
 .dataset-summary-row {
     display: flex;
     align-items: center;

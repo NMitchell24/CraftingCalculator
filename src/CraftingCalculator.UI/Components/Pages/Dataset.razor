@@ -6,17 +6,25 @@
 <div class="dataset-page">
     @foreach (DatasetSection section in Sections)
     {
-        <MudPaper Class="app-card dataset-summary-card" Elevation="0" @key="section.Type" onclick="@(() => OpenList(section.Type))">
-            <div class="dataset-summary-row">
-                <div class="dataset-summary-info">
-                    <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">@section.Title</MudText>
-                    <MudText Typo="Typo.body2" Class="dataset-summary-count">@section.Caption</MudText>
+        @* The click sits on a plain wrapper element rather than on MudPaper: MudPaper exposes no
+           OnClick, and @onclick is an element-only directive, so the alternative was splatting a
+           delegate through UserAttributes - which works, but leans on MudBlazor forwarding it to
+           its root element. The wrapper keeps the whole card clickable, padding included. The
+           pencil still needs its own OnClick: MudBaseButton.ClickPropagation defaults to false, so
+           a click on it never reaches this handler. *@
+        <div class="dataset-summary-target" @key="section.Type" @onclick="@(() => OpenList(section.Type))">
+            <MudPaper Class="app-card dataset-summary-card" Elevation="0">
+                <div class="dataset-summary-row">
+                    <div class="dataset-summary-info">
+                        <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">@section.Title</MudText>
+                        <MudText Typo="Typo.body2" Class="dataset-summary-count">@section.Caption</MudText>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                   OnClick="@(() => OpenList(section.Type))"
+                                   title="@($"Edit {section.Title}")" aria-label="@($"Edit {section.Title}")" />
                 </div>
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                               OnClick="@(() => OpenList(section.Type))"
-                               title="@($"Edit {section.Title}")" aria-label="@($"Edit {section.Title}")" />
-            </div>
-        </MudPaper>
+            </MudPaper>
+        </div>
     }
 </div>
 
