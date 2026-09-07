@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
@@ -33,7 +34,11 @@ public partial class Favorites : ComponentBase, IDisposable
         await ReloadAsync();
     }
 
-    private async Task ReloadAsync() => _favorites = await FavoriteService.GetAllFavoritesAsync();
+    private async Task ReloadAsync()
+    {
+        _favorites = await FavoriteService.GetAllFavoritesAsync();
+        StateHasChanged();
+    }
 
     private async Task LoadAsync(BlueprintFavorite favorite)
     {
