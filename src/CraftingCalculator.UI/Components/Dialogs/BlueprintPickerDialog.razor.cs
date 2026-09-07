@@ -10,17 +10,17 @@ public partial class BlueprintPickerDialog : ComponentBase
 {
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
     [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
-    [Inject] private IBlueprintFilterService BlueprintFilterService { get; set; } = null!;
+    [Inject] private ICategoryService CategoryService { get; set; } = null!;
 
     private List<Blueprint> _blueprints = [];
-    private List<BlueprintFilter> _filters = [];
+    private List<Category> _categorys = [];
     private IReadOnlyCollection<Blueprint> _selected = [];
     private string _search = "";
-    private string _selectedFilterName = BlueprintFilter.ALL;
+    private string _selectedCategoryName = Category.ALL;
 
     private List<Blueprint> _filteredBlueprints =>
         [.. _blueprints.Where(r =>
-            (_selectedFilterName == BlueprintFilter.ALL || r.Filter?.Name == _selectedFilterName) &&
+            (_selectedCategoryName == Category.ALL || r.Category?.Name == _selectedCategoryName) &&
             (string.IsNullOrWhiteSpace(_search) || (r.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false)))];
 
     protected override async Task OnInitializedAsync()
@@ -29,13 +29,13 @@ public partial class BlueprintPickerDialog : ComponentBase
 
         // The seeded "All" row is the sentinel this dialog already renders as its own first chip, not
         // a real category - excluded here the same way WPF dropped it positionally from
-        // ConfigureBlueprintsViewModel's filter list. Matched on id rather than name so a user category
+        // ConfigureBlueprintsViewModel's category list. Matched on id rather than name so a user category
         // of their own called "All" (which the Library screen lets them create) still shows up.
-        _filters = [.. (await BlueprintFilterService.GetBlueprintFiltersAsync())
-            .Where(f => f.Id != DatabaseSeedConstants.AllFilterId)];
+        _categorys = [.. (await CategoryService.GetCategorysAsync())
+            .Where(f => f.Id != DatabaseSeedConstants.AllCategoryId)];
     }
 
-    private void OnFilterChanged(string filterName) => _selectedFilterName = filterName;
+    private void OnCategoryChanged(string categoryName) => _selectedCategoryName = categoryName;
 
     private void Confirm() => MudDialog.Close(DialogResult.Ok(_selected));
 

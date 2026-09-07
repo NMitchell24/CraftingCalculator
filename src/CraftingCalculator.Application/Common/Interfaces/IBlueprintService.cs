@@ -4,7 +4,7 @@ namespace CraftingCalculator.Application.Common.Interfaces;
 
 public interface IBlueprintService
 {
-    Task<List<Blueprint>> GetBlueprintsByFilterAsync(BlueprintFilter filter);
+    Task<List<Blueprint>> GetBlueprintsByCategoryAsync(Category category);
 
     Task<Blueprint?> GetBlueprintByIdAsync(int id);
 

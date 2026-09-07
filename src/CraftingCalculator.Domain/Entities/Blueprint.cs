@@ -7,8 +7,8 @@ public class Blueprint
     public string Description { get; set; } = string.Empty;
     public double Value { get; set; }
 
-    public int? FilterId { get; set; }
-    public BlueprintFilter? Filter { get; set; }
+    public int? CategoryId { get; set; }
+    public Category? Category { get; set; }
 
     public List<BlueprintComponent> Components { get; set; } = [];
 

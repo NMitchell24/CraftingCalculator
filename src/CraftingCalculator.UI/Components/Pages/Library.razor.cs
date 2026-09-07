@@ -46,7 +46,7 @@ public partial class Library : ComponentBase, IDisposable
     // singularise by trimming an s, and it does not pluralise by adding one either.
     private static readonly (DataType Type, string Title, string Singular, string Plural)[] SectionSpecs =
     [
-        (DataType.BlueprintFilter, "Categories", "category", "categories"),
+        (DataType.Category, "Categories", "category", "categories"),
         (DataType.Component, "Components", "component", "components"),
         (DataType.Blueprint, "Blueprints", "blueprint", "blueprints")
     ];

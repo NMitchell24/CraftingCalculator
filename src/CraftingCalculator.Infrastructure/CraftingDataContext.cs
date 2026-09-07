@@ -6,7 +6,7 @@ namespace CraftingCalculator.Infrastructure;
 public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) : DbContext(options)
 {
     public DbSet<Component> Components => Set<Component>();
-    public DbSet<BlueprintFilter> BlueprintFilters => Set<BlueprintFilter>();
+    public DbSet<Category> Categorys => Set<Category>();
     public DbSet<Blueprint> Blueprints => Set<Blueprint>();
     public DbSet<BlueprintComponent> BlueprintComponents => Set<BlueprintComponent>();
     public DbSet<BlueprintChild> BlueprintChildren => Set<BlueprintChild>();

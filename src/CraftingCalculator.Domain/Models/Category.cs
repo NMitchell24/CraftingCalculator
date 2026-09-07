@@ -3,9 +3,9 @@ using CraftingCalculator.Domain.Enums;
 namespace CraftingCalculator.Domain.Models;
 
 /// <summary>
-/// Simple Class to define the UI Model for BlueprintFilters
+/// Simple Class to define the UI Model for Categorys
 /// </summary>
-public class BlueprintFilter : IBaseDataRecord
+public class Category : IBaseDataRecord
 {
     public const string ALL = "All";
     public string? Name { get; set; }
@@ -16,7 +16,7 @@ public class BlueprintFilter : IBaseDataRecord
     {
         get
         {
-            return DataType.BlueprintFilter;
+            return DataType.Category;
         }
         //Don't allow this to be changed as it should remain static
         set { }
@@ -24,7 +24,7 @@ public class BlueprintFilter : IBaseDataRecord
 
     public IBaseDataRecord Clone()
     {
-        BlueprintFilter clone = new BlueprintFilter()
+        Category clone = new Category()
         {
             Id = this.Id,
             Name = this.Name,
@@ -36,7 +36,7 @@ public class BlueprintFilter : IBaseDataRecord
 
     public IBaseDataRecord CopyForSave()
     {
-        BlueprintFilter ret = (BlueprintFilter)Clone();
+        Category ret = (Category)Clone();
         ret.Name += " - Copy";
         ret.Id = 0;
 

@@ -3,7 +3,7 @@ using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Entities;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using BlueprintFilterModel = CraftingCalculator.Domain.Models.BlueprintFilter;
+using CategoryModel = CraftingCalculator.Domain.Models.Category;
 
 namespace CraftingCalculator.Infrastructure.UnitTests;
 
@@ -11,7 +11,7 @@ namespace CraftingCalculator.Infrastructure.UnitTests;
 public class MigrationTests
 {
     [Test]
-    public async Task Migrate_OnAnEmptyFile_CreatesTheSchemaAndSeedsExactlyTheAllFilter()
+    public async Task Migrate_OnAnEmptyFile_CreatesTheSchemaAndSeedsExactlyTheAllCategory()
     {
         string dbPath = Path.Combine(Path.GetTempPath(), $"crafting_migration_{Guid.NewGuid():N}.db3");
         try
@@ -27,10 +27,10 @@ public class MigrationTests
 
             await using (CraftingDataContext context = new(options))
             {
-                List<BlueprintFilter> filters = await context.BlueprintFilters.ToListAsync();
-                filters.Should().ContainSingle();
-                filters[0].Id.Should().Be(DatabaseSeedConstants.AllFilterId);
-                filters[0].Name.Should().Be(BlueprintFilterModel.ALL);
+                List<Category> categorys = await context.Categorys.ToListAsync();
+                categorys.Should().ContainSingle();
+                categorys[0].Id.Should().Be(DatabaseSeedConstants.AllCategoryId);
+                categorys[0].Name.Should().Be(CategoryModel.ALL);
 
                 (await context.Components.CountAsync()).Should().Be(0);
                 (await context.Blueprints.CountAsync()).Should().Be(0);

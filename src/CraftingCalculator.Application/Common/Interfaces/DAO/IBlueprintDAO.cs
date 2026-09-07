@@ -5,12 +5,12 @@ namespace CraftingCalculator.Application.Common.Interfaces.DAO;
 public interface IBlueprintDAO
 {
     /// <summary>
-    /// Returns every blueprint matching <paramref name="filter"/>, or all blueprints when
-    /// <paramref name="filter"/> is the <see cref="BlueprintFilter.ALL"/> filter. Each blueprint is
+    /// Returns every blueprint matching <paramref name="category"/>, or all blueprints when
+    /// <paramref name="category"/> is the <see cref="Category.ALL"/> category. Each blueprint is
     /// returned with its <see cref="Blueprint.Components"/> and <see cref="Blueprint.ChildBlueprints"/>
     /// populated.
     /// </summary>
-    Task<List<Blueprint>> GetByFilterAsync(BlueprintFilter filter);
+    Task<List<Blueprint>> GetByCategoryAsync(Category category);
 
     /// <summary>
     /// Returns the blueprint with its full component graph populated (components and, recursively,

@@ -13,7 +13,7 @@ namespace CraftingCalculator.Application.UnitTests.Common.Services;
 public class LibraryServiceTests
 {
     private Mock<IComponentService> _componentService = null!;
-    private Mock<IBlueprintFilterService> _blueprintFilterService = null!;
+    private Mock<ICategoryService> _categoryService = null!;
     private Mock<IBlueprintService> _blueprintService = null!;
     private LibraryService _service = null!;
 
@@ -21,9 +21,9 @@ public class LibraryServiceTests
     public void SetUp()
     {
         _componentService = new Mock<IComponentService>();
-        _blueprintFilterService = new Mock<IBlueprintFilterService>();
+        _categoryService = new Mock<ICategoryService>();
         _blueprintService = new Mock<IBlueprintService>();
-        _service = new LibraryService(_componentService.Object, _blueprintFilterService.Object, _blueprintService.Object);
+        _service = new LibraryService(_componentService.Object, _categoryService.Object, _blueprintService.Object);
     }
 
     [Test]
@@ -49,29 +49,29 @@ public class LibraryServiceTests
     }
 
     [Test]
-    public async Task GetRecordsAsync_BlueprintFilter_ExcludesTheSeededAllFilter()
+    public async Task GetRecordsAsync_Category_ExcludesTheSeededAllCategory()
     {
-        _blueprintFilterService.Setup(s => s.GetBlueprintFiltersAsync()).ReturnsAsync(
+        _categoryService.Setup(s => s.GetCategorysAsync()).ReturnsAsync(
         [
-            new BlueprintFilter { Id = DatabaseSeedConstants.AllFilterId, Name = BlueprintFilter.ALL },
-            new BlueprintFilter { Id = 2, Name = "Tools" }
+            new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL },
+            new Category { Id = 2, Name = "Tools" }
         ]);
 
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.BlueprintFilter);
+        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
 
         records.Should().ContainSingle().Which.Name.Should().Be("Tools");
     }
 
     [Test]
-    public async Task GetRecordsAsync_BlueprintFilter_KeepsAUserCategoryNamedAll()
+    public async Task GetRecordsAsync_Category_KeepsAUserCategoryNamedAll()
     {
-        _blueprintFilterService.Setup(s => s.GetBlueprintFiltersAsync()).ReturnsAsync(
+        _categoryService.Setup(s => s.GetCategorysAsync()).ReturnsAsync(
         [
-            new BlueprintFilter { Id = DatabaseSeedConstants.AllFilterId, Name = BlueprintFilter.ALL },
-            new BlueprintFilter { Id = 7, Name = BlueprintFilter.ALL }
+            new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL },
+            new Category { Id = 7, Name = Category.ALL }
         ]);
 
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.BlueprintFilter);
+        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
 
         records.Should().ContainSingle().Which.Id.Should().Be(7);
     }
@@ -98,13 +98,13 @@ public class LibraryServiceTests
     }
 
     [Test]
-    public async Task SaveRecordAsync_BlueprintFilter_SavesThroughTheBlueprintFilterService()
+    public async Task SaveRecordAsync_Category_SavesThroughTheCategoryService()
     {
-        BlueprintFilter filter = new BlueprintFilter { Id = 2, Name = "Tools" };
+        Category category = new Category { Id = 2, Name = "Tools" };
 
-        await _service.SaveRecordAsync(filter);
+        await _service.SaveRecordAsync(category);
 
-        _blueprintFilterService.Verify(s => s.SaveBlueprintFilterAsync(filter), Times.Once);
+        _categoryService.Verify(s => s.SaveCategoryAsync(category), Times.Once);
     }
 
     [Test]
@@ -135,7 +135,7 @@ public class LibraryServiceTests
         await _service.DeleteRecordAsync(null);
 
         _componentService.VerifyNoOtherCalls();
-        _blueprintFilterService.VerifyNoOtherCalls();
+        _categoryService.VerifyNoOtherCalls();
         _blueprintService.VerifyNoOtherCalls();
     }
 }

@@ -18,7 +18,7 @@
                     <div class="list-row">
                         <div class="list-row-info">
                             <MudText Class="list-row-name">@rq.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="list-row-name">@rq.FilterType</MudText>
+                            <MudText Typo="Typo.caption" Class="list-row-name">@rq.CategoryName</MudText>
                         </div>
                         <div class="list-row-stepper">
                             <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" OnClick="@(() => State.SetQuantity(rq, rq.Quantity - 1))" />

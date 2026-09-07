@@ -4,12 +4,12 @@
                       AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mb-2" />
 
         <div class="picker-chip-row mb-2">
-            <MudChipSet T="string" SelectedValue="@_selectedFilterName" SelectedValueChanged="OnFilterChanged"
+            <MudChipSet T="string" SelectedValue="@_selectedCategoryName" SelectedValueChanged="OnCategoryChanged"
                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
-                <MudChip Text="@BlueprintFilter.ALL" Value="@BlueprintFilter.ALL" />
-                @foreach (Domain.Models.BlueprintFilter filter in _filters)
+                <MudChip Text="@Category.ALL" Value="@Category.ALL" />
+                @foreach (Domain.Models.Category category in _categorys)
                 {
-                    <MudChip Text="@filter.Name" Value="@filter.Name" />
+                    <MudChip Text="@category.Name" Value="@category.Name" />
                 }
             </MudChipSet>
         </div>
@@ -25,7 +25,7 @@
                 {
                     <MudListItem T="Blueprint" Value="@blueprint">
                         <MudText>@blueprint.Name</MudText>
-                        <MudText Typo="Typo.caption">@blueprint.Filter?.Name</MudText>
+                        <MudText Typo="Typo.caption">@blueprint.Category?.Name</MudText>
                     </MudListItem>
                 }
             </MudList>

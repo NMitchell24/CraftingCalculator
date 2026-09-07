@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CraftingCalculator.Infrastructure.Data.Configurations;
 
-public class BlueprintFilterConfiguration : IEntityTypeConfiguration<BlueprintFilter>
+public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
-    public void Configure(EntityTypeBuilder<BlueprintFilter> builder)
+    public void Configure(EntityTypeBuilder<Category> builder)
     {
-        builder.ToTable("BlueprintFilters");
+        builder.ToTable("Categorys");
         builder.HasKey(f => f.Id);
         builder.Property(f => f.Name).IsRequired();
         builder.Property(f => f.Description).IsRequired();

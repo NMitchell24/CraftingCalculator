@@ -15,22 +15,22 @@ public partial class BlueprintEditor : ComponentBase
 
     [Inject] private ILibraryService LibraryService { get; set; } = null!;
 
-    private List<BlueprintFilter> _filters = [];
+    private List<Category> _categorys = [];
     private List<IBaseDataRecord> _components = [];
     private List<IBaseDataRecord> _childBlueprintCandidates = [];
 
     private DataType _partType = DataType.Component;
     private IBaseDataRecord? _selectedPart;
     private long _quantityToAdd = 1;
-    private int? _filterId;
+    private int? _categoryId;
 
     private List<IBaseQuantityRecord> Parts => BlueprintPartProcessor.GetParts(Model);
 
     protected override async Task OnInitializedAsync()
     {
-        _filterId = Model.Filter?.Id;
+        _categoryId = Model.Category?.Id;
 
-        _filters = [.. (await LibraryService.GetRecordsAsync(DataType.BlueprintFilter)).Cast<BlueprintFilter>()];
+        _categorys = [.. (await LibraryService.GetRecordsAsync(DataType.Category)).Cast<Category>()];
         _components = await LibraryService.GetRecordsAsync(DataType.Component);
 
         // Ports ConfigureBlueprintsViewModel.BlueprintSelectedType: a blueprint cannot be its own part.
@@ -55,10 +55,10 @@ public partial class BlueprintEditor : ComponentBase
         _quantityToAdd = 1;
     }
 
-    private async Task OnFilterChangedAsync(int? filterId)
+    private async Task OnCategoryChangedAsync(int? categoryId)
     {
-        _filterId = filterId;
-        Model.Filter = _filters.FirstOrDefault(f => f.Id == filterId);
+        _categoryId = categoryId;
+        Model.Category = _categorys.FirstOrDefault(f => f.Id == categoryId);
 
         await NotifyChangedAsync();
     }

@@ -5,20 +5,20 @@ using Microsoft.EntityFrameworkCore;
 using ComponentEntity = CraftingCalculator.Domain.Entities.Component;
 using BlueprintChildEntity = CraftingCalculator.Domain.Entities.BlueprintChild;
 using BlueprintEntity = CraftingCalculator.Domain.Entities.Blueprint;
-using BlueprintFilterEntity = CraftingCalculator.Domain.Entities.BlueprintFilter;
+using CategoryEntity = CraftingCalculator.Domain.Entities.Category;
 using BlueprintComponentEntity = CraftingCalculator.Domain.Entities.BlueprintComponent;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
 public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IBlueprintDAO
 {
-    public async Task<List<Blueprint>> GetByFilterAsync(BlueprintFilter filter)
+    public async Task<List<Blueprint>> GetByCategoryAsync(Category category)
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        IEnumerable<BlueprintEntity> matching = filter.Name == BlueprintFilter.ALL
+        IEnumerable<BlueprintEntity> matching = category.Name == Category.ALL
             ? graph.BlueprintsById.Values
-            : graph.BlueprintsById.Values.Where(r => r.FilterId == filter.Id);
+            : graph.BlueprintsById.Values.Where(r => r.CategoryId == category.Id);
 
         return [.. matching.OrderBy(r => r.Name).Select(r => BuildModel(r, graph, 0))];
     }
@@ -48,7 +48,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         entity.Name = blueprint.Name ?? "";
         entity.Description = blueprint.Description ?? "";
         entity.Value = blueprint.Value;
-        entity.FilterId = blueprint.Filter?.Id;
+        entity.CategoryId = blueprint.Category?.Id;
 
         if (entity.Id == 0)
         {
@@ -117,7 +117,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     }
 
     /// <summary>
-    /// Loads every blueprint, component, filter, and component link in five queries so the component
+    /// Loads every blueprint, component, category, and component link in five queries so the component
     /// graph can be stitched together in memory instead of one query per node (the shape the old
     /// LiteDB-backed recursive loader used, which the plan calls out as the wrong fit for EF Core).
     /// </summary>
@@ -127,8 +127,8 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
         Dictionary<int, ComponentEntity> componentsById =
             await context.Components.AsNoTracking().ToDictionaryAsync(i => i.Id);
-        Dictionary<int, BlueprintFilterEntity> filtersById =
-            await context.BlueprintFilters.AsNoTracking().ToDictionaryAsync(f => f.Id);
+        Dictionary<int, CategoryEntity> categorysById =
+            await context.Categorys.AsNoTracking().ToDictionaryAsync(f => f.Id);
         Dictionary<int, BlueprintEntity> blueprintsById =
             await context.Blueprints.AsNoTracking().ToDictionaryAsync(r => r.Id);
         ILookup<int, BlueprintComponentEntity> componentsByBlueprintId =
@@ -136,7 +136,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         ILookup<int, BlueprintChildEntity> childrenByParentId =
             (await context.BlueprintChildren.AsNoTracking().ToListAsync()).ToLookup(rc => rc.ParentBlueprintId);
 
-        return new BlueprintGraph(blueprintsById, componentsById, filtersById, componentsByBlueprintId, childrenByParentId);
+        return new BlueprintGraph(blueprintsById, componentsById, categorysById, componentsByBlueprintId, childrenByParentId);
     }
 
     /// <summary>
@@ -162,9 +162,9 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             Value = entity.Value
         };
 
-        if (entity.FilterId is int filterId && graph.FiltersById.TryGetValue(filterId, out BlueprintFilterEntity? filterEntity))
+        if (entity.CategoryId is int categoryId && graph.CategorysById.TryGetValue(categoryId, out CategoryEntity? categoryEntity))
         {
-            model.Filter = ToFilterModel(filterEntity);
+            model.Category = ToCategoryModel(categoryEntity);
         }
 
         foreach (BlueprintComponentEntity ri in graph.ComponentsByBlueprintId[entity.Id])
@@ -186,7 +186,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         return model;
     }
 
-    private static BlueprintFilter ToFilterModel(BlueprintFilterEntity entity) => new()
+    private static Category ToCategoryModel(CategoryEntity entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
@@ -204,7 +204,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     private sealed record BlueprintGraph(
         Dictionary<int, BlueprintEntity> BlueprintsById,
         Dictionary<int, ComponentEntity> ComponentsById,
-        Dictionary<int, BlueprintFilterEntity> FiltersById,
+        Dictionary<int, CategoryEntity> CategorysById,
         ILookup<int, BlueprintComponentEntity> ComponentsByBlueprintId,
         ILookup<int, BlueprintChildEntity> ChildrenByParentId);
 }

@@ -12,7 +12,7 @@ public enum DataType
     [Description("Component")]
     Component = 0,
     [Description("Category")]
-    BlueprintFilter = 1,
+    Category = 1,
     [Description("Blueprint")]
     Blueprint = 2
 }
@@ -43,7 +43,7 @@ public static class DataTypeExtensions
         {
             DataType.Component => new Component(),
             DataType.Blueprint => new Blueprint(),
-            DataType.BlueprintFilter => new BlueprintFilter(),
+            DataType.Category => new Category(),
             _ => new Component(),
         };
     }

@@ -13,8 +13,8 @@
             case Component component:
                 <ComponentEditor @key="_record" Model="component" OnChanged="MarkDirty" />
                 break;
-            case BlueprintFilter filter:
-                <CategoryEditor @key="_record" Model="filter" OnChanged="MarkDirty" />
+            case Category category:
+                <CategoryEditor @key="_record" Model="category" OnChanged="MarkDirty" />
                 break;
             case Blueprint blueprint:
                 <BlueprintEditor @key="_record" Model="blueprint" OnChanged="MarkDirty" />

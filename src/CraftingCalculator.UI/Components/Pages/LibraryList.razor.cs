@@ -93,7 +93,7 @@ public partial class LibraryList : ComponentBase, IDisposable
         int components = blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count;
         string summary = $"{components} component{(components == 1 ? "" : "s")}";
 
-        return string.IsNullOrWhiteSpace(blueprint.Filter?.Name) ? summary : $"{blueprint.Filter.Name} · {summary}";
+        return string.IsNullOrWhiteSpace(blueprint.Category?.Name) ? summary : $"{blueprint.Category.Name} · {summary}";
     }
 
     public void Dispose() => AppBarState.Reset(this);

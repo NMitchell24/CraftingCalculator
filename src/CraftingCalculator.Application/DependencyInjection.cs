@@ -9,7 +9,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IComponentService, ComponentService>();
-        services.AddScoped<IBlueprintFilterService, BlueprintFilterService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IBlueprintService, BlueprintService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();

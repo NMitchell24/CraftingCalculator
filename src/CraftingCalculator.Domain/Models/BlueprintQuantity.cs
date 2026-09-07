@@ -20,7 +20,7 @@ public class BlueprintQuantity : IBaseQuantityRecord
         }
     }
     public string Name { get => Blueprint.Name ?? ""; set { } }
-    public string FilterType { get => Blueprint.Filter?.Name ?? ""; set { } }
+    public string CategoryName { get => Blueprint.Category?.Name ?? ""; set { } }
     public DataType Type { get => Blueprint.Type; set { } }
     public string Description { get => Blueprint.Description ?? ""; set { } }
     public double TotalValue { get => Blueprint.Value * Quantity; set { } }

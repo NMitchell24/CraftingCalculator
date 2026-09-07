@@ -11,8 +11,8 @@ public interface ILibraryService
 {
     /// <summary>
     /// Every record of <paramref name="type"/>, ordered by name.
-    /// <see cref="DataType.BlueprintFilter"/> excludes the seeded <see cref="BlueprintFilter.ALL"/> row,
-    /// which is a filter sentinel rather than a category a user can edit.
+    /// <see cref="DataType.Category"/> excludes the seeded <see cref="Category.ALL"/> row,
+    /// which is a category sentinel rather than a category a user can edit.
     /// </summary>
     Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type);
 

@@ -90,21 +90,21 @@ public class DeleteBehaviorTests
     }
 
     [Test]
-    public async Task DeletingFilter_SetsBlueprintsFilterIdToNullRatherThanDeletingThem()
+    public async Task DeletingCategory_SetsBlueprintsCategoryIdToNullRatherThanDeletingThem()
     {
         await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();
-        BlueprintFilter filter = new() { Name = "Building" };
-        Blueprint blueprint = new() { Name = "Table", Filter = filter };
+        Category category = new() { Name = "Building" };
+        Blueprint blueprint = new() { Name = "Table", Category = category };
         seed.Blueprints.Add(blueprint);
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.BlueprintFilters.Where(f => f.Id == filter.Id).ExecuteDeleteAsync();
+        await act.Categorys.Where(f => f.Id == category.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
         Blueprint? reloaded = await verify.Blueprints.FirstOrDefaultAsync(r => r.Id == blueprint.Id);
         reloaded.Should().NotBeNull();
-        reloaded!.FilterId.Should().BeNull();
+        reloaded!.CategoryId.Should().BeNull();
     }
 
     [Test]

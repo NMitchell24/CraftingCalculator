@@ -14,7 +14,7 @@ public class Blueprint : IBaseDataRecord
     public string? Name { get; set; }
     public int Id { get; set; }
     public string? Description { get; set; }
-    public BlueprintFilter? Filter { get; set; }
+    public Category? Category { get; set; }
     public double Value { get; set; }
 
     public string Tooltip
@@ -23,7 +23,7 @@ public class Blueprint : IBaseDataRecord
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(Name);
-            sb.AppendLine(Filter?.Name);
+            sb.AppendLine(Category?.Name);
             if (Value > 0)
             {
                 sb.AppendLine("Value per Item: " + string.Format("{0:C2}", Value));
@@ -85,7 +85,7 @@ public class Blueprint : IBaseDataRecord
             Id = this.Id,
             Name = this.Name,
             Description = this.Description,
-            Filter = this.Filter,
+            Category = this.Category,
             Value = this.Value,
             Components = this.Components.Clone(),
             ChildBlueprints = this.ChildBlueprints.Clone()

@@ -13,11 +13,11 @@ public class BlueprintConfiguration : IEntityTypeConfiguration<Blueprint>
         builder.Property(r => r.Name).IsRequired();
         builder.Property(r => r.Description).IsRequired();
         builder.HasIndex(r => r.Name);
-        builder.HasIndex(r => r.FilterId);
+        builder.HasIndex(r => r.CategoryId);
 
-        builder.HasOne(r => r.Filter)
+        builder.HasOne(r => r.Category)
             .WithMany(f => f.Blueprints)
-            .HasForeignKey(r => r.FilterId)
+            .HasForeignKey(r => r.CategoryId)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

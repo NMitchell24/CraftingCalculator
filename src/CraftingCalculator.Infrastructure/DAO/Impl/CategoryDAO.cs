@@ -1,47 +1,47 @@
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using BlueprintFilterEntity = CraftingCalculator.Domain.Entities.BlueprintFilter;
+using CategoryEntity = CraftingCalculator.Domain.Entities.Category;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
-public class BlueprintFilterDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IBlueprintFilterDAO
+public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) : ICategoryDAO
 {
-    public async Task<List<BlueprintFilter>> GetAllAsync()
+    public async Task<List<Category>> GetAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        List<BlueprintFilterEntity> entities = await context.BlueprintFilters
+        List<CategoryEntity> entities = await context.Categorys
             .AsNoTracking()
-            .OrderByDescending(f => f.Name == BlueprintFilter.ALL)
+            .OrderByDescending(f => f.Name == Category.ALL)
             .ThenBy(f => f.Name)
             .ToListAsync();
 
         return [.. entities.Select(ToModel)];
     }
 
-    public async Task<BlueprintFilter?> GetByIdAsync(int id)
+    public async Task<Category?> GetByIdAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        BlueprintFilterEntity? entity = await context.BlueprintFilters.AsNoTracking()
+        CategoryEntity? entity = await context.Categorys.AsNoTracking()
             .FirstOrDefaultAsync(f => f.Id == id);
 
         return entity != null ? ToModel(entity) : null;
     }
 
-    public async Task<BlueprintFilter> SaveAsync(BlueprintFilter filter)
+    public async Task<Category> SaveAsync(Category category)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        BlueprintFilterEntity entity = filter.Id > 0
-            ? await context.BlueprintFilters.FirstAsync(f => f.Id == filter.Id)
-            : new BlueprintFilterEntity();
+        CategoryEntity entity = category.Id > 0
+            ? await context.Categorys.FirstAsync(f => f.Id == category.Id)
+            : new CategoryEntity();
 
-        entity.Name = filter.Name ?? "";
-        entity.Description = filter.Description ?? "";
+        entity.Name = category.Name ?? "";
+        entity.Description = category.Description ?? "";
 
         if (entity.Id == 0)
         {
-            context.BlueprintFilters.Add(entity);
+            context.Categorys.Add(entity);
         }
 
         await context.SaveChangesAsync();
@@ -52,10 +52,10 @@ public class BlueprintFilterDAO(IDbContextFactory<CraftingDataContext> contextFa
     public async Task DeleteAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.BlueprintFilters.Where(f => f.Id == id).ExecuteDeleteAsync();
+        await context.Categorys.Where(f => f.Id == id).ExecuteDeleteAsync();
     }
 
-    private static BlueprintFilter ToModel(BlueprintFilterEntity entity) => new()
+    private static Category ToModel(CategoryEntity entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
