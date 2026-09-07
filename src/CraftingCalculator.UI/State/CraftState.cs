@@ -54,7 +54,11 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         Recalculate();
     }
 
-    /// <summary>Setting a quantity of 0 or less removes the blueprint from the batch entirely.</summary>
+    /// <summary>
+    /// Sets the blueprint's quantity in the batch. Zero is a valid quantity that keeps the blueprint
+    /// selected; only a negative quantity removes it, which the stepper reaches by decrementing past
+    /// zero.
+    /// </summary>
     public void SetQuantity(BlueprintQuantity target, long quantity)
     {
         if (quantity < 0)
