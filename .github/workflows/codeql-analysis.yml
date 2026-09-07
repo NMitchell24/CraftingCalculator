@@ -2,9 +2,9 @@ name: CodeQL
 
 on:
   push:
-    branches: [master, Convert-to-Dotnet-MAUI]
+    branches: [master]
+  # No branch filter - see the same note in build.yml.
   pull_request:
-    branches: [master, Convert-to-Dotnet-MAUI]
   schedule:
     - cron: '0 7 * * 0'
   workflow_dispatch:

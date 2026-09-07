@@ -2,9 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [master, Convert-to-Dotnet-MAUI]
+    branches: [master]
+  # No branch filter: this runs on a PR into any base, so the stacked migration PRs and everything
+  # after them are covered without naming a branch that gets deleted when it merges.
   pull_request:
-    branches: [master, Convert-to-Dotnet-MAUI]
   schedule:
     - cron: '0 6 * * *'
   workflow_dispatch:
