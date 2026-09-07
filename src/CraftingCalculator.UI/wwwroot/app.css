@@ -421,32 +421,43 @@ html, body {
     padding-top: 0;
 }
 
-/* Fixed-width qty/cost columns so they line up across rows regardless of how long each ingredient's
-   name is - the flex+space-between this replaced positioned each column based on that row's own
-   content width instead of a shared column width. tabular-nums keeps the digits themselves from
-   shifting the alignment as quantities and costs change. */
+/* The name gets its own line above a labelled quantity/cost table. Keeping the name in the same row as
+   the stats centred it against the taller two-line cost cell, so it sat off the baseline of the value
+   it was read against. tabular-nums keeps the digits from shifting the column alignment as quantities
+   and costs change. */
 .materials-row {
-    display: grid;
-    grid-template-columns: 1fr 3rem 4.5rem;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     width: 100%;
     font-variant-numeric: tabular-nums;
 }
 
+/* The rule sits on the name rather than the stats grid so its own padding-bottom and the row's gap
+   leave equal space on both sides of the line. */
 .materials-row-name {
     min-width: 0;
+    font-weight: 500;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
 }
 
-.materials-row-cost {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    line-height: 1.1;
+/* One grid for all four cells (both labels, then both values) so each value sits directly under its
+   own label and the two values share a row. */
+.materials-row-stats {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    column-gap: 8px;
+    row-gap: 2px;
 }
 
-.materials-row-cost-label {
+.materials-row-label {
     opacity: 0.7;
+}
+
+.materials-row-end {
+    text-align: right;
 }
 
 /* Tree on a narrow screen: cap MudBlazor's fixed 17px-per-level indent (Styles/components/_treeview.scss)
@@ -458,7 +469,7 @@ html, body {
 
 .steps-tree-view .mud-treeview-item-label {
     white-space: normal;
-    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 @media (max-width: 599.98px) {
