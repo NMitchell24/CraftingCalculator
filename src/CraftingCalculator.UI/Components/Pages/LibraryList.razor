@@ -1,0 +1,51 @@
+@page "/library/{Type}"
+@implements IDisposable
+
+<PageTitle>Library</PageTitle>
+
+<div class="library-page">
+    <MudTextField @bind-Value="_search" Placeholder="Search" Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true" Class="mb-2" />
+
+    @if (FilteredRecords.Count == 0)
+    {
+        <div class="pane-empty-state">
+            @if (_records.Count == 0)
+            {
+                <MudText Typo="Typo.body1">Nothing here yet</MudText>
+                <MudText Typo="Typo.caption">Use the + button above to create one.</MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.body1">No matches</MudText>
+                <MudText Typo="Typo.caption">Nothing here is named like "@_search".</MudText>
+            }
+        </div>
+    }
+    else
+    {
+        <MudList T="IBaseDataRecord">
+            @foreach (IBaseDataRecord record in FilteredRecords)
+            {
+                <MudListItem T="IBaseDataRecord" OnClick="@(() => Edit(record))">
+                    <div class="list-row">
+                        <div class="list-row-info">
+                            <MudText Class="list-row-name">@record.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="list-row-name">@CaptionFor(record)</MudText>
+                        </div>
+                        @* Same shape as Favorites.razor: the row itself opens the editor, so the
+                           overflow menu has to stop the event before it bubbles, and
+                           @onclick:stopPropagation only applies to an element - hence the wrapper. *@
+                        <div @onclick="() => { }" @onclick:stopPropagation="true">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+                                     AriaLabel="@($"Actions for {record.Name}")">
+                                <MudMenuItem Icon="@Icons.Material.Filled.ContentCopy" OnClick="@(() => Duplicate(record))">Duplicate</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteAsync(record))">Delete</MudMenuItem>
+                            </MudMenu>
+                        </div>
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    }
+</div>

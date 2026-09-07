@@ -31,7 +31,7 @@ public partial class LibraryEditor : ComponentBase, IDisposable
     private bool _isDirty;
     private IDisposable? _navigationGuard;
 
-    private string ListHref => $"/library?type={_type}";
+    private string ListHref => $"/library/{_type}";
 
     protected override void OnInitialized()
     {

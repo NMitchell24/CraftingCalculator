@@ -53,7 +53,7 @@ html, body {
     --safe-area-inset-top: 0px;
     --safe-area-inset-bottom: 0px;
     /* The xs bottom nav's exact height, pinned rather than left to grow with its content: every bar
-       that docks above it (.totals-bar, .editor-action-bar) offsets by this, and any drift between
+       that docks above it (.editor-action-bar, the snackbars) offsets by this, and any drift between
        the real height and the offset shows up as a strip of scrolling page content between them. */
     --bottom-nav-height: 56px;
     /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Sized for
@@ -95,10 +95,14 @@ html, body {
     padding: 0 8px;
 }
 
-/* Compensates MudMainContent's own top offset (which only accounts for the app bar's nominal toolbar
-   height) for the extra padding-top MainLayout.razor puts on the app bar to clear the status bar. */
+/* Two jobs. First, compensate MudMainContent's own top offset (which only accounts for the app bar's
+   nominal toolbar height) for the extra padding-top MainLayout.razor puts on the app bar to clear the
+   status bar. Second, supply the 16px gap under the bar: MudBlazor offsets the bar with `padding-top`
+   on .mud-main-content at two classes of specificity (_main.scss), so .page-content's one-class
+   `padding: 16px` shorthand never won the top edge and page content sat flush against the bar. The gap
+   goes here, on the rule that does win, rather than by out-specifying MudBlazor's. */
 .mud-layout .mud-main-content {
-    margin-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));
+    margin-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
 }
 
 /* Same compensation as .mud-main-content above, for the side rail (sm+: MudDrawer Mini/Persistent,
@@ -162,25 +166,70 @@ html, body {
     clip-path: inset(50%);
 }
 
+/* Cards. One shared shape for every panel on Calculate and the Library landing, so a "card" means the
+   same thing everywhere: surface fill, hairline, the theme's radius, and its own padding. Elevation is
+   deliberately 0 - the border is what separates a card from the page ground in both themes, and stacked
+   shadows on a scrolling page of cards read as clutter. */
+.app-card {
+    background-color: var(--mud-palette-surface);
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: var(--mud-default-borderradius);
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.app-card-title {
+    margin-bottom: 8px;
+}
+
+/* A row inside a card is already inset by the card's own padding, so MudListItem's default 16px sides
+   are paid twice - and the name column is what gives up the width, truncating recipe names that fit
+   before these lists moved into cards. */
+.app-card .mud-list > .mud-list-item {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
 /* Calculate screen (Components/Pages/Calculate.razor + Components/Controls/*) */
 
-.calculate-page {
-    padding-bottom: calc(56px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+/* Stacked by default; two columns only where both dimensions are ample (see the media query below). */
+.calculate-columns {
+    display: block;
 }
 
-@media (max-width: 599.98px) {
-    .calculate-page {
-        padding-bottom: calc(var(--bottom-nav-height) + 56px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-    }
+/* The batch and summary cards fill the page width on a phone, so the list inside the batch card needs
+   no separate scroll container - the page itself scrolls. */
+.calculate-column {
+    min-width: 0;
 }
 
-/* The tab bar and the active pane's actions, on one row. Before PR 8c these were two stacked bands
-   that read as one on screen: the toggle group, then a header strip holding the copy /
-   expand-collapse buttons. */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.summary-grid dt {
+    color: var(--mud-palette-text-secondary);
+}
+
+.summary-grid dd {
+    margin: 0;
+    text-align: right;
+}
+
+.summary-profit {
+    font-weight: 600;
+    color: var(--mud-palette-text-primary);
+}
+
+/* The tab row's own row, holding nothing else. Sharing it with the pane actions sized the tab bar by
+   whatever they left over, so it changed width whenever the active pane's action count changed. */
 .pane-toolbar {
     display: flex;
     align-items: center;
-    gap: 8px;
     margin-bottom: 8px;
 }
 
@@ -188,11 +237,11 @@ html, body {
    raised pill. The group is already display:grid (MudBlazor _togglegroup.scss), so equal-width
    segments come free. */
 .segmented {
-    flex: 1 1 auto;
-    min-width: 0;
-    background-color: var(--mud-palette-background-grey);
-    /* The border, not the fill, is what makes the track legible: in the dark palette background-grey
-       sits a few points *below* the page background, so a fill-only track is invisible there. */
+    width: 100%;
+    /* MudBlazor spells this one "gray", not "grey" (MudThemeProvider emits --mud-palette-background-gray).
+       The misspelling made the declaration invalid, so the track painted transparent and simply showed
+       whatever was behind it - which is why it looked like it had no fill at all. */
+    background-color: var(--mud-palette-background-gray);
     border: 1px solid var(--mud-palette-lines-default);
     padding: 3px;
     gap: 3px;
@@ -208,6 +257,12 @@ html, body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* MudBlazor's .mud-toggle-item sets `border-style: none !important`, so a plain border on the
+       selected pill below would never paint. Re-declaring the style here with the same weight is what
+       lets that rule's border-color and width take effect. */
+    border-style: solid !important;
+    border-width: 0;
+    border-color: transparent;
 }
 
 /* The truncation has to live on the label, not just the item: .mud-button-label is a flex child that
@@ -228,20 +283,30 @@ html, body {
 
 /* :not() above matters as much as the fill does - a muted text-secondary label left on the selected
    pill reads as a disabled control, the same way PR 8b's dimmed Add Recipes button did. */
+
+/* The pill shares the surface token with the card it sits on, so the recessed track behind it is what
+   makes it read as raised; the border and shadow keep its edges legible where pill and card meet. */
 .segmented .mud-toggle-item.segmented-selected {
     background-color: var(--mud-palette-surface);
+    border: 1px solid var(--mud-palette-lines-default);
     color: var(--mud-palette-primary);
-    box-shadow: var(--mud-elevation-1);
+    box-shadow: var(--mud-elevation-3);
 }
 
-/* Default (small/cramped): one pane at a time, picked by the toggle group. This covers portrait
-   phones AND landscape phones/small tablets - a width-only breakpoint (e.g. MudBlazor's Md) can't
-   tell those apart from a real tablet, since a landscape phone is wide but short, and the side rail
-   (MainLayout, shown at every non-xs breakpoint) eats into that width further. All three panes stay
-   mounted (so BatchList/MaterialsList/StepsTree don't re-subscribe to CalculatorState on every tab
-   switch) - only which one is visible changes. */
-.calculate-content {
-    display: block;
+/* Both tabs carry actions, so this row is always populated and never collapses to zero height - the
+   content below it does not shift when the tab changes. Wraps rather than truncates, because at large
+   text zoom two labelled buttons will not fit one phone row. */
+.pane-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 44px;
+    margin-bottom: 4px;
+}
+
+.pane-actions .mud-button-root {
+    min-height: 44px;
 }
 
 .calculate-pane {
@@ -252,52 +317,18 @@ html, body {
     display: block;
 }
 
-/* Exactly one of .pane-toolbar and .pane-header is ever on screen: the toolbar row names the visible
-   pane by its tabs, so a per-pane title would be redundant beside it. The side-by-side layout below
-   has no tab bar, so there the per-pane header is the only thing labelling each column. */
-.pane-header {
-    display: none;
-}
-
-/* margin-left rather than the header's justify-content, which would put a lone child at the start on
-   a pane whose title is empty. A no-op inside .pane-toolbar, where .segmented's flex-grow already
-   pushes the actions to the end. */
-.pane-header-actions {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-}
-
 /* Large tablets and up only - both dimensions ample, which a landscape phone never satisfies at the
-   same time as a genuine tablet does. Show every pane side by side, drop the now-redundant tab row,
-   and hand each pane back its own header. */
+   same time as a genuine tablet does. The batch and summary move beside the content card rather than
+   above it, so the whole screen fits without scrolling. */
 @media (min-width: 960px) and (min-height: 600px) {
-    /* Scoped to Calculate: only its tab row becomes redundant here, because only its panes are shown
-       side by side. Library shares .pane-toolbar but keeps one list at a time, so its tabs must stay. */
-    .calculate-page .pane-toolbar {
-        display: none;
-    }
-
-    .pane-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        /* Matches the touch-target floor its action buttons already carry, so the Batch pane - which
-           has no actions - keeps its title on the same baseline as Materials' and Steps' instead of
-           riding higher and offsetting everything below it. */
-        min-height: 44px;
-    }
-
-    .calculate-content {
+    .calculate-columns {
         display: flex;
         gap: 16px;
         align-items: flex-start;
     }
 
-    .calculate-pane {
-        display: block !important;
+    .calculate-column {
         flex: 1 1 0;
-        min-width: 0;
     }
 }
 
@@ -329,8 +360,7 @@ html, body {
 
 /* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
    regardless of the icon button's own visual (smaller) padding. */
-.list-row .mud-icon-button,
-.pane-header-actions .mud-icon-button {
+.list-row .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
 }
@@ -353,6 +383,17 @@ html, body {
     border: 1px solid var(--mud-palette-lines-default);
     border-radius: var(--mud-default-borderradius);
     margin-bottom: 6px;
+}
+
+/* MudSelect and MudMenu build their dropdowns out of the same .mud-list / .mud-list-item markup, so the
+   rule above turns each option into a spaced card floating inside the popover - a panel of cards where
+   a plain option list belongs. Dialogs are deliberately not excluded here: their lists are real content
+   (the recipe picker's rows) and should keep the cards. */
+.mud-popover .mud-list > .mud-list-item {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 0;
 }
 
 .list-row-info {
@@ -426,9 +467,42 @@ html, body {
     }
 }
 
-/* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor) screens.
-   Library's tab row uses the shared .pane-toolbar / .segmented rules above; it carries no pane
-   actions, so the segmented control simply fills the row. */
+/* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor +
+   LibraryList.razor) screens. The Library landing is one card per record type; the sub-tabs it used to
+   carry are gone, replaced by a card each opening that type's own list page. */
+
+/* Capped for the same reason as .library-editor: a single column of cards stretched across a desktop
+   window is far harder to scan than the same column at phone width. */
+.library-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.library-summary-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.library-summary-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* The count is the point of the card, so it carries the weight its heading does not. */
+.library-summary-count {
+    color: var(--mud-palette-text-secondary);
+}
+
+/* The card itself is the target, so its own title needs no bottom gap above the count. */
+.library-summary-card .app-card-title {
+    margin-bottom: 2px;
+}
+
+.library-summary-card .mud-icon-button {
+    min-width: 44px;
+    min-height: 44px;
+}
 
 /* Settings (Components/Pages/Settings.razor) */
 
@@ -473,8 +547,8 @@ html, body {
     width: 96px;
 }
 
-/* Thumb-reachable Cancel/Save, pinned the same way .totals-bar is - above the bottom nav on xs and
-   clear of the gesture-nav area everywhere. */
+/* Thumb-reachable Cancel/Save - above the bottom nav on xs and clear of the gesture-nav area
+   everywhere. The only fixed bar left in the app now that the totals bar is a card. */
 .editor-action-bar {
     position: fixed;
     border-top: 1px solid var(--mud-palette-lines-default);
@@ -507,8 +581,8 @@ html, body {
    `bottom: 24px`, which on Android lands on the gesture bar; and its default position is TopRight,
    which lands squarely on the app bar's +/settings/overflow cluster - at z-index 1500 over every bar
    in this file, for eight seconds, swallowing the taps meant for the + underneath. Docking arithmetic
-   matches .totals-bar / .editor-action-bar. The 56px is the totals bar's height, held constant on the
-   screens that have no totals bar: a slightly high toast there is cheaper than making this position
+   matches .editor-action-bar, the one fixed bar left. The 56px is that bar's height, held constant on
+   the screens that do not show it: a slightly high toast there is cheaper than making this position
    depend on which page is mounted. */
 .mud-snackbar-location-bottom-center {
     bottom: calc(56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
@@ -525,24 +599,6 @@ html, body {
    timeout only now, which is also why ShowCloseIcon is off (MauiProgram.cs). */
 .mud-snackbar {
     pointer-events: none;
-}
-
-.totals-bar {
-    position: fixed;
-    border-top: 1px solid var(--mud-palette-lines-default);
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1200;
-    padding: 8px 16px;
-    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-}
-
-@media (max-width: 599.98px) {
-    .totals-bar {
-        bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-        padding-bottom: 8px;
-    }
 }
 
 /* House style is set on MudDialogProvider (MainLayout.razor); these are the two things it cannot
@@ -580,17 +636,6 @@ html, body {
    flush against the gesture nav bar's swipe area. */
 .mud-dialog-fullscreen .mud-dialog-actions {
     padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-}
-
-.totals-bar-line {
-    display: flex;
-    justify-content: space-around;
-    font-variant-numeric: tabular-nums;
-}
-
-.totals-bar-label {
-    font-weight: 600;
-    margin-right: 4px;
 }
 
 #blazor-error-ui {

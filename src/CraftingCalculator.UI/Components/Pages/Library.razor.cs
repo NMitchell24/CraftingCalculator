@@ -1,7 +1,5 @@
 using CraftingCalculator.Application.Common.Interfaces;
-using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Enums;
-using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
@@ -9,9 +7,14 @@ using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
 
+/// <summary>
+/// The Library landing page: one card per record type showing how many of it exist, each opening that
+/// type's list. The lists themselves live in <see cref="LibraryList" />.
+/// </summary>
 public partial class Library : ComponentBase, IDisposable
 {
-    [Parameter, SupplyParameterFromQuery(Name = "type")] public string? TypeQuery { get; set; }
+    /// <summary>One row of the landing page - a record type, its heading, and its current count.</summary>
+    private sealed record LibrarySection(DataType Type, string Title, string Caption);
 
     [Inject] private ILibraryService LibraryService { get; set; } = null!;
     [Inject] private IDatabaseAdminService DatabaseAdminService { get; set; } = null!;
@@ -21,76 +24,50 @@ public partial class Library : ComponentBase, IDisposable
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
-    private DataType _type = DataType.Recipe;
-    private List<IBaseDataRecord> _records = [];
-    private string _search = "";
+    private List<LibrarySection> Sections { get; set; } = [];
     private bool _busy;
-
-    private List<IBaseDataRecord> FilteredRecords =>
-        [.. _records.Where(r => string.IsNullOrWhiteSpace(_search)
-            || (r.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false))];
 
     protected override async Task OnInitializedAsync()
     {
-        // The editor sends the tab back on its return link, so reopening Library from an ingredient
-        // lands on Ingredients rather than resetting to Recipes.
-        if (Enum.TryParse(TypeQuery, ignoreCase: true, out DataType type))
-        {
-            _type = type;
-        }
-
-        ConfigureAppBar();
-        await ReloadAsync();
-    }
-
-    // The primary action names the type it creates, so this re-runs whenever the selected tab changes.
-    private void ConfigureAppBar() =>
         AppBarState.Configure(this, new AppBarConfig("Library")
         {
-            PrimaryAction = new AppBarAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync),
             MenuItems =
             [
                 new AppBarMenuItem("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
             ]
         });
 
-    private async Task ReloadAsync() => _records = await LibraryService.GetRecordsAsync(_type);
-
-    private async Task OnTypeChangedAsync(DataType type)
-    {
-        _type = type;
-        _search = "";
-        ConfigureAppBar();
         await ReloadAsync();
-
-        // Replace rather than push, so tab taps don't stack up history entries. This keeps the tab in
-        // the URL for the Android hardware back button, which pops to this page's own history entry
-        // rather than following the editor's return link.
-        Navigation.NavigateTo($"/library?type={_type}", replace: true);
     }
 
-    private Task CreateNewAsync()
+    // Ordered the way the records have to be created: a recipe needs ingredients, and an ingredient is
+    // filed under a category, so the landing page reads top to bottom as the path a new user takes.
+    // Both noun forms are spelled out rather than derived from the heading: "Categories" does not
+    // singularise by trimming an s, and it does not pluralise by adding one either.
+    private static readonly (DataType Type, string Title, string Singular, string Plural)[] SectionSpecs =
+    [
+        (DataType.RecipeFilter, "Categories", "category", "categories"),
+        (DataType.Ingredient, "Ingredients", "ingredient", "ingredients"),
+        (DataType.Recipe, "Recipes", "recipe", "recipes")
+    ];
+
+    // Counting means loading each type in full, since ILibraryService exposes no count. That is the same
+    // work the list pages already do and the data is local SQLite, so it is not worth a service method
+    // until one of these lists is large enough to notice.
+    private async Task ReloadAsync()
     {
-        Navigation.NavigateTo($"/library/{_type}/0");
-        return Task.CompletedTask;
-    }
+        List<LibrarySection> sections = [];
 
-    private void Edit(IBaseDataRecord record) => Navigation.NavigateTo($"/library/{record.Type}/{record.Id}");
-
-    private void Duplicate(IBaseDataRecord record) =>
-        Navigation.NavigateTo($"/library/{record.Type}/0?copyFrom={record.Id}");
-
-    private async Task DeleteAsync(IBaseDataRecord record)
-    {
-        if (!await LibraryPrompts.ConfirmDeleteAsync(DialogService, record))
+        foreach ((DataType type, string title, string singular, string plural) in SectionSpecs)
         {
-            return;
+            int count = (await LibraryService.GetRecordsAsync(type)).Count;
+            sections.Add(new LibrarySection(type, title, $"{count} {(count == 1 ? singular : plural)}"));
         }
 
-        await LibraryService.DeleteRecordAsync(record);
-        Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
-        await ReloadAsync();
+        Sections = sections;
     }
+
+    private void OpenList(DataType type) => Navigation.NavigateTo($"/library/{type}");
 
     private async Task DeleteAllDataAsync()
     {
@@ -129,21 +106,6 @@ public partial class Library : ComponentBase, IDisposable
         }
 
         Snackbar.Add("Deleted all data", Severity.Success);
-    }
-
-    private static string CaptionFor(IBaseDataRecord record) => record switch
-    {
-        Ingredient ingredient => string.Format(FormatConstants.CurrencyFormat, ingredient.Cost),
-        Recipe recipe => RecipeCaption(recipe),
-        _ => record.Description ?? ""
-    };
-
-    private static string RecipeCaption(Recipe recipe)
-    {
-        int components = recipe.Ingredients.IngredientList.Count + recipe.ChildRecipes.RecipeList.Count;
-        string summary = $"{components} component{(components == 1 ? "" : "s")}";
-
-        return string.IsNullOrWhiteSpace(recipe.Filter?.Name) ? summary : $"{recipe.Filter.Name} \u00b7 {summary}";
     }
 
     public void Dispose() => AppBarState.Reset(this);

@@ -2,75 +2,56 @@
 @implements IDisposable
 
 <div class="calculate-page">
-    @* Tabs and the active pane's actions on one row. Exactly one of this and the per-pane .pane-header
-       blocks below is on screen at a time (app.css), so each action fragment mounts once. *@
-    <div class="pane-toolbar">
-        <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
-                        SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
-            <MudToggleItem Value="CalculateView.Batch">Batch (@State.RecipeQuantities.Count)</MudToggleItem>
-            <MudToggleItem Value="CalculateView.Materials">Materials (@State.TotalIngredients.Count)</MudToggleItem>
-            <MudToggleItem Value="CalculateView.Steps">Steps</MudToggleItem>
-        </MudToggleGroup>
+    @* Two columns only at >=960x600 (app.css); everything stacks below that. The batch and the summary
+       ride together because both describe the whole batch, while the content card is the one thing that
+       switches. *@
+    <div class="calculate-columns">
+        <div class="calculate-column">
+            <MudPaper Class="app-card" Elevation="0">
+                <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Batch</MudText>
+                <BatchList OnAddRecipes="OpenPickerAsync" />
+            </MudPaper>
 
-        <div class="pane-header-actions">
-            @switch (_view)
-            {
-                case CalculateView.Materials:
-                    @MaterialsActions
-                    break;
-                case CalculateView.Steps:
-                    @StepsActions
-                    break;
-            }
+            <SummaryCard />
         </div>
-    </div>
 
-    @* All three panes stay mounted at every breakpoint - a CSS media query (see app.css) picks between
-       showing only the active one (phones, and landscape phones/small tablets - too little room to
-       combine all three) or all of them side by side (large tablets and up only). Keeping them mounted
-       either way means BatchList/MaterialsList/StepsTree each subscribe to CalculatorState.Changed once,
-       not on every tab switch or every breakpoint change. *@
-    <div class="calculate-content">
-        <div class="calculate-pane @(_view == CalculateView.Batch ? "calculate-pane-active" : "")">
-            @* Visible only in the side-by-side layout, which has no tab row to name each column. *@
-            <div class="pane-header">
-                <MudText Typo="Typo.subtitle1" Class="display-title">Batch</MudText>
-            </div>
-            <BatchList OnAddRecipes="OpenPickerAsync" />
-        </div>
-        <div class="calculate-pane @(_view == CalculateView.Materials ? "calculate-pane-active" : "")">
-            <div class="pane-header">
-                <MudText Typo="Typo.subtitle1" Class="display-title">Materials</MudText>
-                <div class="pane-header-actions">@MaterialsActions</div>
-            </div>
-            <MaterialsList />
-        </div>
-        <div class="calculate-pane @(_view == CalculateView.Steps ? "calculate-pane-active" : "")">
-            <div class="pane-header">
-                <MudText Typo="Typo.subtitle1" Class="display-title">Steps</MudText>
-                <div class="pane-header-actions">@StepsActions</div>
-            </div>
-            <StepsTree />
+        <div class="calculate-column">
+            <MudPaper Class="app-card" Elevation="0">
+                @* Tabs and actions are separate rows on purpose. Sharing one row sized the tab bar by
+                   whatever the actions left over, so it changed width on every switch - Materials has one
+                   action and Steps has two. Both tabs have actions, so neither row ever empties. *@
+                <MudToggleGroup T="CalculateView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
+                                SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+                    <MudToggleItem Value="CalculateView.Materials">Materials</MudToggleItem>
+                    <MudToggleItem Value="CalculateView.Steps">Steps</MudToggleItem>
+                </MudToggleGroup>
+
+                @* Labelled rather than icon-only: PR 8b shrank these to bare icons only because they were
+                   sharing the tab row. On their own row there is space to say what they do. *@
+                <div class="pane-actions">
+                    @if (_view == CalculateView.Materials)
+                    {
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.ContentCopy"
+                                   Disabled="@(State.TotalIngredients.Count == 0)" OnClick="CopyMaterialsAsync">Copy</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.UnfoldMore"
+                                   OnClick="@State.ExpandAll">Expand all</MudButton>
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.UnfoldLess"
+                                   OnClick="@State.CollapseAll">Collapse all</MudButton>
+                    }
+                </div>
+
+                @* Both panes stay mounted and are shown or hidden by class, so MaterialsList and StepsTree
+                   each subscribe to CalculatorState.Changed once rather than on every tab switch. *@
+                <div class="calculate-pane @(_view == CalculateView.Materials ? "calculate-pane-active" : "")">
+                    <MaterialsList />
+                </div>
+                <div class="calculate-pane @(_view == CalculateView.Steps ? "calculate-pane-active" : "")">
+                    <StepsTree />
+                </div>
+            </MudPaper>
         </div>
     </div>
 </div>
-
-<TotalsBar />
-
-@code {
-
-    // Defined once and rendered into whichever layout is visible, so the two never drift apart.
-    private RenderFragment MaterialsActions => @<MudIconButton Icon="@Icons.Material.Filled.ContentCopy"
-                                                               Disabled="@(State.TotalIngredients.Count == 0)"
-                                                               OnClick="CopyMaterialsAsync"
-                                                               title="Copy materials" aria-label="Copy materials" />;
-
-    private RenderFragment StepsActions =>
-        @<text>
-            <MudIconButton Icon="@Icons.Material.Filled.UnfoldMore" OnClick="@State.ExpandAll"
-                           title="Expand all" aria-label="Expand all" />
-            <MudIconButton Icon="@Icons.Material.Filled.UnfoldLess" OnClick="@State.CollapseAll"
-                           title="Collapse all" aria-label="Collapse all" />
-        </text>;
-
-}

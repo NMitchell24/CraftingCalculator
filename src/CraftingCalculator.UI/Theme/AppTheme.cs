@@ -22,7 +22,7 @@ public static class AppTheme
         public const string LightSlate = "#2E3440"; // Secondary + AppbarBackground
         public const string LightSurface = "#FFFFFF"; // Surface + DrawerBackground
         public const string LightBackground = "#F5F6F8";
-        public const string LightBackgroundGray = "#EDEFF3"; // also the segmented control's track (app.css)
+        public const string LightBackgroundGray = "#EDEFF3"; // also the segmented control's recessed track (app.css)
         public const string LightInk = "#1C2027"; // TextPrimary + DrawerText
         public const string LightMuted = "#5A6270"; // TextSecondary + ActionDefault + DrawerIcon
         public const string LightLines = "#E1E4EA"; // Divider + LinesDefault + TableLines
@@ -35,7 +35,7 @@ public static class AppTheme
         public const string DarkSurface = "#1B1E24"; // Surface + AppbarBackground
         public const string DarkDrawer = "#171A20";
         public const string DarkBackground = "#12141A";
-        public const string DarkBackgroundGray = "#0E1016"; // also the segmented control's track (app.css)
+        public const string DarkBackgroundGray = "#0E1016"; // also the segmented control's recessed track (app.css)
         public const string DarkInk = "#E4E7EC"; // SecondaryContrastText + AppbarText + DrawerText + TextPrimary
         public const string DarkMuted = "#98A1B0"; // TextSecondary + ActionDefault + DrawerIcon
         public const string DarkSuccess = "#66BB6A";

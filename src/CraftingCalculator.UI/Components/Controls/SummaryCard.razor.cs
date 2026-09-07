@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
-public partial class TotalsBar : ComponentBase, IDisposable
+public partial class SummaryCard : ComponentBase, IDisposable
 {
     [Inject] private CalculatorState State { get; set; } = null!;
 

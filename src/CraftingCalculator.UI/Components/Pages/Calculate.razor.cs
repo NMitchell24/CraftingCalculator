@@ -11,7 +11,6 @@ public partial class Calculate : ComponentBase, IDisposable
 {
     private enum CalculateView
     {
-        Batch,
         Materials,
         Steps
     }
@@ -24,7 +23,7 @@ public partial class Calculate : ComponentBase, IDisposable
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IClipboardService ClipboardService { get; set; } = null!;
 
-    private CalculateView _view = CalculateView.Batch;
+    private CalculateView _view = CalculateView.Materials;
 
     // Only drives the Add Recipes dialog's FullScreen vs. side-drawer choice now - the pane layout
     // itself (single active pane vs. all three side by side) is a pure CSS media query (app.css),

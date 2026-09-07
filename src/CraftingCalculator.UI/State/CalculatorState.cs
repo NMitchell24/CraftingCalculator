@@ -29,6 +29,15 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
     public double TotalValue { get; private set; }
     public double Profit => TotalValue - TotalCost;
 
+    /// <summary>Total units of raw material the batch needs, summed across every distinct ingredient.</summary>
+    public long TotalComponentCount { get; private set; }
+
+    /// <summary>
+    /// How many craft operations the breakdown implies - every recipe in the tree, at every depth.
+    /// Ingredient leaves are not steps: they are gathered, not crafted.
+    /// </summary>
+    public int CraftingStepCount { get; private set; }
+
     /// <summary>
     /// The favorite the current batch came from, or null when it was built by hand or cleared. Drives
     /// the "update or create new" branch of the save flow (see Components/Dialogs/FavoritePrompts).
@@ -142,6 +151,9 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
         Changed?.Invoke();
     }
 
+    private static int CountRecipes(IReadOnlyList<RecipeNode> nodes) =>
+        nodes.Sum(node => (node.IsIngredient ? 0 : 1) + CountRecipes(node.Children));
+
     private static void CollectPaths(IReadOnlyList<RecipeNode> nodes, string parentPath, HashSet<string> into)
     {
         foreach (RecipeNode node in nodes)
@@ -160,6 +172,11 @@ public sealed class CalculatorState(IRecipeService recipeService, IFavoriteServi
         TotalValue = totalValue;
         TotalIngredients = [.. materials.IngredientList.OrderBy(i => i.Name)];
         TreeRoots = [.. _recipeMap.RecipeList.Select(rq => recipeService.GetRecipeNode(rq.Recipe, rq.Quantity))];
+
+        // Computed here rather than as expression-bodied properties: both walk the whole batch, and the
+        // summary card reads them on every render.
+        TotalComponentCount = TotalIngredients.Sum(i => i.Quantity);
+        CraftingStepCount = CountRecipes(TreeRoots);
 
         Changed?.Invoke();
     }

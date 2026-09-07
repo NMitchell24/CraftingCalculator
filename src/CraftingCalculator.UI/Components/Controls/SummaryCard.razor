@@ -1,0 +1,23 @@
+@implements IDisposable
+
+<MudPaper Class="app-card" Elevation="0">
+    <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Calculation Summary</MudText>
+
+    <dl class="summary-grid">
+        <dt>Components Needed</dt>
+        <dd>@State.TotalComponentCount total</dd>
+
+        <dt>Crafting Path</dt>
+        <dd>@State.CraftingStepCount @(State.CraftingStepCount == 1 ? "step" : "steps")</dd>
+
+        <dt>Cost</dt>
+        <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
+
+        <dt>Value</dt>
+        <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
+
+        @* The one line a user is actually here for, so it is the only one that carries emphasis. *@
+        <dt class="summary-profit">Profit</dt>
+        <dd class="summary-profit">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>
+    </dl>
+</MudPaper>
