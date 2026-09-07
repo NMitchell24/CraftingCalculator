@@ -11,11 +11,11 @@ public partial class BlueprintTreeNode : ComponentBase
     /// <summary>The path of the parent node, empty for a tree root. See <see cref="Path"/>.</summary>
     [Parameter] public string ParentPath { get; set; } = "";
 
-    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private CraftState State { get; set; } = null!;
 
     /// <summary>
     /// This node's position in the tree, e.g. "/Frame/Bracket" - distinct from <see cref="Node"/>.Id
-    /// (which is just this node's own name) so that CalculatorState can track expansion per tree
+    /// (which is just this node's own name) so that CraftState can track expansion per tree
     /// position rather than per blueprint/component name. The same blueprint can appear more than once in
     /// one tree (standalone in the batch and nested inside another batch blueprint); keying by Id alone
     /// would make every occurrence share one expanded/collapsed state.

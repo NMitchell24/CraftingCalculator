@@ -5,12 +5,12 @@ using CraftingCalculator.Domain.Models;
 namespace CraftingCalculator.UI.State;
 
 /// <summary>
-/// The batch of blueprints currently being priced out on the Calculate screen. Scoped and shared across
-/// pages (Favorites/Library can load into or read from it) - the one exception to "state rides in the
+/// The batch of blueprints currently being priced out on the Craft screen. Scoped and shared across
+/// pages (Favorites/Dataset can load into or read from it) - the one exception to "state rides in the
 /// route", since this is genuine cross-page session state. Components subscribe to <see cref="Changed"/>
 /// in <c>OnInitialized</c> and unsubscribe in <c>Dispose</c>.
 /// </summary>
-public sealed class CalculatorState(IBlueprintService blueprintService, IFavoriteService favoriteService)
+public sealed class CraftState(IBlueprintService blueprintService, IFavoriteService favoriteService)
 {
     private readonly BlueprintMap _blueprintMap = new();
 

@@ -4,10 +4,10 @@ using CraftingCalculator.Domain.Models;
 namespace CraftingCalculator.Application.Common.Interfaces;
 
 /// <summary>
-/// The Library screen's view of the three user-editable record types, addressed uniformly by
+/// The Dataset screen's view of the three user-editable record types, addressed uniformly by
 /// <see cref="DataType"/> so callers do not each have to branch on it.
 /// </summary>
-public interface ILibraryService
+public interface IDatasetService
 {
     /// <summary>
     /// Every record of <paramref name="type"/>, ordered by name.

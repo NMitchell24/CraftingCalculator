@@ -30,7 +30,7 @@ public partial class BlueprintPickerDialog : ComponentBase
         // The seeded "All" row is the sentinel this dialog already renders as its own first chip, not
         // a real category - excluded here the same way WPF dropped it positionally from
         // ConfigureBlueprintsViewModel's category list. Matched on id rather than name so a user category
-        // of their own called "All" (which the Library screen lets them create) still shows up.
+        // of their own called "All" (which the Dataset screen lets them create) still shows up.
         _categories = [.. (await CategoryService.GetCategoriesAsync())
             .Where(f => f.Id != DatabaseSeedConstants.AllCategoryId)];
     }

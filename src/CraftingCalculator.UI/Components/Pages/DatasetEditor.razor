@@ -1,13 +1,13 @@
-@page "/library/{Type}/{Id:int}"
+@page "/dataset/{Type}/{Id:int}"
 @implements IDisposable
 
 <PageTitle>Dataset</PageTitle>
 
 @if (_record is not null)
 {
-    <div class="library-editor">
+    <div class="dataset-editor">
         @* The one place this screen branches on the record type. Every data operation goes through
-           ILibraryService instead, which is why there is no matching switch for load/save/delete. *@
+           IDatasetService instead, which is why there is no matching switch for load/save/delete. *@
         @switch (_record)
         {
             case Component component:

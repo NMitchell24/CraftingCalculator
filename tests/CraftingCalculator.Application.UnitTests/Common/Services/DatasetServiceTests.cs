@@ -10,12 +10,12 @@ using NUnit.Framework;
 namespace CraftingCalculator.Application.UnitTests.Common.Services;
 
 [TestFixture]
-public class LibraryServiceTests
+public class DatasetServiceTests
 {
     private Mock<IComponentService> _componentService = null!;
     private Mock<ICategoryService> _categoryService = null!;
     private Mock<IBlueprintService> _blueprintService = null!;
-    private LibraryService _service = null!;
+    private DatasetService _service = null!;
 
     [SetUp]
     public void SetUp()
@@ -23,7 +23,7 @@ public class LibraryServiceTests
         _componentService = new Mock<IComponentService>();
         _categoryService = new Mock<ICategoryService>();
         _blueprintService = new Mock<IBlueprintService>();
-        _service = new LibraryService(_componentService.Object, _categoryService.Object, _blueprintService.Object);
+        _service = new DatasetService(_componentService.Object, _categoryService.Object, _blueprintService.Object);
     }
 
     [Test]

@@ -5,10 +5,10 @@ using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.Common.Services.Impl;
 
-public class LibraryService(
+public class DatasetService(
     IComponentService componentService,
     ICategoryService categoryService,
-    IBlueprintService blueprintService) : ILibraryService
+    IBlueprintService blueprintService) : IDatasetService
 {
     public async Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type) => type switch
     {

@@ -1,16 +1,16 @@
-@page "/library"
+@page "/dataset"
 @implements IDisposable
 
 <PageTitle>Dataset</PageTitle>
 
-<div class="library-page">
-    @foreach (LibrarySection section in Sections)
+<div class="dataset-page">
+    @foreach (DatasetSection section in Sections)
     {
-        <MudPaper Class="app-card library-summary-card" Elevation="0" @key="section.Type">
-            <div class="library-summary-row">
-                <div class="library-summary-info">
+        <MudPaper Class="app-card dataset-summary-card" Elevation="0" @key="section.Type">
+            <div class="dataset-summary-row">
+                <div class="dataset-summary-info">
                     <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">@section.Title</MudText>
-                    <MudText Typo="Typo.body2" Class="library-summary-count">@section.Caption</MudText>
+                    <MudText Typo="Typo.body2" Class="dataset-summary-count">@section.Caption</MudText>
                 </div>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
                                OnClick="@(() => OpenList(section.Type))"

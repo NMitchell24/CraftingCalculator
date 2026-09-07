@@ -8,23 +8,23 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
-/// The Library landing page: one card per record type showing how many of it exist, each opening that
-/// type's list. The lists themselves live in <see cref="LibraryList" />.
+/// The Dataset landing page: one card per record type showing how many of it exist, each opening that
+/// type's list. The lists themselves live in <see cref="DatasetList" />.
 /// </summary>
-public partial class Library : ComponentBase, IDisposable
+public partial class Dataset : ComponentBase, IDisposable
 {
     /// <summary>One row of the landing page - a record type, its heading, and its current count.</summary>
-    private sealed record LibrarySection(DataType Type, string Title, string Caption);
+    private sealed record DatasetSection(DataType Type, string Title, string Caption);
 
-    [Inject] private ILibraryService LibraryService { get; set; } = null!;
+    [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private IDatabaseAdminService DatabaseAdminService { get; set; } = null!;
-    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private CraftState State { get; set; } = null!;
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
-    private List<LibrarySection> Sections { get; set; } = [];
+    private List<DatasetSection> Sections { get; set; } = [];
     private bool _busy;
 
     protected override async Task OnInitializedAsync()
@@ -51,23 +51,23 @@ public partial class Library : ComponentBase, IDisposable
         (DataType.Blueprint, "Blueprints", "blueprint", "blueprints")
     ];
 
-    // Counting means loading each type in full, since ILibraryService exposes no count. That is the same
+    // Counting means loading each type in full, since IDatasetService exposes no count. That is the same
     // work the list pages already do and the data is local SQLite, so it is not worth a service method
     // until one of these lists is large enough to notice.
     private async Task ReloadAsync()
     {
-        List<LibrarySection> sections = [];
+        List<DatasetSection> sections = [];
 
         foreach ((DataType type, string title, string singular, string plural) in SectionSpecs)
         {
-            int count = (await LibraryService.GetRecordsAsync(type)).Count;
-            sections.Add(new LibrarySection(type, title, $"{count} {(count == 1 ? singular : plural)}"));
+            int count = (await DatasetService.GetRecordsAsync(type)).Count;
+            sections.Add(new DatasetSection(type, title, $"{count} {(count == 1 ? singular : plural)}"));
         }
 
         Sections = sections;
     }
 
-    private void OpenList(DataType type) => Navigation.NavigateTo($"/library/{type}");
+    private void OpenList(DataType type) => Navigation.NavigateTo($"/dataset/{type}");
 
     private async Task DeleteAllDataAsync()
     {
@@ -94,7 +94,7 @@ public partial class Library : ComponentBase, IDisposable
         {
             await DatabaseAdminService.DeleteAllDataAsync();
 
-            // The batch on the Calculate screen holds Blueprint models that no longer exist in the
+            // The batch on the Craft screen holds Blueprint models that no longer exist in the
             // database - left alone it would keep pricing out deleted blueprints.
             State.Clear();
 

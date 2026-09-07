@@ -166,7 +166,7 @@ html, body {
     clip-path: inset(50%);
 }
 
-/* Cards. One shared shape for every panel on Calculate and the Library landing, so a "card" means the
+/* Cards. One shared shape for every panel on Calculate and the Dataset landing, so a "card" means the
    same thing everywhere: surface fill, hairline, the theme's radius, and its own padding. Elevation is
    deliberately 0 - the border is what separates a card from the page ground in both themes, and stacked
    shadows on a scrolling page of cards read as clutter. */
@@ -190,16 +190,16 @@ html, body {
     padding-right: 8px;
 }
 
-/* Calculate screen (Components/Pages/Calculate.razor + Components/Controls/*) */
+/* Craft screen (Components/Pages/Calculate.razor + Components/Controls/*) */
 
 /* Stacked by default; two columns only where both dimensions are ample (see the media query below). */
-.calculate-columns {
+.craft-columns {
     display: block;
 }
 
 /* The batch and summary cards fill the page width on a phone, so the list inside the batch card needs
    no separate scroll container - the page itself scrolls. */
-.calculate-column {
+.craft-column {
     min-width: 0;
 }
 
@@ -309,11 +309,11 @@ html, body {
     min-height: 44px;
 }
 
-.calculate-pane {
+.craft-pane {
     display: none;
 }
 
-.calculate-pane-active {
+.craft-pane-active {
     display: block;
 }
 
@@ -321,13 +321,13 @@ html, body {
    same time as a genuine tablet does. The batch and summary move beside the content card rather than
    above it, so the whole screen fits without scrolling. */
 @media (min-width: 960px) and (min-height: 600px) {
-    .calculate-columns {
+    .craft-columns {
         display: flex;
         gap: 16px;
         align-items: flex-start;
     }
 
-    .calculate-column {
+    .craft-column {
         flex: 1 1 0;
     }
 }
@@ -366,7 +366,7 @@ html, body {
 }
 
 /* One shared row shape for every name-plus-actions list in the app: the Calculate batch, Favorites,
-   the Library list, and the blueprint editor's components. Same dedupe as .list-row-name. */
+   the Dataset list, and the blueprint editor's components. Same dedupe as .list-row-name. */
 .list-row {
     display: flex;
     align-items: center;
@@ -478,46 +478,46 @@ html, body {
     }
 }
 
-/* Favorites (Components/Pages/Favorites.razor) and Library (Components/Pages/Library.razor +
-   LibraryList.razor) screens. The Library landing is one card per record type; the sub-tabs it used to
+/* Favorites (Components/Pages/Favorites.razor) and Dataset (Components/Pages/Dataset.razor +
+   DatasetList.razor) screens. The Dataset landing is one card per record type; the sub-tabs it used to
    carry are gone, replaced by a card each opening that type's own list page. */
 
-/* Capped for the same reason as .library-editor: a single column of cards stretched across a desktop
+/* Capped for the same reason as .dataset-editor: a single column of cards stretched across a desktop
    window is far harder to scan than the same column at phone width. */
-.library-page {
+.dataset-page {
     max-width: 720px;
     margin: 0 auto;
 }
 
-.library-summary-row {
+.dataset-summary-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.library-summary-info {
+.dataset-summary-info {
     flex: 1 1 auto;
     min-width: 0;
 }
 
 /* The count is the point of the card, so it carries the weight its heading does not. */
-.library-summary-count {
+.dataset-summary-count {
     color: var(--mud-palette-text-secondary);
 }
 
 /* The card itself is the target, so its own title needs no bottom gap above the count. */
-.library-summary-card .app-card-title {
+.dataset-summary-card .app-card-title {
     margin-bottom: 2px;
 }
 
-.library-summary-card .mud-icon-button {
+.dataset-summary-card .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
 }
 
 /* Settings (Components/Pages/Settings.razor) */
 
-/* Capped for the same reason as .library-editor: a single column of controls and body text stretched
+/* Capped for the same reason as .dataset-editor: a single column of controls and body text stretched
    across a desktop window is far harder to scan than the same column at phone width. */
 .settings-page {
     max-width: 720px;
@@ -537,11 +537,11 @@ html, body {
     opacity: 0.7;
 }
 
-/* Library editor (Components/Pages/LibraryEditor.razor + Components/Controls/*Editor.razor) */
+/* Dataset editor (Components/Pages/DatasetEditor.razor + Components/Controls/*Editor.razor) */
 
 /* Capped rather than full-bleed: a single column of form fields stretched across a tablet or desktop
    window is far harder to scan than the same column at phone width. */
-.library-editor {
+.dataset-editor {
     max-width: 720px;
     margin: 0 auto;
     /* Clears the fixed .editor-action-bar so the last field is never trapped under it. */

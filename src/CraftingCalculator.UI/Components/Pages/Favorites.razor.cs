@@ -10,7 +10,7 @@ namespace CraftingCalculator.UI.Components.Pages;
 public partial class Favorites : ComponentBase, IDisposable
 {
     [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
-    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private CraftState State { get; set; } = null!;
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -18,7 +18,7 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private List<BlueprintFavorite> _favorites = [];
 
-    // Unlike the Calculate screen's panes, this page does not subscribe to CalculatorState.Changed:
+    // Unlike the Craft screen's panes, this page does not subscribe to CraftState.Changed:
     // the only thing that mutates the batch while it is on screen is its own LoadAsync, which
     // navigates away to "/" immediately afterwards.
     protected override async Task OnInitializedAsync()

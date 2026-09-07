@@ -13,7 +13,7 @@ public partial class BlueprintEditor : ComponentBase
     /// <summary>Raised on every edit, so the hosting page can track unsaved changes.</summary>
     [Parameter] public EventCallback OnChanged { get; set; }
 
-    [Inject] private ILibraryService LibraryService { get; set; } = null!;
+    [Inject] private IDatasetService DatasetService { get; set; } = null!;
 
     private List<Category> _categories = [];
     private List<IBaseDataRecord> _components = [];
@@ -30,14 +30,14 @@ public partial class BlueprintEditor : ComponentBase
     {
         _categoryId = Model.Category?.Id;
 
-        _categories = [.. (await LibraryService.GetRecordsAsync(DataType.Category)).Cast<Category>()];
-        _components = await LibraryService.GetRecordsAsync(DataType.Component);
+        _categories = [.. (await DatasetService.GetRecordsAsync(DataType.Category)).Cast<Category>()];
+        _components = await DatasetService.GetRecordsAsync(DataType.Component);
 
         // Ports ConfigureBlueprintsViewModel.BlueprintSelectedType: a blueprint cannot be its own part.
         // Nothing guards a longer A -> B -> A cycle here either, matching the WPF app - the depth cap
         // in BlueprintProcessor is what keeps that catchable.
         _childBlueprintCandidates =
-            [.. (await LibraryService.GetRecordsAsync(DataType.Blueprint)).Where(r => r.Id != Model.Id)];
+            [.. (await DatasetService.GetRecordsAsync(DataType.Blueprint)).Where(r => r.Id != Model.Id)];
     }
 
     private Task<IEnumerable<IBaseDataRecord>> SearchAsync(string? search, CancellationToken cancellationToken)

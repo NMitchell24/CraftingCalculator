@@ -46,7 +46,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IClipboardService, ClipboardService>();
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
 
-        builder.Services.AddScoped<CalculatorState>();
+        builder.Services.AddScoped<CraftState>();
         builder.Services.AddScoped<AppBarState>();
         builder.Services.AddScoped<ThemeState>();
 

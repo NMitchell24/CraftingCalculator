@@ -13,7 +13,7 @@ public static class DependencyInjection
         services.AddScoped<IBlueprintService, BlueprintService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
-        services.AddScoped<ILibraryService, LibraryService>();
+        services.AddScoped<IDatasetService, DatasetService>();
 
         return services;
     }

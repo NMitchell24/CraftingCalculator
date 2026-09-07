@@ -7,9 +7,9 @@ using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
 
-public partial class Calculate : ComponentBase, IDisposable
+public partial class Craft : ComponentBase, IDisposable
 {
-    private enum CalculateView
+    private enum CraftView
     {
         Materials,
         Steps
@@ -17,13 +17,13 @@ public partial class Calculate : ComponentBase, IDisposable
 
     [CascadingParameter] private Breakpoint Breakpoint { get; set; }
 
-    [Inject] private CalculatorState State { get; set; } = null!;
+    [Inject] private CraftState State { get; set; } = null!;
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IClipboardService ClipboardService { get; set; } = null!;
 
-    private CalculateView _view = CalculateView.Materials;
+    private CraftView _view = CraftView.Materials;
 
     // Only drives the Add Blueprints dialog's FullScreen vs. side-drawer choice now - the pane layout
     // itself (single active pane vs. all three side by side) is a pure CSS media query (app.css),
@@ -45,7 +45,7 @@ public partial class Calculate : ComponentBase, IDisposable
         });
     }
 
-    private void OnViewChanged(CalculateView view) => _view = view;
+    private void OnViewChanged(CraftView view) => _view = view;
 
     private async Task OpenPickerAsync()
     {

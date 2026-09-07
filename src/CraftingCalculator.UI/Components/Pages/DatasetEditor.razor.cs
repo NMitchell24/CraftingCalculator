@@ -9,7 +9,7 @@ using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
 
-public partial class LibraryEditor : ComponentBase, IDisposable
+public partial class DatasetEditor : ComponentBase, IDisposable
 {
     /// <summary>The <see cref="DataType"/> being edited, as its enum name.</summary>
     [Parameter] public string Type { get; set; } = "";
@@ -20,7 +20,7 @@ public partial class LibraryEditor : ComponentBase, IDisposable
     /// <summary>Id of the record this one starts as a copy of. Only read when <see cref="Id"/> is 0.</summary>
     [Parameter, SupplyParameterFromQuery(Name = "copyFrom")] public int CopyFrom { get; set; }
 
-    [Inject] private ILibraryService LibraryService { get; set; } = null!;
+    [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -31,7 +31,7 @@ public partial class LibraryEditor : ComponentBase, IDisposable
     private bool _isDirty;
     private IDisposable? _navigationGuard;
 
-    private string ListHref => $"/library/{_type}";
+    private string ListHref => $"/dataset/{_type}";
 
     protected override void OnInitialized()
     {
@@ -42,19 +42,19 @@ public partial class LibraryEditor : ComponentBase, IDisposable
     {
         if (!Enum.TryParse(Type, ignoreCase: true, out _type))
         {
-            Navigation.NavigateTo("/library");
+            Navigation.NavigateTo("/dataset");
             return;
         }
 
         _record = Id > 0
-            ? await LibraryService.GetRecordAsync(_type, Id)
+            ? await DatasetService.GetRecordAsync(_type, Id)
             : CopyFrom > 0
-                ? (await LibraryService.GetRecordAsync(_type, CopyFrom))?.CopyForSave()
+                ? (await DatasetService.GetRecordAsync(_type, CopyFrom))?.CopyForSave()
                 : _type.GetDataRecord();
 
         if (_record is null)
         {
-            Navigation.NavigateTo("/library");
+            Navigation.NavigateTo("/dataset");
             return;
         }
 
@@ -78,7 +78,7 @@ public partial class LibraryEditor : ComponentBase, IDisposable
 
     private async Task SaveAsync()
     {
-        await LibraryService.SaveRecordAsync(_record);
+        await DatasetService.SaveRecordAsync(_record);
 
         _isDirty = false;
         Snackbar.Add($"Saved '{_record?.Name}'", Severity.Success);
@@ -87,12 +87,12 @@ public partial class LibraryEditor : ComponentBase, IDisposable
 
     private async Task DeleteAsync()
     {
-        if (_record is null || !await LibraryPrompts.ConfirmDeleteAsync(DialogService, _record))
+        if (_record is null || !await DatasetPrompts.ConfirmDeleteAsync(DialogService, _record))
         {
             return;
         }
 
-        await LibraryService.DeleteRecordAsync(_record);
+        await DatasetService.DeleteRecordAsync(_record);
 
         _isDirty = false;
         Snackbar.Add($"Deleted '{_record.Name}'", Severity.Success);

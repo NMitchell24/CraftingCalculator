@@ -10,15 +10,15 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
-/// One record type's list, reached from the <see cref="Library" /> landing page. Rows open
-/// <see cref="LibraryEditor" />; the app bar creates a new record of this page's type.
+/// One record type's list, reached from the <see cref="Dataset" /> landing page. Rows open
+/// <see cref="DatasetEditor" />; the app bar creates a new record of this page's type.
 /// </summary>
-public partial class LibraryList : ComponentBase, IDisposable
+public partial class DatasetList : ComponentBase, IDisposable
 {
     /// <summary>The <see cref="DataType"/> being listed, as its enum name.</summary>
     [Parameter] public string Type { get; set; } = "";
 
-    [Inject] private ILibraryService LibraryService { get; set; } = null!;
+    [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private AppBarState AppBarState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -36,13 +36,13 @@ public partial class LibraryList : ComponentBase, IDisposable
     {
         if (!Enum.TryParse(Type, ignoreCase: true, out _type))
         {
-            Navigation.NavigateTo("/library");
+            Navigation.NavigateTo("/dataset");
             return;
         }
 
         AppBarState.Configure(this, new AppBarConfig(TitleFor(_type))
         {
-            BackHref = "/library",
+            BackHref = "/dataset",
             PrimaryAction = new AppBarAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync)
         });
 
@@ -56,27 +56,27 @@ public partial class LibraryList : ComponentBase, IDisposable
         _ => "Categories"
     };
 
-    private async Task ReloadAsync() => _records = await LibraryService.GetRecordsAsync(_type);
+    private async Task ReloadAsync() => _records = await DatasetService.GetRecordsAsync(_type);
 
     private Task CreateNewAsync()
     {
-        Navigation.NavigateTo($"/library/{_type}/0");
+        Navigation.NavigateTo($"/dataset/{_type}/0");
         return Task.CompletedTask;
     }
 
-    private void Edit(IBaseDataRecord record) => Navigation.NavigateTo($"/library/{record.Type}/{record.Id}");
+    private void Edit(IBaseDataRecord record) => Navigation.NavigateTo($"/dataset/{record.Type}/{record.Id}");
 
     private void Duplicate(IBaseDataRecord record) =>
-        Navigation.NavigateTo($"/library/{record.Type}/0?copyFrom={record.Id}");
+        Navigation.NavigateTo($"/dataset/{record.Type}/0?copyFrom={record.Id}");
 
     private async Task DeleteAsync(IBaseDataRecord record)
     {
-        if (!await LibraryPrompts.ConfirmDeleteAsync(DialogService, record))
+        if (!await DatasetPrompts.ConfirmDeleteAsync(DialogService, record))
         {
             return;
         }
 
-        await LibraryService.DeleteRecordAsync(record);
+        await DatasetService.DeleteRecordAsync(record);
         Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
         await ReloadAsync();
     }
