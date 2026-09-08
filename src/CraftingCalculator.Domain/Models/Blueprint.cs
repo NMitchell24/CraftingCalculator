@@ -17,6 +17,20 @@ public class Blueprint : IBaseDataRecord
     public Category? Category { get; set; }
     public double Value { get; set; }
 
+    private long _yield = 1;
+
+    /// <summary>
+    /// How many items one craft of this blueprint produces. Always at least 1.
+    /// </summary>
+    public long Yield
+    {
+        get => _yield;
+        //Guards the divide in BlueprintProcessor.CraftsFor. A yield of 0 or less has no meaning and
+        //would either divide by zero or produce a negative craft count, so it is pinned to the
+        //1-per-craft default rather than rejected - the editor's Min="1" is the user-facing validation.
+        set => _yield = value < 1 ? 1 : value;
+    }
+
     public string Tooltip
     {
         get
@@ -27,6 +41,10 @@ public class Blueprint : IBaseDataRecord
             if (Value > 0)
             {
                 sb.AppendLine("Value per Item: " + string.Format("{0:C2}", Value));
+            }
+            if (Yield > 1)
+            {
+                sb.AppendLine("Yield per Craft: " + Yield);
             }
             sb.Append(Environment.NewLine);
             if (Description != null && Description.Length > 0)
@@ -52,9 +70,11 @@ public class Blueprint : IBaseDataRecord
 
             return sb.ToString();
         }
-        //Computed from Name/Description/Components - the setter exists only to satisfy
-        //IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
-        set { }
+        set
+        {
+            // Computed from Name/Description/Components - the setter exists only to satisfy
+            // IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
+        }
     }
 
     public DataType Type
@@ -63,8 +83,11 @@ public class Blueprint : IBaseDataRecord
         {
             return DataType.Blueprint;
         }
-        //Don't allow this to be changed as it should remain static.
-        set { }
+
+        set
+        {
+            //Don't allow this to be changed as it should remain static.
+        }
     }
 
     /// <summary>
@@ -87,6 +110,7 @@ public class Blueprint : IBaseDataRecord
             Description = this.Description,
             Category = this.Category,
             Value = this.Value,
+            Yield = this.Yield,
             Components = this.Components.Clone(),
             ChildBlueprints = this.ChildBlueprints.Clone()
         };

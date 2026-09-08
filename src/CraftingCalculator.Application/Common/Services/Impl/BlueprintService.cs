@@ -17,7 +17,8 @@ public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
 
     public Task DeleteBlueprintAsync(Blueprint? blueprint) => blueprint != null ? dao.DeleteAsync(blueprint.Id) : Task.CompletedTask;
 
-    public ComponentMap GetFlattenedComponents(Blueprint blueprint) => BlueprintProcessor.Flatten(blueprint);
+    public (ComponentMap Components, BlueprintMap Surplus) GetFlattenedComponents(Blueprint blueprint, long quantity) =>
+        BlueprintProcessor.Flatten(blueprint, quantity);
 
     public BlueprintNode GetBlueprintNode(Blueprint blueprint, long quantity) => BlueprintProcessor.BuildNode(blueprint, quantity);
 }

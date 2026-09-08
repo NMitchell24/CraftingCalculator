@@ -34,11 +34,24 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     /// <summary>
     /// How many craft operations the breakdown implies: every blueprint in the tree, at every depth,
-    /// counted once per unit rather than once per row - four Frames that each need two Brackets are
-    /// eight Bracket crafts plus four Frame crafts. Component leaves are not steps: they are
-    /// gathered, not crafted.
+    /// counted once per craft rather than once per row - four Frames that each need two Brackets are
+    /// eight Bracket crafts plus four Frame crafts, or half that many Bracket crafts if the Bracket
+    /// blueprint yields two. Component leaves are not steps: they are gathered, not crafted.
     /// </summary>
     public long CraftingStepCount { get; private set; }
+
+    /// <summary>
+    /// The items the batch produces beyond what it asked for, because a craft is indivisible - needing
+    /// three of something that yields two runs two crafts and leaves one spare. Merged across the whole
+    /// batch and every depth of the tree.
+    /// </summary>
+    public IReadOnlyList<BlueprintQuantity> SurplusStock { get; private set; } = [];
+
+    /// <summary>Total surplus items, summed across every distinct blueprint.</summary>
+    public long SurplusCount { get; private set; }
+
+    /// <summary>What the surplus is worth. Deliberately not part of <see cref="Profit"/>.</summary>
+    public double SurplusValue { get; private set; }
 
     /// <summary>
     /// The favorite the current batch came from, or null when it was built by hand or cleared. Drives
@@ -158,7 +171,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     }
 
     private static long CountCrafts(IReadOnlyList<BlueprintNode> nodes) =>
-        nodes.Sum(node => (node.IsComponent ? 0 : node.Quantity) + CountCrafts(node.Children));
+        nodes.Sum(node => node.Crafts + CountCrafts(node.Children));
 
     private static void CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
     {
@@ -172,17 +185,20 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     private void Recalculate()
     {
-        (double totalCost, double totalValue, ComponentMap materials) = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList);
+        BatchTotals totals = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList);
 
-        TotalCost = totalCost;
-        TotalValue = totalValue;
-        TotalComponents = [.. materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
+        TotalCost = totals.TotalCost;
+        TotalValue = totals.TotalValue;
+        TotalComponents = [.. totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
+        SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
         TreeRoots = [.. _blueprintMap.BlueprintList.Select(blueprintQuantity => blueprintService.GetBlueprintNode(blueprintQuantity.Blueprint, blueprintQuantity.Quantity))];
 
-        // Computed here rather than as expression-bodied properties: both walk the whole batch, and the
+        // Computed here rather than as expression-bodied properties: each walks the whole batch, and the
         // summary card reads them on every render.
         TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
         CraftingStepCount = CountCrafts(TreeRoots);
+        SurplusCount = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.Quantity);
+        SurplusValue = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.TotalValue);
 
         Changed?.Invoke();
     }

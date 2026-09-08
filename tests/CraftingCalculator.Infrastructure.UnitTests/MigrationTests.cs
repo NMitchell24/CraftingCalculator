@@ -130,6 +130,45 @@ public class MigrationTests
         }
     }
 
+    /// <summary>
+    /// Yield arrived after the app shipped, so every blueprint written before it must come back as the
+    /// 1-per-craft default rather than 0, which would divide by zero in BlueprintProcessor.CraftsFor.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeYield_DefaultsExistingBlueprintsToOne()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("RenameToCraftingVocabulary");
+
+                // Raw SQL because the entity no longer describes a Blueprints table without a Yield column.
+                await context.Database.ExecuteSqlRawAsync(
+                    "INSERT INTO Blueprints (Id, Name, Description, Value) VALUES (1, 'Table', 'Four legs', 30.0);");
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                Blueprint table = await context.Blueprints.SingleAsync();
+                table.Name.Should().Be("Table");
+                table.Yield.Should().Be(1);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
     private static string NewDbPath() =>
         Path.Combine(Path.GetTempPath(), $"crafting_migration_{Guid.NewGuid():N}.db3");
 

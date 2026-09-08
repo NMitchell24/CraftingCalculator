@@ -20,9 +20,10 @@ public interface IBlueprintService
 
     /// <summary>
     /// Flattens the blueprint's own components and every (recursively) nested child blueprint's
-    /// components into one combined <see cref="ComponentMap"/>.
+    /// components into one combined <see cref="ComponentMap"/> for <paramref name="quantity"/> of the
+    /// blueprint, alongside the items its rounded-up crafts produce beyond that quantity.
     /// </summary>
-    ComponentMap GetFlattenedComponents(Blueprint blueprint);
+    (ComponentMap Components, BlueprintMap Surplus) GetFlattenedComponents(Blueprint blueprint, long quantity);
 
     /// <summary>
     /// Builds the blueprint's component breakdown as a <see cref="BlueprintNode"/> tree, scaled by

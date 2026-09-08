@@ -16,6 +16,13 @@
         <dt>Value</dt>
         <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
 
+        @* Listed rather than folded into Profit: surplus is stock on hand, not a sale. *@
+        <dt>Surplus Stock</dt>
+        <dd>@State.SurplusCount total</dd>
+
+        <dt>Surplus Value</dt>
+        <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
+
         @* The one line a user is actually here for, so it is the only one that carries emphasis. *@
         <dt class="summary-profit">Profit</dt>
         <dd class="summary-profit">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>

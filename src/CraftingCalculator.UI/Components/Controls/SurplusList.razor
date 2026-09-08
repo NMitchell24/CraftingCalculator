@@ -1,0 +1,31 @@
+@implements IDisposable
+
+<div class="materials-list">
+    @if (State.SurplusStock.Count == 0)
+    {
+        <div class="pane-empty-state">
+            <MudText Typo="Typo.body1">No surplus</MudText>
+        </div>
+    }
+    else
+    {
+        <MudList T="BlueprintQuantity">
+            @foreach (BlueprintQuantity blueprintQuantity in State.SurplusStock)
+            {
+                <MudListItem T="BlueprintQuantity">
+                    @* Same row shape as MaterialsList - name, then a paired label/value grid - so it
+                       reuses those classes rather than cloning them under a surplus- prefix. *@
+                    <div class="materials-row">
+                        <MudText Class="list-row-name materials-row-name">@blueprintQuantity.Name</MudText>
+                        <div class="materials-row-stats">
+                            <MudText Typo="Typo.caption" Class="materials-row-label">Quantity</MudText>
+                            <MudText Typo="Typo.caption" Class="materials-row-label materials-row-end">Value</MudText>
+                            <MudText>x@(blueprintQuantity.Quantity)</MudText>
+                            <MudText Class="materials-row-end">@string.Format(FormatConstants.CurrencyFormat, blueprintQuantity.TotalValue)</MudText>
+                        </div>
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    }
+</div>

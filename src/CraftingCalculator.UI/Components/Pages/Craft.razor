@@ -19,11 +19,15 @@
             <MudPaper Class="app-card" Elevation="0">
                 @* Tabs and actions are separate rows on purpose. Sharing one row sized the tab bar by
                    whatever the actions left over, so it changed width on every switch - Materials has one
-                   action and Steps has two. Both tabs have actions, so neither row ever empties. *@
+                   action and Steps has two. Every tab has an action, so no row ever empties. *@
                 <MudToggleGroup T="CraftView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
                                 SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+                    @* "Steps" rather than "Crafting Steps": the group is an equal-column grid, so a third
+                       segment leaves each one about a third of a phone's width. The Crafting Summary card
+                       still spells it out. *@
                     <MudToggleItem Value="CraftView.Materials">Components</MudToggleItem>
-                    <MudToggleItem Value="CraftView.Steps">Crafting Steps</MudToggleItem>
+                    <MudToggleItem Value="CraftView.Steps">Steps</MudToggleItem>
+                    <MudToggleItem Value="CraftView.Surplus">Surplus</MudToggleItem>
                 </MudToggleGroup>
 
                 @* Labelled rather than icon-only: PR 8b shrank these to bare icons only because they were
@@ -34,6 +38,11 @@
                         <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.ContentCopy"
                                    Disabled="@(State.TotalComponents.Count == 0)" OnClick="CopyMaterialsAsync">Copy</MudButton>
                     }
+                    else if (_view == CraftView.Surplus)
+                    {
+                        <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.ContentCopy"
+                                   Disabled="@(State.SurplusStock.Count == 0)" OnClick="CopySurplusAsync">Copy</MudButton>
+                    }
                     else
                     {
                         <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.UnfoldMore"
@@ -43,13 +52,16 @@
                     }
                 </div>
 
-                @* Both panes stay mounted and are shown or hidden by class, so MaterialsList and StepsTree
-                   each subscribe to CraftState.Changed once rather than on every tab switch. *@
+                @* All three panes stay mounted and are shown or hidden by class, so each list component
+                   subscribes to CraftState.Changed once rather than on every tab switch. *@
                 <div class="craft-pane @(_view == CraftView.Materials ? "craft-pane-active" : "")">
                     <MaterialsList />
                 </div>
                 <div class="craft-pane @(_view == CraftView.Steps ? "craft-pane-active" : "")">
                     <StepsTree />
+                </div>
+                <div class="craft-pane @(_view == CraftView.Surplus ? "craft-pane-active" : "")">
+                    <SurplusList />
                 </div>
             </MudPaper>
         </div>
