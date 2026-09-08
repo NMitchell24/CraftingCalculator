@@ -12,7 +12,8 @@ public partial class Craft : ComponentBase, IDisposable
     private enum CraftView
     {
         Materials,
-        Steps
+        Steps,
+        Surplus
     }
 
     [CascadingParameter] private Breakpoint Breakpoint { get; set; }
@@ -76,6 +77,13 @@ public partial class Craft : ComponentBase, IDisposable
         string text = string.Join(Environment.NewLine, State.TotalComponents.Select(componentQuantity => componentQuantity.DisplayName));
         await ClipboardService.SetTextAsync(text);
         Snackbar.Add("Copied components to clipboard", Severity.Success);
+    }
+
+    private async Task CopySurplusAsync()
+    {
+        string text = string.Join(Environment.NewLine, State.SurplusStock.Select(blueprintQuantity => blueprintQuantity.DisplayName));
+        await ClipboardService.SetTextAsync(text);
+        Snackbar.Add("Copied surplus to clipboard", Severity.Success);
     }
 
     private Task SaveAsFavoriteAsync() => FavoritePrompts.SaveBatchAsync(DialogService, Snackbar, State);

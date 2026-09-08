@@ -10,17 +10,47 @@ public class ComponentQuantity : IBaseQuantityRecord
     public int Id { get; set; }
     public Component Component { get; set; }
     public long Quantity { get; set; }
-    public string Name { get => Component.Name ?? ""; set { } }
-    public string Description { get => Component.Description ?? ""; set { } }
-    public string Tooltip { get => Component.Tooltip; set { } }
-    public DataType Type { get => DataType.Component; set { } }
-    public double TotalCost { get => Component.Cost * Quantity; set { } }
 
-    public string DisplayName
+    public string Name
     {
-        get => Name + " x" + Quantity;
-        private set { }
+        get => Component.Name ?? "";
+        set
+        {
+            // Projected from Component.Name - the setter exists only to satisfy IBaseQuantityRecord
+            // and is deliberately inert, as on every projected member below.
+        }
     }
+
+    public string Description
+    {
+        get => Component.Description ?? "";
+        set
+        {
+            // Projected from Component.Description - inert for the reason given on Name.
+        }
+    }
+
+    public string Tooltip
+    {
+        get => Component.Tooltip;
+        set
+        {
+            // Projected from Component.Tooltip - inert for the reason given on Name.
+        }
+    }
+
+    public DataType Type
+    {
+        get => DataType.Component;
+        set
+        {
+            // Fixed for this type - inert for the reason given on Name.
+        }
+    }
+
+    public double TotalCost => Component.Cost * Quantity;
+
+    public string DisplayName => Name + " x" + Quantity;
 
     public ComponentQuantity(Component component, long quantity, int id)
     {

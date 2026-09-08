@@ -5,7 +5,9 @@ namespace CraftingCalculator.Domain.Models;
 /// child blueprints, or a leaf component. <see cref="Id"/> matches the source blueprint/component's
 /// <c>Name</c>, not its numeric id - same-named blueprints collide, matching the WPF app's tree.
 /// <see cref="Quantity"/> is the effective amount at this position in the tree, already multiplied
-/// through every ancestor's quantity.
+/// through every ancestor's quantity. <see cref="Crafts"/> is how many craft operations produce that
+/// amount, which is fewer than <see cref="Quantity"/> whenever the blueprint's yield is above 1; it is
+/// 0 for a component leaf, which is gathered rather than crafted.
 /// </summary>
 public sealed record BlueprintNode(
     string Name,
@@ -13,4 +15,5 @@ public sealed record BlueprintNode(
     string Tooltip,
     bool IsComponent,
     long Quantity,
+    long Crafts,
     IReadOnlyList<BlueprintNode> Children);

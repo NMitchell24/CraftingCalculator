@@ -37,8 +37,30 @@ public class BlueprintDAOTests
 
         Blueprint? reloaded = await _blueprintDAO.GetByIdAsync(saved.Id);
         reloaded.Should().NotBeNull();
-        reloaded!.Components.ComponentList.Should().ContainSingle(componentQuantity => componentQuantity.Component.Name == "Wood" && componentQuantity.Quantity == 2);
+        reloaded.Components.ComponentList.Should().ContainSingle(componentQuantity => componentQuantity.Component.Name == "Wood" && componentQuantity.Quantity == 2);
         reloaded.ChildBlueprints.BlueprintList.Should().ContainSingle(blueprintQuantity => blueprintQuantity.Blueprint.Name == "Plank" && blueprintQuantity.Quantity == 4);
+    }
+
+    [Test]
+    public async Task SaveAsync_Yield_RoundTripsThroughTheDatabase()
+    {
+        Blueprint saved = await _blueprintDAO.SaveAsync(new Blueprint { Name = "Bracket", Yield = 4 });
+
+        Blueprint reloaded = (await _blueprintDAO.GetByIdAsync(saved.Id))!;
+        reloaded.Yield.Should().Be(4);
+
+        reloaded.Yield = 7;
+        await _blueprintDAO.SaveAsync(reloaded);
+
+        (await _blueprintDAO.GetByIdAsync(saved.Id))!.Yield.Should().Be(7);
+    }
+
+    [Test]
+    public async Task SaveAsync_BlueprintWithoutAnExplicitYield_DefaultsToOne()
+    {
+        Blueprint saved = await _blueprintDAO.SaveAsync(new Blueprint { Name = "Plank" });
+
+        (await _blueprintDAO.GetByIdAsync(saved.Id))!.Yield.Should().Be(1);
     }
 
     [Test]

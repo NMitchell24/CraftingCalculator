@@ -48,6 +48,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         entity.Name = blueprint.Name ?? "";
         entity.Description = blueprint.Description ?? "";
         entity.Value = blueprint.Value;
+        entity.Yield = blueprint.Yield;
         entity.CategoryId = blueprint.Category?.Id;
 
         if (entity.Id == 0)
@@ -159,7 +160,8 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
-            Value = entity.Value
+            Value = entity.Value,
+            Yield = entity.Yield
         };
 
         if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out CategoryEntity? categoryEntity))

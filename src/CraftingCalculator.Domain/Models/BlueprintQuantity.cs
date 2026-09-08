@@ -19,21 +19,51 @@ public class BlueprintQuantity : IBaseQuantityRecord
             _quantity = Math.Abs(value);
         }
     }
-    public string Name { get => Blueprint.Name ?? ""; set { } }
-    public string CategoryName { get => Blueprint.Category?.Name ?? ""; set { } }
-    public DataType Type { get => Blueprint.Type; set { } }
-    public string Description { get => Blueprint.Description ?? ""; set { } }
-    public double TotalValue { get => Blueprint.Value * Quantity; set { } }
+
+    public string Name
+    {
+        get => Blueprint.Name ?? "";
+        set
+        {
+            // Projected from Blueprint.Name - the setter exists only to satisfy IBaseQuantityRecord
+            // and is deliberately inert, as on every projected member below.
+        }
+    }
+
+    public string CategoryName => Blueprint.Category?.Name ?? "";
+
+    public DataType Type
+    {
+        get => Blueprint.Type;
+        set
+        {
+            // Projected from Blueprint.Type - inert for the reason given on Name.
+        }
+    }
+
+    public string Description
+    {
+        get => Blueprint.Description ?? "";
+        set
+        {
+            // Projected from Blueprint.Description - inert for the reason given on Name.
+        }
+    }
+
+    public double TotalValue => Blueprint.Value * Quantity;
+
     public string Tooltip
     {
-        get
+        get => Blueprint.Tooltip;
+        set
         {
-            return Blueprint.Tooltip;
+            // Projected from Blueprint.Tooltip - inert for the reason given on Name.
         }
-
-        set { }
     }
+
     public bool IsSelected { get; set; }
+
+    public string DisplayName => Name + " x" + Quantity;
 
     public BlueprintQuantity(Blueprint blueprint, long quantity, int id)
     {

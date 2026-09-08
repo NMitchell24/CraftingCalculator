@@ -68,10 +68,11 @@ public class BlueprintServiceTests
         Blueprint parent = new Blueprint { Name = "Frame" };
         parent.ChildBlueprints.Add(child, 2);
 
-        ComponentMap result = _service.GetFlattenedComponents(parent);
+        (ComponentMap result, BlueprintMap surplus) = _service.GetFlattenedComponents(parent, 1);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Quantity.Should().Be(6);
+        surplus.BlueprintList.Should().BeEmpty();
     }
 
     [Test]
@@ -83,6 +84,7 @@ public class BlueprintServiceTests
         BlueprintNode tree = _service.GetBlueprintNode(blueprint, 3);
 
         tree.Name.Should().Be("Widget x3");
+        tree.Crafts.Should().Be(3);
         tree.Children.Should().ContainSingle();
     }
 }

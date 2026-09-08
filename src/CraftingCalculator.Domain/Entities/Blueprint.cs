@@ -7,6 +7,9 @@ public class Blueprint
     public string Description { get; set; } = string.Empty;
     public double Value { get; set; }
 
+    /// <summary>How many items one craft of this blueprint produces.</summary>
+    public long Yield { get; set; } = 1;
+
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
 

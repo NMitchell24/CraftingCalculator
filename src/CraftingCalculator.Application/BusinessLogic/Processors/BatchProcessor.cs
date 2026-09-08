@@ -8,20 +8,31 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 /// </summary>
 public static class BatchProcessor
 {
-    public static (double TotalCost, double TotalValue, ComponentMap Materials) CalculateTotals(
-        IReadOnlyCollection<BlueprintQuantity> batch)
+    public static BatchTotals CalculateTotals(IReadOnlyCollection<BlueprintQuantity> batch)
     {
         ComponentMap materials = new();
+        BlueprintMap surplus = new();
         double totalValue = 0;
 
         foreach (BlueprintQuantity blueprintQuantity in batch)
         {
-            materials = ComponentProcessor.CombineComponents(BlueprintProcessor.Flatten(blueprintQuantity.Blueprint), materials, blueprintQuantity.Quantity);
+            (ComponentMap components, BlueprintMap blueprintSurplus) =
+                BlueprintProcessor.Flatten(blueprintQuantity.Blueprint, blueprintQuantity.Quantity);
+
+            materials = ComponentProcessor.CombineComponents(components, materials, 1);
+
+            foreach (BlueprintQuantity spare in blueprintSurplus.BlueprintList)
+            {
+                surplus.Add(spare.Blueprint, spare.Quantity);
+            }
+
+            //Value follows the quantity the batch asked for; what the rounding up overproduces is
+            //reported through Surplus instead.
             totalValue += blueprintQuantity.TotalValue;
         }
 
         double totalCost = materials.ComponentList.Sum(componentQuantity => componentQuantity.TotalCost);
 
-        return (totalCost, totalValue, materials);
+        return new BatchTotals(totalCost, totalValue, materials, surplus);
     }
 }
