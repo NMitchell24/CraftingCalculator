@@ -3,9 +3,13 @@
   Crafting Calculator splash screen - the editable master.
 
   The build consumes splash.png beside this file, not this SVG: MAUI rasterises through Svg.Skia,
-  which drops the inner orbit group and shades the buttons differently. Re-export after editing:
-    inkscape --export-type=png --export-filename=splash.png --export-width=1024 --export-height=1024 --export-background-opacity=0 splash.svg
-  1024 covers BaseSize up to 256dp at xxxhdpi; anything smaller makes MAUI upscale.
+  which drops the inner orbit group and shades the buttons differently. Re-export after editing.
+  This file's stored export settings already describe the required asset, so Inkscape's
+  File > Export needs no adjustment; the command line equivalent is:
+    inkscape -o splash.png -d 192 -y 0 splash.svg
+  192 dpi on this 512px document is exactly 1024x1024, which covers BaseSize up to 256dp at
+  xxxhdpi; anything smaller makes MAUI upscale. The short flags are deliberate: an XML comment
+  cannot contain a double hyphen, so the long option names would make this file malformed.
 
   Unlike Resources/AppIcon/appiconfg.svg this keeps the Inkscape filters (the orbit tube shading,
   the body bevel and the button highlights). The splash renders at 288dp and is never reused as
@@ -21,11 +25,11 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg9"
-   sodipodi:docname="calc.svg"
+   sodipodi:docname="splash.svg"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
-   inkscape:export-filename="calc.png"
-   inkscape:export-xdpi="300"
-   inkscape:export-ydpi="300"
+   inkscape:export-filename="splash.png"
+   inkscape:export-xdpi="192"
+   inkscape:export-ydpi="192"
    xml:space="preserve"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
