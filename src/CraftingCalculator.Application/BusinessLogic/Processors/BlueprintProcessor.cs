@@ -1,3 +1,4 @@
+using CraftingCalculator.Domain.BusinessLogic;
 using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.BusinessLogic.Processors;
@@ -63,16 +64,14 @@ public static class BlueprintProcessor
         }
 
         ComponentMap combined = ComponentProcessor.CombineComponents(blueprint.Components, new ComponentMap(), crafts);
-        //Ticks rather than the TimeSpan * double operator: craft counts are whole numbers, so this keeps
-        //the accumulation exact instead of routing every level of the walk through floating point.
-        TimeSpan productionTime = TimeSpan.FromTicks(blueprint.ProductionTime.Ticks * crafts);
+        TimeSpan productionTime = DurationMath.Scale(blueprint.ProductionTime, crafts);
 
         foreach (BlueprintQuantity child in blueprint.ChildBlueprints.BlueprintList)
         {
             (ComponentMap childComponents, TimeSpan childTime) =
                 Flatten(child.Blueprint, child.Quantity * crafts, surplus, depth + 1);
             combined = ComponentProcessor.CombineComponents(childComponents, combined, 1);
-            productionTime += childTime;
+            productionTime = DurationMath.Add(productionTime, childTime);
         }
 
         return (combined, productionTime);
@@ -100,7 +99,7 @@ public static class BlueprintProcessor
             children.Add(new BlueprintNode(
                 component.Name + " x" + componentQuantity, component.Name, component.Tooltip, IsComponent: true,
                 Quantity: componentQuantity, Crafts: 0, Yield: 0, Surplus: 0,
-                ProductionTime: TimeSpan.FromTicks(component.Component.ProductionTime.Ticks * componentQuantity),
+                ProductionTime: DurationMath.Scale(component.Component.ProductionTime, componentQuantity),
                 Children: []));
         }
 
@@ -115,7 +114,7 @@ public static class BlueprintProcessor
             blueprint.Name + " x" + quantity, blueprint.Name, blueprint.Tooltip, IsComponent: false,
             Quantity: quantity, Crafts: crafts, Yield: blueprint.Yield,
             Surplus: crafts * blueprint.Yield - quantity,
-            ProductionTime: TimeSpan.FromTicks(blueprint.ProductionTime.Ticks * crafts),
+            ProductionTime: DurationMath.Scale(blueprint.ProductionTime, crafts),
             Children: children);
     }
 

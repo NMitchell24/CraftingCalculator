@@ -217,4 +217,24 @@ public class BatchProcessorTests
 
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(55));
     }
+
+    /// <summary>
+    /// The batch quantity field has no upper bound, so a long enough production time and a large enough
+    /// quantity reach the point where the tick multiplication wraps negative and the TimeSpan additions
+    /// throw. DurationMath saturates both, so the total stays a large duration.
+    /// </summary>
+    [Test]
+    public void CalculateTotals_ProductionTime_SaturatesInsteadOfWrappingOnAnAbsurdBatch()
+    {
+        Component screw = NewComponent("Screw", 0);
+        screw.ProductionTime = TimeSpan.FromHours(24);
+
+        Blueprint blueprint = NewBlueprint("Widget", 1);
+        blueprint.ProductionTime = TimeSpan.FromHours(24);
+        blueprint.Components.Add(screw, 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, long.MaxValue, id: 0)]);
+
+        totals.TotalProductionTime.Should().Be(TimeSpan.MaxValue);
+    }
 }

@@ -1,3 +1,4 @@
+using CraftingCalculator.Domain.BusinessLogic;
 using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.BusinessLogic.Processors;
@@ -27,7 +28,7 @@ public static class BatchProcessor
                 surplus.Add(spare.Blueprint, spare.Quantity);
             }
 
-            blueprintTime += flattened.ProductionTime;
+            blueprintTime = DurationMath.Add(blueprintTime, flattened.ProductionTime);
 
             //Value follows the quantity the batch asked for; what the rounding up overproduces is
             //reported through Surplus instead.
@@ -39,8 +40,8 @@ public static class BatchProcessor
         //it follows how many of each component the batch ends up needing, which is what that map already
         //holds. Components have no yield, so the multiplier is quantity rather than a craft count.
         TimeSpan componentTime = materials.ComponentList.Aggregate(
-            TimeSpan.Zero, (total, componentQuantity) => total + componentQuantity.TotalProductionTime);
+            TimeSpan.Zero, (total, componentQuantity) => DurationMath.Add(total, componentQuantity.TotalProductionTime));
 
-        return new BatchTotals(totalCost, totalValue, materials, surplus, blueprintTime + componentTime);
+        return new BatchTotals(totalCost, totalValue, materials, surplus, DurationMath.Add(blueprintTime, componentTime));
     }
 }

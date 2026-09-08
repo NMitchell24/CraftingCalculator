@@ -1,3 +1,4 @@
+using CraftingCalculator.Domain.BusinessLogic;
 using CraftingCalculator.Domain.Enums;
 
 namespace CraftingCalculator.Domain.Models;
@@ -51,7 +52,7 @@ public class ComponentQuantity : IBaseQuantityRecord
     public double TotalCost => Component.Cost * Quantity;
 
     /// <summary>How long producing this many of the component takes.</summary>
-    public TimeSpan TotalProductionTime => TimeSpan.FromTicks(Component.ProductionTime.Ticks * Quantity);
+    public TimeSpan TotalProductionTime => DurationMath.Scale(Component.ProductionTime, Quantity);
 
     public string DisplayName => Name + " x" + Quantity;
 
