@@ -20,11 +20,22 @@ public static class BlueprintProcessor
     /// <summary>
     /// Whole crafts needed to produce <paramref name="quantity"/> items, rounded up: a craft is
     /// indivisible, so producing 3 of something that yields 2 takes 2 crafts and leaves 1 spare.
+    /// A <paramref name="quantity"/> of 0 or less needs no crafts.
     /// </summary>
-    public static long CraftsFor(long quantity, long yield) =>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="yield"/> is less than 1.
+    /// </exception>
+    public static long CraftsFor(long quantity, long yield)
+    {
+        //Asserts the invariant rather than re-clamping: Blueprint.Yield already pins itself to 1, so
+        //reaching here with less than that means a caller bypassed the model, and a silent clamp would
+        //hide that behind a plausible-looking craft count.
+        ArgumentOutOfRangeException.ThrowIfLessThan(yield, 1);
+
         //A quantity of 0 is a valid batch entry (see CraftState.SetQuantity), and the round-up
         //expression would report one craft for it rather than none.
-        quantity <= 0 ? 0 : (quantity - 1) / yield + 1;
+        return quantity <= 0 ? 0 : (quantity - 1) / yield + 1;
+    }
 
     /// <summary>
     /// Flattens the blueprint's own components and every nested child blueprint's components into one

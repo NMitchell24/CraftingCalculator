@@ -132,7 +132,7 @@ public class MigrationTests
 
     /// <summary>
     /// Yield arrived after the app shipped, so every blueprint written before it must come back as the
-    /// 1-per-craft default rather than 0, which would divide by zero in BlueprintProcessor.CraftsFor.
+    /// 1-per-craft default rather than 0, which BlueprintProcessor.CraftsFor rejects.
     /// </summary>
     [Test]
     public async Task Migrate_FromTheSchemaBeforeYield_DefaultsExistingBlueprintsToOne()

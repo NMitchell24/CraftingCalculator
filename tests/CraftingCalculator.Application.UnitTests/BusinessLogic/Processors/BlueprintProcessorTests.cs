@@ -27,6 +27,15 @@ public class BlueprintProcessorTests
     public long CraftsFor_RoundsUpToWholeCrafts(long quantity, long yield) =>
         BlueprintProcessor.CraftsFor(quantity, yield);
 
+    [TestCase(0)]
+    [TestCase(-1)]
+    public void CraftsFor_YieldBelowOne_Throws(long yield)
+    {
+        Action act = () => BlueprintProcessor.CraftsFor(4, yield);
+
+        act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
     [Test]
     public void Flatten_SingleLevel_ReturnsOwnComponents()
     {

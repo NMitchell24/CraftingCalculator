@@ -12,7 +12,9 @@ public class BlueprintConfiguration : IEntityTypeConfiguration<Blueprint>
         builder.HasKey(blueprint => blueprint.Id);
         builder.Property(blueprint => blueprint.Name).IsRequired();
         builder.Property(blueprint => blueprint.Description).IsRequired();
-        //A store default so the column added by AddBlueprintYield backfills rows written before yield existed.
+        //Declares the store default, which is what makes AddBlueprintYield scaffold its AddColumn with
+        //defaultValue: 1L instead of the CLR default; that operation is what fills the column for rows
+        //written before yield existed.
         builder.Property(blueprint => blueprint.Yield).HasDefaultValue(1L);
         builder.HasIndex(blueprint => blueprint.Name);
         builder.HasIndex(blueprint => blueprint.CategoryId);
