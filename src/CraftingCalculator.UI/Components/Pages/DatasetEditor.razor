@@ -22,7 +22,14 @@
         }
     </div>
 
+    @* This page declares no PageActions, so it gets no ActionsBar - which would dock exactly where
+       this bar already is. Delete lives here instead, opposite the Cancel/Save pair. *@
     <MudPaper Class="editor-action-bar" Elevation="8" Square="true">
+        @if (Id > 0)
+        {
+            <MudButton Class="editor-action-bar-delete" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete"
+                       OnClick="DeleteAsync">Delete</MudButton>
+        }
         <MudButton OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save"
                    Disabled="@string.IsNullOrWhiteSpace(_record.Name)" OnClick="SaveAsync">Save</MudButton>

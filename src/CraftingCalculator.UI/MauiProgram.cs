@@ -47,7 +47,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
 
         builder.Services.AddScoped<CraftState>();
-        builder.Services.AddScoped<AppBarState>();
+        builder.Services.AddScoped<PageShellState>();
         builder.Services.AddScoped<ThemeState>();
 
 #if DEBUG

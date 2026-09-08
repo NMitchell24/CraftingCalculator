@@ -11,7 +11,7 @@ public partial class Favorites : ComponentBase, IDisposable
 {
     [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
     [Inject] private CraftState State { get; set; } = null!;
-    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -23,12 +23,15 @@ public partial class Favorites : ComponentBase, IDisposable
     // navigates away to "/" immediately afterwards.
     protected override async Task OnInitializedAsync()
     {
-        AppBarState.Configure(this, new AppBarConfig("Favorites")
+        PageShellState.Configure(this, new PageShellConfig("Favorites")
         {
             // The batch cannot change while this page is on screen - the only thing that mutates it is
             // LoadAsync, which navigates away - so this snapshot stays accurate for the page's life.
-            PrimaryAction = new AppBarAction("Save current selection", Icons.Material.Filled.Save,
-                SaveCurrentBatchAsync, Disabled: State.BlueprintQuantities.Count == 0)
+            Actions =
+            [
+                new PageAction("Save current selection", Icons.Material.Filled.Save,
+                    SaveCurrentBatchAsync, Disabled: State.BlueprintQuantities.Count == 0)
+            ]
         });
         await ReloadAsync();
     }
@@ -119,5 +122,5 @@ public partial class Favorites : ComponentBase, IDisposable
         }
     }
 
-    public void Dispose() => AppBarState.Reset(this);
+    public void Dispose() => PageShellState.Reset(this);
 }

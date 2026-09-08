@@ -19,7 +19,7 @@ public partial class Craft : ComponentBase, IDisposable
     [CascadingParameter] private Breakpoint Breakpoint { get; set; }
 
     [Inject] private CraftState State { get; set; } = null!;
-    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IClipboardService ClipboardService { get; set; } = null!;
@@ -34,14 +34,14 @@ public partial class Craft : ComponentBase, IDisposable
     protected override void OnInitialized()
     {
         State.Changed += StateHasChanged;
-        AppBarState.Configure(this, new AppBarConfig("Craft")
+        PageShellState.Configure(this, new PageShellConfig("Craft")
         {
-            PrimaryAction = new AppBarAction("Add blueprints", Icons.Material.Filled.Add, OpenPickerAsync),
-            MenuItems =
+            Actions =
             [
-                new AppBarMenuItem("Clear selection", Icons.Material.Filled.ClearAll, ClearBatchAsync),
-                new AppBarMenuItem("Copy components", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
-                new AppBarMenuItem("Save as favorite", Icons.Material.Filled.Star, SaveAsFavoriteAsync)
+                new PageAction("Add blueprints", Icons.Material.Filled.Add, OpenPickerAsync),
+                new PageAction("Clear selection", Icons.Material.Filled.ClearAll, ClearBatchAsync),
+                new PageAction("Copy components", Icons.Material.Filled.ContentCopy, CopyMaterialsAsync),
+                new PageAction("Save as favorite", Icons.Material.Filled.Star, SaveAsFavoriteAsync)
             ]
         });
     }
@@ -91,6 +91,6 @@ public partial class Craft : ComponentBase, IDisposable
     public void Dispose()
     {
         State.Changed -= StateHasChanged;
-        AppBarState.Reset(this);
+        PageShellState.Reset(this);
     }
 }

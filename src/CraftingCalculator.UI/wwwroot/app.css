@@ -118,9 +118,14 @@ html, body {
        that docks above it (.editor-action-bar, the snackbars) offsets by this, and any drift between
        the real height and the offset shows up as a strip of scrolling page content between them. */
     --bottom-nav-height: 56px;
-    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Sized for
-       the widest the action side ever gets: primary action + settings + overflow, at 44px each. */
-    --app-bar-side-width: 132px;
+    /* The per-page actions bar (.actions-bar), docked directly above the bottom nav. Pinned for the
+       same reason --bottom-nav-height is: the page content and the snackbars offset by it. Shorter
+       than the nav on purpose - it carries a page's actions, not a second set of destinations. */
+    --actions-bar-height: 48px;
+    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. One 44px
+       icon button is all either side ever holds now - back arrow on the left, settings on the right;
+       a page's own actions moved off the bar to .actions-bar and the drawer. */
+    --app-bar-side-width: 44px;
 }
 
 /* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
@@ -200,6 +205,13 @@ html, body {
     padding-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
+/* Always applied alongside .page-content-with-bottom-nav (MainLayout.razor), never on its own: it
+   restates the whole offset rather than adding to it, because two one-class rules setting the same
+   property are decided by source order, and this one has to come after the rule above. */
+.page-content-with-actions-bar {
+    padding-bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
 /* MainLayout.razor's bottom navigation bar (xs breakpoint only). Not CSS-isolated (see MainLayout.razor
    for why) - .razor.css scoped-bundle output never gets produced for this project's TFMs, so isolated
    rules silently never load. Global rules here are the same fix Schmeg.UI settled on for the same gap. */
@@ -241,6 +253,39 @@ html, body {
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+}
+
+/* The current page's actions (Components/Layout/ActionsBar.razor, BottomBar mode), stacked directly on
+   top of .bottom-nav and in the same z-index band. Only rendered at xs; sm+ folds the same actions
+   into the drawer's nav menu instead, so the two faces are never on screen at once. */
+.actions-bar {
+    position: fixed;
+    border-top: 1px solid var(--mud-palette-lines-default);
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    z-index: 1300;
+    /* Fixed rather than grown from the buttons: --actions-bar-height is what .page-content and the
+       snackbars offset by, and any drift between the two shows as a strip of page content sliding
+       under the bar. */
+    height: var(--actions-bar-height);
+    display: flex;
+    align-items: center;
+    /* Each action gets an equal share of the bar and sits centred in it, the way .bottom-nav-menu
+       spaces its three destinations - so a single action lands dead centre and four still have room
+       to breathe, without the count being wired into the CSS. No gap: space-around already puts equal
+       air on both sides of every icon, and adding one would eat into the shares unevenly at the ends.
+       The buttons are deliberately not flex-grown - MudIconButton is a circle, and stretching one to
+       fill its track would draw its hover and ripple as a wide ellipse. */
+    justify-content: space-around;
+    padding-left: var(--edge-inset-left);
+    padding-right: var(--edge-inset-right);
+}
+
+/* Separates the page's actions from the three destinations above them (ActionsBar.razor, Drawer mode).
+   The negative side margins undo MudNavMenu's own item inset so the rule spans the full rail. */
+.actions-bar-divider {
+    margin: 8px -8px;
 }
 
 /* Cards. One shared shape for every panel on Calculate and the Dataset landing, so a "card" means the
@@ -703,6 +748,13 @@ html, body {
     padding-right: calc(16px + var(--edge-inset-right));
 }
 
+/* Pushed to the opposite end of the bar from Cancel/Save, so a destructive action is nowhere near the
+   button the thumb is aiming for. auto margin rather than justify-content: space-between on the bar,
+   which would spread Cancel and Save apart on a new record, where there is no Delete. */
+.editor-action-bar-delete {
+    margin-right: auto;
+}
+
 @media (max-width: 599.98px) {
     .editor-action-bar {
         bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
@@ -720,17 +772,17 @@ html, body {
 /* Snackbars (configured in MauiProgram.cs). MudBlazor's own rule for this position is a flat
    `bottom: 24px`, which on Android lands on the gesture bar; and its default position is TopRight,
    which lands squarely on the app bar's +/settings/overflow cluster - at z-index 1500 over every bar
-   in this file, for eight seconds, swallowing the taps meant for the + underneath. Docking arithmetic
-   matches .editor-action-bar, the one fixed bar left. The 56px is that bar's height, held constant on
-   the screens that do not show it: a slightly high toast there is cheaper than making this position
-   depend on which page is mounted. */
+   in this file, for eight seconds, swallowing the taps meant for the settings gear underneath. Docking
+   arithmetic matches .editor-action-bar; the 56px is that bar's height. Both that and
+   --actions-bar-height are held constant on the screens that do not show those bars: a slightly high
+   toast there is cheaper than making this position depend on which page is mounted. */
 .mud-snackbar-location-bottom-center {
     bottom: calc(56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
 @media (max-width: 599.98px) {
     .mud-snackbar-location-bottom-center {
-        bottom: calc(var(--bottom-nav-height) + 56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + 56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
     }
 }
 

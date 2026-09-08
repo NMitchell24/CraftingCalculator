@@ -9,7 +9,7 @@ namespace CraftingCalculator.UI.Components.Layout;
 
 public partial class MainLayout : IBrowserViewportObserver, IDisposable
 {
-    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ThemeState ThemeState { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
@@ -37,6 +37,19 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private bool ShowBottomNav => _breakpoint == Breakpoint.Xs;
     private bool ShowSideRail => _breakpoint is not null && !ShowBottomNav;
 
+    // The actions bar is the xs face of the page's actions; on every wider viewport the same actions
+    // are folded into the drawer instead, so the two are never on screen together.
+    private bool ShowActionsBar => ShowBottomNav && PageShellState.Config.Actions.Count > 0;
+
+    // page-content-with-actions-bar restates the whole bottom offset rather than adding to it, so both
+    // classes are applied together and its later declaration in app.css is what decides the padding.
+    private string MainContentClass => (ShowBottomNav, ShowActionsBar) switch
+    {
+        (true, true) => "page-content page-content-with-bottom-nav page-content-with-actions-bar",
+        (true, false) => "page-content page-content-with-bottom-nav",
+        _ => "page-content"
+    };
+
     // The labelled Persistent drawer is for genuine tablets and desktop windows only; every phone
     // gets the icon-only Mini rail whichever way it is turned. Breakpoint alone cannot make that
     // call - it is width-only, and a landscape phone (~890 CSS px) reads the same as a small tablet -
@@ -51,11 +64,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // The display face is reserved for the app's own screen names; a record's own name renders in the
     // body face, which is both the honest signal and the legible choice for text the app never wrote.
     private string AppBarTitleClass =>
-        AppBarState.Config.TitleIsUserContent ? "app-bar-title" : "app-bar-title display-title";
+        PageShellState.Config.TitleIsUserContent ? "app-bar-title" : "app-bar-title display-title";
 
     protected override void OnInitialized()
     {
-        AppBarState.Changed += StateHasChanged;
+        PageShellState.Changed += StateHasChanged;
         ThemeState.Changed += OnThemeChanged;
     }
 
@@ -130,7 +143,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 
     public void Dispose()
     {
-        AppBarState.Changed -= StateHasChanged;
+        PageShellState.Changed -= StateHasChanged;
         ThemeState.Changed -= OnThemeChanged;
 
         // Fire and forget: IDisposable cannot await, and the subscription only holds a JS listener -

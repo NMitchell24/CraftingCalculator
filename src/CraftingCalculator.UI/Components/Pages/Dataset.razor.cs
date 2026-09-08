@@ -19,7 +19,7 @@ public partial class Dataset : ComponentBase, IDisposable
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private IDatabaseAdminService DatabaseAdminService { get; set; } = null!;
     [Inject] private CraftState State { get; set; } = null!;
-    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -29,11 +29,11 @@ public partial class Dataset : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        AppBarState.Configure(this, new AppBarConfig("Dataset")
+        PageShellState.Configure(this, new PageShellConfig("Dataset")
         {
-            MenuItems =
+            Actions =
             [
-                new AppBarMenuItem("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
+                new PageAction("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
             ]
         });
 
@@ -108,5 +108,5 @@ public partial class Dataset : ComponentBase, IDisposable
         Snackbar.Add("Deleted all data", Severity.Success);
     }
 
-    public void Dispose() => AppBarState.Reset(this);
+    public void Dispose() => PageShellState.Reset(this);
 }

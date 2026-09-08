@@ -1,0 +1,49 @@
+@if (Actions.Count > 0)
+{
+    @if (Mode == ActionsBarMode.BottomBar)
+    {
+        <MudPaper Class="actions-bar" Elevation="3" Square="true">
+            @foreach (PageAction action in Visible)
+            {
+                <MudIconButton Icon="@action.Icon" Color="@ColorFor(action)" Disabled="@action.Disabled"
+                               OnClick="@(() => action.OnClick())" title="@action.Label" aria-label="@action.Label" />
+            }
+            @if (OverflowCount > 0)
+            {
+                @* Anchored to its own top edge so the menu opens upward: this bar is docked at the
+                   bottom of the screen and a downward menu would open off it. *@
+                <MudMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="More actions"
+                         AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.BottomRight">
+                    @foreach (PageAction action in Overflow)
+                    {
+                        <MudMenuItem Icon="@action.Icon" Disabled="@action.Disabled"
+                                     OnClick="@(() => action.OnClick())">@action.Label</MudMenuItem>
+                    }
+                </MudMenu>
+            }
+        </MudPaper>
+    }
+    else
+    {
+        @* MudNavLink rather than a button so the actions inherit the drawer variant's own label
+           behaviour - icons alone on the Mini rail, icon + label when it is Persistent - without this
+           component knowing which variant is on screen. *@
+        <MudDivider Class="actions-bar-divider" />
+        @foreach (PageAction action in Visible)
+        {
+            <MudNavLink Icon="@action.Icon" IconColor="@ColorFor(action)" Disabled="@action.Disabled"
+                        OnClick="@(() => action.OnClick())">@action.Label</MudNavLink>
+        }
+        @if (OverflowCount > 0)
+        {
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="More actions"
+                     AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
+                @foreach (PageAction action in Overflow)
+                {
+                    <MudMenuItem Icon="@action.Icon" Disabled="@action.Disabled"
+                                 OnClick="@(() => action.OnClick())">@action.Label</MudMenuItem>
+                }
+            </MudMenu>
+        }
+    }
+}
