@@ -8,7 +8,7 @@
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No saved selections</MudText>
-            <MudText Typo="Typo.caption">Build a selection on the Craft screen, then save it with the button above.</MudText>
+            <MudText Typo="Typo.caption">Build a selection on the Craft screen, then save it from there.</MudText>
         </div>
     }
     else
@@ -16,7 +16,7 @@
         <MudList T="BlueprintFavorite">
             @foreach (BlueprintFavorite favorite in _favorites)
             {
-                <MudListItem T="BlueprintFavorite" OnClick="@(() => LoadAsync(favorite))">
+                <MudListItem T="BlueprintFavorite" OnClick="@(() => RenameAsync(favorite))">
                     <div class="list-row">
                         <div class="list-row-info">
                             <MudText Class="list-row-name">@favorite.Name</MudText>
@@ -24,15 +24,16 @@
                                 @favorite.BlueprintCount blueprint@(favorite.BlueprintCount == 1 ? "" : "s")
                             </MudText>
                         </div>
-                        @* The row itself loads the favorite on click, so the overflow menu has to stop
-                           the event before it bubbles. @onclick:stopPropagation can only be applied to
-                           an element, never a component tag, hence the wrapper div. *@
-                        <div @onclick="() => { }" @onclick:stopPropagation="true">
-                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
-                                     AriaLabel="@($"Actions for {favorite.Name}")">
-                                <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="@(() => RenameAsync(favorite))">Rename</MudMenuItem>
-                                <MudMenuItem Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteAsync(favorite))">Delete</MudMenuItem>
-                            </MudMenu>
+                        @* The row itself opens the rename dialog, so the row actions have to stop the
+                           event before it bubbles. @onclick:stopPropagation can only be applied to an
+                           element, never a component tag, hence the wrapper div. *@
+                        <div class="list-row-actions" @onclick="() => { }" @onclick:stopPropagation="true">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                           title="@($"Rename {favorite.Name}")" aria-label="@($"Rename {favorite.Name}")"
+                                           OnClick="@(() => RenameAsync(favorite))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                                           title="@($"Delete {favorite.Name}")" aria-label="@($"Delete {favorite.Name}")"
+                                           OnClick="@(() => DeleteAsync(favorite))" />
                         </div>
                     </div>
                 </MudListItem>

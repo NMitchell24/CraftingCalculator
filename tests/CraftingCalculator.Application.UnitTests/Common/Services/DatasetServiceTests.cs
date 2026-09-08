@@ -129,6 +129,56 @@ public class DatasetServiceTests
     }
 
     [Test]
+    public async Task DeleteRecordsAsync_DeletesEachRecordThroughItsOwnService()
+    {
+        Component component = new Component { Id = 1, Name = "Screw" };
+        Category category = new Category { Id = 2, Name = "Tools" };
+        Blueprint blueprint = new Blueprint { Id = 3, Name = "Widget" };
+
+        await _service.DeleteRecordsAsync([component, category, blueprint]);
+
+        _componentService.Verify(s => s.DeleteComponentAsync(component), Times.Once);
+        _categoryService.Verify(s => s.DeleteCategoryAsync(category), Times.Once);
+        _blueprintService.Verify(s => s.DeleteBlueprintAsync(blueprint), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteRecordsAsync_Empty_DoesNothing()
+    {
+        await _service.DeleteRecordsAsync([]);
+
+        _componentService.VerifyNoOtherCalls();
+        _categoryService.VerifyNoOtherCalls();
+        _blueprintService.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task DeleteAllOfTypeAsync_Component_DeletesEveryComponent()
+    {
+        Component screw = new Component { Id = 1, Name = "Screw" };
+        Component bolt = new Component { Id = 2, Name = "Bolt" };
+        _componentService.Setup(s => s.GetAllComponentsAsync()).ReturnsAsync([screw, bolt]);
+
+        await _service.DeleteAllOfTypeAsync(DataType.Component);
+
+        _componentService.Verify(s => s.DeleteComponentAsync(screw), Times.Once);
+        _componentService.Verify(s => s.DeleteComponentAsync(bolt), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteAllOfTypeAsync_Category_KeepsTheSeededAllCategory()
+    {
+        Category all = new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL };
+        Category tools = new Category { Id = 2, Name = "Tools" };
+        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([all, tools]);
+
+        await _service.DeleteAllOfTypeAsync(DataType.Category);
+
+        _categoryService.Verify(s => s.DeleteCategoryAsync(tools), Times.Once);
+        _categoryService.Verify(s => s.DeleteCategoryAsync(all), Times.Never);
+    }
+
+    [Test]
     public async Task SaveRecordAsync_Null_DoesNothing()
     {
         await _service.SaveRecordAsync(null);

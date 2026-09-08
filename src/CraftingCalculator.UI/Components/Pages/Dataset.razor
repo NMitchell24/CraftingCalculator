@@ -15,6 +15,8 @@
         <div class="dataset-summary-target" @key="section.Type" @onclick="@(() => OpenList(section.Type))">
             <MudPaper Class="app-card dataset-summary-card" Elevation="0">
                 <div class="dataset-summary-row">
+                    @* Same icon the matching Actions Bar action uses, so the two read as one pair. *@
+                    <MudIcon Icon="@section.Icon" Color="Color.Primary" Class="dataset-summary-icon" />
                     <div class="dataset-summary-info">
                         <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">@section.Title</MudText>
                         <MudText Typo="Typo.body2" Class="dataset-summary-count">@section.Caption</MudText>

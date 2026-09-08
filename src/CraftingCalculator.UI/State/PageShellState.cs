@@ -9,8 +9,13 @@ namespace CraftingCalculator.UI.State;
 /// <param name="OnClick">Runs when the action is invoked.</param>
 /// <param name="Disabled">True to render the action but refuse interaction.</param>
 /// <param name="Active">True when the action is a mode the page is currently in, which the shell highlights.</param>
+/// <param name="OnLongPress">
+/// Runs instead of <paramref name="OnClick"/> when the action is pressed and held. Null on an action
+/// that has no second gesture, which is what leaves an over-long press behaving as an ordinary tap.
+/// </param>
 public sealed record PageAction(
-    string Label, string Icon, Func<Task> OnClick, bool Disabled = false, bool Active = false);
+    string Label, string Icon, Func<Task> OnClick, bool Disabled = false, bool Active = false,
+    Func<Task>? OnLongPress = null);
 
 /// <summary>
 /// Everything a page puts on the shared shell. Only <see cref="Title"/> is required.

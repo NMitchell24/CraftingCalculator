@@ -45,4 +45,19 @@ public class DatasetService(
         Blueprint blueprint => blueprintService.DeleteBlueprintAsync(blueprint),
         _ => Task.CompletedTask
     };
+
+    public async Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records)
+    {
+        // Sequential rather than Task.WhenAll: the per-type services share one DbContext factory and a
+        // delete cascades, so overlapping deletes would race each other's cascade.
+        foreach (IBaseDataRecord record in records)
+        {
+            await DeleteRecordAsync(record);
+        }
+    }
+
+    // Goes through GetRecordsAsync rather than the per-type service so the Category sentinel stays
+    // excluded here for the same reason it is excluded there.
+    public async Task DeleteAllOfTypeAsync(DataType type) =>
+        await DeleteRecordsAsync(await GetRecordsAsync(type));
 }

@@ -26,4 +26,13 @@ public interface IDatasetService
     Task SaveRecordAsync(IBaseDataRecord? record);
 
     Task DeleteRecordAsync(IBaseDataRecord? record);
+
+    /// <summary>Deletes every record in <paramref name="records"/>, of any mix of types.</summary>
+    Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records);
+
+    /// <summary>
+    /// Deletes every record of <paramref name="type"/> that <see cref="GetRecordsAsync"/> returns -
+    /// so for <see cref="DataType.Category"/> the seeded <see cref="Category.ALL"/> row survives.
+    /// </summary>
+    Task DeleteAllOfTypeAsync(DataType type);
 }

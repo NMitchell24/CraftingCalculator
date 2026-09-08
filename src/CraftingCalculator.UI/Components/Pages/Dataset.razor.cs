@@ -13,8 +13,8 @@ namespace CraftingCalculator.UI.Components.Pages;
 /// </summary>
 public partial class Dataset : ComponentBase, IDisposable
 {
-    /// <summary>One row of the landing page - a record type, its heading, and its current count.</summary>
-    private sealed record DatasetSection(DataType Type, string Title, string Caption);
+    /// <summary>One row of the landing page - a record type, its heading, icon, and current count.</summary>
+    private sealed record DatasetSection(DataType Type, string Title, string Icon, string Caption);
 
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private IDatabaseAdminService DatabaseAdminService { get; set; } = null!;
@@ -31,8 +31,12 @@ public partial class Dataset : ComponentBase, IDisposable
     {
         PageShellState.Configure(this, new PageShellConfig("Dataset")
         {
+            // Built from SectionSpecs so an action and the card it opens always carry the same icon -
+            // that pairing is what tells the user which list each action leads to.
             Actions =
             [
+                .. SectionSpecs.Select(spec =>
+                    new PageAction(spec.Title, spec.Icon, () => OpenList(spec.Type))),
                 new PageAction("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
             ]
         });
@@ -44,11 +48,11 @@ public partial class Dataset : ComponentBase, IDisposable
     // filed under a category, so the landing page reads top to bottom as the path a new user takes.
     // Both noun forms are spelled out rather than derived from the heading: "Categories" does not
     // singularise by trimming an s, and it does not pluralise by adding one either.
-    private static readonly (DataType Type, string Title, string Singular, string Plural)[] SectionSpecs =
+    private static readonly (DataType Type, string Title, string Icon, string Singular, string Plural)[] SectionSpecs =
     [
-        (DataType.Category, "Categories", "category", "categories"),
-        (DataType.Component, "Components", "component", "components"),
-        (DataType.Blueprint, "Blueprints", "blueprint", "blueprints")
+        (DataType.Category, "Categories", Icons.Material.Filled.Label, "category", "categories"),
+        (DataType.Component, "Components", Icons.Material.Filled.Inventory2, "component", "components"),
+        (DataType.Blueprint, "Blueprints", Icons.Material.Filled.Handyman, "blueprint", "blueprints")
     ];
 
     // Counting means loading each type in full, since IDatasetService exposes no count. That is the same
@@ -58,16 +62,22 @@ public partial class Dataset : ComponentBase, IDisposable
     {
         List<DatasetSection> sections = [];
 
-        foreach ((DataType type, string title, string singular, string plural) in SectionSpecs)
+        foreach ((DataType type, string title, string icon, string singular, string plural) in SectionSpecs)
         {
             int count = (await DatasetService.GetRecordsAsync(type)).Count;
-            sections.Add(new DatasetSection(type, title, $"{count} {(count == 1 ? singular : plural)}"));
+            sections.Add(new DatasetSection(type, title, icon, $"{count} {(count == 1 ? singular : plural)}"));
         }
 
         Sections = sections;
     }
 
-    private void OpenList(DataType type) => Navigation.NavigateTo($"/dataset/{type}");
+    // Returns a Task only because PageAction.OnClick is a Func<Task> - the navigation is synchronous,
+    // and the card taps in the markup bind the same method.
+    private Task OpenList(DataType type)
+    {
+        Navigation.NavigateTo($"/dataset/{type}");
+        return Task.CompletedTask;
+    }
 
     private async Task DeleteAllDataAsync()
     {

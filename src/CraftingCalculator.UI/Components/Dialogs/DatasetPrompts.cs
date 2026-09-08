@@ -5,8 +5,8 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
-/// The delete confirmation for a single Dataset record, shared by the Dataset list's row menu and the
-/// editor's app-bar menu.
+/// The delete confirmations for Dataset records - one record or several - shared by the Dataset list's
+/// row actions, its Delete Mode, and the editor's action bar.
 /// </summary>
 public static class DatasetPrompts
 {
@@ -20,6 +20,22 @@ public static class DatasetPrompts
         bool? confirmed = await dialogs.ShowMessageBoxAsync(
             $"Delete {record.Type.GetDescription()}?",
             $"'{record.Name}' will be deleted forever and removed from any blueprints {alsoFavorites}where it is used.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        return confirmed == true;
+    }
+
+    /// <summary>
+    /// Confirms deleting <paramref name="count"/> records of <paramref name="type"/>, named by the
+    /// plural noun <paramref name="plural"/>. Returns true only if the user confirmed.
+    /// </summary>
+    public static async Task<bool> ConfirmDeleteManyAsync(IDialogService dialogs, DataType type, string plural, int count)
+    {
+        string alsoFavorites = type == DataType.Blueprint ? "or blueprint favorites " : "";
+
+        bool? confirmed = await dialogs.ShowMessageBoxAsync(
+            $"Delete {count} {plural}?",
+            $"{count} {plural} will be deleted forever and removed from any blueprints {alsoFavorites}where they are used.",
             yesText: "Delete", cancelText: "Cancel");
 
         return confirmed == true;
