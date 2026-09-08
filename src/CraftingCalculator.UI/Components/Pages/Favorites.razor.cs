@@ -44,24 +44,10 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private async Task LoadAsync(BlueprintFavorite favorite)
     {
-        // WPF replaced the working batch silently (BlueprintsViewModel.SelectedFav); on a phone that is
-        // one mis-tap from discarding unsaved work.
-        if (State.BlueprintQuantities.Count > 0)
+        if (await FavoritePrompts.LoadAsync(DialogService, Snackbar, State, favorite))
         {
-            bool? replace = await DialogService.ShowMessageBoxAsync(
-                "Replace current selection?",
-                $"Loading '{favorite.Name}' will discard the blueprints you have selected.",
-                yesText: "Load", cancelText: "Cancel");
-
-            if (replace != true)
-            {
-                return;
-            }
+            Navigation.NavigateTo("/");
         }
-
-        await State.LoadFavoriteAsync(favorite);
-        Snackbar.Add($"Loaded '{favorite.Name}'", Severity.Success);
-        Navigation.NavigateTo("/");
     }
 
     private async Task RenameAsync(BlueprintFavorite favorite)
