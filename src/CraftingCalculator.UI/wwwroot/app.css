@@ -271,8 +271,13 @@ html, body {
     height: var(--actions-bar-height);
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 4px;
+    /* Each action gets an equal share of the bar and sits centred in it, the way .bottom-nav-menu
+       spaces its three destinations - so a single action lands dead centre and four still have room
+       to breathe, without the count being wired into the CSS. No gap: space-around already puts equal
+       air on both sides of every icon, and adding one would eat into the shares unevenly at the ends.
+       The buttons are deliberately not flex-grown - MudIconButton is a circle, and stretching one to
+       fill its track would draw its hover and ripple as a wide ellipse. */
+    justify-content: space-around;
     padding-left: var(--edge-inset-left);
     padding-right: var(--edge-inset-right);
 }

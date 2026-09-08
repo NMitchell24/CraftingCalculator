@@ -31,7 +31,9 @@ public partial class ActionsBar
     [Parameter] public int MaxVisible { get; set; } = 4;
 
     // At or under the cap everything fits; past it the last slot is spent on the overflow menu itself.
-    private int VisibleCount => Actions.Count <= MaxVisible ? Actions.Count : MaxVisible - 1;
+    // The floor is what keeps OverflowCount honest: MaxVisible is a public parameter, and a caller
+    // passing 0 would otherwise make this -1 while Overflow still yields every action.
+    private int VisibleCount => Actions.Count <= MaxVisible ? Actions.Count : Math.Max(MaxVisible - 1, 0);
 
     private IEnumerable<PageAction> Visible => Actions.Take(VisibleCount);
 
