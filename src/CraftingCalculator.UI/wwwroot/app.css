@@ -1,4 +1,4 @@
-/* Both faces are bundled locally (wwwroot/Fonts) rather than pulled from a CDN, so the app renders
+﻿/* Both faces are bundled locally (wwwroot/Fonts) rather than pulled from a CDN, so the app renders
    identically with no network - it is an offline-first tool. Inter is the body face and is wired into
    the MudTheme (Theme/AppTheme.cs); Jersey 20 is the display face and is applied only through
    .display-title below. */
@@ -43,6 +43,56 @@ html, body {
 
 #app {
     height: 100%;
+}
+
+/* Startup cloak - the markup and its dismissal live in index.html; this is only its appearance. Covers
+   the whole webview from the first paint until MainLayout reports the breakpoint and dark-mode values
+   in. Sits above every MudBlazor layer (its highest, the tooltip, is 1600) so no part of the
+   half-resolved layout shows through. The colour is the MauiSplashScreen Color in
+   CraftingCalculator.UI.csproj; the two have to be changed together. */
+.app-cloak {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px;
+    background-color: #2E3440;
+    /* Duration is mirrored by AppCloak.FadeDuration, which keeps the element mounted long enough for
+       this to play; change both together. */
+    transition: opacity 300ms ease-out;
+}
+
+/* Added by appCloak.dismiss for the last frames of the cloak's life.
+   pointer-events because a fading cloak is still a full-screen element over a now-usable app. */
+.app-cloak-fading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The fade is decoration, so honouring the OS setting collapses it back to an instant hide - which
+   appCloak.dismiss picks up automatically, since it reads this duration back off the element. */
+@media (prefers-reduced-motion: reduce) {
+    .app-cloak {
+        transition-duration: 0ms;
+    }
+}
+
+/* Every value here is pinned rather than inherited, and each for its own reason. This block follows
+   .display-title in the file, so it wins those ties.
+   - color: nothing has resolved a palette yet when this paints, so there is no theme colour to inherit.
+     #E4E7EC is the ink the slate app bar already uses (AppTheme.ForgeColors.DarkInk).
+   - font-size: .display-title's 1.24em is relative, and against the body's 16px would land at app-bar
+     size on a full-screen splash. 34px is Jersey 20's design em, the size it renders grid-crisp at (see
+     the .display-title comment), and this is the only place in the app with room to use it.
+   - line-height: .display-title sets 1 for single-line titles; at this size most phrases wrap to two
+     lines on a phone. */
+.app-cloak-text {
+    color: #E4E7EC;
+    font-size: 2.125rem;
+    line-height: 1.3;
+    text-align: center;
 }
 
 /* Safe-area insets. On iOS these stay 0 and env() (used directly below) does the work; on Android

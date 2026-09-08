@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Crafting Calculator</title>
     <base href="/" />
     <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
@@ -12,13 +12,53 @@
 
 <body>
 
-    <div id="app">Loading…</div>
+    <div id="app"></div>
+
+    <!-- The startup cloak, and deliberately a sibling of #app rather than a Blazor component: it has to
+         be on screen from the very first paint, which happens well before the Blazor app boots, and
+         Blazor replaces everything inside #app once it does. MainLayout calls appCloak.dismiss when the
+         layout has resolved. Styles live with the rest of the app's in app.css. -->
+    <div id="app-cloak" class="app-cloak">
+        <span class="app-cloak-text display-title"></span>
+    </div>
 
     <div id="blazor-error-ui" data-nosnippet>
         An unhandled error has occurred.
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+
+    <script>
+        // Inline, and next to the markup it fills, so the phrase is in place for the first paint - an
+        // external file would leave the cloak sitting empty until it arrived. Add, cut, or reword the
+        // phrases freely; the only thing each one has to do is read as "still working on it".
+        (function () {
+            var phrases = [
+                'Stoking the forge...',
+                'Gathering your materials...',
+                'Hammering out the details...',
+                'Sharpening the axe...',
+                'Counting every last nail...',
+                'Smelting down the numbers...',
+                'Foraging for spare parts...',
+                'Waking up the blacksmith...'
+            ];
+
+            var cloak = document.getElementById('app-cloak');
+            cloak.firstElementChild.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+
+            window.appCloak = {
+                dismiss: function () {
+                    cloak.classList.add('app-cloak-fading');
+                    // On a timer rather than transitionend, which never fires when prefers-reduced-motion
+                    // collapses the duration to zero. Reading the duration back off the element keeps
+                    // this from drifting out of step with the stylesheet.
+                    var ms = Number.parseFloat(getComputedStyle(cloak).transitionDuration) * 1000;
+                    setTimeout(function () { cloak.remove(); }, ms);
+                }
+            };
+        })();
+    </script>
 
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
