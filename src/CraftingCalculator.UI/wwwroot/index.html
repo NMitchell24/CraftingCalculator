@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Crafting Calculator</title>
     <base href="/" />
     <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
@@ -12,7 +12,53 @@
 
 <body>
 
-    <div id="app">Loading…</div>
+    <div id="app"></div>
+
+    <!-- The startup cloak, and deliberately a sibling of #app rather than a Blazor component: it has to
+         be on screen from the very first paint, which happens well before the Blazor app boots, and
+         Blazor replaces everything inside #app once it does. MainLayout calls appCloak.dismiss when the
+         layout has resolved. Styles live with the rest of the app's own in app.css. -->
+    <div id="app-cloak" class="app-cloak">
+        <span class="app-cloak-text display-title">Stoking the forge...</span>
+    </div>
+
+    <script>
+        // Inline and directly after the markup it fills, so the phrase is in place before the parser can
+        // yield and let the browser paint; an external file would leave the cloak sitting empty until it
+        // arrived. The span already carries the first phrase as a literal, so a paint that lands between
+        // the two still shows words rather than a bare slate - this only swaps in the random pick, and is
+        // why that one phrase appears in both places. Add, cut, or reword freely; the only thing each one
+        // has to do is read as "still working on it".
+        (function () {
+            var phrases = [
+                'Stoking the forge...',
+                'Gathering your materials...',
+                'Hammering out the details...',
+                'Sharpening the axe...',
+                'Counting every last nail...',
+                'Smelting down the numbers...',
+                'Foraging for spare parts...',
+                'Waking up the blacksmith...'
+            ];
+
+            var cloak = document.getElementById('app-cloak');
+            cloak.firstElementChild.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+
+            window.appCloak = {
+                dismiss: function () {
+                    cloak.classList.add('app-cloak-fading');
+                    // On a timer rather than transitionend, which never fires when prefers-reduced-motion
+                    // collapses the duration to zero. Reading the duration back off the element keeps this
+                    // from drifting out of step with the stylesheet. The unit is parsed rather than
+                    // assumed: Chromium serializes a computed <time> in seconds whatever the stylesheet
+                    // wrote, but an engine that answered "300ms" would hold the cloak for 300 seconds.
+                    var duration = getComputedStyle(cloak).transitionDuration.trim();
+                    var ms = Number.parseFloat(duration) * (duration.endsWith('ms') ? 1 : 1000);
+                    setTimeout(function () { cloak.remove(); }, ms);
+                }
+            };
+        })();
+    </script>
 
     <div id="blazor-error-ui" data-nosnippet>
         An unhandled error has occurred.
