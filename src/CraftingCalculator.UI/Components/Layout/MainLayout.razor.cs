@@ -22,9 +22,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private bool _themeResolved;
     private bool _cloakDismissed;
     // The viewport subscription is opened from OnAfterRenderAsync, so the first frame is painted
-    // before NotifyBrowserViewportChangeAsync has ever run. Null is that unmeasured state - seeding a
-    // concrete breakpoint instead makes the app open on whichever nav the seed happened to pick and
-    // swap once the real viewport arrives.
+    // before NotifyBrowserViewportChangeAsync has ever run. Null is that unmeasured state for this
+    // component's own layout decisions; MainLayout.razor currently cascades Breakpoint.Xs as a fallback
+    // until the first viewport notification arrives.
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
 
