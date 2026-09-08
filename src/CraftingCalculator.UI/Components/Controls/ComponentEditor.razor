@@ -4,5 +4,9 @@
 <MudNumericField @bind-Value="Model.Cost" @bind-Value:after="NotifyChangedAsync" Label="Cost per item"
                  Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" onfocus="this.select()" />
 
+@* Raw materials can still cost time - a Potato has to be grown before it can be cooked. *@
+<ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
+                     Label="Production time per item" />
+
 <MudTextField @bind-Value="Model.Description" @bind-Value:after="NotifyChangedAsync" Label="Description"
               Variant="Variant.Outlined" FullWidth="true" Lines="3" Sizing="InputSizing.Auto" MaxLines="10" />

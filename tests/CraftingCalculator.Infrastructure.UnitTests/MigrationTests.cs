@@ -169,6 +169,51 @@ public class MigrationTests
         }
     }
 
+    /// <summary>
+    /// Production time arrived after yield, so blueprints and components written before it must come
+    /// back as instant rather than as some non-zero tick count read out of an unwritten column.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeProductionTime_DefaultsExistingRowsToInstant()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("AddBlueprintYield");
+
+                // Raw SQL because neither entity describes a table without a ProductionTime column now.
+                await context.Database.ExecuteSqlRawAsync(
+                    "INSERT INTO Blueprints (Id, Name, Description, Value, Yield) VALUES (1, 'Soup', 'Warm', 30.0, 1);");
+                await context.Database.ExecuteSqlRawAsync(
+                    "INSERT INTO Components (Id, Name, Description, Cost) VALUES (1, 'Potato', 'Starchy', 2.0);");
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                Blueprint soup = await context.Blueprints.SingleAsync();
+                soup.Name.Should().Be("Soup");
+                soup.ProductionTime.Should().Be(TimeSpan.Zero);
+
+                Component potato = await context.Components.SingleAsync();
+                potato.Name.Should().Be("Potato");
+                potato.ProductionTime.Should().Be(TimeSpan.Zero);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
     private static string NewDbPath() =>
         Path.Combine(Path.GetTempPath(), $"crafting_migration_{Guid.NewGuid():N}.db3");
 

@@ -10,6 +10,9 @@ public class Blueprint
     /// <summary>How many items one craft of this blueprint produces.</summary>
     public long Yield { get; set; } = 1;
 
+    /// <summary>How long one craft of this blueprint takes. Zero is instant.</summary>
+    public TimeSpan ProductionTime { get; set; }
+
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
 

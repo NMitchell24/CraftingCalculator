@@ -12,6 +12,8 @@ public class ComponentConfiguration : IEntityTypeConfiguration<Component>
         builder.HasKey(component => component.Id);
         builder.Property(component => component.Name).IsRequired();
         builder.Property(component => component.Description).IsRequired();
+        //Ticks, for the reason given in BlueprintConfiguration.
+        builder.Property(component => component.ProductionTime).HasConversion<long>();
         builder.HasIndex(component => component.Name);
     }
 }

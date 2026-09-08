@@ -16,6 +16,10 @@ public class BlueprintConfiguration : IEntityTypeConfiguration<Blueprint>
         //defaultValue: 1L instead of the CLR default; that operation is what fills the column for rows
         //written before yield existed.
         builder.Property(blueprint => blueprint.Yield).HasDefaultValue(1L);
+        //Stored as ticks (INTEGER) rather than the provider's default TEXT so the column round-trips
+        //losslessly and stays cheap to compare. No HasDefaultValue here, unlike Yield above: the
+        //default is TimeSpan.Zero, which is already what SQLite backfills into a NOT NULL INTEGER.
+        builder.Property(blueprint => blueprint.ProductionTime).HasConversion<long>();
         builder.HasIndex(blueprint => blueprint.Name);
         builder.HasIndex(blueprint => blueprint.CategoryId);
 

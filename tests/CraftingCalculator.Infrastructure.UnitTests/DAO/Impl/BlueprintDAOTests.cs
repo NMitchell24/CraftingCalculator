@@ -55,6 +55,39 @@ public class BlueprintDAOTests
         (await _blueprintDAO.GetByIdAsync(saved.Id))!.Yield.Should().Be(7);
     }
 
+    /// <summary>
+    /// Production time is stored as ticks through a value converter, so this covers the whole round trip
+    /// rather than just the property: a tenth of a second has to survive the conversion in both
+    /// directions, and on a component as well as a blueprint.
+    /// </summary>
+    [Test]
+    public async Task SaveAsync_ProductionTime_RoundTripsThroughTheDatabase()
+    {
+        Component potato = await _componentDAO.SaveAsync(
+            new Component { Name = "Potato", ProductionTime = TimeSpan.FromMinutes(5) });
+
+        Blueprint soup = new() { Name = "Soup", ProductionTime = TimeSpan.FromSeconds(5.5) };
+        soup.Components.Add(potato, 2);
+        Blueprint saved = await _blueprintDAO.SaveAsync(soup);
+
+        Blueprint reloaded = (await _blueprintDAO.GetByIdAsync(saved.Id))!;
+        reloaded.ProductionTime.Should().Be(TimeSpan.FromSeconds(5.5));
+        reloaded.Components.ComponentList[0].Component.ProductionTime.Should().Be(TimeSpan.FromMinutes(5));
+
+        reloaded.ProductionTime = TimeSpan.FromHours(2);
+        await _blueprintDAO.SaveAsync(reloaded);
+
+        (await _blueprintDAO.GetByIdAsync(saved.Id))!.ProductionTime.Should().Be(TimeSpan.FromHours(2));
+    }
+
+    [Test]
+    public async Task SaveAsync_WithoutAnExplicitProductionTime_DefaultsToInstant()
+    {
+        Blueprint saved = await _blueprintDAO.SaveAsync(new Blueprint { Name = "Plank" });
+
+        (await _blueprintDAO.GetByIdAsync(saved.Id))!.ProductionTime.Should().Be(TimeSpan.Zero);
+    }
+
     [Test]
     public async Task SaveAsync_BlueprintWithoutAnExplicitYield_DefaultsToOne()
     {

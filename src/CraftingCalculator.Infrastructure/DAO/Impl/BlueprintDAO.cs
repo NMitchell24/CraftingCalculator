@@ -49,6 +49,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         entity.Description = blueprint.Description ?? "";
         entity.Value = blueprint.Value;
         entity.Yield = blueprint.Yield;
+        entity.ProductionTime = blueprint.ProductionTime;
         entity.CategoryId = blueprint.Category?.Id;
 
         if (entity.Id == 0)
@@ -161,7 +162,8 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             Name = entity.Name,
             Description = entity.Description,
             Value = entity.Value,
-            Yield = entity.Yield
+            Yield = entity.Yield,
+            ProductionTime = entity.ProductionTime
         };
 
         if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out CategoryEntity? categoryEntity))
@@ -200,7 +202,8 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         Id = entity.Id,
         Name = entity.Name,
         Description = entity.Description,
-        Cost = entity.Cost
+        Cost = entity.Cost,
+        ProductionTime = entity.ProductionTime
     };
 
     private sealed record BlueprintGraph(

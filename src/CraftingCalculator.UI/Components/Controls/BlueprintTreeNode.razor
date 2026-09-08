@@ -1,11 +1,16 @@
 @* MudTreeViewItem shows its expand arrow whenever ChildContent is non-null, regardless of whether the
    render fragment produces any elements - a zero-iteration @foreach still counts. Leaf nodes (no
-   Children) render a second, ChildContent-free tag so the arrow is correctly hidden for them. *@
+   Children) render a second, ChildContent-free tag so the arrow is correctly hidden for them.
+
+   OnClick is free for the detail dialog because MudTreeView leaves ExpandOnClick false: the arrow owns
+   expansion, so tapping the row itself never toggles it. *@
 @if (Node.Children.Count > 0)
 {
-    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Node.Name"
+    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Node.Name" EndText="@EndText"
+                     EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
                      Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
-                     Expanded="@State.IsExpanded(Path)" ExpandedChanged="@(_ => State.ToggleExpanded(Path))">
+                     Expanded="@State.IsExpanded(Path)" ExpandedChanged="@(_ => State.ToggleExpanded(Path))"
+                     OnClick="OpenDetailAsync">
         @foreach (BlueprintNode child in Node.Children)
         {
             <BlueprintTreeNode Node="child" ParentPath="@Path" />
@@ -14,6 +19,8 @@
 }
 else
 {
-    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Node.Name"
-                     Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)" />
+    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Node.Name" EndText="@EndText"
+                     EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
+                     Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
+                     OnClick="OpenDetailAsync" />
 }
