@@ -102,6 +102,18 @@ html, body {
 :root {
     --safe-area-inset-top: 0px;
     --safe-area-inset-bottom: 0px;
+    /* Only ever non-zero in landscape, where the camera cutout takes a strip off one edge. Every
+       surface that reaches a screen edge pads by these; the pair below is the single expression, so
+       edge padding reads the same everywhere it appears. */
+    --safe-area-inset-left: 0px;
+    --safe-area-inset-right: 0px;
+    --edge-inset-left: max(env(safe-area-inset-left), var(--safe-area-inset-left));
+    --edge-inset-right: max(env(safe-area-inset-right), var(--safe-area-inset-right));
+    /* The app bar takes the larger of the two on both sides instead of each edge's own. Its title is
+       centred by an equal-sided grid, so an asymmetric inset - which is the normal case, the cutout
+       being on one edge only - would slide the title off the middle of the screen by half the
+       difference. Symmetry costs a strip of dead bar on the uncut side and keeps the title centred. */
+    --edge-inset-symmetric: max(var(--edge-inset-left), var(--edge-inset-right));
     /* The xs bottom nav's exact height, pinned rather than left to grow with its content: every bar
        that docks above it (.editor-action-bar, the snackbars) offsets by this, and any drift between
        the real height and the offset shows up as a strip of scrolling page content between them. */
@@ -119,6 +131,8 @@ html, body {
     display: grid;
     grid-template-columns: var(--app-bar-side-width) minmax(0, 1fr) var(--app-bar-side-width);
     align-items: center;
+    padding-left: calc(16px + var(--edge-inset-symmetric));
+    padding-right: calc(16px + var(--edge-inset-symmetric));
 }
 
 .app-bar-start {
@@ -164,11 +178,22 @@ html, body {
 .mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-persistent:not(.mud-drawer-clipped-never) {
     top: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
     height: calc(100% - var(--mud-appbar-height) + var(--mud-appbar-height) / 4 - max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    /* Landscape: the rail is flush against the left screen edge, which in landscape is where the
+       camera cutout sits - without this its nav icons render underneath it (see the drawer
+       screenshot). content-box is what makes the padding widen the rail rather than eat into it:
+       MudBlazor sets the rail's width from --mud-drawer-width-mini-left and the global box-sizing is
+       border-box, so a border-box padding would just squeeze a 56px rail down to a sliver. The rail
+       therefore ends up inset px wider than the offset MudBlazor gives .mud-main-content, and
+       .page-content's own edge inset below is what clears that overhang. */
+    padding-left: var(--edge-inset-left);
+    box-sizing: content-box;
 }
 
 .page-content {
     padding: 16px;
     padding-bottom: calc(16px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    padding-left: calc(16px + var(--edge-inset-left));
+    padding-right: calc(16px + var(--edge-inset-right));
 }
 
 .page-content-with-bottom-nav {
@@ -186,6 +211,8 @@ html, body {
     bottom: 0;
     z-index: 1300;
     padding-bottom: max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom));
+    padding-left: var(--edge-inset-left);
+    padding-right: var(--edge-inset-right);
 }
 
 .bottom-nav-menu {
@@ -672,6 +699,8 @@ html, body {
     gap: 8px;
     padding: 8px 16px;
     padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    padding-left: calc(16px + var(--edge-inset-left));
+    padding-right: calc(16px + var(--edge-inset-right));
 }
 
 @media (max-width: 599.98px) {

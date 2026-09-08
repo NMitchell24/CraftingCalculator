@@ -33,9 +33,16 @@
             <MudToggleItem Value="DataType.Blueprint">Blueprint</MudToggleItem>
         </MudToggleGroup>
 
+        @* Opens upward. This is a type-ahead, so focusing it raises the on-screen keyboard, and the
+           default downward popover lands squarely behind it - scrolling to see the list then counts as
+           a click outside and closes it. Modal is the other half: without it a scroll gesture anywhere
+           outside the list dismisses it before it can be read. MaxHeight is below MudBlazor's 300
+           default so that opening upward from a field near the top of the form cannot reach the app
+           bar. *@
         <MudAutocomplete T="IBaseDataRecord" @bind-Value="_selectedPart" SearchFunc="SearchAsync"
                          ToStringFunc="@(record => record?.Name ?? "")" Label="@($"{_partType.GetDescription()} to add")"
                          Variant="Variant.Outlined" FullWidth="true" Clearable="true" ResetValueOnEmptyText="true"
+                         AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.BottomLeft" MaxHeight="220"
                          Class="mb-3" />
 
         <div class="blueprint-add-row">
