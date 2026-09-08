@@ -8,7 +8,24 @@
     <div class="craft-columns">
         <div class="craft-column">
             <MudPaper Class="app-card" Elevation="0">
-                <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Selected Blueprints</MudText>
+                @* The loader shares the heading's row rather than taking one of its own: the batch list
+                   starts directly below it, and a full row of chrome pushes the batch off a phone screen. *@
+                <div class="craft-batch-title-row">
+                    <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Selected Blueprints</MudText>
+                    @* Bound on the favorite's id rather than the BlueprintFavorite itself, for the reason
+                       the category select in BlueprintEditor.razor is: the model has no value equality, so
+                       MudSelect's reference comparison would never preselect the loaded favorite.
+                       OuterClass rather than Class: Class lands on the inner MudInputControl, and the flex
+                       width has to sit on the outer div, which is this row's flex item. *@
+                    <MudSelect T="int?" @key="FavoriteSelectKey" Value="SelectedFavoriteId" ValueChanged="OnFavoriteSelectedAsync"
+                               Label="@FavoriteSelectLabel" Disabled="@(_favorites.Count == 0)"
+                               Variant="Variant.Outlined" Margin="Margin.Dense" OuterClass="craft-favorite-select">
+                        @foreach (BlueprintFavorite favorite in _favorites)
+                        {
+                            <MudSelectItem T="int?" Value="@favorite.Id">@favorite.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
                 <BatchList OnAddBlueprints="OpenPickerAsync" />
             </MudPaper>
 

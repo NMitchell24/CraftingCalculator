@@ -325,6 +325,29 @@ html, body {
     min-width: 0;
 }
 
+/* The batch card's heading shares its row with the Load Favorite select - same shape as
+   .dataset-summary-row, which pairs a heading with a control the same way. */
+.craft-batch-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* The heading takes the slack and gives up its own bottom margin to the row, which now carries the
+   gap to the batch list below. */
+.craft-batch-title-row .app-card-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+/* Shrinks before the heading does, and never grows past a width that would crowd it off a phone row. */
+.craft-favorite-select {
+    flex: 0 1 168px;
+    min-width: 0;
+}
+
 .summary-grid {
     display: grid;
     grid-template-columns: 1fr auto;
