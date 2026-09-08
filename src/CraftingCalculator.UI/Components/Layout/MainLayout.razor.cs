@@ -1,4 +1,4 @@
-﻿using CraftingCalculator.UI.State;
+using CraftingCalculator.UI.State;
 using CraftingCalculator.UI.Theme;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;

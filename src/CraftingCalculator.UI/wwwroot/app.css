@@ -1,4 +1,4 @@
-﻿/* Both faces are bundled locally (wwwroot/Fonts) rather than pulled from a CDN, so the app renders
+/* Both faces are bundled locally (wwwroot/Fonts) rather than pulled from a CDN, so the app renders
    identically with no network - it is an offline-first tool. Inter is the body face and is wired into
    the MudTheme (Theme/AppTheme.cs); Jersey 20 is the display face and is applied only through
    .display-title below. */
