@@ -40,17 +40,18 @@ public static class BlueprintProcessor
     /// <summary>
     /// Flattens the blueprint's own components and every nested child blueprint's components into one
     /// combined map for <paramref name="quantity"/> of the blueprint, alongside the items its rounded-up
-    /// crafts produce beyond what was asked for.
+    /// crafts produce beyond what was asked for and how long those crafts take.
     /// </summary>
-    public static (ComponentMap Components, BlueprintMap Surplus) Flatten(Blueprint blueprint, long quantity)
+    public static FlattenResult Flatten(Blueprint blueprint, long quantity)
     {
         BlueprintMap surplus = new();
-        ComponentMap components = Flatten(blueprint, quantity, surplus, 0);
+        (ComponentMap components, TimeSpan productionTime) = Flatten(blueprint, quantity, surplus, 0);
 
-        return (components, surplus);
+        return new FlattenResult(components, surplus, productionTime);
     }
 
-    private static ComponentMap Flatten(Blueprint blueprint, long quantity, BlueprintMap surplus, int depth)
+    private static (ComponentMap Components, TimeSpan ProductionTime) Flatten(
+        Blueprint blueprint, long quantity, BlueprintMap surplus, int depth)
     {
         ThrowIfTooDeep(blueprint, depth);
 
@@ -62,14 +63,19 @@ public static class BlueprintProcessor
         }
 
         ComponentMap combined = ComponentProcessor.CombineComponents(blueprint.Components, new ComponentMap(), crafts);
+        //Ticks rather than the TimeSpan * double operator: craft counts are whole numbers, so this keeps
+        //the accumulation exact instead of routing every level of the walk through floating point.
+        TimeSpan productionTime = TimeSpan.FromTicks(blueprint.ProductionTime.Ticks * crafts);
 
         foreach (BlueprintQuantity child in blueprint.ChildBlueprints.BlueprintList)
         {
-            ComponentMap childComponents = Flatten(child.Blueprint, child.Quantity * crafts, surplus, depth + 1);
+            (ComponentMap childComponents, TimeSpan childTime) =
+                Flatten(child.Blueprint, child.Quantity * crafts, surplus, depth + 1);
             combined = ComponentProcessor.CombineComponents(childComponents, combined, 1);
+            productionTime += childTime;
         }
 
-        return combined;
+        return (combined, productionTime);
     }
 
     /// <summary>
@@ -90,8 +96,12 @@ public static class BlueprintProcessor
         foreach (ComponentQuantity component in blueprint.Components.ComponentList)
         {
             long componentQuantity = component.Quantity * crafts;
+            //Named from Quantity on: four adjacent long arguments would otherwise transpose silently.
             children.Add(new BlueprintNode(
-                component.Name + " x" + componentQuantity, component.Name, component.Tooltip, true, componentQuantity, 0, []));
+                component.Name + " x" + componentQuantity, component.Name, component.Tooltip, IsComponent: true,
+                Quantity: componentQuantity, Crafts: 0, Yield: 0, Surplus: 0,
+                ProductionTime: TimeSpan.FromTicks(component.Component.ProductionTime.Ticks * componentQuantity),
+                Children: []));
         }
 
         foreach (BlueprintQuantity child in blueprint.ChildBlueprints.BlueprintList)
@@ -99,20 +109,14 @@ public static class BlueprintProcessor
             children.Add(BuildNode(child.Blueprint, child.Quantity * crafts, depth + 1));
         }
 
+        //The label carries only the quantity. The craft count the yield feature appended here moved into
+        //the per-step dialog, which has room for it alongside the yield, surplus and production time.
         return new BlueprintNode(
-            NodeLabel(blueprint, quantity, crafts), blueprint.Name, blueprint.Tooltip, false, quantity, crafts, children);
-    }
-
-    private static string NodeLabel(Blueprint blueprint, long quantity, long crafts)
-    {
-        //Crafts never exceeds quantity, so the two differ only where the yield is above 1. At the
-        //default yield the suffix would restate the number already in the label.
-        if (crafts == quantity)
-        {
-            return blueprint.Name + " x" + quantity;
-        }
-
-        return blueprint.Name + " x" + quantity + " (" + crafts + (crafts == 1 ? " craft)" : " crafts)");
+            blueprint.Name + " x" + quantity, blueprint.Name, blueprint.Tooltip, IsComponent: false,
+            Quantity: quantity, Crafts: crafts, Yield: blueprint.Yield,
+            Surplus: crafts * blueprint.Yield - quantity,
+            ProductionTime: TimeSpan.FromTicks(blueprint.ProductionTime.Ticks * crafts),
+            Children: children);
     }
 
     private static void ThrowIfTooDeep(Blueprint blueprint, int depth)

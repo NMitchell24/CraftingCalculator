@@ -767,3 +767,38 @@ html, body {
     right: 0.75rem;
     top: 0.5rem;
 }
+
+/* Production time editor: three fields on one line so hours/minutes/seconds read as one value rather
+   than three unrelated settings. Equal columns keep each one a comfortable tap target on a phone. */
+.production-time-label {
+    display: block;
+    opacity: 0.7;
+    margin-bottom: 4px;
+}
+
+.production-time-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+/* Echoes the entered value back in the same format the Crafting Summary uses, so the user can see that
+   90 seconds is going to read as 1:30 before they save. */
+.production-time-hint {
+    display: block;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+/* Per-step time at the end of a Crafting Steps row. Dimmed so the step name stays the thing you scan
+   the tree for, and tabular so the times line up down the column. */
+.steps-tree-time {
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+}
+
+.step-dialog-note {
+    display: block;
+    margin-top: 12px;
+    opacity: 0.7;
+}

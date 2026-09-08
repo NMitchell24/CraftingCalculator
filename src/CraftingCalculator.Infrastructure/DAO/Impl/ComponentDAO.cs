@@ -38,6 +38,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         entity.Name = component.Name ?? "";
         entity.Description = component.Description ?? "";
         entity.Cost = component.Cost;
+        entity.ProductionTime = component.ProductionTime;
 
         if (entity.Id == 0)
         {
@@ -60,6 +61,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         Id = entity.Id,
         Name = entity.Name,
         Description = entity.Description,
-        Cost = entity.Cost
+        Cost = entity.Cost,
+        ProductionTime = entity.ProductionTime
     };
 }

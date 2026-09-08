@@ -50,6 +50,9 @@ public class ComponentQuantity : IBaseQuantityRecord
 
     public double TotalCost => Component.Cost * Quantity;
 
+    /// <summary>How long producing this many of the component takes.</summary>
+    public TimeSpan TotalProductionTime => TimeSpan.FromTicks(Component.ProductionTime.Ticks * Quantity);
+
     public string DisplayName => Name + " x" + Quantity;
 
     public ComponentQuantity(Component component, long quantity, int id)

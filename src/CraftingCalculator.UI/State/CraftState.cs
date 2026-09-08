@@ -50,6 +50,12 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// <summary>Total surplus items, summed across every distinct blueprint.</summary>
     public long SurplusCount { get; private set; }
 
+    /// <summary>
+    /// How long the whole batch takes: every craft at every depth plus the components those crafts
+    /// consume, summed as though the batch were made one step at a time.
+    /// </summary>
+    public TimeSpan TotalProductionTime { get; private set; }
+
     /// <summary>What the surplus is worth. Deliberately not part of <see cref="Profit"/>.</summary>
     public double SurplusValue { get; private set; }
 
@@ -189,6 +195,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
         TotalCost = totals.TotalCost;
         TotalValue = totals.TotalValue;
+        TotalProductionTime = totals.TotalProductionTime;
         TotalComponents = [.. totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
         SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
         TreeRoots = [.. _blueprintMap.BlueprintList.Select(blueprintQuantity => blueprintService.GetBlueprintNode(blueprintQuantity.Blueprint, blueprintQuantity.Quantity))];

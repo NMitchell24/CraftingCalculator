@@ -10,6 +10,9 @@
         <dt>Crafting Steps</dt>
         <dd>@State.CraftingStepCount</dd>
 
+        <dt>Crafting Time</dt>
+        <dd>@DurationProcessor.Format(State.TotalProductionTime)</dd>
+
         <dt>Cost</dt>
         <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
 

@@ -8,6 +8,9 @@
 <MudNumericField T="long" @bind-Value="Model.Yield" @bind-Value:after="NotifyChangedAsync" Label="Yield per craft"
                  Variant="Variant.Outlined" FullWidth="true" Min="1" Class="mb-4" onfocus="this.select()" />
 
+<ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
+                     Label="Production time per craft" />
+
 @* Bound on the category's id rather than the Category itself: the model has no value equality and
    Model.Category comes from a different load than _categories, so MudSelect's reference comparison would
    never preselect the blueprint's current category. *@

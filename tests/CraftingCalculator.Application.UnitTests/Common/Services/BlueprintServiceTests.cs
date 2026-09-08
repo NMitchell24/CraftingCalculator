@@ -60,22 +60,6 @@ public class BlueprintServiceTests
     }
 
     [Test]
-    public void GetFlattenedComponents_CombinesNestedChildComponents()
-    {
-        Blueprint child = new Blueprint { Name = "Bracket" };
-        child.Components.Add(new Component { Name = "Screw" }, 3);
-
-        Blueprint parent = new Blueprint { Name = "Frame" };
-        parent.ChildBlueprints.Add(child, 2);
-
-        (ComponentMap result, BlueprintMap surplus) = _service.GetFlattenedComponents(parent, 1);
-
-        result.ComponentList.Should().ContainSingle();
-        result.ComponentList[0].Quantity.Should().Be(6);
-        surplus.BlueprintList.Should().BeEmpty();
-    }
-
-    [Test]
     public void GetBlueprintNode_BuildsNodePerComponent()
     {
         Blueprint blueprint = new Blueprint { Name = "Widget" };

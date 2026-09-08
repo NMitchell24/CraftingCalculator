@@ -1,0 +1,18 @@
+@* Three fields rather than one parsed text box: "1:30" is ambiguous between minutes:seconds and
+   hours:minutes, and separate fields each get their own 44px target on a phone. Hours is deliberately
+   unbounded - some games measure a craft in days. *@
+<MudText Typo="Typo.caption" Class="production-time-label">@Label</MudText>
+<div class="production-time-row">
+    <MudNumericField T="int" @bind-Value="_hours" @bind-Value:after="NotifyChangedAsync" Label="Hours"
+                     Variant="Variant.Outlined" Min="0" HideSpinButtons="true" onfocus="this.select()" />
+    <MudNumericField T="int" @bind-Value="_minutes" @bind-Value:after="NotifyChangedAsync" Label="Minutes"
+                     Variant="Variant.Outlined" Min="0" Max="59" HideSpinButtons="true" onfocus="this.select()" />
+    @* InputMode is load-bearing on mobile: the default numeric keyboard has no decimal separator, which
+       would put the tenth-of-a-second values this feature exists for out of reach on a phone. Its value
+       is parenthesised because Razor would otherwise read the @ of the escaped "decimal" keyword as a
+       transition into markup. *@
+    <MudNumericField T="double" @bind-Value="_seconds" @bind-Value:after="NotifyChangedAsync" Label="Seconds"
+                     Variant="Variant.Outlined" Min="0" Max="59.9" Step="0.1" Format="0.#"
+                     InputMode="@(InputMode.@decimal)" HideSpinButtons="true" onfocus="this.select()" />
+</div>
+<MudText Typo="Typo.caption" Class="production-time-hint mb-4">@DurationProcessor.Format(Value)</MudText>
