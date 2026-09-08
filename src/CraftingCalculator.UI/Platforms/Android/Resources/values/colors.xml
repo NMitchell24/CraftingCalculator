@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#512BD4</color>
-    <color name="colorPrimaryDark">#2B0B98</color>
-    <color name="colorAccent">#2B0B98</color>
+    <!-- The Forge palette as Android sees it. These are the native-chrome colours only - the app's
+         own UI is MudBlazor and gets its palette from Theme/AppTheme.cs. The values are duplicated
+         here because an Android resource cannot reference a C# constant; change one and change the
+         other. Names are Android's, so the mapping is spelled out:
+
+           colorPrimary     ForgeColors.LightSlate   - Maui.SplashTheme's app bar and ActionMode
+                                                       background, so it matches the MudBlazor app bar
+           colorPrimaryDark ForgeColors.DarkSurface  - the status bar below Android 15; above it
+                                                       MainActivity goes edge-to-edge and this is unused
+           colorAccent      ForgeColors.LightPrimary - the copper brand accent; what the WebView tints
+                                                       text cursors and selection handles with
+    -->
+    <color name="colorPrimary">#2E3440</color>
+    <color name="colorPrimaryDark">#1B1E24</color>
+    <color name="colorAccent">#B7601F</color>
 </resources>

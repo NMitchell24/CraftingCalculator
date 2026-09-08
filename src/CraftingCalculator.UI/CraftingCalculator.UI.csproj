@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <!-- Single source of truth for each platform's TFM - the TargetFrameworks list below and any
@@ -67,10 +67,16 @@
 
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2E3440" />
 
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+    <!-- Raster, not the splash.svg beside it, which is the editable master. MAUI rasterises SVGs
+         through Svg.Skia, which does not reproduce the master's Inkscape filters: it drops the
+         inner orbit group entirely and shades the buttons differently. Re-export the PNG from
+         the SVG (1024x1024, transparent) after editing the master.
+         BaseSize is the logo's size in dp on every platform except Android 12+, which ignores it
+         and scales the drawable into its own 288dp splash slot. -->
+    <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#2E3440" BaseSize="192,192" />
 
     <!-- Custom Fonts -->
     <MauiFont Include="Resources\Fonts\*" />
