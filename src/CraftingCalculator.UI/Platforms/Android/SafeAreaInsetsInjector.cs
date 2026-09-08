@@ -70,7 +70,7 @@ internal sealed class SafeAreaInsetsInjector(Android.Webkit.WebView webView)
         // inset type (notably IME, so keyboard resizing still works, and display cutout) flowing.
         // SetInsets is under-annotated as returning a nullable Builder; it always returns the builder.
         return new WindowInsetsCompat.Builder(insets)
-            .SetInsets(WindowInsetsCompat.Type.SystemBars(), Insets.Of(0, 0, 0, 0))
-            ?.Build();
+            .SetInsets(WindowInsetsCompat.Type.SystemBars(), Insets.Of(0, 0, 0, 0))!
+            .Build();
     }
 }
