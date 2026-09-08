@@ -14,25 +14,14 @@ public partial class Favorites : ComponentBase, IDisposable
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
-    [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     private List<BlueprintFavorite> _favorites = [];
 
-    // Unlike the Craft screen's panes, this page does not subscribe to CraftState.Changed:
-    // the only thing that mutates the batch while it is on screen is its own LoadAsync, which
-    // navigates away to "/" immediately afterwards.
+    // Declares no actions: this page manages saved favorites, and both of its operations are per-row.
+    // Saving the current batch as a favorite belongs to the Craft screen, which owns the batch.
     protected override async Task OnInitializedAsync()
     {
-        PageShellState.Configure(this, new PageShellConfig("Favorites")
-        {
-            // The batch cannot change while this page is on screen - the only thing that mutates it is
-            // LoadAsync, which navigates away - so this snapshot stays accurate for the page's life.
-            Actions =
-            [
-                new PageAction("Save current selection", Icons.Material.Filled.Save,
-                    SaveCurrentBatchAsync, Disabled: State.BlueprintQuantities.Count == 0)
-            ]
-        });
+        PageShellState.Configure(this, new PageShellConfig("Favorites"));
         await ReloadAsync();
     }
 
@@ -40,14 +29,6 @@ public partial class Favorites : ComponentBase, IDisposable
     {
         _favorites = await FavoriteService.GetAllFavoritesAsync();
         StateHasChanged();
-    }
-
-    private async Task LoadAsync(BlueprintFavorite favorite)
-    {
-        if (await FavoritePrompts.LoadAsync(DialogService, Snackbar, State, favorite))
-        {
-            Navigation.NavigateTo("/");
-        }
     }
 
     private async Task RenameAsync(BlueprintFavorite favorite)
@@ -98,14 +79,6 @@ public partial class Favorites : ComponentBase, IDisposable
 
         Snackbar.Add($"Deleted '{favorite.Name}'", Severity.Success);
         await ReloadAsync();
-    }
-
-    private async Task SaveCurrentBatchAsync()
-    {
-        if (await FavoritePrompts.SaveBatchAsync(DialogService, Snackbar, State) is not null)
-        {
-            await ReloadAsync();
-        }
     }
 
     public void Dispose() => PageShellState.Reset(this);

@@ -1,3 +1,5 @@
+@implements IDisposable
+
 @if (Actions.Count > 0)
 {
     @if (Mode == ActionsBarMode.BottomBar)
@@ -5,8 +7,18 @@
         <MudPaper Class="actions-bar" Elevation="3" Square="true">
             @foreach (PageAction action in Visible)
             {
-                <MudIconButton Icon="@action.Icon" Color="@ColorFor(action)" Disabled="@action.Disabled"
-                               OnClick="@(() => action.OnClick())" title="@action.Label" aria-label="@action.Label" />
+                @* The pointer handlers cannot go on MudIconButton: @on* is an element-only directive,
+                   the same constraint Dataset.razor works around. preventDefault on contextmenu stops
+                   the WebView's own long-press menu from opening over the gesture. *@
+                <span class="actions-bar-press"
+                      @onpointerdown="@(() => BeginLongPress(action))"
+                      @onpointerup="StopLongPress"
+                      @onpointercancel="StopLongPress"
+                      @onpointerleave="StopLongPress"
+                      @oncontextmenu:preventDefault="true">
+                    <MudIconButton Icon="@action.Icon" Color="@ColorFor(action)" Disabled="@action.Disabled"
+                                   OnClick="@(() => InvokeActionAsync(action))" title="@action.Label" aria-label="@action.Label" />
+                </span>
             }
             @if (OverflowCount > 0)
             {
@@ -31,8 +43,15 @@
         <MudDivider Class="actions-bar-divider" />
         @foreach (PageAction action in Visible)
         {
-            <MudNavLink Icon="@action.Icon" IconColor="@ColorFor(action)" Disabled="@action.Disabled"
-                        OnClick="@(() => action.OnClick())">@action.Label</MudNavLink>
+            <div class="actions-bar-press"
+                 @onpointerdown="@(() => BeginLongPress(action))"
+                 @onpointerup="StopLongPress"
+                 @onpointercancel="StopLongPress"
+                 @onpointerleave="StopLongPress"
+                 @oncontextmenu:preventDefault="true">
+                <MudNavLink Icon="@action.Icon" IconColor="@ColorFor(action)" Disabled="@action.Disabled"
+                            OnClick="@(() => InvokeActionAsync(action))">@action.Label</MudNavLink>
+            </div>
         }
         @if (OverflowCount > 0)
         {

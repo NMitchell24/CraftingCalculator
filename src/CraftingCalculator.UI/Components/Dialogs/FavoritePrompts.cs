@@ -6,15 +6,15 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
 /// The prompt sequences for saving the current batch as a favorite and for loading one back into it,
-/// shared by the Craft and Favorites screens.
+/// used by the Craft screen.
 /// </summary>
 public static class FavoritePrompts
 {
     /// <summary>
     /// Confirms discarding the current batch when there is one, then loads <paramref name="favorite"/>
-    /// into <paramref name="state"/>. Returns true when the batch was replaced.
+    /// into <paramref name="state"/>.
     /// </summary>
-    public static async Task<bool> LoadAsync(IDialogService dialogs, ISnackbar snackbar, CraftState state, BlueprintFavorite favorite)
+    public static async Task LoadAsync(IDialogService dialogs, ISnackbar snackbar, CraftState state, BlueprintFavorite favorite)
     {
         // WPF replaced the working batch silently (BlueprintsViewModel.SelectedFav); on a phone that is
         // one mis-tap from discarding unsaved work.
@@ -27,14 +27,12 @@ public static class FavoritePrompts
 
             if (replace != true)
             {
-                return false;
+                return;
             }
         }
 
         await state.LoadFavoriteAsync(favorite);
         snackbar.Add($"Loaded '{favorite.Name}'", Severity.Success);
-
-        return true;
     }
 
     /// <summary>

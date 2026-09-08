@@ -19,9 +19,10 @@ public enum ActionsBarMode
 
 /// <summary>
 /// Renders a page's <see cref="PageAction"/>s, either as the bottom actions bar or as extra rows in the
-/// nav drawer. Actions past <see cref="MaxVisible"/> collapse into an overflow menu.
+/// nav drawer. Actions past <see cref="MaxVisible"/> collapse into an overflow menu, and an action that
+/// supplies <see cref="PageAction.OnLongPress"/> runs that instead when it is pressed and held.
 /// </summary>
-public partial class ActionsBar
+public partial class ActionsBar : IDisposable
 {
     [Parameter, EditorRequired] public IReadOnlyList<PageAction> Actions { get; set; } = [];
 
@@ -42,4 +43,81 @@ public partial class ActionsBar
     private int OverflowCount => Actions.Count - VisibleCount;
 
     private static Color ColorFor(PageAction action) => action.Active ? Color.Primary : Color.Default;
+
+    // Android's own threshold (ViewConfiguration.getLongPressTimeout), so a hold that feels long here
+    // feels long everywhere else on the device.
+    private const int LongPressMilliseconds = 500;
+
+    private CancellationTokenSource? _longPress;
+    private bool _longPressFired;
+
+    private void BeginLongPress(PageAction action)
+    {
+        StopLongPress();
+        _longPressFired = false;
+
+        if (action.OnLongPress is null || action.Disabled)
+        {
+            return;
+        }
+
+        CancellationTokenSource pressed = new();
+        _longPress = pressed;
+
+        _ = RunLongPressAsync(action.OnLongPress, pressed.Token);
+    }
+
+    private async Task RunLongPressAsync(Func<Task> onLongPress, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(LongPressMilliseconds, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        // Set before the handler runs, not after: releasing the finger fires pointerup and then click
+        // in immediate succession, and InvokeActionAsync reads this to swallow that click.
+        _longPressFired = true;
+
+        try
+        {
+            // Task.Delay resumes off the renderer's sync context, so the handler has to be marshalled back.
+            await InvokeAsync(onLongPress);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The component was torn down while the handler ran, so there is no renderer left to
+            // report to. Dispose cancels the token, but only the Task.Delay above observes it.
+        }
+        catch (Exception exception)
+        {
+            // BeginLongPress discards this task, so an escaping exception would fault it unobserved
+            // rather than surfacing. DispatchExceptionAsync routes it to the renderer the way an
+            // awaited EventCallback would.
+            await DispatchExceptionAsync(exception);
+        }
+    }
+
+    private void StopLongPress()
+    {
+        _longPress?.Cancel();
+        _longPress?.Dispose();
+        _longPress = null;
+    }
+
+    private Task InvokeActionAsync(PageAction action)
+    {
+        if (!_longPressFired)
+        {
+            return action.OnClick();
+        }
+
+        _longPressFired = false;
+        return Task.CompletedTask;
+    }
+
+    public void Dispose() => StopLongPress();
 }

@@ -282,6 +282,16 @@ html, body {
     padding-right: var(--edge-inset-right);
 }
 
+/* Wraps each action so ActionsBar.razor can hang pointer handlers on an element. The WebView's own
+   text selection and callout fire at about the same hold duration as the long-press gesture, and would
+   otherwise open a selection menu on top of it. No display rule: the span shrink-wraps its button as a
+   flex item of .actions-bar, and the div stays block inside the drawer's nav menu. */
+.actions-bar-press {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 /* Separates the page's actions from the three destinations above them (ActionsBar.razor, Drawer mode).
    The negative side margins undo MudNavMenu's own item inset so the rule spans the full rail. */
 .actions-bar-divider {
@@ -531,6 +541,13 @@ html, body {
     margin-bottom: 6px;
 }
 
+/* Delete Mode on the Dataset list. Scoped the same way as the card rule above rather than by class
+   alone, because that rule sets a background on every row and would otherwise win on specificity. */
+.mud-list > .mud-list-item.list-row-selected {
+    background-color: var(--mud-palette-primary-hover);
+    border-color: var(--mud-palette-primary);
+}
+
 /* MudSelect and MudMenu build their dropdowns out of the same .mud-list / .mud-list-item markup, so the
    rule above turns each option into a spaced card floating inside the popover - a panel of cards where
    a plain option list belongs. Dialogs are deliberately not excluded here: their lists are real content
@@ -545,6 +562,14 @@ html, body {
 .list-row-info {
     flex: 1 1 auto;
     min-width: 0;
+}
+
+/* The row's two action buttons have to hold their width whatever the name and caption beside them are:
+   left to the default flex-shrink they squeeze to one button's width and stack vertically, which is
+   what a long category description did. .list-row-info is the item that gives way instead. */
+.list-row-actions {
+    display: flex;
+    flex: 0 0 auto;
 }
 
 .list-row-stepper {
@@ -688,6 +713,13 @@ html, body {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+/* Pairs the card with its Actions Bar action, which carries the same icon. Sized against the title
+   rather than the default 24px so it reads as part of the heading and not as a second control. */
+.dataset-summary-icon {
+    flex: 0 0 auto;
+    font-size: 1.5rem;
 }
 
 .dataset-summary-info {
