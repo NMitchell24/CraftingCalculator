@@ -59,8 +59,8 @@ html, body {
     justify-content: center;
     padding: 0 32px;
     background-color: #2E3440;
-    /* Duration is mirrored by AppCloak.FadeDuration, which keeps the element mounted long enough for
-       this to play; change both together. */
+    /* appCloak.dismiss in index.html reads this duration back off the element to decide how long to
+       keep the cloak mounted, so its timer cannot drift out of step with this transition. */
     transition: opacity 300ms ease-out;
 }
 
