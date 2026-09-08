@@ -21,7 +21,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
     [Parameter, SupplyParameterFromQuery(Name = "copyFrom")] public int CopyFrom { get; set; }
 
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
-    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -58,19 +58,14 @@ public partial class DatasetEditor : ComponentBase, IDisposable
             return;
         }
 
-        AppBarState.Configure(this, new AppBarConfig(Title())
+        PageShellState.Configure(this, new PageShellConfig(Title())
         {
-            MenuItems = MenuItems(),
             BackHref = ListHref,
             TitleIsUserContent = Id > 0
         });
     }
 
     private string Title() => Id > 0 ? _record?.Name ?? "" : $"New {_type.GetDescription()}";
-
-    private IReadOnlyList<AppBarMenuItem> MenuItems() => Id > 0
-        ? [new AppBarMenuItem("Delete", Icons.Material.Filled.Delete, DeleteAsync)]
-        : [];
 
     private void MarkDirty() => _isDirty = true;
 
@@ -129,6 +124,6 @@ public partial class DatasetEditor : ComponentBase, IDisposable
     public void Dispose()
     {
         _navigationGuard?.Dispose();
-        AppBarState.Reset(this);
+        PageShellState.Reset(this);
     }
 }

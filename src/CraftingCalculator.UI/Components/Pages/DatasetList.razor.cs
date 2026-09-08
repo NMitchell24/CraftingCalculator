@@ -19,7 +19,7 @@ public partial class DatasetList : ComponentBase, IDisposable
     [Parameter] public string Type { get; set; } = "";
 
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
-    [Inject] private AppBarState AppBarState { get; set; } = null!;
+    [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -40,10 +40,10 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        AppBarState.Configure(this, new AppBarConfig(TitleFor(_type))
+        PageShellState.Configure(this, new PageShellConfig(TitleFor(_type))
         {
             BackHref = "/dataset",
-            PrimaryAction = new AppBarAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync)
+            Actions = [new PageAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync)]
         });
 
         await ReloadAsync();
@@ -96,5 +96,5 @@ public partial class DatasetList : ComponentBase, IDisposable
         return string.IsNullOrWhiteSpace(blueprint.Category?.Name) ? summary : $"{blueprint.Category.Name} · {summary}";
     }
 
-    public void Dispose() => AppBarState.Reset(this);
+    public void Dispose() => PageShellState.Reset(this);
 }

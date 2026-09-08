@@ -17,38 +17,23 @@
    value this component already has. *@
 <CascadingValue Value="_breakpoint ?? Breakpoint.Xs" IsFixed="false">
     <MudLayout>
-        @* Three tracks with equal-width sides (app.css) so the title is centred on the viewport no
-           matter how many icons each side holds - a MudSpacer would push it off-centre, since the
-           action side is always heavier than the back-arrow side. *@
+        @* Three tracks with equal-width sides (app.css) so the title is centred on the viewport rather
+           than on the space the icons leave - a MudSpacer would push it off-centre on every page
+           without a back arrow. The page's own actions live on the ActionsBar below, not up here. *@
         <MudAppBar Dense="true" Elevation="1" Style="padding-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));">
             <div class="app-bar-start">
-                @if (AppBarState.Config.BackHref is string backHref)
+                @if (PageShellState.Config.BackHref is string backHref)
                 {
                     <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Inherit" Href="@backHref"
                                    aria-label="Back" />
                 }
             </div>
 
-            <MudText Typo="Typo.h6" Class="@AppBarTitleClass">@AppBarState.Config.Title</MudText>
+            <MudText Typo="Typo.h6" Class="@AppBarTitleClass">@PageShellState.Config.Title</MudText>
 
             <div class="app-bar-end">
-                @if (AppBarState.Config.PrimaryAction is AppBarAction action)
-                {
-                    <MudIconButton Icon="@action.Icon" Color="Color.Inherit" Disabled="@action.Disabled"
-                                   OnClick="@(() => action.OnClick())" title="@action.Label" aria-label="@action.Label" />
-                }
                 <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" OnClick="ToggleSettings"
                                title="@SettingsActionLabel" aria-label="@SettingsActionLabel" />
-                @if (AppBarState.Config.MenuItems.Count > 0)
-                {
-                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" AriaLabel="More actions"
-                             AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                        @foreach (AppBarMenuItem item in AppBarState.Config.MenuItems)
-                        {
-                            <MudMenuItem Icon="@item.Icon" OnClick="@(() => item.OnClick())">@item.Text</MudMenuItem>
-                        }
-                    </MudMenu>
-                }
             </div>
         </MudAppBar>
 
@@ -64,13 +49,19 @@
                     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Calculate">Craft</MudNavLink>
                     <MudNavLink Href="/favorites" Icon="@Icons.Material.Filled.Star">Favorites</MudNavLink>
                     <MudNavLink Href="/dataset" Icon="@Icons.Material.Filled.MenuBook">Dataset</MudNavLink>
+                    <ActionsBar Actions="@PageShellState.Config.Actions" Mode="ActionsBarMode.Drawer" />
                 </MudNavMenu>
             </MudDrawer>
         }
 
-        <MudMainContent Class="@(ShowBottomNav ? "page-content page-content-with-bottom-nav" : "page-content")">
+        <MudMainContent Class="@MainContentClass">
             @Body
         </MudMainContent>
+
+        @if (ShowActionsBar)
+        {
+            <ActionsBar Actions="@PageShellState.Config.Actions" Mode="ActionsBarMode.BottomBar" />
+        }
 
         @if (ShowBottomNav)
         {
