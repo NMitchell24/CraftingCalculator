@@ -1,11 +1,16 @@
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using Android.Views;
 using AndroidX.Core.View;
 
 namespace CraftingCalculator.UI;
 
-[Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+// SoftInput.AdjustResize rather than MAUI's default, Pan, which slides the whole window up when the
+// keyboard opens and takes the status bar with it. App.xaml.cs sets the same mode through MAUI's own
+// platform configuration - that is the one that wins at runtime; this keeps the manifest honest.
+// Neither resizes the WebView under edge-to-edge, which is SafeAreaInsetsInjector's job.
+[Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, WindowSoftInputMode = SoftInput.AdjustResize, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 public class MainActivity : MauiAppCompatActivity
 {
     protected override void OnCreate(Bundle? savedInstanceState)

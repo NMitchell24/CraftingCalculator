@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <!-- Deliberately no interactive-widget=resizes-content here: this WebView ignores it (measured -
+         window.innerHeight does not change when the IME opens), and SafeAreaInsetsInjector shrinks the
+         WebView by the IME inset instead. If a future WebView honours the keyword, both would fire and
+         the layout viewport would shrink twice. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Crafting Calculator</title>
     <base href="/" />
