@@ -59,6 +59,13 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
+        // The router reuses this instance when only {Type} changes, so the previous type's rows,
+        // selection and mode would stay on screen for the length of the load below. SetMode clears
+        // them and re-declares the shell against the new type before anything is awaited.
+        _records = [];
+        _search = "";
+        SetMode(ListMode.Normal);
+
         await ReloadAsync();
     }
 
@@ -68,6 +75,9 @@ public partial class DatasetList : ComponentBase, IDisposable
         DataType.Component => "Components",
         _ => "Categories"
     };
+
+    /// <summary>The type's noun agreeing with <paramref name="count"/>, for text that counts records.</summary>
+    private static string NounFor(DataType type, int count) => count == 1 ? type.GetDescription() : TitleFor(type);
 
     private void ConfigureShell()
     {
@@ -210,7 +220,7 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        if (!await DatasetPrompts.ConfirmDeleteManyAsync(DialogService, _type, TitleFor(_type), selected.Count))
+        if (!await DatasetPrompts.ConfirmDeleteManyAsync(DialogService, _type, NounFor(_type, selected.Count), selected.Count))
         {
             SetMode(ListMode.Normal);
             return;
@@ -219,13 +229,13 @@ public partial class DatasetList : ComponentBase, IDisposable
         await DatasetService.DeleteRecordsAsync(selected);
         await ReloadAsync();
 
-        Snackbar.Add($"Deleted {selected.Count} {TitleFor(_type)}", Severity.Success);
+        Snackbar.Add($"Deleted {selected.Count} {NounFor(_type, selected.Count)}", Severity.Success);
         SetMode(ListMode.Normal);
     }
 
     private async Task DeleteAllAsync()
     {
-        if (!await DatasetPrompts.ConfirmDeleteManyAsync(DialogService, _type, TitleFor(_type), _records.Count))
+        if (!await DatasetPrompts.ConfirmDeleteManyAsync(DialogService, _type, NounFor(_type, _records.Count), _records.Count))
         {
             return;
         }

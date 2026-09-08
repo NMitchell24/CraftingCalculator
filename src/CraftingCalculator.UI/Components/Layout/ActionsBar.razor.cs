@@ -82,8 +82,23 @@ public partial class ActionsBar : IDisposable
         // in immediate succession, and InvokeActionAsync reads this to swallow that click.
         _longPressFired = true;
 
-        // Task.Delay resumes off the renderer's sync context, so the handler has to be marshalled back.
-        await InvokeAsync(onLongPress);
+        try
+        {
+            // Task.Delay resumes off the renderer's sync context, so the handler has to be marshalled back.
+            await InvokeAsync(onLongPress);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The component was torn down while the handler ran, so there is no renderer left to
+            // report to. Dispose cancels the token, but only the Task.Delay above observes it.
+        }
+        catch (Exception exception)
+        {
+            // BeginLongPress discards this task, so an escaping exception would fault it unobserved
+            // rather than surfacing. DispatchExceptionAsync routes it to the renderer the way an
+            // awaited EventCallback would.
+            await DispatchExceptionAsync(exception);
+        }
     }
 
     private void StopLongPress()
