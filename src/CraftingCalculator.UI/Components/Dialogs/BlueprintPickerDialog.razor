@@ -4,12 +4,14 @@
                       AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mb-2" />
 
         <div class="picker-chip-row mb-2">
-            <MudChipSet T="string" SelectedValue="@_selectedCategoryName" SelectedValueChanged="OnCategoryChanged"
+            <MudChipSet T="int" SelectedValue="@_selectedCategoryId" SelectedValueChanged="OnCategoryChanged"
                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
-                <MudChip Text="@CategoryModel.All" Value="@CategoryModel.All" />
+                @* Tertiary rather than the set's Primary: this chip is a filter control, not one of the
+                   user's categories, and a user is free to name a category "All" too. *@
+                <MudChip T="int" Text="@AllCategoriesLabel" Value="@AllCategoriesId" Color="Color.Tertiary" />
                 @foreach (Domain.Models.CategoryModel category in _categories)
                 {
-                    <MudChip Text="@category.Name" Value="@category.Name" />
+                    <MudChip T="int" Text="@category.Name" Value="@category.Id" />
                 }
             </MudChipSet>
         </div>

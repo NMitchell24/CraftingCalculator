@@ -7,7 +7,6 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class CategoryModel : IBaseDataRecord
 {
-    public const string All = "All";
     public string? Name { get; set; }
     public int Id { get; set; }
     public string? Description { get; set; }

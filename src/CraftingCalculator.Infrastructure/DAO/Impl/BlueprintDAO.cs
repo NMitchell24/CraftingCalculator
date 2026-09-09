@@ -8,17 +8,6 @@ namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
 public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IBlueprintDAO
 {
-    public async Task<List<BlueprintModel>> GetByCategoryAsync(CategoryModel category)
-    {
-        BlueprintGraph graph = await LoadGraphAsync();
-
-        IEnumerable<Blueprint> matching = category.Name == CategoryModel.All
-            ? graph.BlueprintsById.Values
-            : graph.BlueprintsById.Values.Where(blueprintEntity => blueprintEntity.CategoryId == category.Id);
-
-        return [.. matching.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, 0))];
-    }
-
     public async Task<BlueprintModel?> GetByIdAsync(int id)
     {
         BlueprintGraph graph = await LoadGraphAsync();

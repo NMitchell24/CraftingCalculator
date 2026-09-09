@@ -4,9 +4,7 @@ namespace CraftingCalculator.Application.Common.Interfaces.DAO;
 
 public interface ICategoryDAO
 {
-    /// <summary>
-    /// Returns all categories with the <see cref="CategoryModel.All"/> category first, then alphabetically.
-    /// </summary>
+    /// <summary>Returns all categories, ordered alphabetically by name.</summary>
     Task<List<CategoryModel>> GetAllAsync();
 
     Task<CategoryModel?> GetByIdAsync(int id);

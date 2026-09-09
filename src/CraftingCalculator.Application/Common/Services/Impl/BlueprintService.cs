@@ -7,8 +7,6 @@ namespace CraftingCalculator.Application.Common.Services.Impl;
 
 public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
 {
-    public Task<List<BlueprintModel>> GetBlueprintsByCategoryAsync(CategoryModel category) => dao.GetByCategoryAsync(category);
-
     public Task<BlueprintModel?> GetBlueprintByIdAsync(int id) => dao.GetByIdAsync(id);
 
     public Task<List<BlueprintModel>> GetAllBlueprintsAsync() => dao.GetAllAsync();

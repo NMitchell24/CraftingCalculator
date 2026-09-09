@@ -1,7 +1,6 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Application.Common.Services.Impl;
-using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using Moq;
@@ -49,31 +48,17 @@ public class DatasetServiceTests
     }
 
     [Test]
-    public async Task GetRecordsAsync_Category_ExcludesTheSeededAllCategory()
+    public async Task GetRecordsAsync_Category_ReturnsCategories()
     {
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
-            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.All },
-            new CategoryModel { Id = 2, Name = "Tools" }
+            new CategoryModel { Id = 2, Name = "Tools" },
+            new CategoryModel { Id = 7, Name = "All" }
         ]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
 
-        records.Should().ContainSingle().Which.Name.Should().Be("Tools");
-    }
-
-    [Test]
-    public async Task GetRecordsAsync_Category_KeepsAUserCategoryNamedAll()
-    {
-        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
-        [
-            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.All },
-            new CategoryModel { Id = 7, Name = CategoryModel.All }
-        ]);
-
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
-
-        records.Should().ContainSingle().Which.Id.Should().Be(7);
+        records.Select(record => record.Name).Should().Equal("Tools", "All");
     }
 
     [Test]
@@ -166,16 +151,16 @@ public class DatasetServiceTests
     }
 
     [Test]
-    public async Task DeleteAllOfTypeAsync_Category_KeepsTheSeededAllCategory()
+    public async Task DeleteAllOfTypeAsync_Category_DeletesEveryCategory()
     {
-        CategoryModel all = new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.All };
-        CategoryModel tools = new CategoryModel { Id = 2, Name = "Tools" };
-        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([all, tools]);
+        CategoryModel building = new() { Id = 1, Name = "Building" };
+        CategoryModel tools = new() { Id = 2, Name = "Tools" };
+        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([building, tools]);
 
         await _service.DeleteAllOfTypeAsync(DataType.Category);
 
+        _categoryService.Verify(s => s.DeleteCategoryAsync(building), Times.Once);
         _categoryService.Verify(s => s.DeleteCategoryAsync(tools), Times.Once);
-        _categoryService.Verify(s => s.DeleteCategoryAsync(all), Times.Never);
     }
 
     [Test]

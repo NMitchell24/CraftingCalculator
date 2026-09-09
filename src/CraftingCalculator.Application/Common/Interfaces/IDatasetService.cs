@@ -9,11 +9,7 @@ namespace CraftingCalculator.Application.Common.Interfaces;
 /// </summary>
 public interface IDatasetService
 {
-    /// <summary>
-    /// Every record of <paramref name="type"/>, ordered by name.
-    /// <see cref="DataType.Category"/> excludes the seeded <see cref="CategoryModel.All"/> row,
-    /// which is a category sentinel rather than a category a user can edit.
-    /// </summary>
+    /// <summary>Every record of <paramref name="type"/>, ordered by name.</summary>
     Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type);
 
     /// <summary>Returns the record, or null when no record of that type has that id.</summary>
@@ -30,9 +26,6 @@ public interface IDatasetService
     /// <summary>Deletes every record in <paramref name="records"/>, of any mix of types.</summary>
     Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records);
 
-    /// <summary>
-    /// Deletes every record of <paramref name="type"/> that <see cref="GetRecordsAsync"/> returns -
-    /// so for <see cref="DataType.Category"/> the seeded <see cref="CategoryModel.All"/> row survives.
-    /// </summary>
+    /// <summary>Deletes every record of <paramref name="type"/>.</summary>
     Task DeleteAllOfTypeAsync(DataType type);
 }
