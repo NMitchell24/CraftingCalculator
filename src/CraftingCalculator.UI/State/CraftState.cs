@@ -65,9 +65,9 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// </summary>
     public string? LoadedFavoriteName { get; private set; }
 
-    public void AddBlueprints(IEnumerable<Blueprint> blueprints)
+    public void AddBlueprints(IEnumerable<BlueprintModel> blueprints)
     {
-        foreach (Blueprint blueprint in blueprints)
+        foreach (BlueprintModel blueprint in blueprints)
         {
             _blueprintMap.Add(blueprint, 1);
         }

@@ -4,15 +4,15 @@ namespace CraftingCalculator.Application.Common.Interfaces;
 
 public interface IComponentService
 {
-    Task<List<Component>> GetAllComponentsAsync();
+    Task<List<ComponentModel>> GetAllComponentsAsync();
 
-    Task<Component?> GetComponentByIdAsync(int id);
+    Task<ComponentModel?> GetComponentByIdAsync(int id);
 
     /// <summary>
-    /// Saves or adds the component. If <see cref="Component.Id"/> is 0 a new one is added,
+    /// Saves or adds the component. If <see cref="ComponentModel.Id"/> is 0 a new one is added,
     /// otherwise the existing record is updated.
     /// </summary>
-    Task SaveComponentAsync(Component? component);
+    Task SaveComponentAsync(ComponentModel? component);
 
-    Task DeleteComponentAsync(Component? component);
+    Task DeleteComponentAsync(ComponentModel? component);
 }

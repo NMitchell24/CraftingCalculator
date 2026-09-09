@@ -12,15 +12,15 @@ public partial class BlueprintPickerDialog : ComponentBase
     [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
     [Inject] private ICategoryService CategoryService { get; set; } = null!;
 
-    private List<Blueprint> _blueprints = [];
-    private List<Category> _categories = [];
-    private IReadOnlyCollection<Blueprint> _selected = [];
+    private List<BlueprintModel> _blueprints = [];
+    private List<CategoryModel> _categories = [];
+    private IReadOnlyCollection<BlueprintModel> _selected = [];
     private string _search = "";
-    private string _selectedCategoryName = Category.ALL;
+    private string _selectedCategoryName = CategoryModel.ALL;
 
-    private List<Blueprint> _filteredBlueprints =>
+    private List<BlueprintModel> _filteredBlueprints =>
         [.. _blueprints.Where(blueprint =>
-            (_selectedCategoryName == Category.ALL || blueprint.Category?.Name == _selectedCategoryName) &&
+            (_selectedCategoryName == CategoryModel.ALL || blueprint.Category?.Name == _selectedCategoryName) &&
             (string.IsNullOrWhiteSpace(_search) || (blueprint.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false)))];
 
     protected override async Task OnInitializedAsync()

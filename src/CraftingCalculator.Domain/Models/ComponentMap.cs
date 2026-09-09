@@ -6,13 +6,9 @@ namespace CraftingCalculator.Domain.Models;
 
 public class ComponentMap
 {
-    private List<ComponentQuantity> _internalList = new List<ComponentQuantity>();
-    public ReadOnlyCollection<ComponentQuantity> ComponentList
-    {
-        get => _internalList.AsReadOnly();
-        private set { }
-    }
-    public List<ComponentQuantity> RemovedComponents = new List<ComponentQuantity>();
+    private readonly List<ComponentQuantity> _internalList = new List<ComponentQuantity>();
+    public ReadOnlyCollection<ComponentQuantity> ComponentList => _internalList.AsReadOnly();
+    public List<ComponentQuantity> RemovedComponents { get; } = new List<ComponentQuantity>();
 
     public ComponentMap(ComponentMap map, bool cloneForSave)
     {
@@ -43,7 +39,7 @@ public class ComponentMap
     /// </summary>
     /// <param name="component"></param>
     /// <param name="quantity"></param>
-    public void Add(Component? component, long quantity)
+    public void Add(ComponentModel? component, long quantity)
     {
         if (component != null)
         {
@@ -51,7 +47,7 @@ public class ComponentMap
         }
     }
 
-    public void Add(Component component, long quantity, int id)
+    public void Add(ComponentModel component, long quantity, int id)
     {
         if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name))
         {
@@ -74,7 +70,7 @@ public class ComponentMap
     /// </summary>
     /// <param name="component"></param>
     /// <param name="quantity"></param>
-    public void Remove(Component component, long quantity)
+    public void Remove(ComponentModel component, long quantity)
     {
         if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name && componentQuantity.Quantity - quantity > 0))
         {
@@ -91,7 +87,7 @@ public class ComponentMap
     /// Remove a Component from the list entirely if it exists.
     /// </summary>
     /// <param name="component"></param>
-    public void RemoveAll(Component component)
+    public void RemoveAll(ComponentModel component)
     {
         if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name))
         {

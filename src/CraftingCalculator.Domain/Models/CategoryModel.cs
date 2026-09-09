@@ -5,7 +5,7 @@ namespace CraftingCalculator.Domain.Models;
 /// <summary>
 /// Simple Class to define the UI Model for Categories
 /// </summary>
-public class Category : IBaseDataRecord
+public class CategoryModel : IBaseDataRecord
 {
     public const string ALL = "All";
     public string? Name { get; set; }
@@ -24,7 +24,7 @@ public class Category : IBaseDataRecord
 
     public IBaseDataRecord Clone()
     {
-        Category clone = new Category()
+        CategoryModel clone = new CategoryModel()
         {
             Id = this.Id,
             Name = this.Name,
@@ -36,7 +36,7 @@ public class Category : IBaseDataRecord
 
     public IBaseDataRecord CopyForSave()
     {
-        Category ret = (Category)Clone();
+        CategoryModel ret = (CategoryModel)Clone();
         ret.Name += " - Copy";
         ret.Id = 0;
 

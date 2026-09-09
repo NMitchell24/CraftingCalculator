@@ -24,7 +24,7 @@ public class FavoriteServiceTests
     public async Task SaveFavoriteAsync_SavesFavoriteAndItsQuantitiesThroughDAO()
     {
         BlueprintFavorite favorite = new BlueprintFavorite { Name = "My Batch" };
-        List<BlueprintQuantity> quantities = [new BlueprintQuantity(new Blueprint { Name = "Widget" }, 2, 0)];
+        List<BlueprintQuantity> quantities = [new BlueprintQuantity(new BlueprintModel { Name = "Widget" }, 2, 0)];
 
         await _service.SaveFavoriteAsync(favorite, quantities);
 

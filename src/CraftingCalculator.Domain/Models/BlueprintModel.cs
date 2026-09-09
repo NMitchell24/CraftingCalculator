@@ -1,4 +1,5 @@
 using CraftingCalculator.Domain.Enums;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System;
 
@@ -7,14 +8,14 @@ namespace CraftingCalculator.Domain.Models;
 /// <summary>
 /// Represents an individual UI Model for the Blueprints
 /// </summary>
-public class Blueprint : IBaseDataRecord
+public class BlueprintModel : IBaseDataRecord
 {
     public ComponentMap Components { get; private set; }
     public BlueprintMap ChildBlueprints { get; private set; }
     public string? Name { get; set; }
     public int Id { get; set; }
     public string? Description { get; set; }
-    public Category? Category { get; set; }
+    public CategoryModel? Category { get; set; }
     public double Value { get; set; }
 
     /// <summary>
@@ -41,6 +42,8 @@ public class Blueprint : IBaseDataRecord
         set => field = value < TimeSpan.Zero ? TimeSpan.Zero : value;
     }
 
+    [SuppressMessage("Major Code Smell", "S2325",
+        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public string Tooltip
     {
         get
@@ -84,9 +87,12 @@ public class Blueprint : IBaseDataRecord
         {
             // Computed from Name/Description/Components - the setter exists only to satisfy
             // IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
+            _ = value;
         }
     }
 
+    [SuppressMessage("Major Code Smell", "S2325",
+        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public DataType Type
     {
         get
@@ -97,13 +103,14 @@ public class Blueprint : IBaseDataRecord
         set
         {
             //Don't allow this to be changed as it should remain static.
+            _ = value;
         }
     }
 
     /// <summary>
     /// Default constructor.  ensures maps are initialized.
     /// </summary>
-    public Blueprint()
+    public BlueprintModel()
     {
         Components = new ComponentMap();
         ChildBlueprints = new BlueprintMap();
@@ -111,9 +118,11 @@ public class Blueprint : IBaseDataRecord
 
     public bool IsSelected { get; set; }
 
+    [SuppressMessage("Major Code Smell", "S2325",
+        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public IBaseDataRecord Clone()
     {
-        Blueprint clone = new()
+        BlueprintModel clone = new()
         {
             Id = Id,
             Name = Name,
@@ -129,9 +138,11 @@ public class Blueprint : IBaseDataRecord
         return clone;
     }
 
+    [SuppressMessage("Major Code Smell", "S2325",
+        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public IBaseDataRecord CopyForSave()
     {
-        Blueprint ret = (Blueprint)Clone();
+        BlueprintModel ret = (BlueprintModel)Clone();
         ret.Name += " - Copy";
         ret.Id = 0;
         ret.Components = Components.CloneForSave();

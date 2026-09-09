@@ -98,7 +98,7 @@ public partial class Craft : ComponentBase, IDisposable
         IDialogReference dialogRef = await DialogService.ShowAsync<BlueprintPickerDialog>("Select Blueprints to Craft", options);
         DialogResult? result = await dialogRef.Result;
 
-        if (result is { Canceled: false } && result.Data is IReadOnlyCollection<Blueprint> selected)
+        if (result is { Canceled: false } && result.Data is IReadOnlyCollection<BlueprintModel> selected)
         {
             State.AddBlueprints(selected);
         }

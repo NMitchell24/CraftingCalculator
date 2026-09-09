@@ -5,12 +5,12 @@ using NUnit.Framework;
 namespace CraftingCalculator.Application.UnitTests.Domain.Models;
 
 [TestFixture]
-public class BlueprintTests
+public class BlueprintModelTests
 {
     [Test]
     public void Tooltip_Setter_IsInertAndDoesNotRecurse()
     {
-        Blueprint blueprint = new Blueprint { Id = 1, Name = "Frame", Description = "A frame" };
+        BlueprintModel blueprint = new BlueprintModel { Id = 1, Name = "Frame", Description = "A frame" };
         string computed = blueprint.Tooltip;
 
         blueprint.Tooltip = "anything";
@@ -21,7 +21,7 @@ public class BlueprintTests
     [Test]
     public void Tooltip_Setter_IsInertThroughTheInterface()
     {
-        IBaseDataRecord record = new Blueprint { Id = 1, Name = "Frame", Description = "A frame" };
+        IBaseDataRecord record = new BlueprintModel { Id = 1, Name = "Frame", Description = "A frame" };
         string computed = record.Tooltip;
 
         record.Tooltip = "anything";
@@ -32,7 +32,7 @@ public class BlueprintTests
     [Test]
     public void Yield_DefaultsToOne()
     {
-        new Blueprint().Yield.Should().Be(1);
+        new BlueprintModel().Yield.Should().Be(1);
     }
 
     [TestCase(0)]
@@ -40,7 +40,7 @@ public class BlueprintTests
     [TestCase(-100)]
     public void Yield_BelowOne_ClampsToOne(long yield)
     {
-        Blueprint blueprint = new Blueprint { Yield = yield };
+        BlueprintModel blueprint = new BlueprintModel { Yield = yield };
 
         blueprint.Yield.Should().Be(1);
     }
@@ -48,9 +48,9 @@ public class BlueprintTests
     [Test]
     public void Clone_CarriesTheYield()
     {
-        Blueprint blueprint = new Blueprint { Id = 1, Name = "Bracket", Yield = 4 };
+        BlueprintModel blueprint = new BlueprintModel { Id = 1, Name = "Bracket", Yield = 4 };
 
-        Blueprint clone = (Blueprint)blueprint.Clone();
+        BlueprintModel clone = (BlueprintModel)blueprint.Clone();
 
         clone.Yield.Should().Be(4);
     }
@@ -58,8 +58,8 @@ public class BlueprintTests
     [Test]
     public void Tooltip_ShowsTheYieldOnlyWhenItIsAboveOne()
     {
-        Blueprint single = new Blueprint { Id = 1, Name = "Frame" };
-        Blueprint batched = new Blueprint { Id = 1, Name = "Bracket", Yield = 2 };
+        BlueprintModel single = new BlueprintModel { Id = 1, Name = "Frame" };
+        BlueprintModel batched = new BlueprintModel { Id = 1, Name = "Bracket", Yield = 2 };
 
         single.Tooltip.Should().NotContain("Yield");
         batched.Tooltip.Should().Contain("Yield per Craft: 2");

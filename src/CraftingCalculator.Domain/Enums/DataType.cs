@@ -21,18 +21,13 @@ public static class DataTypeExtensions
 {
     public static string GetDescription(this Enum value)
     {
-        Type? type = value.GetType();
+        Type type = value.GetType();
         string? name = Enum.GetName(type, value);
-        if (name != null)
+        if (name != null
+            && type.GetField(name) is { } field
+            && Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attr)
         {
-            FieldInfo? field = type.GetField(name);
-            if (field != null)
-            {
-                if (Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attr)
-                {
-                    return attr.Description;
-                }
-            }
+            return attr.Description;
         }
         return "";
     }
@@ -41,10 +36,10 @@ public static class DataTypeExtensions
     {
         return value switch
         {
-            DataType.Component => new Component(),
-            DataType.Blueprint => new Blueprint(),
-            DataType.Category => new Category(),
-            _ => new Component(),
+            DataType.Component => new ComponentModel(),
+            DataType.Blueprint => new BlueprintModel(),
+            DataType.Category => new CategoryModel(),
+            _ => new ComponentModel(),
         };
     }
 }

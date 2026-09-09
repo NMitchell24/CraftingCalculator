@@ -23,10 +23,10 @@ public class BlueprintServiceTests
     [Test]
     public async Task GetBlueprintByIdAsync_DelegatesToDAO()
     {
-        Blueprint blueprint = new Blueprint { Id = 5, Name = "Widget" };
+        BlueprintModel blueprint = new BlueprintModel { Id = 5, Name = "Widget" };
         _dao.Setup(d => d.GetByIdAsync(5)).ReturnsAsync(blueprint);
 
-        Blueprint? result = await _service.GetBlueprintByIdAsync(5);
+        BlueprintModel? result = await _service.GetBlueprintByIdAsync(5);
 
         result.Should().BeSameAs(blueprint);
     }
@@ -36,13 +36,13 @@ public class BlueprintServiceTests
     {
         await _service.SaveBlueprintAsync(null);
 
-        _dao.Verify(d => d.SaveAsync(It.IsAny<Blueprint>()), Times.Never);
+        _dao.Verify(d => d.SaveAsync(It.IsAny<BlueprintModel>()), Times.Never);
     }
 
     [Test]
     public async Task SaveBlueprintAsync_SavesThroughDAO()
     {
-        Blueprint blueprint = new Blueprint { Name = "Widget" };
+        BlueprintModel blueprint = new BlueprintModel { Name = "Widget" };
 
         await _service.SaveBlueprintAsync(blueprint);
 
@@ -52,7 +52,7 @@ public class BlueprintServiceTests
     [Test]
     public async Task DeleteBlueprintAsync_DeletesById()
     {
-        Blueprint blueprint = new Blueprint { Id = 7, Name = "Widget" };
+        BlueprintModel blueprint = new BlueprintModel { Id = 7, Name = "Widget" };
 
         await _service.DeleteBlueprintAsync(blueprint);
 
@@ -62,8 +62,8 @@ public class BlueprintServiceTests
     [Test]
     public void GetBlueprintNode_BuildsNodePerComponent()
     {
-        Blueprint blueprint = new Blueprint { Name = "Widget" };
-        blueprint.Components.Add(new Component { Name = "Screw" }, 1);
+        BlueprintModel blueprint = new BlueprintModel { Name = "Widget" };
+        blueprint.Components.Add(new ComponentModel { Name = "Screw" }, 1);
 
         BlueprintNode tree = _service.GetBlueprintNode(blueprint, 3);
 

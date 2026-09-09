@@ -4,15 +4,15 @@ namespace CraftingCalculator.Application.Common.Interfaces.DAO;
 
 public interface IComponentDAO
 {
-    Task<List<Component>> GetAllAsync();
+    Task<List<ComponentModel>> GetAllAsync();
 
-    Task<Component?> GetByIdAsync(int id);
+    Task<ComponentModel?> GetByIdAsync(int id);
 
     /// <summary>
-    /// Adds the component if <see cref="Component.Id"/> is 0, otherwise updates the existing record.
-    /// Returns the saved component with its assigned <see cref="Component.Id"/>.
+    /// Adds the component if <see cref="ComponentModel.Id"/> is 0, otherwise updates the existing record.
+    /// Returns the saved component with its assigned <see cref="ComponentModel.Id"/>.
     /// </summary>
-    Task<Component> SaveAsync(Component component);
+    Task<ComponentModel> SaveAsync(ComponentModel component);
 
     Task DeleteAsync(int id);
 }

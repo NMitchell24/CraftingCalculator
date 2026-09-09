@@ -6,13 +6,13 @@ namespace CraftingCalculator.Application.Common.Services.Impl;
 
 public class CategoryService(ICategoryDAO dao) : ICategoryService
 {
-    public Task<List<Category>> GetCategoriesAsync() => dao.GetAllAsync();
+    public Task<List<CategoryModel>> GetCategoriesAsync() => dao.GetAllAsync();
 
-    public Task<Category?> GetCategoryByIdAsync(int id) => dao.GetByIdAsync(id);
+    public Task<CategoryModel?> GetCategoryByIdAsync(int id) => dao.GetByIdAsync(id);
 
-    public Task SaveCategoryAsync(Category? category)
+    public Task SaveCategoryAsync(CategoryModel? category)
         => category != null ? dao.SaveAsync(category) : Task.CompletedTask;
 
-    public Task DeleteCategoryAsync(Category? category)
+    public Task DeleteCategoryAsync(CategoryModel? category)
         => category != null ? dao.DeleteAsync(category.Id) : Task.CompletedTask;
 }

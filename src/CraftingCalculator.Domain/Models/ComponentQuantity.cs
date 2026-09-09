@@ -9,7 +9,7 @@ namespace CraftingCalculator.Domain.Models;
 public class ComponentQuantity : IBaseQuantityRecord
 {
     public int Id { get; set; }
-    public Component Component { get; set; }
+    public ComponentModel Component { get; set; }
     public long Quantity { get; set; }
 
     public string Name
@@ -56,7 +56,7 @@ public class ComponentQuantity : IBaseQuantityRecord
 
     public string DisplayName => Name + " x" + Quantity;
 
-    public ComponentQuantity(Component component, long quantity, int id)
+    public ComponentQuantity(ComponentModel component, long quantity, int id)
     {
         Component = component;
         Quantity = quantity;

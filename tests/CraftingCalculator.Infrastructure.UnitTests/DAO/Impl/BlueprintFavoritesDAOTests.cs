@@ -25,8 +25,8 @@ public class BlueprintFavoritesDAOTests
     [Test]
     public async Task GetAllAsync_ReturnsEachFavoritesSavedBlueprintCount()
     {
-        Blueprint plank = await _blueprintDAO.SaveAsync(new Blueprint { Name = "Plank" });
-        Blueprint table = await _blueprintDAO.SaveAsync(new Blueprint { Name = "Table" });
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+        BlueprintModel table = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Table" });
 
         await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Two" },
             [new BlueprintQuantity(plank, 3, 0), new BlueprintQuantity(table, 1, 0)]);
@@ -42,7 +42,7 @@ public class BlueprintFavoritesDAOTests
     [Test]
     public async Task RenameAsync_ChangesTheNameAndLeavesTheSavedQuantitiesIntact()
     {
-        Blueprint plank = await _blueprintDAO.SaveAsync(new Blueprint { Name = "Plank" });
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
         BlueprintFavorite saved = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Old" },
             [new BlueprintQuantity(plank, 7, 0)]);
 

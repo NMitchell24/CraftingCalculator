@@ -1,49 +1,45 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
+using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using ComponentEntity = CraftingCalculator.Domain.Entities.Component;
-using BlueprintChildEntity = CraftingCalculator.Domain.Entities.BlueprintChild;
-using BlueprintEntity = CraftingCalculator.Domain.Entities.Blueprint;
-using CategoryEntity = CraftingCalculator.Domain.Entities.Category;
-using BlueprintComponentEntity = CraftingCalculator.Domain.Entities.BlueprintComponent;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
 public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IBlueprintDAO
 {
-    public async Task<List<Blueprint>> GetByCategoryAsync(Category category)
+    public async Task<List<BlueprintModel>> GetByCategoryAsync(CategoryModel category)
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        IEnumerable<BlueprintEntity> matching = category.Name == Category.ALL
+        IEnumerable<Blueprint> matching = category.Name == CategoryModel.ALL
             ? graph.BlueprintsById.Values
             : graph.BlueprintsById.Values.Where(blueprintEntity => blueprintEntity.CategoryId == category.Id);
 
         return [.. matching.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, 0))];
     }
 
-    public async Task<Blueprint?> GetByIdAsync(int id)
+    public async Task<BlueprintModel?> GetByIdAsync(int id)
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        return graph.BlueprintsById.TryGetValue(id, out BlueprintEntity? entity) ? BuildModel(entity, graph, 0) : null;
+        return graph.BlueprintsById.TryGetValue(id, out Blueprint? entity) ? BuildModel(entity, graph, 0) : null;
     }
 
-    public async Task<List<Blueprint>> GetAllAsync()
+    public async Task<List<BlueprintModel>> GetAllAsync()
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
         return [.. graph.BlueprintsById.Values.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, 0))];
     }
 
-    public async Task<Blueprint> SaveAsync(Blueprint blueprint)
+    public async Task<BlueprintModel> SaveAsync(BlueprintModel blueprint)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        BlueprintEntity entity = blueprint.Id > 0
+        Blueprint entity = blueprint.Id > 0
             ? await context.Blueprints.Include(blueprintEntity => blueprintEntity.Components).FirstAsync(blueprintEntity => blueprintEntity.Id == blueprint.Id)
-            : new BlueprintEntity();
+            : new Blueprint();
 
         entity.Name = blueprint.Name ?? "";
         entity.Description = blueprint.Description ?? "";
@@ -59,7 +55,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
         foreach (ComponentQuantity removed in blueprint.Components.RemovedComponents.Where(componentQuantity => componentQuantity.Id > 0))
         {
-            BlueprintComponentEntity? toRemove = entity.Components.FirstOrDefault(blueprintComponent => blueprintComponent.Id == removed.Id);
+            BlueprintComponent? toRemove = entity.Components.FirstOrDefault(blueprintComponent => blueprintComponent.Id == removed.Id);
             if (toRemove != null)
             {
                 context.BlueprintComponents.Remove(toRemove);
@@ -75,7 +71,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             }
             else
             {
-                entity.Components.Add(new BlueprintComponentEntity { ComponentId = componentQuantity.Component.Id, Quantity = componentQuantity.Quantity });
+                entity.Components.Add(new BlueprintComponent { ComponentId = componentQuantity.Component.Id, Quantity = componentQuantity.Quantity });
             }
         }
 
@@ -92,12 +88,12 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         {
             if (blueprintQuantity.Id > 0)
             {
-                BlueprintChildEntity existing = await context.BlueprintChildren.FirstAsync(link => link.Id == blueprintQuantity.Id);
+                BlueprintChild existing = await context.BlueprintChildren.FirstAsync(link => link.Id == blueprintQuantity.Id);
                 existing.Quantity = blueprintQuantity.Quantity;
             }
             else
             {
-                context.BlueprintChildren.Add(new BlueprintChildEntity
+                context.BlueprintChildren.Add(new BlueprintChild
                 {
                     ParentBlueprintId = entity.Id,
                     ChildBlueprintId = blueprintQuantity.Blueprint.Id,
@@ -127,28 +123,28 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        Dictionary<int, ComponentEntity> componentsById =
+        Dictionary<int, Component> componentsById =
             await context.Components.AsNoTracking().ToDictionaryAsync(component => component.Id);
-        Dictionary<int, CategoryEntity> categoriesById =
+        Dictionary<int, Category> categoriesById =
             await context.Categories.AsNoTracking().ToDictionaryAsync(category => category.Id);
-        Dictionary<int, BlueprintEntity> blueprintsById =
+        Dictionary<int, Blueprint> blueprintsById =
             await context.Blueprints.AsNoTracking().ToDictionaryAsync(blueprintEntity => blueprintEntity.Id);
-        ILookup<int, BlueprintComponentEntity> componentsByBlueprintId =
+        ILookup<int, BlueprintComponent> componentsByBlueprintId =
             (await context.BlueprintComponents.AsNoTracking().ToListAsync()).ToLookup(blueprintComponent => blueprintComponent.BlueprintId);
-        ILookup<int, BlueprintChildEntity> childrenByParentId =
+        ILookup<int, BlueprintChild> childrenByParentId =
             (await context.BlueprintChildren.AsNoTracking().ToListAsync()).ToLookup(blueprintChild => blueprintChild.ParentBlueprintId);
 
         return new BlueprintGraph(blueprintsById, componentsById, categoriesById, componentsByBlueprintId, childrenByParentId);
     }
 
     /// <summary>
-    /// Recursively hydrates a full <see cref="Blueprint"/> model (components and, recursively, child
+    /// Recursively hydrates a full <see cref="BlueprintModel"/> model (components and, recursively, child
     /// blueprints) from the in-memory graph. The app does not otherwise detect a cycle in the blueprint
     /// graph (see the "no cycle guard" parity issue), so an A -> B -> A pair would recurse
     /// indefinitely; the shared <see cref="BlueprintProcessor.MaxBlueprintDepth"/> bound turns that into a
     /// catchable exception instead of a StackOverflowException.
     /// </summary>
-    private static Blueprint BuildModel(BlueprintEntity entity, BlueprintGraph graph, int depth)
+    private static BlueprintModel BuildModel(Blueprint entity, BlueprintGraph graph, int depth)
     {
         if (depth > BlueprintProcessor.MaxBlueprintDepth)
         {
@@ -156,7 +152,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
                 $"Blueprint graph exceeded the maximum depth of {BlueprintProcessor.MaxBlueprintDepth}; check for a cycle involving '{entity.Name}'.");
         }
 
-        Blueprint model = new()
+        BlueprintModel model = new()
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -166,22 +162,22 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             ProductionTime = entity.ProductionTime
         };
 
-        if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out CategoryEntity? categoryEntity))
+        if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out Category? categoryEntity))
         {
             model.Category = ToCategoryModel(categoryEntity);
         }
 
-        foreach (BlueprintComponentEntity blueprintComponent in graph.ComponentsByBlueprintId[entity.Id])
+        foreach (BlueprintComponent blueprintComponent in graph.ComponentsByBlueprintId[entity.Id])
         {
-            if (graph.ComponentsById.TryGetValue(blueprintComponent.ComponentId, out ComponentEntity? componentEntity))
+            if (graph.ComponentsById.TryGetValue(blueprintComponent.ComponentId, out Component? componentEntity))
             {
                 model.Components.Add(ToComponentModel(componentEntity), blueprintComponent.Quantity, blueprintComponent.Id);
             }
         }
 
-        foreach (BlueprintChildEntity blueprintChild in graph.ChildrenByParentId[entity.Id])
+        foreach (BlueprintChild blueprintChild in graph.ChildrenByParentId[entity.Id])
         {
-            if (graph.BlueprintsById.TryGetValue(blueprintChild.ChildBlueprintId, out BlueprintEntity? childEntity))
+            if (graph.BlueprintsById.TryGetValue(blueprintChild.ChildBlueprintId, out Blueprint? childEntity))
             {
                 model.ChildBlueprints.Add(BuildModel(childEntity, graph, depth + 1), blueprintChild.Quantity, blueprintChild.Id);
             }
@@ -190,14 +186,14 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         return model;
     }
 
-    private static Category ToCategoryModel(CategoryEntity entity) => new()
+    private static CategoryModel ToCategoryModel(Category entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
         Description = entity.Description
     };
 
-    private static Component ToComponentModel(ComponentEntity entity) => new()
+    private static ComponentModel ToComponentModel(Component entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
@@ -207,9 +203,9 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     };
 
     private sealed record BlueprintGraph(
-        Dictionary<int, BlueprintEntity> BlueprintsById,
-        Dictionary<int, ComponentEntity> ComponentsById,
-        Dictionary<int, CategoryEntity> CategoriesById,
-        ILookup<int, BlueprintComponentEntity> ComponentsByBlueprintId,
-        ILookup<int, BlueprintChildEntity> ChildrenByParentId);
+        Dictionary<int, Blueprint> BlueprintsById,
+        Dictionary<int, Component> ComponentsById,
+        Dictionary<int, Category> CategoriesById,
+        ILookup<int, BlueprintComponent> ComponentsByBlueprintId,
+        ILookup<int, BlueprintChild> ChildrenByParentId);
 }

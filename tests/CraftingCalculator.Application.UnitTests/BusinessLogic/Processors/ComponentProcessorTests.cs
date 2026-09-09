@@ -11,7 +11,7 @@ public class ComponentProcessorTests
     [Test]
     public void CombineComponents_AddsSourceQuantitiesOntoDestination()
     {
-        Component component = new Component { Id = 1, Name = "Test", Description = "Test" };
+        ComponentModel component = new ComponentModel { Id = 1, Name = "Test", Description = "Test" };
 
         ComponentMap source = new ComponentMap();
         source.Add(component, 5);
@@ -29,7 +29,7 @@ public class ComponentProcessorTests
     [Test]
     public void CombineComponents_MultipliesSourceQuantityBeforeAdding()
     {
-        Component component = new Component { Id = 1, Name = "Test" };
+        ComponentModel component = new ComponentModel { Id = 1, Name = "Test" };
 
         ComponentMap source = new ComponentMap();
         source.Add(component, 5);

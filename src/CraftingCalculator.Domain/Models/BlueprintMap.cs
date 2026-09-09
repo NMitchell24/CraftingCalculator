@@ -6,13 +6,9 @@ namespace CraftingCalculator.Domain.Models;
 
 public class BlueprintMap
 {
-    private List<BlueprintQuantity> _internalList = new List<BlueprintQuantity>();
-    public ReadOnlyCollection<BlueprintQuantity> BlueprintList
-    {
-        get => _internalList.AsReadOnly();
-        private set { }
-    }
-    public List<BlueprintQuantity> RemovedBlueprints = new List<BlueprintQuantity>();
+    private readonly List<BlueprintQuantity> _internalList = new List<BlueprintQuantity>();
+    public ReadOnlyCollection<BlueprintQuantity> BlueprintList => _internalList.AsReadOnly();
+    public List<BlueprintQuantity> RemovedBlueprints { get; } = new List<BlueprintQuantity>();
 
     public BlueprintMap(BlueprintMap map, bool cloneForSave)
     {
@@ -42,7 +38,7 @@ public class BlueprintMap
     /// </summary>
     /// <param name="blueprint"></param>
     /// <param name="quantity"></param>
-    public void Add(Blueprint? blueprint, long quantity)
+    public void Add(BlueprintModel? blueprint, long quantity)
     {
         if (blueprint != null)
         {
@@ -56,7 +52,7 @@ public class BlueprintMap
     /// <param name="blueprint"></param>
     /// <param name="quantity"></param>
     /// <param name="id"></param>
-    public void Add(Blueprint blueprint, long quantity, int id)
+    public void Add(BlueprintModel blueprint, long quantity, int id)
     {
         if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name))
         {
@@ -79,7 +75,7 @@ public class BlueprintMap
     /// </summary>
     /// <param name="blueprint"></param>
     /// <param name="quantity"></param>
-    public void Remove(Blueprint blueprint, long quantity)
+    public void Remove(BlueprintModel blueprint, long quantity)
     {
         if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name && blueprintQuantity.Quantity - quantity > 0))
         {
@@ -96,7 +92,7 @@ public class BlueprintMap
     /// Remove a BlueprintQuantity from the list entirely if it exists.
     /// </summary>
     /// <param name="blueprint"></param>
-    public void RemoveAll(Blueprint blueprint)
+    public void RemoveAll(BlueprintModel blueprint)
     {
         if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name))
         {
