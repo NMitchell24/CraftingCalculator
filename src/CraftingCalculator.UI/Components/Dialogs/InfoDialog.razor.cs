@@ -12,7 +12,7 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 /// </summary>
 public partial class InfoDialog
 {
-    private IReadOnlyList<IBaseQuantityRecord> _parts = [];
+    private List<IBaseQuantityRecord> _parts = [];
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
@@ -40,7 +40,7 @@ public partial class InfoDialog
     protected override void OnParametersSet() =>
         // Held in a field rather than read from a property in the markup: the panel's header renders
         // the count and its body the rows, so a property would rebuild the list twice per render.
-        _parts = Blueprint is null ? [] : BlueprintProcessor.DirectParts(Blueprint);
+        _parts = Blueprint is null ? [] : BlueprintPartProcessor.GetParts(Blueprint);
 
     private static Task<IDialogReference> ShowAsync(IDialogService dialogs, IBaseDataRecord record, BlueprintNode? step)
     {

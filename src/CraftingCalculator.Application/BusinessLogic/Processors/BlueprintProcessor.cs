@@ -117,17 +117,6 @@ public static class BlueprintProcessor
     }
 
     /// <summary>
-    /// The blueprint's own direct requirements - its components and its immediate child blueprints -
-    /// in the order the breakdown tree lists them, with each child blueprint left whole rather than
-    /// resolved into the components beneath it.
-    /// </summary>
-    public static IReadOnlyList<IBaseQuantityRecord> DirectParts(BlueprintModel blueprint) =>
-    [
-        .. blueprint.Components.ComponentList.Cast<IBaseQuantityRecord>(),
-        .. blueprint.ChildBlueprints.BlueprintList.Cast<IBaseQuantityRecord>()
-    ];
-
-    /// <summary>
     /// Whether <paramref name="node"/> takes fewer crafts than the quantity it produces, because the
     /// blueprint yields more than one per craft. False for a component leaf, which is gathered rather
     /// than crafted, and false for a yield that happens to leave the two counts equal.
