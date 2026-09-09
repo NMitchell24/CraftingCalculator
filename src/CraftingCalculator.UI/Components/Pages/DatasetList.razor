@@ -33,6 +33,7 @@
                             <MudText Class="list-row-name">@record.Name</MudText>
                             <MudText Typo="Typo.caption" Class="list-row-name">@CaptionFor(record)</MudText>
                         </div>
+                        <CategoryChip Record="@record" Class="card-row-category" />
                         @* Same shape as Favorites.razor: the row itself has a tap action, so the row
                            buttons have to stop the event before it bubbles, and
                            @onclick:stopPropagation only applies to an element - hence the wrapper. *@

@@ -12,6 +12,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         List<Component> entities = await context.Components
             .AsNoTracking()
+            .Include(componentEntity => componentEntity.Category)
             .OrderBy(componentEntity => componentEntity.Name)
             .ToListAsync();
 
@@ -22,6 +23,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         Component? entity = await context.Components.AsNoTracking()
+            .Include(componentEntity => componentEntity.Category)
             .FirstOrDefaultAsync(componentEntity => componentEntity.Id == id);
 
         return entity != null ? ToModel(entity) : null;
@@ -39,6 +41,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         entity.Description = component.Description ?? "";
         entity.Cost = component.Cost;
         entity.ProductionTime = component.ProductionTime;
+        entity.CategoryId = component.Category?.Id;
 
         if (entity.Id == 0)
         {
@@ -47,7 +50,12 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
         await context.SaveChangesAsync();
 
-        return ToModel(entity);
+        // The caller's model rather than ToModel(entity), which would report a null Category: only
+        // CategoryId was set above, and loading the navigation back would cost a query for a value the
+        // caller already holds. Same shape as BlueprintDAO.SaveAsync.
+        component.Id = entity.Id;
+
+        return component;
     }
 
     public async Task DeleteAsync(int id)
@@ -61,6 +69,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         Id = entity.Id,
         Name = entity.Name,
         Description = entity.Description,
+        Category = entity.Category is { } categoryEntity ? CategoryDAO.ToModel(categoryEntity) : null,
         Cost = entity.Cost,
         ProductionTime = entity.ProductionTime
     };

@@ -8,5 +8,7 @@
 <ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
                      Label="Production time per item" />
 
+<CategorySelect Model="Model" OnChanged="NotifyChangedAsync" />
+
 <MudTextField @bind-Value="Model.Description" @bind-Value:after="NotifyChangedAsync" Label="Description"
               Variant="Variant.Outlined" FullWidth="true" Lines="3" Sizing="InputSizing.Auto" MaxLines="10" />

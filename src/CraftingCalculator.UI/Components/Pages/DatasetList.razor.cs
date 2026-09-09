@@ -257,9 +257,8 @@ public partial class DatasetList : ComponentBase, IDisposable
     private static string BlueprintCaption(BlueprintModel blueprint)
     {
         int components = blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count;
-        string summary = $"{components} component{(components == 1 ? "" : "s")}";
 
-        return string.IsNullOrWhiteSpace(blueprint.Category?.Name) ? summary : $"{blueprint.Category.Name} · {summary}";
+        return $"{components} component{(components == 1 ? "" : "s")}";
     }
 
     public void Dispose() => PageShellState.Reset(this);

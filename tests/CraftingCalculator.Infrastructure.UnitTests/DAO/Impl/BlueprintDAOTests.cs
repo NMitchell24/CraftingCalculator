@@ -41,6 +41,44 @@ public class BlueprintDAOTests
         reloaded.ChildBlueprints.BlueprintList.Should().ContainSingle(blueprintQuantity => blueprintQuantity.Blueprint.Name == "Plank" && blueprintQuantity.Quantity == 4);
     }
 
+    /// <summary>
+    /// The Craft screen reads its components out of the blueprint graph rather than through
+    /// <see cref="ComponentDAO" />, and that graph's entities are detached, so the category has to be
+    /// resolved from the graph's own category lookup. Covers a nested child blueprint too, which is the
+    /// depth the Components list actually flattens from.
+    /// </summary>
+    [Test]
+    public async Task GetByIdAsync_ComponentsInTheGraph_CarryTheirOwnCategory()
+    {
+        CategoryDAO categoryDAO = new(_fixture.Factory);
+        CategoryModel ores = await categoryDAO.SaveAsync(new CategoryModel { Name = "Ores" });
+        CategoryModel parts = await categoryDAO.SaveAsync(new CategoryModel { Name = "Parts" });
+
+        ComponentModel iron = await _componentDAO.SaveAsync(new ComponentModel { Name = "Iron", Category = ores });
+        ComponentModel wood = await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood" });
+
+        BlueprintModel bracket = new() { Name = "Bracket", Category = parts };
+        bracket.Components.Add(iron, 2);
+        bracket = await _blueprintDAO.SaveAsync(bracket);
+
+        BlueprintModel frame = new() { Name = "Frame" };
+        frame.Components.Add(wood, 1);
+        frame.ChildBlueprints.Add(bracket, 3);
+        BlueprintModel saved = await _blueprintDAO.SaveAsync(frame);
+
+        BlueprintModel reloaded = (await _blueprintDAO.GetByIdAsync(saved.Id))!;
+
+        reloaded.Components.ComponentList.Should()
+            .ContainSingle(componentQuantity => componentQuantity.Component.Name == "Wood"
+                && componentQuantity.Component.Category == null);
+
+        BlueprintModel child = reloaded.ChildBlueprints.BlueprintList.Single().Blueprint;
+        child.Category!.Name.Should().Be("Parts");
+        child.Components.ComponentList.Should()
+            .ContainSingle(componentQuantity => componentQuantity.Component.Name == "Iron"
+                && componentQuantity.Component.Category!.Name == "Ores");
+    }
+
     [Test]
     public async Task SaveAsync_Yield_RoundTripsThroughTheDatabase()
     {

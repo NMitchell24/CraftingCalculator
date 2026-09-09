@@ -597,8 +597,32 @@ html, body {
     font-variant-numeric: tabular-nums;
 }
 
-/* MudList and MudTreeView both pad themselves vertically, which reads as a gap under the toolbar row
-   rather than as spacing between items. */
+/* The header every card row shares: a name, then its category chip. Used by the Craft batch
+   (.batch-row) and by the Components and Surplus lists (.materials-row), which is why it is not part
+   of either family. The border sits here rather than on the name so the header's own padding-bottom
+   and the row's gap leave equal space on both sides of the line. */
+.card-row-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+.card-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 500;
+}
+
+/* Intrinsic width, so the name is what gives way when the two cannot both fit. Used from the
+   one-line .list-row shape too (the Dataset list), where the chip sits between the name/caption block
+   and the row actions rather than in a .card-row-header. */
+.card-row-category {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
 /* The Craft screen's batch row is two lines rather than the one-line .list-row shape: the name gets a
    full line to itself, so a long blueprint name has the whole card width before it ellipsizes, which
    it was doing constantly in phone portrait. Deliberately its own family rather than a change to
@@ -609,26 +633,6 @@ html, body {
     flex-direction: column;
     gap: 8px;
     width: 100%;
-}
-
-.batch-row-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--mud-palette-lines-default);
-}
-
-.batch-row-name {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-weight: 500;
-}
-
-/* Intrinsic width, so the name is what gives way when the two cannot both fit. */
-.batch-row-category {
-    flex: 0 0 auto;
-    margin: 0;
 }
 
 .batch-row-actions {
@@ -656,15 +660,6 @@ html, body {
     gap: 8px;
     width: 100%;
     font-variant-numeric: tabular-nums;
-}
-
-/* The rule sits on the name rather than the stats grid so its own padding-bottom and the row's gap
-   leave equal space on both sides of the line. */
-.materials-row-name {
-    min-width: 0;
-    font-weight: 500;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--mud-palette-lines-default);
 }
 
 /* One grid for all four cells (both labels, then both values) so each value sits directly under its

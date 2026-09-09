@@ -30,8 +30,6 @@ public class BlueprintQuantity : IBaseQuantityRecord
         }
     }
 
-    public string CategoryName => Blueprint.Category?.Name ?? "";
-
     public DataType Type
     {
         get => Blueprint.Type;

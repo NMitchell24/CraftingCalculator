@@ -54,7 +54,9 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
         await context.Categories.Where(categoryEntity => categoryEntity.Id == id).ExecuteDeleteAsync();
     }
 
-    private static CategoryModel ToModel(Category entity) => new()
+    /// <summary>The model for a loaded category entity. Shared with the DAOs that resolve a
+    /// record's category as part of a larger load.</summary>
+    internal static CategoryModel ToModel(Category entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
