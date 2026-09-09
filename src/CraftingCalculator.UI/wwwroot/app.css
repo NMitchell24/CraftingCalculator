@@ -126,6 +126,10 @@ html, body {
        icon button is all either side ever holds now - back arrow on the left, settings on the right;
        a page's own actions moved off the bar to .actions-bar and the drawer. */
     --app-bar-side-width: 44px;
+    /* The app bar's bottom edge in viewport coordinates. The bar is Dense (MainLayout.razor), which is
+       three quarters of --mud-appbar-height, and MainLayout pads it by the status-bar inset on top.
+       Anything that pins itself directly under the bar offsets by this. */
+    --app-bar-bottom: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
 }
 
 /* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
@@ -181,8 +185,8 @@ html, body {
    bar is Dense) so this wins on specificity rather than source order alone. */
 .mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-mini:not(.mud-drawer-clipped-never),
 .mud-appbar-dense ~ .mud-drawer-fixed.mud-drawer-persistent:not(.mud-drawer-clipped-never) {
-    top: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
-    height: calc(100% - var(--mud-appbar-height) + var(--mud-appbar-height) / 4 - max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    top: var(--app-bar-bottom);
+    height: calc(100% - var(--app-bar-bottom));
     /* Landscape: the rail is flush against the left screen edge, which in landscape is where the
        camera cutout sits - without this its nav icons render underneath it (see the drawer
        screenshot). content-box is what makes the padding widen the rail rather than eat into it:
@@ -823,11 +827,99 @@ html, body {
     }
 }
 
-.picker-chip-row {
+/* The search-and-filter block shared by the Dataset list and the blueprint picker: the search row,
+   and beneath it the active category filters when there are any. */
+.record-search {
     display: flex;
-    overflow-x: auto;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 8px;
+}
+
+/* The bar parks at the top of whichever scrollport it is in and the rows scroll underneath - which is
+   why it needs an opaque background of its own. Both hosts are listed because neither selector covers
+   the other: the Dataset list scrolls the document, BlueprintPickerDialog scrolls its own dialog
+   content, and the offset and surface colour differ with it. */
+.dataset-page .record-search,
+.picker-dialog-content .record-search {
+    position: sticky;
+    /* Only has to beat the rows, which are all static. Far below MudBlazor's app bar (1100) and popover
+       (1200) layers, so the bar still passes under the app bar and under its own filter menu. */
+    z-index: 1;
+}
+
+/* The Dataset list's scrollport is the document behind the fixed app bar, so the bar parks at the bar's
+   bottom edge, on the page background. */
+.dataset-page .record-search {
+    top: var(--app-bar-bottom);
+    background-color: var(--mud-palette-background);
+}
+
+/* Components/Dialogs/BlueprintPickerDialog.razor, whose scrollport is its own .mud-dialog-content.
+   Sticky offsets are measured from the scroll container's content box, so MudBlazor's 8px padding-top
+   on that element would hold the bar 8px clear of the top edge and let the rows scroll through the
+   gap. Moving that padding onto the bar itself parks it flush against the edge and keeps the same
+   spacing above the search field. The class is doubled with .mud-dialog-content because MudBlazor's
+   own padding is set through `.mud-dialog .mud-dialog-content` - two classes, which a single class of
+   ours loses to however late it is declared. */
+.mud-dialog-content.picker-dialog-content {
+    padding-top: 0;
+}
+
+.picker-dialog-content .record-search {
+    top: 0;
+    padding-top: 8px;
+    background-color: var(--mud-palette-surface);
+}
+
+/* MudBlazor's Adornment is a single enum (None/Start/End), so the search icon and the filter button
+   cannot both be adornments of the field - the menu sits beside it and the field takes the rest. */
+.record-search-row {
+    display: flex;
+    align-items: center;
     gap: 4px;
-    padding-bottom: 4px;
+}
+
+.record-search-field {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.record-search-row .mud-menu {
+    flex: 0 0 auto;
+}
+
+/* Same 44px floor as .list-row's buttons - the filter menu has no other way in. */
+.record-search-row .mud-icon-button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* The activator is padded out to the 44px touch floor, so anchoring at the bottom of its box leaves the
+   panel floating a visible gap below the icon glyph inside it. This closes most of that gap - but the
+   popover paints over the activator, so every pixel pulled up is a pixel of the button that stops
+   closing the menu and starts hitting its first entry instead. Capped at the button's 10px bottom
+   padding so the whole glyph, which is what the thumb aims at, stays clear. */
+.record-search-filter-menu {
+    margin-top: -8px;
+}
+
+.record-search-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* The close button is the whole point of these chips, and MudBlazor renders it at Size.Small - well
+   under the 44px floor. Raising the button means raising the chip around it, which is fixed at
+   .mud-chip-size-medium's 32px. */
+.record-search-filters .mud-chip {
+    height: 44px;
+}
+
+.record-search-filters .mud-chip-close-button {
+    min-width: 44px;
+    min-height: 44px;
 }
 
 /* Snackbars (configured in MauiProgram.cs). MudBlazor's own rule for this position is a flat

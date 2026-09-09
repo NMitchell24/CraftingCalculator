@@ -1,33 +1,24 @@
-<MudDialog>
+@* The search bar is sticky inside the dialog content, which needs a hook of its own (app.css). *@
+<MudDialog ContentClass="picker-dialog-content">
     <DialogContent>
-        <MudTextField @bind-Value="_search" Placeholder="Search blueprints" Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mb-2" />
+        <RecordSearchBar Records="_blueprints" Placeholder="Search blueprints" FilterChanged="OnFilterChanged" />
 
-        <div class="picker-chip-row mb-2">
-            <MudChipSet T="int" SelectedValue="@_selectedCategoryId" SelectedValueChanged="OnCategoryChanged"
-                        SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
-                @* Tertiary rather than the set's Primary: this chip is a filter control, not one of the
-                   user's categories, and a user is free to name a category "All" too. *@
-                <MudChip T="int" Text="@AllCategoriesLabel" Value="@AllCategoriesId" Color="Color.Tertiary" />
-                @foreach (Domain.Models.CategoryModel category in _categories)
-                {
-                    <MudChip T="int" Text="@category.Name" Value="@category.Id" />
-                }
-            </MudChipSet>
-        </div>
-
-        @if (_filteredBlueprints.Count == 0)
+        @if (FilteredBlueprints.Count == 0)
         {
             <MudText Class="pa-4" Align="Align.Center">No blueprints match.</MudText>
         }
         else
         {
             <MudList T="BlueprintModel" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
-                @foreach (BlueprintModel blueprint in _filteredBlueprints)
+                @foreach (BlueprintModel blueprint in FilteredBlueprints)
                 {
                     <MudListItem T="BlueprintModel" Value="@blueprint">
-                        <MudText>@blueprint.Name</MudText>
-                        <MudText Typo="Typo.caption">@blueprint.Category?.Name</MudText>
+                        <div class="list-row">
+                            <div class="list-row-info">
+                                <MudText Class="list-row-name">@blueprint.Name</MudText>
+                            </div>
+                            <CategoryChip Record="@blueprint" Class="card-row-category" />
+                        </div>
                     </MudListItem>
                 }
             </MudList>

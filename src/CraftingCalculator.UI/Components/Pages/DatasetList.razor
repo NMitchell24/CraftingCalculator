@@ -4,8 +4,9 @@
 <PageTitle>Dataset</PageTitle>
 
 <div class="dataset-page">
-    <MudTextField @bind-Value="_search" Placeholder="Search" Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true" Class="mb-2" />
+    @* Keyed on the type: the router reuses this page instance when only {Type} changes, so without it
+       the bar would keep the previous type's search text and selection. *@
+    <RecordSearchBar @key="_type" Records="_records" FilterChanged="OnFilterChanged" />
 
     @if (FilteredRecords.Count == 0)
     {
@@ -18,7 +19,7 @@
             else
             {
                 <MudText Typo="Typo.body1">No matches</MudText>
-                <MudText Typo="Typo.caption">Nothing here is named like "@_search".</MudText>
+                <MudText Typo="Typo.caption">Nothing here matches the current filter.</MudText>
             }
         </div>
     }
