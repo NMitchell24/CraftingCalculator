@@ -19,13 +19,25 @@ public partial class BlueprintTreeNode : ComponentBase
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
     /// <summary>
-    /// This node's position in the tree, e.g. "/Frame/Bracket" - distinct from <see cref="Node"/>.Id
-    /// (which is just this node's own name) so that CraftState can track expansion per tree
-    /// position rather than per blueprint/component name. The same blueprint can appear more than once in
-    /// one tree (standalone in the batch and nested inside another batch blueprint); keying by Id alone
-    /// would make every occurrence share one expanded/collapsed state.
+    /// This node's position in the tree, e.g. "/Frame/Bracket" - distinct from <see cref="Node"/>.Name
+    /// so that CraftState can track expansion per tree position rather than per blueprint/component
+    /// name. The same blueprint can appear more than once in one tree (standalone in the batch and
+    /// nested inside another batch blueprint); keying by name alone would make every occurrence share
+    /// one expanded/collapsed state.
     /// </summary>
-    private string Path => $"{ParentPath}/{Node.Id ?? Node.Name}";
+    private string Path => $"{ParentPath}/{Node.Name}";
+
+    /// <summary>
+    /// The row label: the step's name followed by how many of it this step covers.
+    /// </summary>
+    // A yield above 1 makes the craft count the actionable number - the user performs crafts, not items -
+    // so those rows count crafts and take the asterisk that StepsTree's legend explains. The quantity
+    // stays one tap away in CraftStepDialog.
+    private string Label => BlueprintProcessor.CountsByCraft(Node)
+        ? $"{Node.Name} x{Node.Crafts}*"
+        : $"{Node.Name} x{Node.Quantity}";
+
+    private string? LabelClass => BlueprintProcessor.CountsByCraft(Node) ? "steps-tree-crafts" : null;
 
     /// <summary>
     /// The step's production time, shown at the end of the row, or null to leave the row unadorned.

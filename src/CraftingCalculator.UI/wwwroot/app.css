@@ -938,3 +938,19 @@ html, body {
     margin-top: 12px;
     opacity: 0.7;
 }
+
+/* A Crafting Steps row whose count is crafts rather than items (BlueprintTreeNode.Label). Dotted
+   underline rather than a fill: the copper selection already owns background tint in this tree, and a
+   second tinted row would read as a second selection. */
+.steps-tree-crafts {
+    text-decoration: underline dotted;
+    text-decoration-color: var(--mud-palette-text-secondary);
+    text-underline-offset: 3px;
+}
+
+/* Footnote resolving the asterisk on those rows. */
+.steps-tree-legend {
+    display: block;
+    margin-top: 8px;
+    opacity: 0.7;
+}

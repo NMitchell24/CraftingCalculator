@@ -67,7 +67,8 @@ public class BlueprintServiceTests
 
         BlueprintNode tree = _service.GetBlueprintNode(blueprint, 3);
 
-        tree.Name.Should().Be("Widget x3");
+        tree.Name.Should().Be("Widget");
+        tree.Quantity.Should().Be(3);
         tree.Crafts.Should().Be(3);
         tree.Children.Should().ContainSingle();
     }

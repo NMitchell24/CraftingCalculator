@@ -215,7 +215,7 @@ public class BlueprintProcessorTests
     }
 
     [Test]
-    public void BuildNode_ScalesNodeNamesByQuantity()
+    public void BuildNode_NamesEachNodeAfterItsSourceRecord()
     {
         BlueprintModel child = NewBlueprint("Bracket");
         child.Components.Add(NewComponent("Screw"), 3);
@@ -225,12 +225,12 @@ public class BlueprintProcessorTests
 
         BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1);
 
-        tree.Name.Should().Be("Frame x1");
+        tree.Name.Should().Be("Frame");
         BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
-        childNode.Name.Should().Be("Bracket x2");
+        childNode.Name.Should().Be("Bracket");
         childNode.IsComponent.Should().BeFalse();
         BlueprintNode componentNode = childNode.Children.Should().ContainSingle().Subject;
-        componentNode.Name.Should().Be("Screw x6");
+        componentNode.Name.Should().Be("Screw");
         componentNode.IsComponent.Should().BeTrue();
     }
 
@@ -254,33 +254,28 @@ public class BlueprintProcessorTests
     }
 
     [Test]
-    public void BuildNode_DefaultYield_CountsOneCraftPerUnitAndOmitsTheSuffix()
+    public void BuildNode_DefaultYield_CountsOneCraftPerUnit()
     {
         BlueprintModel blueprint = NewBlueprint("Frame");
         blueprint.Components.Add(NewComponent("Screw"), 1);
 
         BlueprintNode tree = BlueprintProcessor.BuildNode(blueprint, 4);
 
-        tree.Name.Should().Be("Frame x4");
         tree.Crafts.Should().Be(4);
         tree.Children.Should().ContainSingle().Subject.Crafts.Should().Be(0); // components are gathered, not crafted
     }
 
-    /// <summary>
-    /// The craft count used to be appended to the label. Production time moved it into the per-step
-    /// dialog, so the label carries the quantity alone and the count is read off the node.
-    /// </summary>
     [Test]
-    public void BuildNode_Yield_LabelsTheQuantityAndReportsCraftsSeparately()
+    public void BuildNode_Yield_ReportsTheCraftsThatCoverTheQuantity()
     {
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
         BlueprintNode three = BlueprintProcessor.BuildNode(blueprint, 3);
-        three.Name.Should().Be("Bracket x3");
+        three.Quantity.Should().Be(3);
         three.Crafts.Should().Be(2);
 
         BlueprintNode two = BlueprintProcessor.BuildNode(blueprint, 2);
-        two.Name.Should().Be("Bracket x2");
+        two.Quantity.Should().Be(2);
         two.Crafts.Should().Be(1);
     }
 
@@ -367,7 +362,6 @@ public class BlueprintProcessorTests
 
         tree.Quantity.Should().Be(100);
         tree.Crafts.Should().Be(50);
-        tree.Name.Should().Be("Frame x100");
     }
 
     [Test]
@@ -474,5 +468,46 @@ public class BlueprintProcessorTests
 
         leaf.Quantity.Should().Be(6);
         leaf.ProductionTime.Should().Be(TimeSpan.FromMinutes(30));
+    }
+
+    [Test]
+    public void CountsByCraft_YieldLeavingFewerCraftsThanItems_IsTrue()
+    {
+        Blueprint blueprint = NewBlueprint("Bracket", yield: 2);
+
+        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 2);
+
+        node.Crafts.Should().Be(1);
+        BlueprintProcessor.CountsByCraft(node).Should().BeTrue();
+    }
+
+    [Test]
+    public void CountsByCraft_YieldLeavingTheTwoCountsEqual_IsFalse()
+    {
+        Blueprint blueprint = NewBlueprint("Bracket", yield: 2);
+
+        // One Bracket still takes one craft, so there is no second number to tell the user about.
+        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 1);
+
+        BlueprintProcessor.CountsByCraft(node).Should().BeFalse();
+    }
+
+    [Test]
+    public void CountsByCraft_DefaultYield_IsFalse()
+    {
+        BlueprintNode node = BlueprintProcessor.BuildNode(NewBlueprint("Frame"), 4);
+
+        BlueprintProcessor.CountsByCraft(node).Should().BeFalse();
+    }
+
+    [Test]
+    public void CountsByCraft_Component_IsFalse()
+    {
+        Blueprint blueprint = NewBlueprint("Frame");
+        blueprint.Components.Add(NewComponent("Screw"), 3);
+
+        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1).Children.Should().ContainSingle().Subject;
+
+        BlueprintProcessor.CountsByCraft(leaf).Should().BeFalse();
     }
 }
