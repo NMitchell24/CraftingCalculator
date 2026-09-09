@@ -97,7 +97,7 @@ public static class BlueprintProcessor
             long componentQuantity = component.Quantity * crafts;
             //Named from Quantity on: four adjacent long arguments would otherwise transpose silently.
             children.Add(new BlueprintNode(
-                component.Name + " x" + componentQuantity, component.Name, component.Tooltip, IsComponent: true,
+                component.Name, component.Tooltip, IsComponent: true,
                 Quantity: componentQuantity, Crafts: 0, Yield: 0, Surplus: 0,
                 ProductionTime: DurationMath.Scale(component.Component.ProductionTime, componentQuantity),
                 Children: []));
@@ -108,15 +108,20 @@ public static class BlueprintProcessor
             children.Add(BuildNode(child.Blueprint, child.Quantity * crafts, depth + 1));
         }
 
-        //The label carries only the quantity. The craft count the yield feature appended here moved into
-        //the per-step dialog, which has room for it alongside the yield, surplus and production time.
         return new BlueprintNode(
-            blueprint.Name + " x" + quantity, blueprint.Name, blueprint.Tooltip, IsComponent: false,
+            blueprint.Name, blueprint.Tooltip, IsComponent: false,
             Quantity: quantity, Crafts: crafts, Yield: blueprint.Yield,
             Surplus: crafts * blueprint.Yield - quantity,
             ProductionTime: DurationMath.Scale(blueprint.ProductionTime, crafts),
             Children: children);
     }
+
+    /// <summary>
+    /// Whether <paramref name="node"/> takes fewer crafts than the quantity it produces, because the
+    /// blueprint yields more than one per craft. False for a component leaf, which is gathered rather
+    /// than crafted, and false for a yield that happens to leave the two counts equal.
+    /// </summary>
+    public static bool CountsByCraft(BlueprintNode node) => !node.IsComponent && node.Crafts != node.Quantity;
 
     private static void ThrowIfTooDeep(Blueprint blueprint, int depth)
     {

@@ -6,7 +6,7 @@
    expansion, so tapping the row itself never toggles it. *@
 @if (Node.Children.Count > 0)
 {
-    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Node.Name" EndText="@EndText"
+    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Label" TextClass="@LabelClass" EndText="@EndText"
                      EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
                      Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
                      Expanded="@State.IsExpanded(Path)" ExpandedChanged="@(_ => State.ToggleExpanded(Path))"
@@ -19,7 +19,7 @@
 }
 else
 {
-    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Node.Name" EndText="@EndText"
+    <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Label" TextClass="@LabelClass" EndText="@EndText"
                      EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
                      Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
                      OnClick="OpenDetailAsync" />

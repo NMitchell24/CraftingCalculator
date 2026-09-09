@@ -1,4 +1,3 @@
-using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 
