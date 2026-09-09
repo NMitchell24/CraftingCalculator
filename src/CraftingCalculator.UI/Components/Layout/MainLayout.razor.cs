@@ -1,3 +1,5 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
+using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.UI.State;
 using CraftingCalculator.UI.Theme;
 using Microsoft.AspNetCore.Components;
@@ -28,8 +30,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
 
-    // Where Settings was opened from, so the gear closes back to it rather than to a fixed route.
+    // Settings and Help are both app-bar overlays: they open over whatever page is showing, and their
+    // own icon closes them back to it rather than to a fixed route. One return address each, so opening
+    // Help from Settings and closing it again lands back on Settings instead of skipping past it.
     private string? _preSettingsUri;
+    private string? _preHelpUri;
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
@@ -113,22 +118,42 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         _themeResolved = true;
     }
 
-    private bool IsSettingsOpen =>
-        Navigation.ToBaseRelativePath(Navigation.Uri).TrimStart('/')
-            .StartsWith(SettingsRoute, StringComparison.OrdinalIgnoreCase);
+    private string CurrentRoute => Navigation.ToBaseRelativePath(Navigation.Uri).TrimStart('/');
+
+    private bool IsSettingsOpen => IsOpen(SettingsRoute);
+
+    private bool IsHelpOpen => IsOpen(HelpTopics.HelpRoot);
 
     private string SettingsActionLabel => IsSettingsOpen ? "Close settings" : "Settings";
 
-    private void ToggleSettings()
+    private string HelpActionLabel => IsHelpOpen ? "Close help" : "Help for this screen";
+
+    private void ToggleSettings() => ToggleOverlay(IsSettingsOpen, ref _preSettingsUri, $"/{SettingsRoute}");
+
+    // The target is resolved from the route the user is on now, which is why it is computed here rather
+    // than by the Help page itself: once the navigation has happened that route is gone.
+    private void ToggleHelp() => ToggleOverlay(IsHelpOpen, ref _preHelpUri,
+        $"/{HelpTopics.HelpRoot}/{HelpProcessor.ResolveTopic(CurrentRoute).Id}");
+
+    /// <summary>Whether the current route is <paramref name="route"/> or a page beneath it.</summary>
+    private bool IsOpen(string route) =>
+        CurrentRoute.Equals(route, StringComparison.OrdinalIgnoreCase)
+        || CurrentRoute.StartsWith($"{route}/", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Opens <paramref name="target"/> over the current page, remembering where it was opened from in
+    /// <paramref name="origin"/>, or closes it by navigating back there.
+    /// </summary>
+    private void ToggleOverlay(bool isOpen, ref string? origin, string target)
     {
-        if (IsSettingsOpen)
+        if (isOpen)
         {
-            Navigation.NavigateTo(_preSettingsUri ?? "/");
+            Navigation.NavigateTo(origin ?? "/");
             return;
         }
 
-        _preSettingsUri = Navigation.Uri;
-        Navigation.NavigateTo($"/{SettingsRoute}");
+        origin = Navigation.Uri;
+        Navigation.NavigateTo(target);
     }
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
