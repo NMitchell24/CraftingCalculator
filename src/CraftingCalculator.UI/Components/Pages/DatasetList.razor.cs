@@ -249,12 +249,12 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private static string CaptionFor(IBaseDataRecord record) => record switch
     {
-        Component component => string.Format(FormatConstants.CurrencyFormat, component.Cost),
-        Blueprint blueprint => BlueprintCaption(blueprint),
+        ComponentModel component => string.Format(FormatConstants.CurrencyFormat, component.Cost),
+        BlueprintModel blueprint => BlueprintCaption(blueprint),
         _ => record.Description ?? ""
     };
 
-    private static string BlueprintCaption(Blueprint blueprint)
+    private static string BlueprintCaption(BlueprintModel blueprint)
     {
         int components = blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count;
         string summary = $"{components} component{(components == 1 ? "" : "s")}";

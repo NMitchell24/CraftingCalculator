@@ -4,8 +4,8 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 
 /// <summary>
 /// Edits the parts of a single blueprint - its own components plus the child blueprints nested inside it -
-/// as one collection, so callers do not have to know which of <see cref="Blueprint.Components"/> or
-/// <see cref="Blueprint.ChildBlueprints"/> a given part lives in.
+/// as one collection, so callers do not have to know which of <see cref="BlueprintModel.Components"/> or
+/// <see cref="BlueprintModel.ChildBlueprints"/> a given part lives in.
 /// </summary>
 public static class BlueprintPartProcessor
 {
@@ -13,7 +13,7 @@ public static class BlueprintPartProcessor
     /// The blueprint's components and child blueprints as one list, components first and each group
     /// ordered by name.
     /// </summary>
-    public static List<IBaseQuantityRecord> GetParts(Blueprint blueprint)
+    public static List<IBaseQuantityRecord> GetParts(BlueprintModel blueprint)
     {
         List<IBaseQuantityRecord> parts = [.. blueprint.Components.ComponentList];
         parts.AddRange(blueprint.ChildBlueprints.BlueprintList);
@@ -25,14 +25,14 @@ public static class BlueprintPartProcessor
     /// Adds the part to the blueprint, or raises the quantity of the matching part already on it by
     /// <paramref name="quantity"/>.
     /// </summary>
-    public static void Add(Blueprint blueprint, IBaseDataRecord? part, long quantity)
+    public static void Add(BlueprintModel blueprint, IBaseDataRecord? part, long quantity)
     {
         switch (part)
         {
-            case Component component:
+            case ComponentModel component:
                 blueprint.Components.Add(component, quantity);
                 break;
-            case Blueprint child:
+            case BlueprintModel child:
                 blueprint.ChildBlueprints.Add(child, quantity);
                 break;
         }
@@ -41,7 +41,7 @@ public static class BlueprintPartProcessor
     /// <summary>
     /// Sets the part's quantity on the blueprint. A quantity of 0 or less removes the part entirely.
     /// </summary>
-    public static void SetQuantity(Blueprint blueprint, IBaseQuantityRecord part, long quantity)
+    public static void SetQuantity(BlueprintModel blueprint, IBaseQuantityRecord part, long quantity)
     {
         if (quantity <= 0)
         {
@@ -53,7 +53,7 @@ public static class BlueprintPartProcessor
     }
 
     /// <summary>Removes the part from the blueprint.</summary>
-    public static void Remove(Blueprint blueprint, IBaseQuantityRecord part)
+    public static void Remove(BlueprintModel blueprint, IBaseQuantityRecord part)
     {
         // RemoveAll rather than a quantity of 0: it is what pushes the part onto the map's
         // RemovedComponents/RemovedBlueprints list, which is the only signal BlueprintDAO.SaveAsync has

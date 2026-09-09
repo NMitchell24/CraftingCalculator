@@ -6,8 +6,8 @@
         <div class="picker-chip-row mb-2">
             <MudChipSet T="string" SelectedValue="@_selectedCategoryName" SelectedValueChanged="OnCategoryChanged"
                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
-                <MudChip Text="@Category.ALL" Value="@Category.ALL" />
-                @foreach (Domain.Models.Category category in _categories)
+                <MudChip Text="@CategoryModel.ALL" Value="@CategoryModel.ALL" />
+                @foreach (Domain.Models.CategoryModel category in _categories)
                 {
                     <MudChip Text="@category.Name" Value="@category.Name" />
                 }
@@ -20,10 +20,10 @@
         }
         else
         {
-            <MudList T="Blueprint" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
-                @foreach (Blueprint blueprint in _filteredBlueprints)
+            <MudList T="BlueprintModel" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
+                @foreach (BlueprintModel blueprint in _filteredBlueprints)
                 {
-                    <MudListItem T="Blueprint" Value="@blueprint">
+                    <MudListItem T="BlueprintModel" Value="@blueprint">
                         <MudText>@blueprint.Name</MudText>
                         <MudText Typo="Typo.caption">@blueprint.Category?.Name</MudText>
                     </MudListItem>

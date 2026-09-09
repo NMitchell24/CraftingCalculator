@@ -10,13 +10,13 @@
            IDatasetService instead, which is why there is no matching switch for load/save/delete. *@
         @switch (_record)
         {
-            case Component component:
+            case ComponentModel component:
                 <ComponentEditor @key="_record" Model="component" OnChanged="MarkDirty" />
                 break;
-            case Category category:
+            case CategoryModel category:
                 <CategoryEditor @key="_record" Model="category" OnChanged="MarkDirty" />
                 break;
-            case Blueprint blueprint:
+            case BlueprintModel blueprint:
                 <BlueprintEditor @key="_record" Model="blueprint" OnChanged="MarkDirty" />
                 break;
         }

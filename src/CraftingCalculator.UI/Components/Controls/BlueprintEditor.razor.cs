@@ -8,14 +8,14 @@ namespace CraftingCalculator.UI.Components.Controls;
 
 public partial class BlueprintEditor : ComponentBase
 {
-    [Parameter, EditorRequired] public Blueprint Model { get; set; } = null!;
+    [Parameter, EditorRequired] public BlueprintModel Model { get; set; } = null!;
 
     /// <summary>Raised on every edit, so the hosting page can track unsaved changes.</summary>
     [Parameter] public EventCallback OnChanged { get; set; }
 
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
 
-    private List<Category> _categories = [];
+    private List<CategoryModel> _categories = [];
     private List<IBaseDataRecord> _components = [];
     private List<IBaseDataRecord> _childBlueprintCandidates = [];
 
@@ -30,7 +30,7 @@ public partial class BlueprintEditor : ComponentBase
     {
         _categoryId = Model.Category?.Id;
 
-        _categories = [.. (await DatasetService.GetRecordsAsync(DataType.Category)).Cast<Category>()];
+        _categories = [.. (await DatasetService.GetRecordsAsync(DataType.Category)).Cast<CategoryModel>()];
         _components = await DatasetService.GetRecordsAsync(DataType.Component);
 
         // Ports ConfigureBlueprintsViewModel.BlueprintSelectedType: a blueprint cannot be its own part.

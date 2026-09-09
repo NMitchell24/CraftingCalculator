@@ -30,7 +30,7 @@ public class DatasetServiceTests
     public async Task GetRecordsAsync_Component_ReturnsComponents()
     {
         _componentService.Setup(s => s.GetAllComponentsAsync())
-            .ReturnsAsync([new Component { Id = 1, Name = "Screw" }]);
+            .ReturnsAsync([new ComponentModel { Id = 1, Name = "Screw" }]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Component);
 
@@ -41,7 +41,7 @@ public class DatasetServiceTests
     public async Task GetRecordsAsync_Blueprint_ReturnsBlueprints()
     {
         _blueprintService.Setup(s => s.GetAllBlueprintsAsync())
-            .ReturnsAsync([new Blueprint { Id = 1, Name = "Widget" }]);
+            .ReturnsAsync([new BlueprintModel { Id = 1, Name = "Widget" }]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Blueprint);
 
@@ -53,8 +53,8 @@ public class DatasetServiceTests
     {
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
-            new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL },
-            new Category { Id = 2, Name = "Tools" }
+            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.ALL },
+            new CategoryModel { Id = 2, Name = "Tools" }
         ]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
@@ -67,8 +67,8 @@ public class DatasetServiceTests
     {
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
-            new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL },
-            new Category { Id = 7, Name = Category.ALL }
+            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.ALL },
+            new CategoryModel { Id = 7, Name = CategoryModel.ALL }
         ]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
@@ -79,7 +79,7 @@ public class DatasetServiceTests
     [Test]
     public async Task GetRecordAsync_RoutesToTheServiceMatchingTheType()
     {
-        _blueprintService.Setup(s => s.GetBlueprintByIdAsync(5)).ReturnsAsync(new Blueprint { Id = 5, Name = "Widget" });
+        _blueprintService.Setup(s => s.GetBlueprintByIdAsync(5)).ReturnsAsync(new BlueprintModel { Id = 5, Name = "Widget" });
 
         IBaseDataRecord? record = await _service.GetRecordAsync(DataType.Blueprint, 5);
 
@@ -90,7 +90,7 @@ public class DatasetServiceTests
     [Test]
     public async Task SaveRecordAsync_Component_SavesThroughTheComponentService()
     {
-        Component component = new Component { Id = 3, Name = "Screw" };
+        ComponentModel component = new ComponentModel { Id = 3, Name = "Screw" };
 
         await _service.SaveRecordAsync(component);
 
@@ -100,7 +100,7 @@ public class DatasetServiceTests
     [Test]
     public async Task SaveRecordAsync_Category_SavesThroughTheCategoryService()
     {
-        Category category = new Category { Id = 2, Name = "Tools" };
+        CategoryModel category = new CategoryModel { Id = 2, Name = "Tools" };
 
         await _service.SaveRecordAsync(category);
 
@@ -110,7 +110,7 @@ public class DatasetServiceTests
     [Test]
     public async Task SaveRecordAsync_Blueprint_SavesThroughTheBlueprintService()
     {
-        Blueprint blueprint = new Blueprint { Id = 4, Name = "Widget" };
+        BlueprintModel blueprint = new BlueprintModel { Id = 4, Name = "Widget" };
 
         await _service.SaveRecordAsync(blueprint);
 
@@ -120,20 +120,20 @@ public class DatasetServiceTests
     [Test]
     public async Task DeleteRecordAsync_Blueprint_DeletesThroughTheBlueprintService()
     {
-        Blueprint blueprint = new Blueprint { Id = 4, Name = "Widget" };
+        BlueprintModel blueprint = new BlueprintModel { Id = 4, Name = "Widget" };
 
         await _service.DeleteRecordAsync(blueprint);
 
         _blueprintService.Verify(s => s.DeleteBlueprintAsync(blueprint), Times.Once);
-        _componentService.Verify(s => s.DeleteComponentAsync(It.IsAny<Component>()), Times.Never);
+        _componentService.Verify(s => s.DeleteComponentAsync(It.IsAny<ComponentModel>()), Times.Never);
     }
 
     [Test]
     public async Task DeleteRecordsAsync_DeletesEachRecordThroughItsOwnService()
     {
-        Component component = new Component { Id = 1, Name = "Screw" };
-        Category category = new Category { Id = 2, Name = "Tools" };
-        Blueprint blueprint = new Blueprint { Id = 3, Name = "Widget" };
+        ComponentModel component = new ComponentModel { Id = 1, Name = "Screw" };
+        CategoryModel category = new CategoryModel { Id = 2, Name = "Tools" };
+        BlueprintModel blueprint = new BlueprintModel { Id = 3, Name = "Widget" };
 
         await _service.DeleteRecordsAsync([component, category, blueprint]);
 
@@ -155,8 +155,8 @@ public class DatasetServiceTests
     [Test]
     public async Task DeleteAllOfTypeAsync_Component_DeletesEveryComponent()
     {
-        Component screw = new Component { Id = 1, Name = "Screw" };
-        Component bolt = new Component { Id = 2, Name = "Bolt" };
+        ComponentModel screw = new ComponentModel { Id = 1, Name = "Screw" };
+        ComponentModel bolt = new ComponentModel { Id = 2, Name = "Bolt" };
         _componentService.Setup(s => s.GetAllComponentsAsync()).ReturnsAsync([screw, bolt]);
 
         await _service.DeleteAllOfTypeAsync(DataType.Component);
@@ -168,8 +168,8 @@ public class DatasetServiceTests
     [Test]
     public async Task DeleteAllOfTypeAsync_Category_KeepsTheSeededAllCategory()
     {
-        Category all = new Category { Id = DatabaseSeedConstants.AllCategoryId, Name = Category.ALL };
-        Category tools = new Category { Id = 2, Name = "Tools" };
+        CategoryModel all = new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.ALL };
+        CategoryModel tools = new CategoryModel { Id = 2, Name = "Tools" };
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([all, tools]);
 
         await _service.DeleteAllOfTypeAsync(DataType.Category);

@@ -1,16 +1,16 @@
 using CraftingCalculator.Application.Common.Interfaces.DAO;
+using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using ComponentEntity = CraftingCalculator.Domain.Entities.Component;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
 public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IComponentDAO
 {
-    public async Task<List<Component>> GetAllAsync()
+    public async Task<List<ComponentModel>> GetAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        List<ComponentEntity> entities = await context.Components
+        List<Component> entities = await context.Components
             .AsNoTracking()
             .OrderBy(componentEntity => componentEntity.Name)
             .ToListAsync();
@@ -18,22 +18,22 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         return [.. entities.Select(ToModel)];
     }
 
-    public async Task<Component?> GetByIdAsync(int id)
+    public async Task<ComponentModel?> GetByIdAsync(int id)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        ComponentEntity? entity = await context.Components.AsNoTracking()
+        Component? entity = await context.Components.AsNoTracking()
             .FirstOrDefaultAsync(componentEntity => componentEntity.Id == id);
 
         return entity != null ? ToModel(entity) : null;
     }
 
-    public async Task<Component> SaveAsync(Component component)
+    public async Task<ComponentModel> SaveAsync(ComponentModel component)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        ComponentEntity entity = component.Id > 0
+        Component entity = component.Id > 0
             ? await context.Components.FirstAsync(componentEntity => componentEntity.Id == component.Id)
-            : new ComponentEntity();
+            : new Component();
 
         entity.Name = component.Name ?? "";
         entity.Description = component.Description ?? "";
@@ -56,7 +56,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         await context.Components.Where(componentEntity => componentEntity.Id == id).ExecuteDeleteAsync();
     }
 
-    private static Component ToModel(ComponentEntity entity) => new()
+    private static ComponentModel ToModel(Component entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name,

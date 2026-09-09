@@ -1,8 +1,7 @@
 using CraftingCalculator.Application.Common.Interfaces.DAO;
+using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using FavoriteEntity = CraftingCalculator.Domain.Entities.Favorite;
-using FavoriteBlueprintEntity = CraftingCalculator.Domain.Entities.FavoriteBlueprint;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
@@ -34,7 +33,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
         }
 
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        FavoriteEntity? entity = await context.Favorites.AsNoTracking().FirstOrDefaultAsync(f => f.Name == name);
+        Favorite? entity = await context.Favorites.AsNoTracking().FirstOrDefaultAsync(f => f.Name == name);
 
         return entity != null ? ToModel(entity) : null;
     }
@@ -43,13 +42,13 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        FavoriteEntity? entity = favorite.Id > 0
+        Favorite? entity = favorite.Id > 0
             ? await context.Favorites.FirstOrDefaultAsync(f => f.Id == favorite.Id)
             : await context.Favorites.FirstOrDefaultAsync(f => f.Name == favorite.Name);
 
         if (entity == null)
         {
-            entity = new FavoriteEntity();
+            entity = new Favorite();
             context.Favorites.Add(entity);
         }
 
@@ -62,7 +61,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
 
         foreach (BlueprintQuantity blueprintQuantity in quantities)
         {
-            context.FavoriteBlueprints.Add(new FavoriteBlueprintEntity
+            context.FavoriteBlueprints.Add(new FavoriteBlueprint
             {
                 FavoriteId = entity.Id,
                 BlueprintId = blueprintQuantity.Blueprint.Id,
@@ -92,15 +91,15 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
     public async Task<List<BlueprintQuantity>> GetBlueprintQuantitiesAsync(int favoriteId)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        List<FavoriteBlueprintEntity> rows = await context.FavoriteBlueprints
+        List<FavoriteBlueprint> rows = await context.FavoriteBlueprints
             .AsNoTracking()
             .Where(fr => fr.FavoriteId == favoriteId)
             .ToListAsync();
 
         List<BlueprintQuantity> result = [];
-        foreach (FavoriteBlueprintEntity row in rows)
+        foreach (FavoriteBlueprint row in rows)
         {
-            Blueprint? blueprint = await blueprintDAO.GetByIdAsync(row.BlueprintId);
+            BlueprintModel? blueprint = await blueprintDAO.GetByIdAsync(row.BlueprintId);
             if (blueprint != null)
             {
                 // Id is hardcoded to 0 here to match the old BlueprintFavoriteService quirk: a
@@ -113,7 +112,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
         return result;
     }
 
-    private static BlueprintFavorite ToModel(FavoriteEntity entity) => new()
+    private static BlueprintFavorite ToModel(Favorite entity) => new()
     {
         Id = entity.Id,
         Name = entity.Name

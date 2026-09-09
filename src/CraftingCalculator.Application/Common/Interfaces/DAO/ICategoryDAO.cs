@@ -5,17 +5,17 @@ namespace CraftingCalculator.Application.Common.Interfaces.DAO;
 public interface ICategoryDAO
 {
     /// <summary>
-    /// Returns all categories with the <see cref="Category.ALL"/> category first, then alphabetically.
+    /// Returns all categories with the <see cref="CategoryModel.ALL"/> category first, then alphabetically.
     /// </summary>
-    Task<List<Category>> GetAllAsync();
+    Task<List<CategoryModel>> GetAllAsync();
 
-    Task<Category?> GetByIdAsync(int id);
+    Task<CategoryModel?> GetByIdAsync(int id);
 
     /// <summary>
-    /// Adds the category if <see cref="Category.Id"/> is 0, otherwise updates the existing record.
-    /// Returns the saved category with its assigned <see cref="Category.Id"/>.
+    /// Adds the category if <see cref="CategoryModel.Id"/> is 0, otherwise updates the existing record.
+    /// Returns the saved category with its assigned <see cref="CategoryModel.Id"/>.
     /// </summary>
-    Task<Category> SaveAsync(Category category);
+    Task<CategoryModel> SaveAsync(CategoryModel category);
 
     /// <summary>
     /// Deletes the category. Blueprints referencing it have their category reference cleared by the

@@ -32,17 +32,17 @@ public class DatasetService(
 
     public Task SaveRecordAsync(IBaseDataRecord? record) => record switch
     {
-        Component component => componentService.SaveComponentAsync(component),
-        Category category => categoryService.SaveCategoryAsync(category),
-        Blueprint blueprint => blueprintService.SaveBlueprintAsync(blueprint),
+        ComponentModel component => componentService.SaveComponentAsync(component),
+        CategoryModel category => categoryService.SaveCategoryAsync(category),
+        BlueprintModel blueprint => blueprintService.SaveBlueprintAsync(blueprint),
         _ => Task.CompletedTask
     };
 
     public Task DeleteRecordAsync(IBaseDataRecord? record) => record switch
     {
-        Component component => componentService.DeleteComponentAsync(component),
-        Category category => categoryService.DeleteCategoryAsync(category),
-        Blueprint blueprint => blueprintService.DeleteBlueprintAsync(blueprint),
+        ComponentModel component => componentService.DeleteComponentAsync(component),
+        CategoryModel category => categoryService.DeleteCategoryAsync(category),
+        BlueprintModel blueprint => blueprintService.DeleteBlueprintAsync(blueprint),
         _ => Task.CompletedTask
     };
 

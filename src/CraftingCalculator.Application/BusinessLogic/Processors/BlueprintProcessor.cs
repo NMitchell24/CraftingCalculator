@@ -43,7 +43,7 @@ public static class BlueprintProcessor
     /// combined map for <paramref name="quantity"/> of the blueprint, alongside the items its rounded-up
     /// crafts produce beyond what was asked for and how long those crafts take.
     /// </summary>
-    public static FlattenResult Flatten(Blueprint blueprint, long quantity)
+    public static FlattenResult Flatten(BlueprintModel blueprint, long quantity)
     {
         BlueprintMap surplus = new();
         (ComponentMap components, TimeSpan productionTime) = Flatten(blueprint, quantity, surplus, 0);
@@ -52,7 +52,7 @@ public static class BlueprintProcessor
     }
 
     private static (ComponentMap Components, TimeSpan ProductionTime) Flatten(
-        Blueprint blueprint, long quantity, BlueprintMap surplus, int depth)
+        BlueprintModel blueprint, long quantity, BlueprintMap surplus, int depth)
     {
         ThrowIfTooDeep(blueprint, depth);
 
@@ -83,9 +83,9 @@ public static class BlueprintProcessor
     /// recursively. Children are scaled by the crafts <paramref name="quantity"/> takes, not by
     /// <paramref name="quantity"/> itself, so a yield above 1 reduces everything below it.
     /// </summary>
-    public static BlueprintNode BuildNode(Blueprint blueprint, long quantity) => BuildNode(blueprint, quantity, 0);
+    public static BlueprintNode BuildNode(BlueprintModel blueprint, long quantity) => BuildNode(blueprint, quantity, 0);
 
-    private static BlueprintNode BuildNode(Blueprint blueprint, long quantity, int depth)
+    private static BlueprintNode BuildNode(BlueprintModel blueprint, long quantity, int depth)
     {
         ThrowIfTooDeep(blueprint, depth);
 
@@ -123,7 +123,7 @@ public static class BlueprintProcessor
     /// </summary>
     public static bool CountsByCraft(BlueprintNode node) => !node.IsComponent && node.Crafts != node.Quantity;
 
-    private static void ThrowIfTooDeep(Blueprint blueprint, int depth)
+    private static void ThrowIfTooDeep(BlueprintModel blueprint, int depth)
     {
         if (depth > MaxBlueprintDepth)
         {

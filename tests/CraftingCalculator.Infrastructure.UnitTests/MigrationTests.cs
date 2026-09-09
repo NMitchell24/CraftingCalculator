@@ -1,12 +1,12 @@
 using AwesomeAssertions;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Entities;
+using CraftingCalculator.Domain.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
-using CategoryModel = CraftingCalculator.Domain.Models.Category;
 
 namespace CraftingCalculator.Infrastructure.UnitTests;
 

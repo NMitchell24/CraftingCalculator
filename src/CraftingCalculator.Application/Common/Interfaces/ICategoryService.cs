@@ -4,15 +4,15 @@ namespace CraftingCalculator.Application.Common.Interfaces;
 
 public interface ICategoryService
 {
-    Task<List<Category>> GetCategoriesAsync();
+    Task<List<CategoryModel>> GetCategoriesAsync();
 
-    Task<Category?> GetCategoryByIdAsync(int id);
+    Task<CategoryModel?> GetCategoryByIdAsync(int id);
 
     /// <summary>
-    /// Saves or adds the category. If <see cref="Category.Id"/> is 0 a new one is added,
+    /// Saves or adds the category. If <see cref="CategoryModel.Id"/> is 0 a new one is added,
     /// otherwise the existing record is updated.
     /// </summary>
-    Task SaveCategoryAsync(Category? category);
+    Task SaveCategoryAsync(CategoryModel? category);
 
-    Task DeleteCategoryAsync(Category? category);
+    Task DeleteCategoryAsync(CategoryModel? category);
 }

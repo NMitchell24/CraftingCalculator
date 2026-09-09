@@ -9,7 +9,7 @@ namespace CraftingCalculator.Domain.Models;
 public class BlueprintQuantity : IBaseQuantityRecord
 {
     public int Id { get; set; }
-    public Blueprint Blueprint { get; set; }
+    public BlueprintModel Blueprint { get; set; }
     private long _quantity;
     public long Quantity
     {
@@ -65,7 +65,7 @@ public class BlueprintQuantity : IBaseQuantityRecord
 
     public string DisplayName => Name + " x" + Quantity;
 
-    public BlueprintQuantity(Blueprint blueprint, long quantity, int id)
+    public BlueprintQuantity(BlueprintModel blueprint, long quantity, int id)
     {
         Blueprint = blueprint;
         Quantity = quantity;
