@@ -836,17 +836,40 @@ html, body {
     padding-bottom: 8px;
 }
 
-/* Sticky on the Dataset list only. Its scrollport is the document behind the fixed app bar, so the bar
-   parks at the bar's bottom edge and the rows scroll underneath - which is also why it needs an opaque
-   background of its own. BlueprintPickerDialog uses the same control inside .mud-dialog-content, whose
-   scrollport and surface colour are both different, and is left scrolling with its list. */
-.dataset-page .record-search {
+/* The bar parks at the top of whichever scrollport it is in and the rows scroll underneath - which is
+   why it needs an opaque background of its own. Both hosts are listed because neither selector covers
+   the other: the Dataset list scrolls the document, BlueprintPickerDialog scrolls its own dialog
+   content, and the offset and surface colour differ with it. */
+.dataset-page .record-search,
+.picker-dialog-content .record-search {
     position: sticky;
-    top: var(--app-bar-bottom);
     /* Only has to beat the rows, which are all static. Far below MudBlazor's app bar (1100) and popover
        (1200) layers, so the bar still passes under the app bar and under its own filter menu. */
     z-index: 1;
+}
+
+/* The Dataset list's scrollport is the document behind the fixed app bar, so the bar parks at the bar's
+   bottom edge, on the page background. */
+.dataset-page .record-search {
+    top: var(--app-bar-bottom);
     background-color: var(--mud-palette-background);
+}
+
+/* Components/Dialogs/BlueprintPickerDialog.razor, whose scrollport is its own .mud-dialog-content.
+   Sticky offsets are measured from the scroll container's content box, so MudBlazor's 8px padding-top
+   on that element would hold the bar 8px clear of the top edge and let the rows scroll through the
+   gap. Moving that padding onto the bar itself parks it flush against the edge and keeps the same
+   spacing above the search field. The class is doubled with .mud-dialog-content because MudBlazor's
+   own padding is set through `.mud-dialog .mud-dialog-content` - two classes, which a single class of
+   ours loses to however late it is declared. */
+.mud-dialog-content.picker-dialog-content {
+    padding-top: 0;
+}
+
+.picker-dialog-content .record-search {
+    top: 0;
+    padding-top: 8px;
+    background-color: var(--mud-palette-surface);
 }
 
 /* MudBlazor's Adornment is a single enum (None/Start/End), so the search icon and the filter button

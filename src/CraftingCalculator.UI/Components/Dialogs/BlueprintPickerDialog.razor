@@ -1,4 +1,5 @@
-<MudDialog>
+@* The search bar is sticky inside the dialog content, which needs a hook of its own (app.css). *@
+<MudDialog ContentClass="picker-dialog-content">
     <DialogContent>
         <RecordSearchBar Records="_blueprints" Placeholder="Search blueprints" FilterChanged="OnFilterChanged" />
 
