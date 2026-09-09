@@ -31,15 +31,6 @@ public class ComponentQuantity : IBaseQuantityRecord
         }
     }
 
-    public string Tooltip
-    {
-        get => Component.Tooltip;
-        set
-        {
-            // Projected from Component.Tooltip - inert for the reason given on Name.
-        }
-    }
-
     public DataType Type
     {
         get => DataType.Component;

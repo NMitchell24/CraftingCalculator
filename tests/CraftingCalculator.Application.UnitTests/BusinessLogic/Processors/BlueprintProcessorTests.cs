@@ -471,6 +471,24 @@ public class BlueprintProcessorTests
     }
 
     [Test]
+    public void BuildNode_CarriesTheSourceRecordOnEveryNode()
+    {
+        ComponentModel screw = NewComponent("Screw");
+        BlueprintModel child = NewBlueprint("Bracket");
+        child.Components.Add(screw, 3);
+
+        BlueprintModel parent = NewBlueprint("Frame");
+        parent.ChildBlueprints.Add(child, 2);
+
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1);
+
+        tree.Source.Should().BeSameAs(parent);
+        BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
+        childNode.Source.Should().BeSameAs(child);
+        childNode.Children.Should().ContainSingle().Subject.Source.Should().BeSameAs(screw);
+    }
+
+    [Test]
     public void CountsByCraft_YieldLeavingFewerCraftsThanItems_IsTrue()
     {
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);

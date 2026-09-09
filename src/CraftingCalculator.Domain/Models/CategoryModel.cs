@@ -7,28 +7,31 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class CategoryModel : IBaseDataRecord
 {
-    public const string ALL = "All";
+    public const string All = "All";
     public string? Name { get; set; }
     public int Id { get; set; }
     public string? Description { get; set; }
-    public string Tooltip { get => Description ?? ""; set { } }
     public DataType Type
     {
         get
         {
             return DataType.Category;
         }
-        //Don't allow this to be changed as it should remain static
-        set { }
+
+        set
+        {
+            //Don't allow this to be changed as it should remain static
+            _ = value;
+        }
     }
 
     public IBaseDataRecord Clone()
     {
-        CategoryModel clone = new CategoryModel()
+        CategoryModel clone = new()
         {
-            Id = this.Id,
-            Name = this.Name,
-            Description = this.Description
+            Id = Id,
+            Name = Name,
+            Description = Description
         };
 
         return clone;

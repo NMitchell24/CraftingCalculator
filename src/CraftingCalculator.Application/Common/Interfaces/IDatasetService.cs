@@ -11,7 +11,7 @@ public interface IDatasetService
 {
     /// <summary>
     /// Every record of <paramref name="type"/>, ordered by name.
-    /// <see cref="DataType.Category"/> excludes the seeded <see cref="CategoryModel.ALL"/> row,
+    /// <see cref="DataType.Category"/> excludes the seeded <see cref="CategoryModel.All"/> row,
     /// which is a category sentinel rather than a category a user can edit.
     /// </summary>
     Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type);
@@ -32,7 +32,7 @@ public interface IDatasetService
 
     /// <summary>
     /// Deletes every record of <paramref name="type"/> that <see cref="GetRecordsAsync"/> returns -
-    /// so for <see cref="DataType.Category"/> the seeded <see cref="CategoryModel.ALL"/> row survives.
+    /// so for <see cref="DataType.Category"/> the seeded <see cref="CategoryModel.All"/> row survives.
     /// </summary>
     Task DeleteAllOfTypeAsync(DataType type);
 }

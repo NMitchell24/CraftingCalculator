@@ -53,7 +53,7 @@ public class DatasetServiceTests
     {
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
-            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.ALL },
+            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.All },
             new CategoryModel { Id = 2, Name = "Tools" }
         ]);
 
@@ -67,8 +67,8 @@ public class DatasetServiceTests
     {
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
         [
-            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.ALL },
-            new CategoryModel { Id = 7, Name = CategoryModel.ALL }
+            new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.All },
+            new CategoryModel { Id = 7, Name = CategoryModel.All }
         ]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
@@ -168,7 +168,7 @@ public class DatasetServiceTests
     [Test]
     public async Task DeleteAllOfTypeAsync_Category_KeepsTheSeededAllCategory()
     {
-        CategoryModel all = new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.ALL };
+        CategoryModel all = new CategoryModel { Id = DatabaseSeedConstants.AllCategoryId, Name = CategoryModel.All };
         CategoryModel tools = new CategoryModel { Id = 2, Name = "Tools" };
         _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([all, tools]);
 

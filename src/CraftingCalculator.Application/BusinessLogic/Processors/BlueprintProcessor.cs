@@ -97,7 +97,7 @@ public static class BlueprintProcessor
             long componentQuantity = component.Quantity * crafts;
             //Named from Quantity on: four adjacent long arguments would otherwise transpose silently.
             children.Add(new BlueprintNode(
-                component.Name, component.Tooltip, IsComponent: true,
+                component.Component,
                 Quantity: componentQuantity, Crafts: 0, Yield: 0, Surplus: 0,
                 ProductionTime: DurationMath.Scale(component.Component.ProductionTime, componentQuantity),
                 Children: []));
@@ -109,7 +109,7 @@ public static class BlueprintProcessor
         }
 
         return new BlueprintNode(
-            blueprint.Name ?? "", blueprint.Tooltip, IsComponent: false,
+            blueprint,
             Quantity: quantity, Crafts: crafts, Yield: blueprint.Yield,
             Surplus: crafts * blueprint.Yield - quantity,
             ProductionTime: DurationMath.Scale(blueprint.ProductionTime, crafts),

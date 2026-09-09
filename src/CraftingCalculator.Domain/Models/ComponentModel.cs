@@ -1,5 +1,4 @@
 using CraftingCalculator.Domain.Enums;
-using System;
 
 namespace CraftingCalculator.Domain.Models;
 
@@ -21,25 +20,6 @@ public class ComponentModel : IBaseDataRecord
         set => field = value < TimeSpan.Zero ? TimeSpan.Zero : value;
     }
 
-    public string Tooltip
-    {
-        get
-        {
-            string ret = Description ?? "";
-            if (Cost > 0)
-            {
-                ret = ret +
-                    Environment.NewLine + Environment.NewLine +
-                    "Cost Per Item: " + $"{Cost:C2}";
-            }
-            return ret;
-        }
-        set
-        {
-            // Computed from Description/Cost - the setter exists only to satisfy
-            // IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
-        }
-    }
     public DataType Type
     {
         get

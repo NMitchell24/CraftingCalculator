@@ -12,7 +12,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        IEnumerable<Blueprint> matching = category.Name == CategoryModel.ALL
+        IEnumerable<Blueprint> matching = category.Name == CategoryModel.All
             ? graph.BlueprintsById.Values
             : graph.BlueprintsById.Values.Where(blueprintEntity => blueprintEntity.CategoryId == category.Id);
 

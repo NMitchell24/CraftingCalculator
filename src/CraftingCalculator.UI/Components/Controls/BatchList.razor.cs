@@ -1,4 +1,5 @@
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -19,7 +20,7 @@ public partial class BatchList : ComponentBase, IDisposable
     }
 
     private Task ShowInfoAsync(BlueprintQuantity selected) =>
-        DialogService.ShowMessageBoxAsync(selected.Name, selected.Tooltip);
+        InfoDialog.ShowAsync(DialogService, selected.Blueprint);
 
     public void Dispose()
     {

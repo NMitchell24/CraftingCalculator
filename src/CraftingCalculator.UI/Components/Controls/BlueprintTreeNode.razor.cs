@@ -32,7 +32,7 @@ public partial class BlueprintTreeNode : ComponentBase
     /// </summary>
     // A yield above 1 makes the craft count the actionable number - the user performs crafts, not items -
     // so those rows count crafts and take the asterisk that StepsTree's legend explains. The quantity
-    // stays one tap away in CraftStepDialog.
+    // stays one tap away in InfoDialog.
     private string Label => BlueprintProcessor.CountsByCraft(Node)
         ? $"{Node.Name} x{Node.Crafts}*"
         : $"{Node.Name} x{Node.Quantity}";
@@ -46,11 +46,5 @@ public partial class BlueprintTreeNode : ComponentBase
     // "Instant" would bury the handful of rows that do take time.
     private string? EndText => Node.ProductionTime > TimeSpan.Zero ? DurationProcessor.Format(Node.ProductionTime) : null;
 
-    private Task OpenDetailAsync()
-    {
-        DialogParameters<CraftStepDialog> parameters = new() { { dialog => dialog.Node, Node } };
-        DialogOptions options = new() { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, CloseOnEscapeKey = true };
-
-        return DialogService.ShowAsync<CraftStepDialog>(Node.Name, parameters, options);
-    }
+    private Task OpenDetailAsync() => InfoDialog.ShowAsync(DialogService, Node);
 }

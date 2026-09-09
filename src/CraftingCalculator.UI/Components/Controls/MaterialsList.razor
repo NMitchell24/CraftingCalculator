@@ -12,7 +12,7 @@
         <MudList T="ComponentQuantity">
             @foreach (ComponentQuantity componentQuantity in State.TotalComponents)
             {
-                <MudListItem T="ComponentQuantity">
+                <MudListItem T="ComponentQuantity" OnClick="@(() => ShowInfoAsync(componentQuantity))">
                     <div class="materials-row">
                         <MudText Class="list-row-name materials-row-name">@componentQuantity.Name</MudText>
                         @* Labels and values are siblings in one grid rather than a column per stat, so

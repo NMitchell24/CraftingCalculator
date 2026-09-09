@@ -2,8 +2,9 @@ namespace CraftingCalculator.Domain.Models;
 
 /// <summary>
 /// One node in a blueprint's component breakdown tree: either the blueprint itself, one of its nested
-/// child blueprints, or a leaf component. <see cref="Name"/> is the source blueprint/component's own
-/// name, unadorned - same-named blueprints collide, matching the WPF app's tree.
+/// child blueprints, or a leaf component. <see cref="Source"/> is the record the node stands for, and
+/// <see cref="Name"/> is that record's own name, unadorned - same-named blueprints collide, matching
+/// the WPF app's tree.
 /// <see cref="Quantity"/> is the effective amount at this position in the tree, already multiplied
 /// through every ancestor's quantity. <see cref="Crafts"/> is how many craft operations produce that
 /// amount, which is fewer than <see cref="Quantity"/> whenever the blueprint's yield is above 1; it is
@@ -15,12 +16,17 @@ namespace CraftingCalculator.Domain.Models;
 /// children beneath it, so summing the whole tree counts every step exactly once.
 /// </summary>
 public sealed record BlueprintNode(
-    string Name,
-    string Tooltip,
-    bool IsComponent,
+    IBaseDataRecord Source,
     long Quantity,
     long Crafts,
     long Yield,
     long Surplus,
     TimeSpan ProductionTime,
-    IReadOnlyList<BlueprintNode> Children);
+    IReadOnlyList<BlueprintNode> Children)
+{
+    /// <summary>The name of the blueprint or component this node stands for.</summary>
+    public string Name => Source.Name ?? "";
+
+    /// <summary>Whether this node is a gathered component rather than a crafted blueprint.</summary>
+    public bool IsComponent => Source is ComponentModel;
+}
