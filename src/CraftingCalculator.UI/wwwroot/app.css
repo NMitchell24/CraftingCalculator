@@ -380,6 +380,17 @@ html, body {
     color: var(--mud-palette-text-primary);
 }
 
+/* Success/Error rather than fixed hex values: MudThemeProvider re-emits both palette variables for
+   the dark theme, so the sign colours follow the theme without a second rule. A profit of exactly
+   zero gets neither class and keeps the text-primary colour above - an empty batch is not a win. */
+.summary-profit-positive {
+    color: var(--mud-palette-success);
+}
+
+.summary-profit-negative {
+    color: var(--mud-palette-error);
+}
+
 /* The tab row's own row, holding nothing else. Sharing it with the pane actions sized the tab bar by
    whatever they left over, so it changed width whenever the active pane's action count changed. */
 .pane-toolbar {

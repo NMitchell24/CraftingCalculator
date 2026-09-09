@@ -27,6 +27,7 @@ public static class AppTheme
         public const string LightMuted = "#5A6270"; // TextSecondary + ActionDefault + DrawerIcon
         public const string LightLines = "#E1E4EA"; // Divider + LinesDefault + TableLines
         public const string LightSuccess = "#2E7D32";
+        public const string LightError = "#C62828";
 
         // Dark - near-black ground, lifted slate surfaces, warmed copper primary
         public const string DarkPrimary = "#E39A5C";
@@ -39,6 +40,7 @@ public static class AppTheme
         public const string DarkInk = "#E4E7EC"; // SecondaryContrastText + AppbarText + DrawerText + TextPrimary
         public const string DarkMuted = "#98A1B0"; // TextSecondary + ActionDefault + DrawerIcon
         public const string DarkSuccess = "#66BB6A";
+        public const string DarkError = "#EF5350";
     }
 
     // Inter is bundled locally (wwwroot/Fonts) and registered via @font-face in app.css. The display
@@ -73,7 +75,8 @@ public static class AppTheme
             Divider = ForgeColors.LightLines,
             LinesDefault = ForgeColors.LightLines,
             TableLines = ForgeColors.LightLines,
-            Success = ForgeColors.LightSuccess
+            Success = ForgeColors.LightSuccess,
+            Error = ForgeColors.LightError
         },
         PaletteDark = new PaletteDark
         {
@@ -95,7 +98,8 @@ public static class AppTheme
             Divider = ForgeColors.DarkSlate,
             LinesDefault = ForgeColors.DarkSlate,
             TableLines = ForgeColors.DarkSlate,
-            Success = ForgeColors.DarkSuccess
+            Success = ForgeColors.DarkSuccess,
+            Error = ForgeColors.DarkError
         },
         Typography = BuildTypography(),
         // AppbarHeight is deliberately left at MudBlazor's 64px default. The app bar is Dense, and
@@ -107,8 +111,8 @@ public static class AppTheme
     };
 
     // FontSize uses clamp(minPx, Xvw, maxPx) - px + vw, never rem. Android/iOS "Font size"
-    // accessibility inflates the root em, so any rem-based bound balloons with it; px is immune. The
-    // vw term keeps text a stable fraction of the screen and lets "Display size" enlarge it modestly;
+    // accessibility inflates the root em, so any rem-based bound balloons with it; px is immune. Using
+    // viewport width keeps text a stable fraction of the screen and lets "Display size" enlarge it modestly;
     // maxPx holds the look on wide screens, minPx floors legibility.
     private static Typography BuildTypography()
     {
