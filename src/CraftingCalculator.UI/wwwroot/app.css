@@ -838,17 +838,19 @@ html, body {
 /* Snackbars (configured in MauiProgram.cs). MudBlazor's own rule for this position is a flat
    `bottom: 24px`, which on Android lands on the gesture bar; and its default position is TopRight,
    which lands squarely on the app bar's +/settings/overflow cluster - at z-index 1500 over every bar
-   in this file, for eight seconds, swallowing the taps meant for the settings gear underneath. Docking
-   arithmetic matches .editor-action-bar; the 56px is that bar's height. Both that and
-   --actions-bar-height are held constant on the screens that do not show those bars: a slightly high
-   toast there is cheaper than making this position depend on which page is mounted. */
+   in this file, for eight seconds, swallowing the taps meant for the settings gear underneath. Above
+   sm the arithmetic matches .editor-action-bar, the only bottom bar there; the 56px is that bar's
+   height. At xs the toast docks flush on .actions-bar instead, so the two read as one stack rather
+   than a toast floating over the page. Both bar heights are held constant on the screens that do not
+   show those bars: a slightly high toast there is cheaper than making this position depend on which
+   page is mounted. */
 .mud-snackbar-location-bottom-center {
     bottom: calc(56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
 @media (max-width: 599.98px) {
     .mud-snackbar-location-bottom-center {
-        bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + 56px + 8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+        bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
     }
 }
 
@@ -857,6 +859,12 @@ html, body {
    timeout only now, which is also why ShowCloseIcon is off (MauiProgram.cs). */
 .mud-snackbar {
     pointer-events: none;
+    /* MudBlazor's min-width is the width every toast in this app actually renders at, not a floor its
+       max-width grows past: #mud-snackbar-container is `left: 50%` with no `right`, so its shrink-to-fit
+       width is capped by the child's minimum. Widening a toast therefore means raising that minimum -
+       288px + 50px on each side. The clamp keeps a 16px gutter on phones too narrow for the full
+       388px, and floors at MudBlazor's own 288px so this can only ever widen a toast. */
+    min-width: clamp(288px, calc(100vw - 64px), 388px);
 }
 
 /* House style is set on MudDialogProvider (MainLayout.razor); these are the two things it cannot
