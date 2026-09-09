@@ -1,7 +1,5 @@
 using CraftingCalculator.Domain.Enums;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System;
 
 namespace CraftingCalculator.Domain.Models;
 
@@ -42,8 +40,6 @@ public class BlueprintModel : IBaseDataRecord
         set => field = value < TimeSpan.Zero ? TimeSpan.Zero : value;
     }
 
-    [SuppressMessage("Major Code Smell", "S2325",
-        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public string Tooltip
     {
         get
@@ -91,8 +87,6 @@ public class BlueprintModel : IBaseDataRecord
         }
     }
 
-    [SuppressMessage("Major Code Smell", "S2325",
-        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public DataType Type
     {
         get
@@ -118,8 +112,6 @@ public class BlueprintModel : IBaseDataRecord
 
     public bool IsSelected { get; set; }
 
-    [SuppressMessage("Major Code Smell", "S2325",
-        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public IBaseDataRecord Clone()
     {
         BlueprintModel clone = new()
@@ -138,8 +130,6 @@ public class BlueprintModel : IBaseDataRecord
         return clone;
     }
 
-    [SuppressMessage("Major Code Smell", "S2325",
-        Justification = "Implements IBaseDataRecord; a static member cannot implement an interface member.")]
     public IBaseDataRecord CopyForSave()
     {
         BlueprintModel ret = (BlueprintModel)Clone();

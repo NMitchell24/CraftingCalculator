@@ -1,5 +1,4 @@
 using CraftingCalculator.Domain.BusinessLogic;
-using System.Diagnostics.CodeAnalysis;
 using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.BusinessLogic.Processors;
@@ -124,8 +123,6 @@ public static class BlueprintProcessor
     /// </summary>
     public static bool CountsByCraft(BlueprintNode node) => !node.IsComponent && node.Crafts != node.Quantity;
 
-    [SuppressMessage("Major Code Smell", "S1172",
-        Justification = "'blueprint' is used: Name is interpolated into the exception message.")]
     private static void ThrowIfTooDeep(BlueprintModel blueprint, int depth)
     {
         if (depth > MaxBlueprintDepth)
