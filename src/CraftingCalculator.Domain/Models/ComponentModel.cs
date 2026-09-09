@@ -2,11 +2,12 @@ using CraftingCalculator.Domain.Enums;
 
 namespace CraftingCalculator.Domain.Models;
 
-public class ComponentModel : IBaseDataRecord
+public class ComponentModel : ICategorizedRecord
 {
     public int Id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
+    public CategoryModel? Category { get; set; }
     public double Cost { get; set; }
 
     /// <summary>
@@ -29,6 +30,7 @@ public class ComponentModel : IBaseDataRecord
         set
         {
             //Don't allow this to be changed as it should remain static.
+            _ = value;
         }
     }
 
@@ -39,6 +41,7 @@ public class ComponentModel : IBaseDataRecord
             Id = Id,
             Name = Name,
             Description = Description,
+            Category = Category,
             Cost = Cost,
             ProductionTime = ProductionTime
         };

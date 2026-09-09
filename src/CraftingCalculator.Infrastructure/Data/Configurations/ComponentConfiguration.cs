@@ -15,5 +15,13 @@ public class ComponentConfiguration : IEntityTypeConfiguration<Component>
         //Ticks, for the reason given in BlueprintConfiguration.
         builder.Property(component => component.ProductionTime).HasConversion<long>();
         builder.HasIndex(component => component.Name);
+        builder.HasIndex(component => component.CategoryId);
+
+        //SetNull rather than Cascade, matching the same relationship on Blueprint: deleting a category
+        //is a filing change, not a reason to delete what was filed under it.
+        builder.HasOne(component => component.Category)
+            .WithMany(category => category.Components)
+            .HasForeignKey(component => component.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

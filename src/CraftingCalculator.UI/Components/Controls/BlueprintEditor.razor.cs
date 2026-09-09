@@ -15,22 +15,17 @@ public partial class BlueprintEditor : ComponentBase
 
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
 
-    private List<CategoryModel> _categories = [];
     private List<IBaseDataRecord> _components = [];
     private List<IBaseDataRecord> _childBlueprintCandidates = [];
 
     private DataType _partType = DataType.Component;
     private IBaseDataRecord? _selectedPart;
     private long _quantityToAdd = 1;
-    private int? _categoryId;
 
     private List<IBaseQuantityRecord> Parts => BlueprintPartProcessor.GetParts(Model);
 
     protected override async Task OnInitializedAsync()
     {
-        _categoryId = Model.Category?.Id;
-
-        _categories = [.. (await DatasetService.GetRecordsAsync(DataType.Category)).Cast<CategoryModel>()];
         _components = await DatasetService.GetRecordsAsync(DataType.Component);
 
         // Ports ConfigureBlueprintsViewModel.BlueprintSelectedType: a blueprint cannot be its own part.
@@ -53,14 +48,6 @@ public partial class BlueprintEditor : ComponentBase
         _partType = type;
         _selectedPart = null;
         _quantityToAdd = 1;
-    }
-
-    private async Task OnCategoryChangedAsync(int? categoryId)
-    {
-        _categoryId = categoryId;
-        Model.Category = _categories.FirstOrDefault(category => category.Id == categoryId);
-
-        await NotifyChangedAsync();
     }
 
     private async Task AddComponentAsync()

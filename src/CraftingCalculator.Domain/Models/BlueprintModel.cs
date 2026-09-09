@@ -5,7 +5,7 @@ namespace CraftingCalculator.Domain.Models;
 /// <summary>
 /// Represents an individual UI Model for the Blueprints
 /// </summary>
-public class BlueprintModel : IBaseDataRecord
+public class BlueprintModel : ICategorizedRecord
 {
     public ComponentMap Components { get; private set; }
     public BlueprintMap ChildBlueprints { get; private set; }

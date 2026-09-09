@@ -14,7 +14,10 @@
             {
                 <MudListItem T="ComponentQuantity" OnClick="@(() => ShowInfoAsync(componentQuantity))">
                     <div class="materials-row">
-                        <MudText Class="list-row-name materials-row-name">@componentQuantity.Name</MudText>
+                        <div class="card-row-header">
+                            <MudText Class="list-row-name card-row-name">@componentQuantity.Name</MudText>
+                            <CategoryChip Record="@componentQuantity.Component" Class="card-row-category" />
+                        </div>
                         @* Labels and values are siblings in one grid rather than a column per stat, so
                            the two value cells share a baseline no matter how the labels wrap. *@
                         <div class="materials-row-stats">

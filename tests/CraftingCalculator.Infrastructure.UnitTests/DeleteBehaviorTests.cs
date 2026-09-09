@@ -108,6 +108,24 @@ public class DeleteBehaviorTests
     }
 
     [Test]
+    public async Task DeletingCategory_SetsComponentsCategoryIdToNullRatherThanDeletingThem()
+    {
+        await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();
+        Category category = new() { Name = "Ores" };
+        Component component = new() { Name = "Iron", Category = category };
+        seed.Components.Add(component);
+        await seed.SaveChangesAsync();
+
+        await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
+        await act.Categories.Where(candidate => candidate.Id == category.Id).ExecuteDeleteAsync();
+
+        await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
+        Component? reloaded = await verify.Components.FirstOrDefaultAsync(candidate => candidate.Id == component.Id);
+        reloaded.Should().NotBeNull();
+        reloaded!.CategoryId.Should().BeNull();
+    }
+
+    [Test]
     public async Task DeletingFavorite_CascadesItsSavedBlueprintQuantities()
     {
         await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();

@@ -1,0 +1,10 @@
+@* Bound on the category's id rather than the CategoryModel itself: the model has no value equality and
+   Model.Category comes from a different load than _categories, so MudSelect's reference comparison would
+   never preselect the record's current category. *@
+<MudSelect T="int?" Value="_categoryId" ValueChanged="OnCategoryChangedAsync" Label="Category" Variant="Variant.Outlined"
+           FullWidth="true" Clearable="true" Class="mb-4">
+    @foreach (CategoryModel category in _categories)
+    {
+        <MudSelectItem T="int?" Value="@category.Id">@category.Name</MudSelectItem>
+    }
+</MudSelect>

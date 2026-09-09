@@ -7,4 +7,6 @@ public class Category
     public string Description { get; set; } = string.Empty;
 
     public List<Blueprint> Blueprints { get; set; } = [];
+
+    public List<Component> Components { get; set; } = [];
 }

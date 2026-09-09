@@ -153,14 +153,14 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
         if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out Category? categoryEntity))
         {
-            model.Category = ToCategoryModel(categoryEntity);
+            model.Category = CategoryDAO.ToModel(categoryEntity);
         }
 
         foreach (BlueprintComponent blueprintComponent in graph.ComponentsByBlueprintId[entity.Id])
         {
             if (graph.ComponentsById.TryGetValue(blueprintComponent.ComponentId, out Component? componentEntity))
             {
-                model.Components.Add(ToComponentModel(componentEntity), blueprintComponent.Quantity, blueprintComponent.Id);
+                model.Components.Add(ToComponentModel(componentEntity, graph), blueprintComponent.Quantity, blueprintComponent.Id);
             }
         }
 
@@ -175,21 +175,26 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
         return model;
     }
 
-    private static CategoryModel ToCategoryModel(Category entity) => new()
+    private static ComponentModel ToComponentModel(Component entity, BlueprintGraph graph)
     {
-        Id = entity.Id,
-        Name = entity.Name,
-        Description = entity.Description
-    };
+        ComponentModel model = new()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            Cost = entity.Cost,
+            ProductionTime = entity.ProductionTime
+        };
 
-    private static ComponentModel ToComponentModel(Component entity) => new()
-    {
-        Id = entity.Id,
-        Name = entity.Name,
-        Description = entity.Description,
-        Cost = entity.Cost,
-        ProductionTime = entity.ProductionTime
-    };
+        // Resolved through the graph rather than an Include: LoadGraphAsync reads Categories once for
+        // the whole tree, and these entities are detached, so the navigation is never populated.
+        if (entity.CategoryId is int categoryId && graph.CategoriesById.TryGetValue(categoryId, out Category? categoryEntity))
+        {
+            model.Category = CategoryDAO.ToModel(categoryEntity);
+        }
+
+        return model;
+    }
 
     private sealed record BlueprintGraph(
         Dictionary<int, Blueprint> BlueprintsById,

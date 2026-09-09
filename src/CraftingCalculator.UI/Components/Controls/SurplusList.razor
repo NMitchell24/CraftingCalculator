@@ -16,7 +16,10 @@
                     @* Same row shape as MaterialsList - name, then a paired label/value grid - so it
                        reuses those classes rather than cloning them under a surplus- prefix. *@
                     <div class="materials-row">
-                        <MudText Class="list-row-name materials-row-name">@blueprintQuantity.Name</MudText>
+                        <div class="card-row-header">
+                            <MudText Class="list-row-name card-row-name">@blueprintQuantity.Name</MudText>
+                            <CategoryChip Record="@blueprintQuantity.Blueprint" Class="card-row-category" />
+                        </div>
                         <div class="materials-row-stats">
                             <MudText Typo="Typo.caption" Class="materials-row-label">Quantity</MudText>
                             <MudText Typo="Typo.caption" Class="materials-row-label materials-row-end">Value</MudText>
