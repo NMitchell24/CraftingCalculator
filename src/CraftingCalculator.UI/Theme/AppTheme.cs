@@ -112,7 +112,7 @@ public static class AppTheme
 
     // FontSize uses clamp(minPx, Xvw, maxPx) - px + vw, never rem. Android/iOS "Font size"
     // accessibility inflates the root em, so any rem-based bound balloons with it; px is immune. Using
-    // view width keeps text a stable fraction of the screen and lets "Display size" enlarge it modestly;
+    // viewport width keeps text a stable fraction of the screen and lets "Display size" enlarge it modestly;
     // maxPx holds the look on wide screens, minPx floors legibility.
     private static Typography BuildTypography()
     {
