@@ -1,0 +1,47 @@
+<div class="record-search">
+    <div class="record-search-row">
+        @* Adornment is one enum in MudBlazor 9.7.0 (None/Start/End), so the search icon and the filter
+           button cannot both be adornments of this field - the menu is a sibling in the flex row. *@
+        <MudTextField T="string" Value="@_filter.Search" ValueChanged="OnSearchChangedAsync"
+                      Placeholder="@Placeholder" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true"
+                      Class="record-search-field" />
+
+        @if (_showFilter)
+        {
+            @* Right-aligned on the button rather than MudMenu's default BottomLeft/TopLeft, which hangs
+               the panel off the button's left edge - against the right screen edge that overflows, and
+               MudBlazor's correction shifts the whole panel left of the icon it belongs to. *@
+            <MudMenu Icon="@Icons.Material.Filled.FilterList" AriaLabel="Filter by category"
+                     Color="@(_filter.CategoryIds.Count == 0 ? Color.Default : Color.Primary)"
+                     AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+                     PopoverClass="record-search-filter-menu"
+                     MaxHeight="280" Modal="true" LockScroll="true">
+                @* MudList renders the checkboxes itself in MultiSelection mode, and app.css already
+                   strips the card styling from lists inside a popover. *@
+                <MudList T="int" SelectionMode="SelectionMode.MultiSelection" CheckBoxColor="Color.Primary"
+                         SelectedValues="@_filter.CategoryIds" SelectedValuesChanged="OnCategoriesChangedAsync">
+                    @foreach ((int Id, string Label) option in _options)
+                    {
+                        <MudListItem T="int" Value="@option.Id" Text="@option.Label" />
+                    }
+                </MudList>
+            </MudMenu>
+        }
+    </div>
+
+    @if (_filter.CategoryIds.Count > 0)
+    {
+        @* Standalone chips rather than a MudChipSet: the set's ReadOnly is the only thing that stops a
+           chip taking a meaningless selected state on tap, and it short-circuits MudChip.OnCloseAsync
+           along with it. A chip with no OnClick and no set renders as a plain div whose close button
+           still works. *@
+        <div class="record-search-filters">
+            @foreach ((int Id, string Label) option in _options.Where(option => _filter.CategoryIds.Contains(option.Id)))
+            {
+                <MudChip T="int" Value="@option.Id" Text="@option.Label" Variant="Variant.Filled"
+                         Color="@ColorFor(option.Id)" OnClose="@(chip => RemoveAsync(chip.Value))" />
+            }
+        </div>
+    }
+</div>

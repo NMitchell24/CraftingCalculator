@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Enums;
@@ -40,16 +41,14 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private DataType _type;
     private List<IBaseDataRecord> _records = [];
-    private string _search = "";
+    private RecordFilter _filter = RecordFilter.Empty;
     private ListMode _mode = ListMode.Normal;
 
     // Ids rather than records: ReloadAsync replaces every record instance, and these models have no
     // value equality, so a selection held as records would not survive a reload.
     private readonly HashSet<int> _selected = [];
 
-    private List<IBaseDataRecord> FilteredRecords =>
-        [.. _records.Where(record => string.IsNullOrWhiteSpace(_search)
-            || (record.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false))];
+    private List<IBaseDataRecord> FilteredRecords => RecordFilterProcessor.Apply(_records, _filter);
 
     protected override async Task OnParametersSetAsync()
     {
@@ -63,11 +62,13 @@ public partial class DatasetList : ComponentBase, IDisposable
         // selection and mode would stay on screen for the length of the load below. SetMode clears
         // them and re-declares the shell against the new type before anything is awaited.
         _records = [];
-        _search = "";
+        _filter = RecordFilter.Empty;
         SetMode(ListMode.Normal);
 
         await ReloadAsync();
     }
+
+    private void OnFilterChanged(RecordFilter filter) => _filter = filter;
 
     private static string TitleFor(DataType type) => type switch
     {
@@ -184,6 +185,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
                 break;
 
+            case ListMode.Normal:
             default:
                 Edit(record);
                 break;
@@ -214,13 +216,10 @@ public partial class DatasetList : ComponentBase, IDisposable
     {
         List<IBaseDataRecord> selected = [.. _records.Where(record => _selected.Contains(record.Id))];
 
-        if (selected.Count == 0)
-        {
-            SetMode(ListMode.Normal);
-            return;
-        }
-
-        if (!await DatasetPrompts.ConfirmDeleteManyAsync(DialogService, _type, NounFor(_type, selected.Count), selected.Count))
+        // Short-circuits, so an empty selection leaves the mode without putting a confirmation for zero
+        // records on screen.
+        if (selected.Count == 0
+            || !await DatasetPrompts.ConfirmDeleteManyAsync(DialogService, _type, NounFor(_type, selected.Count), selected.Count))
         {
             SetMode(ListMode.Normal);
             return;
