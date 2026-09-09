@@ -473,7 +473,7 @@ public class BlueprintProcessorTests
     [Test]
     public void CountsByCraft_YieldLeavingFewerCraftsThanItems_IsTrue()
     {
-        Blueprint blueprint = NewBlueprint("Bracket", yield: 2);
+        BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
         BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 2);
 
@@ -484,7 +484,7 @@ public class BlueprintProcessorTests
     [Test]
     public void CountsByCraft_YieldLeavingTheTwoCountsEqual_IsFalse()
     {
-        Blueprint blueprint = NewBlueprint("Bracket", yield: 2);
+        BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
         // One Bracket still takes one craft, so there is no second number to tell the user about.
         BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 1);
@@ -503,7 +503,7 @@ public class BlueprintProcessorTests
     [Test]
     public void CountsByCraft_Component_IsFalse()
     {
-        Blueprint blueprint = NewBlueprint("Frame");
+        BlueprintModel blueprint = NewBlueprint("Frame");
         blueprint.Components.Add(NewComponent("Screw"), 3);
 
         BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1).Children.Should().ContainSingle().Subject;
