@@ -12,7 +12,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <!-- The help pages and their icons, linked in from docs/help rather than copied: that folder is the
+       single source the project site and the GitHub wiki also publish from. LogicalName is what
+       HelpService looks them up by, and it flattens the path so the resource id does not depend on where
+       the folder sits relative to this project.
+
+       The icons are deliberately EmbeddedResource on this net10.0 library and NOT MauiImage on the UI
+       project. MauiImage runs every file through the resizetizer, which rasterises each SVG once per
+       Android density bucket and per iOS scale - twenty-odd icons would become a few hundred PNGs in the
+       app package, for images the help renders as inline SVG markup and never loads as a file. Keep them
+       here; never add them to CraftingCalculator.UI's Resources\Images. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\docs\help\*.md" LogicalName="CraftingCalculator.Application.Help.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\docs\help\assets\*.svg" LogicalName="CraftingCalculator.Application.Help.Assets.%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

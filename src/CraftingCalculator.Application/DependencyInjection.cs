@@ -14,6 +14,7 @@ public static class DependencyInjection
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
         services.AddScoped<IDatasetService, DatasetService>();
+        services.AddScoped<IHelpService, HelpService>();
 
         return services;
     }

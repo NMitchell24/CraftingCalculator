@@ -1,0 +1,112 @@
+name: Help Sync
+
+# Publishes docs/help to the repository wiki, so the in-app help pages and the wiki are the same words
+# from the same files. docs/help is the single source: CraftingCalculator.Application embeds those .md
+# files as resources for the app (see its .csproj), GitHub Pages can serve them from docs/, and this
+# workflow pushes them to the wiki. Nothing here edits the content - it only reshapes it for the wiki,
+# which has no front matter and a flat page namespace.
+#
+# The wiki must already exist. GitHub does not create <repo>.wiki.git until a first page is saved in
+# the web UI, and a push to a wiki that was never initialised fails with "repository not found" -
+# create any page there once, by hand, before enabling this.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/help/**'
+      - '.github/workflows/help-sync.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: help-sync
+  cancel-in-progress: true
+
+jobs:
+
+  wiki:
+    name: Publish help to the wiki
+    runs-on: ubuntu-latest
+
+    # The wiki is a separate git repository, but GITHUB_TOKEN scopes it under contents - a read-only
+    # token clones the wiki and then fails on push.
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Checkout wiki
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rewrite help pages for the wiki
+        env:
+          # Tracks main rather than pinning this run's sha, so a re-sync rewrites no URLs and the wiki's
+          # diffs stay limited to text that actually changed.
+          RAW_ASSETS: https://raw.githubusercontent.com/${{ github.repository }}/main/docs/help/assets
+        run: |
+          set -euo pipefail
+
+          # The names the previous run wrote, which is the only record of them: a page deleted from
+          # docs/help has to stop being a wiki page, and by then there is nothing in docs/help left to
+          # recognise it by. Anything not on this list was written by hand in the wiki's web UI - a
+          # sidebar, a footer - and is left alone. The file has no markup extension, so the wiki does
+          # not serve it as a page.
+          manifest=wiki/.help-sync-pages
+
+          if [ -f "$manifest" ]; then
+            while IFS= read -r page; do
+              if [ -n "$page" ]; then
+                rm -f "wiki/$page"
+              fi
+            done < "$manifest"
+          fi
+
+          : > "$manifest"
+
+          for source in docs/help/*.md; do
+            name=$(basename "$source")
+            echo "$name" >> "$manifest"
+
+            # Three edits, all because the wiki is not Jekyll and is its own git repository:
+            #   - strip the YAML front matter, which the wiki renders as a horizontal rule and stray
+            #     text rather than as metadata;
+            #   - drop the .md from the cross-page links, since a wiki page is addressed by its title;
+            #   - point the icon images at this repository's raw content, since "assets/x.svg" is
+            #     relative to docs/help and resolves to nothing from inside the wiki repo.
+            awk 'BEGIN { infm = 0; started = 0 }
+                 NR == 1 && $0 == "---" { infm = 1; next }
+                 infm && $0 == "---" { infm = 0; next }
+                 infm { next }
+                 { if (!started && $0 == "") next; started = 1; print }' "$source" \
+              | sed -E 's/\]\(([a-z0-9-]+)\.md(#[^)]*)?\)/](\1\2)/g' \
+              | sed -E "s#\]\(assets/([a-z0-9-]+\.svg)\)#](${RAW_ASSETS}/\1)#g" > "wiki/$name"
+          done
+
+          # The wiki's landing page. Home.md is the only page name the wiki treats specially, and it is
+          # what a visitor lands on, so the Welcome page is published under both names.
+          cp wiki/welcome.md wiki/Home.md
+          echo "Home.md" >> "$manifest"
+
+      - name: Commit and push
+        working-directory: wiki
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          # A run triggered by a change to this workflow, or a re-run, usually has nothing to commit.
+          if git diff --cached --quiet; then
+            echo "Wiki already matches docs/help."
+            exit 0
+          fi
+
+          git commit -m "Sync help pages from ${{ github.sha }}"
+          git push

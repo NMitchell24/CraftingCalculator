@@ -1,3 +1,5 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
+using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.UI.State;
 using CraftingCalculator.UI.Theme;
 using Microsoft.AspNetCore.Components;
@@ -28,8 +30,12 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
 
-    // Where Settings was opened from, so the gear closes back to it rather than to a fixed route.
-    private string? _preSettingsUri;
+    // Settings and Help are both app-bar overlays: they open over whatever page is showing, and their
+    // own icon closes them back to it rather than to a fixed route. One shared stack rather than a
+    // return address each, because the overlays open over each other: opening Help from Settings has to
+    // close back to Settings, and closing that has to reach the page Settings was opened from. Two
+    // slots would point at each other there, and the pair would never unwind.
+    private readonly Stack<string> _overlayOrigins = new();
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
@@ -113,22 +119,52 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         _themeResolved = true;
     }
 
-    private bool IsSettingsOpen =>
-        Navigation.ToBaseRelativePath(Navigation.Uri).TrimStart('/')
-            .StartsWith(SettingsRoute, StringComparison.OrdinalIgnoreCase);
+    private string CurrentRoute => Navigation.ToBaseRelativePath(Navigation.Uri).TrimStart('/');
+
+    private bool IsSettingsOpen => IsOpen(SettingsRoute);
+
+    private bool IsHelpOpen => IsOpen(HelpTopics.HelpRoot);
 
     private string SettingsActionLabel => IsSettingsOpen ? "Close settings" : "Settings";
 
-    private void ToggleSettings()
+    private string HelpActionLabel => IsHelpOpen ? "Close help" : "Help for this screen";
+
+    private void ToggleSettings() => ToggleOverlay(IsSettingsOpen, $"/{SettingsRoute}");
+
+    // The target is resolved from the route the user is on now, which is why it is computed here rather
+    // than by the Help page itself: once the navigation has happened that route is gone.
+    private void ToggleHelp() => ToggleOverlay(IsHelpOpen,
+        $"/{HelpTopics.HelpRoot}/{HelpProcessor.ResolveTopic(CurrentRoute).Id}");
+
+    /// <summary>Whether the current route is <paramref name="route"/> or a page beneath it.</summary>
+    private bool IsOpen(string route) =>
+        CurrentRoute.Equals(route, StringComparison.OrdinalIgnoreCase)
+        || CurrentRoute.StartsWith($"{route}/", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Opens <paramref name="target"/> over the current page, or closes it by navigating back to
+    /// wherever the topmost open overlay was opened from.
+    /// </summary>
+    private void ToggleOverlay(bool isOpen, string target)
     {
-        if (IsSettingsOpen)
+        if (isOpen)
         {
-            Navigation.NavigateTo(_preSettingsUri ?? "/");
+            // Empty on a deep link straight into an overlay, or once the user has left one by the nav
+            // rail rather than by its own icon.
+            Navigation.NavigateTo(_overlayOrigins.Count > 0 ? _overlayOrigins.Pop() : "/");
             return;
         }
 
-        _preSettingsUri = Navigation.Uri;
-        Navigation.NavigateTo($"/{SettingsRoute}");
+        // Opening an overlay from an ordinary page starts a new chain. Anything still on the stack was
+        // left by an overlay the user walked away from with the nav rail instead of closing, and popping
+        // it later would send them back to a page they had already moved on from.
+        if (!IsSettingsOpen && !IsHelpOpen)
+        {
+            _overlayOrigins.Clear();
+        }
+
+        _overlayOrigins.Push(Navigation.Uri);
+        Navigation.NavigateTo(target);
     }
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();

@@ -32,6 +32,11 @@
             <MudText Typo="Typo.h6" Class="@AppBarTitleClass">@PageShellState.Config.Title</MudText>
 
             <div class="app-bar-end">
+                @* Context sensitive: on any page but Help this opens the help page for the route the
+                   user is on (HelpProcessor.ResolveTopic), so the button answers "what is this screen"
+                   rather than dropping everyone on the contents list. *@
+                <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" Color="Color.Inherit" OnClick="ToggleHelp"
+                               title="@HelpActionLabel" aria-label="@HelpActionLabel" />
                 <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" OnClick="ToggleSettings"
                                title="@SettingsActionLabel" aria-label="@SettingsActionLabel" />
             </div>

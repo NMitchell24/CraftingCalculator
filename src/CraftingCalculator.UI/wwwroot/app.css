@@ -122,10 +122,11 @@ html, body {
        same reason --bottom-nav-height is: the page content and the snackbars offset by it. Shorter
        than the nav on purpose - it carries a page's actions, not a second set of destinations. */
     --actions-bar-height: 48px;
-    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. One 44px
-       icon button is all either side ever holds now - back arrow on the left, settings on the right;
-       a page's own actions moved off the bar to .actions-bar and the drawer. */
-    --app-bar-side-width: 44px;
+    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Two 44px
+       icon buttons is the most either side holds - help and settings on the right, and the left track
+       matches so the centring stays exact even though it only ever carries the back arrow. A page's
+       own actions moved off the bar to .actions-bar and the drawer. */
+    --app-bar-side-width: 88px;
     /* The app bar's bottom edge in viewport coordinates. The bar is Dense (MainLayout.razor), which is
        three quarters of --mud-appbar-height, and MainLayout pads it by the status-bar inset on top.
        Anything that pins itself directly under the bar offsets by this. */
@@ -1125,4 +1126,154 @@ html, body {
     display: block;
     margin-top: 8px;
     opacity: 0.7;
+}
+
+/* Help pages. The body is a rendered Markdown fragment (Components/Pages/Help.razor), so unlike the
+   rest of the app these are bare HTML tags with no MudBlazor classes on them - every rule below is
+   scoped to .help-article for that reason, and none of it leaks into the component markup elsewhere.
+   Colours come from the palette so the pages follow light/dark with everything else. */
+.help-topic-summary {
+    display: block;
+    color: var(--mud-palette-text-secondary);
+    /* The contents list is the one place a caption is a full sentence, so it wraps rather than
+       ellipsizing the way .list-row-name does. */
+    white-space: normal;
+}
+
+/* Wider than the app's other body copy is allowed to get. Long-form prose set the full width of a
+   landscape tablet is measurably harder to read; ~70 characters is the usual comfortable maximum. */
+.help-article {
+    max-width: 68ch;
+    margin-inline: auto;
+    line-height: 1.6;
+}
+
+/* The article's own H1 is the topic title. It carries the display face by hand because the Markdown
+   renderer cannot put .display-title on it; the values are that class's, see it for why. */
+.help-article h1 {
+    font-family: 'Jersey 20', 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 2em;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    margin: 0 0 16px;
+}
+
+.help-article h2 {
+    font-size: 1.3em;
+    margin: 28px 0 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.help-article h3 {
+    font-size: 1.1em;
+    margin: 20px 0 4px;
+}
+
+/* Where a cross-page anchor (calculations.md#surplus) stops. The app bar is fixed over the document,
+   so scrollIntoView would otherwise park the heading under it; scroll-margin-top is the gap it measures
+   the stop against, and --app-bar-bottom is the same offset the sticky search bar pins itself to. */
+.help-article h1,
+.help-article h2,
+.help-article h3 {
+    scroll-margin-top: calc(var(--app-bar-bottom) + 8px);
+}
+
+.help-article p,
+.help-article ul,
+.help-article ol {
+    margin: 0 0 12px;
+}
+
+/* MudBlazor's reset zeroes list padding, which leaves the bullets and numbers hanging outside the
+   card's own padding rather than indented from the body copy. Restored here rather than globally: the
+   rest of the app's lists are MudList, which is styled and wants the reset. */
+.help-article ul,
+.help-article ol {
+    padding-inline-start: 24px;
+}
+
+.help-article li {
+    margin-bottom: 4px;
+}
+
+/* An icon the help names, inlined into the prose by HelpProcessor from docs/help/assets. Sized in em so
+   it tracks whatever it sits in - body copy, a table cell, a heading - and the width/height attributes
+   on the file itself lose to these. fill is currentColor by the time it gets here, so it takes the
+   surrounding text's colour and follows the theme with it. */
+.help-article .help-icon {
+    width: 1.25em;
+    height: 1.25em;
+    /* Centres the 24px-square glyph on the lower-case x-height rather than leaving it on the baseline,
+       where a symmetrical icon reads as sitting too high next to the text. */
+    vertical-align: -0.28em;
+}
+
+.help-article a {
+    color: var(--mud-palette-primary);
+    text-underline-offset: 3px;
+}
+
+/* Tables carry a lot of this content - button/meaning pairs, per-game examples. They scroll inside
+   their own wrapper rather than widening the page, which is the same rule the rest of the app follows
+   for wide content on a phone. */
+.help-article table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 0 0 16px;
+}
+
+.help-article th,
+.help-article td {
+    text-align: left;
+    padding: 6px 12px 6px 0;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+    vertical-align: top;
+}
+
+.help-article th {
+    color: var(--mud-palette-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Worked examples - recipe trees and formulas - which only read correctly as preformatted text. */
+.help-article pre {
+    background-color: var(--mud-palette-background-gray);
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 4px;
+    padding: 12px;
+    overflow-x: auto;
+    margin: 0 0 16px;
+}
+
+.help-article code {
+    font-size: 0.9em;
+}
+
+.help-article :not(pre) > code {
+    background-color: var(--mud-palette-background-gray);
+    border-radius: 3px;
+    padding: 1px 4px;
+}
+
+.help-article blockquote {
+    margin: 0 0 16px;
+    padding-left: 12px;
+    border-left: 3px solid var(--mud-palette-primary);
+    color: var(--mud-palette-text-secondary);
+}
+
+.help-article > :last-child {
+    margin-bottom: 0;
+}
+
+/* The way back to the contents list from the foot of an article, for a reader who got here by
+   following links rather than by opening the list. The app bar's back arrow does the same thing, but
+   after a screen or two of prose it is a long way from the thumb. */
+.help-article-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
 }

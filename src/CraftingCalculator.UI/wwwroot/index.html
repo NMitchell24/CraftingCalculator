@@ -70,6 +70,27 @@
         <span class="dismiss">🗙</span>
     </div>
 
+    <!-- Called by Help.razor after an article renders. The WebView keeps the previous page's scroll
+         offset when a help link routes back into the same component, and a cross-page anchor
+         (calculations.md#surplus) has to reach its heading rather than the top of the page. -->
+    <script>
+        window.helpScroll = {
+            // Headings take their ids from Markdig's UseAutoIdentifiers, so a link to one that has since
+            // been renamed resolves to nothing - that falls back to the top rather than leaving the
+            // reader at the offset the previous page was scrolled to. Where a found heading stops is
+            // scroll-margin-top on .help-article's headings in app.css, which clears the fixed app bar.
+            toTarget: function (id) {
+                var target = id ? document.getElementById(id) : null;
+
+                if (target) {
+                    target.scrollIntoView();
+                } else {
+                    window.scrollTo(0, 0);
+                }
+            }
+        };
+    </script>
+
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
 

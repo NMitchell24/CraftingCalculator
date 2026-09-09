@@ -124,6 +124,66 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   right-click. See the three-destination bottom-nav/side-rail shell (`Craft` `/`, `Favorites`
   `/favorites`, `Dataset` `/dataset`) before adding new navigation.
 
+## Built-in help (`docs/help`)
+
+The app ships a manual. The **?** in the app bar (`MainLayout.ToggleHelp`) opens the help page for the
+route the user is on; `/help` is the contents list and `/help/{TopicId}` one page.
+
+**Any change to what the user sees updates the matching page under `docs/help/`, in the same commit.**
+Screens, controls, fields, actions, defaults, calculations, user-facing copy — all of it. This is not a
+nice-to-have: a stale help page is worse than none, because the user believes it.
+
+**One source, three consumers.** `docs/help/*.md` is the only copy of this content:
+
+| Consumer | Mechanism |
+|---|---|
+| App | `CraftingCalculator.Application.csproj` embeds `..\..\docs\help\*.md` (`LogicalName` `CraftingCalculator.Application.Help.<file>`); `HelpService` reads the resource and `HelpProcessor.Render` turns it into an HTML fragment with Markdig; `UI/Components/Pages/Help.razor` renders it as a `MarkupString` inside `.help-article` (app.css). |
+| GitHub wiki | `.github/workflows/help-sync.yml` on merge to `main` — strips front matter, drops `.md` from links, publishes `welcome.md` as `Home.md` too. |
+| Project site | Files already live under `docs/` with Jekyll front matter. Not wired up; see `docs/pages-rewrite-plan.md`. |
+
+That is why the content is Markdown and not Razor, and why it has to stay portable:
+
+- **Plain Markdown only** — no raw HTML, no Liquid, no MudBlazor components.
+- **Cross-page links are `other-page.md`** (`calculations.md#surplus` for an anchor). GitHub and the
+  wiki resolve those natively; `HelpProcessor.RewriteLink` turns them into `/help/other-page`. Enabled
+  Markdig extensions: YAML front matter, pipe tables, auto identifiers, emphasis extras.
+- **No external links** — the `BlazorWebView` has nowhere to send them.
+- **Front matter on every page**: `title`, `nav_order`.
+
+**Icons.** A control the help names is written as an image: `![Delete](assets/delete.svg)`. The files in
+`docs/help/assets/` are the Material Design icons MudBlazor itself draws — each is
+`<svg viewBox="0 0 24 24" fill="#888888">` wrapping the path data from the matching
+`Icons.Material.Filled.<Name>` constant. To add one, reference MudBlazor from a throwaway console
+project and print the constant, then wrap it in that same template; the grey is deliberate, since on
+GitHub the file renders as an `<img>` with no text colour to inherit. `HelpProcessor.ReplaceIcon` swaps
+that fill for `currentColor` and inlines the markup, which is what makes the icon follow the app's
+palette; `.help-article .help-icon` (app.css) sizes it in `em` against the text it sits in. Icons are
+the only images the help may use, and an image with no matching file degrades to its alt text.
+
+**Never make these MauiImage.** They are `EmbeddedResource` on `CraftingCalculator.Application` on
+purpose: `MauiImage` runs every file through the resizetizer, which rasterises each SVG once per Android
+density bucket and per iOS scale — twenty-odd icons would become a few hundred PNGs in the app package,
+for images the help renders as inline markup and never loads as a file. All 21 currently cost about 8 KB
+inside the assembly. Verify after a change with
+`unzip -l <apk> | grep -iE "handyman|unfold|delete_forever"` — it should find nothing.
+
+**Adding a help page:** write `docs/help/<slug>.md` **and** add a `HelpTopic` to
+`Domain/Constants/HelpTopics.cs` (`Id` = the file's slug). The catalog drives the contents list and the
+route mapping; a file with no entry is embedded but unreachable.
+
+**Adding a screen:** give its route a `RoutePrefixes` entry on the topic that covers it, or the **?**
+falls back to `HelpTopics.DefaultTopicId`. Prefixes are matched by whole segment, longest wins — that
+is how `dataset/blueprint` beats `dataset` for `/dataset/Blueprint/3`.
+
+**Tests are the tripwire.** `HelpServiceTests` runs against the real embedded content and fails when a
+topic has no Markdown, a page has no `<h1>`, or a cross-page link names a topic that does not exist.
+`HelpProcessorTests` covers route resolution and the link/front-matter rewriting.
+
+**Tone.** Written for players, not developers: playful, second person, framed around real survival
+crafting games (Minecraft, Rust, Valheim, Conan Exiles). The repo's "explain with code" rule is for
+conversation about the code and does not apply here — help pages explain with worked examples and plain
+language, never with C#. Match the existing pages.
+
 ### MudBlazor docs MCP server (`mudblazor` / MudMCP)
 
 A local [MudMCP](https://github.com/mcbodge/MudMCP) server can index the **MudBlazor 9.7.0** source
@@ -212,4 +272,6 @@ semantic search).
    `Infrastructure/DependencyInjection.cs`. 5. Service interface + impl in
    `Application/Common/Services` → register in `Application/DependencyInjection.cs`. 6. Transformation
    logic in a `Processor`. 7. Razor page/component in `UI/Components` injecting the service, mobile-
-   first per the design rules above. 8. Unit tests mirroring the source path.
+   first per the design rules above. 8. Unit tests mirroring the source path. 9. **Update the help
+   pages under `docs/help/` for anything the change makes visible to the user**, and add a
+   `HelpTopics` entry if the feature introduces a new screen — see "Built-in help" above.

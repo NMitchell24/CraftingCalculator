@@ -1,0 +1,50 @@
+@page "/help"
+@page "/help/{TopicId}"
+@implements IDisposable
+
+<PageTitle>Help</PageTitle>
+
+<div class="help-page">
+    @if (_article is { } article)
+    {
+        @* The Markdown ships inside the app (docs/help, embedded by CraftingCalculator.Application), so
+           it is the app's own content rather than anything a user or a server supplied. *@
+        <MudPaper Class="app-card help-article" Elevation="0">
+            @((MarkupString)article.Html)
+        </MudPaper>
+
+        <div class="help-article-footer">
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@ContentsHref"
+                       StartIcon="@Icons.Material.Filled.MenuBook">All help topics</MudButton>
+        </div>
+    }
+    else if (_loaded && TopicId is not null)
+    {
+        <div class="pane-empty-state">
+            <MudText Typo="Typo.body1">No such help page</MudText>
+            <MudText Typo="Typo.caption">Pick one from the contents instead.</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@ContentsHref" Class="mt-2">Contents</MudButton>
+        </div>
+    }
+    else if (_loaded)
+    {
+        <MudPaper Class="app-card" Elevation="0">
+            <MudText Typo="Typo.subtitle1" HtmlTag="h1" Class="app-card-title display-title">Contents</MudText>
+
+            <MudList T="HelpTopic">
+                @foreach (HelpTopic topic in HelpTopics.All)
+                {
+                    <MudListItem T="HelpTopic" Href="@HrefFor(topic)">
+                        <div class="list-row">
+                            <div class="list-row-info">
+                                <MudText Class="list-row-name">@topic.Title</MudText>
+                                <MudText Typo="Typo.caption" Class="help-topic-summary">@topic.Summary</MudText>
+                            </div>
+                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Primary" />
+                        </div>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudPaper>
+    }
+</div>

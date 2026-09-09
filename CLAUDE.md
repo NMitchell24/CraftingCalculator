@@ -61,6 +61,54 @@ templates.
 
 ---
 
+## Help content is part of the feature
+
+The app ships a built-in manual: the **?** in the app bar opens the help page for the screen the user is
+on. **A change that alters what the user sees is not finished until the help says so.**
+
+> If you change a screen, a control, a field, a calculation, an action, a default, or a piece of
+> user-facing copy, you also change the matching page under `docs/help/`. In the same commit. A renamed
+> button or a reworded empty state is exactly the kind of change that turns a help page into a lie.
+
+**`docs/help/*.md` is the single source**, published three ways, which is why it is Markdown rather than
+Razor:
+
+- **The app** — `CraftingCalculator.Application.csproj` embeds `..\..\docs\help\*.md` as resources;
+  `HelpService` renders them with Markdig and `UI/Components/Pages/Help.razor` displays the fragment.
+- **The GitHub wiki** — `.github/workflows/help-sync.yml` pushes them on merge to `main`.
+- **The project site** — the files already sit under `docs/` with Jekyll front matter, ready for the
+  site rewrite (`docs/pages-rewrite-plan.md`).
+
+Rules that keep all three working:
+
+- **Plain Markdown only.** No raw HTML, no Liquid, no MudBlazor markup — the same file renders in three
+  places.
+- **Cross-page links are `other-page.md`**, optionally with an anchor (`calculations.md#surplus`).
+  GitHub and the wiki resolve those; `HelpProcessor` rewrites them to `/help/other-page`.
+- **No external links** — there is nowhere for the `BlazorWebView` to send them.
+- **Name a control with its icon**, written as an ordinary image: `![Delete](assets/delete.svg)`. The
+  files under `docs/help/assets/` are the Material Design icons MudBlazor draws, extracted from
+  `MudBlazor.dll`; GitHub, the wiki and Pages render the file, and `HelpProcessor` inlines its markup
+  with `fill="currentColor"` so it follows the app's theme. Icons are the **only** images help content
+  may use — anything else degrades to its alt text.
+- **Adding an icon** means adding the `.svg` to `docs/help/assets/`. It must stay an `EmbeddedResource`
+  on `CraftingCalculator.Application`; never add these to the MAUI project's `Resources\Images`, where
+  the resizetizer would rasterise each one per Android density and iOS scale.
+- **Front matter (`title`, `nav_order`) on every page.**
+- **A new page** = the `.md` **plus** an entry in `Domain/Constants/HelpTopics.cs`. That catalog is what
+  fills the contents list and maps app routes to pages.
+- **A new screen** = a `RoutePrefixes` entry on whichever topic covers it, or the **?** falls back to
+  Welcome. Prefixes match by whole segment, longest first.
+- `HelpServiceTests` runs against the real embedded content: it fails if a topic has no Markdown, if a
+  page has no `<h1>`, or if a cross-page link points at a topic that does not exist.
+
+**Tone.** The help is written for players, not developers: playful, second person, and framed around
+real survival crafting games (Minecraft, Rust, Valheim, Conan Exiles). It is the one place in this repo
+where the "explain with code" rule below does **not** apply — help pages explain with worked examples
+and plain language, and never with C#. Match the voice of the existing pages.
+
+---
+
 ## Key commands
 
 ```bash
