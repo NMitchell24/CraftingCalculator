@@ -14,9 +14,9 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 {
     private readonly BlueprintMap _blueprintMap = new();
 
-    // Keyed by each node's full path from the tree root (see BlueprintTreeNode.Path), not by BlueprintNode.Id
+    // Keyed by each node's full path from the tree root (see BlueprintTreeNode.Path), not by name
     // alone - the same blueprint/component can appear more than once in one tree (e.g. a blueprint used both
-    // standalone in the batch and nested inside another batch blueprint), and keying by Id alone made every
+    // standalone in the batch and nested inside another batch blueprint), and keying by name alone made every
     // occurrence share one expansion state instead of each position remembering its own.
     private readonly HashSet<string> _expandedPaths = [];
 
@@ -152,6 +152,14 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         Changed?.Invoke();
     }
 
+    /// <summary>
+    /// Whether a step currently visible in the tree counts crafts rather than items - what the
+    /// asterisk legend under the Crafting Steps tree explains.
+    /// </summary>
+    // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
+    // is not on screen.
+    public bool HasVisibleCraftCountedStep => AnyCountsByCraft(TreeRoots, "");
+
     public bool IsExpanded(string path) => _expandedPaths.Contains(path);
 
     public void ToggleExpanded(string path)
@@ -176,6 +184,25 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         Changed?.Invoke();
     }
 
+    private bool AnyCountsByCraft(IReadOnlyList<BlueprintNode> nodes, string parentPath)
+    {
+        foreach (BlueprintNode node in nodes)
+        {
+            if (BlueprintProcessor.CountsByCraft(node))
+            {
+                return true;
+            }
+
+            string path = $"{parentPath}/{node.Name}";
+            if (IsExpanded(path) && AnyCountsByCraft(node.Children, path))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static long CountCrafts(IReadOnlyList<BlueprintNode> nodes) =>
         nodes.Sum(node => node.Crafts + CountCrafts(node.Children));
 
@@ -183,7 +210,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     {
         foreach (BlueprintNode node in nodes)
         {
-            string path = $"{parentPath}/{node.Id ?? node.Name}";
+            string path = $"{parentPath}/{node.Name}";
             into.Add(path);
             CollectPaths(node.Children, path, into);
         }

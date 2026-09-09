@@ -15,5 +15,15 @@
                 <BlueprintTreeNode Node="root" />
             }
         </MudTreeView>
+
+        @if (State.HasVisibleCraftCountedStep)
+        {
+            @* Resolves the asterisk BlueprintTreeNode puts on those rows. Rendered once for the whole
+               tree, and only while a row carrying one is on screen. *@
+            <MudText Typo="Typo.caption" Class="steps-tree-legend">
+                * This blueprint produces items in fixed batches. The number shown reflects how many
+                crafts are required to meet your total need. Tap the step to view the item quantity.
+            </MudText>
+        }
     }
 </div>
