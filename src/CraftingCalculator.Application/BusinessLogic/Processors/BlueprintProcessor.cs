@@ -109,7 +109,7 @@ public static class BlueprintProcessor
         }
 
         return new BlueprintNode(
-            blueprint.Name, blueprint.Tooltip, IsComponent: false,
+            blueprint.Name ?? "", blueprint.Tooltip, IsComponent: false,
             Quantity: quantity, Crafts: crafts, Yield: blueprint.Yield,
             Surplus: crafts * blueprint.Yield - quantity,
             ProductionTime: DurationMath.Scale(blueprint.ProductionTime, crafts),
