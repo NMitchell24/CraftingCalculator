@@ -1,7 +1,5 @@
 using AwesomeAssertions;
-using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Entities;
-using CraftingCalculator.Domain.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -13,8 +11,11 @@ namespace CraftingCalculator.Infrastructure.UnitTests;
 [TestFixture]
 public class MigrationTests
 {
+    /// <summary>Id the InsertSeedData migration gave the "All" category row it used to create.</summary>
+    private const int SeededAllCategoryId = 1;
+
     [Test]
-    public async Task Migrate_OnAnEmptyFile_CreatesTheSchemaAndSeedsExactlyTheAllCategory()
+    public async Task Migrate_OnAnEmptyFile_CreatesTheSchemaWithNoRows()
     {
         string dbPath = NewDbPath();
         try
@@ -28,11 +29,7 @@ public class MigrationTests
 
             await using (CraftingDataContext context = new(options))
             {
-                List<Category> categories = await context.Categories.ToListAsync();
-                categories.Should().ContainSingle();
-                categories[0].Id.Should().Be(DatabaseSeedConstants.AllCategoryId);
-                categories[0].Name.Should().Be(CategoryModel.All);
-
+                (await context.Categories.CountAsync()).Should().Be(0);
                 (await context.Components.CountAsync()).Should().Be(0);
                 (await context.Blueprints.CountAsync()).Should().Be(0);
                 (await context.Favorites.CountAsync()).Should().Be(0);
@@ -118,8 +115,8 @@ public class MigrationTests
                 favorite.FavoriteBlueprints.Should().ContainSingle()
                     .Which.Blueprint.Name.Should().Be("Table");
 
-                // The seeded "All" row and the user's own category both survive.
-                (await context.Categories.CountAsync()).Should().Be(2);
+                // The user's own category survives; the seeded "All" row is the one RemoveSeededAllCategory drops.
+                (await context.Categories.CountAsync()).Should().Be(1);
                 (await context.Components.CountAsync()).Should().Be(2);
                 (await context.Blueprints.CountAsync()).Should().Be(2);
             }
@@ -206,6 +203,54 @@ public class MigrationTests
                 Component potato = await context.Components.SingleAsync();
                 potato.Name.Should().Be("Potato");
                 potato.ProductionTime.Should().Be(TimeSpan.Zero);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
+    /// <summary>
+    /// The seeded "All" row was a filter sentinel that no screen ever rendered, so it is removed
+    /// rather than left behind as a category the user can see but never created. A blueprint pointing
+    /// at it comes back uncategorized rather than orphaned.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaWithTheSeededAllCategory_RemovesItAndUncategorizesItsBlueprints()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("AddProductionTime");
+
+                // Rows only, no schema change, so these go in through the model rather than raw SQL.
+                Category furniture = new() { Name = "Furniture", Description = "Things to sit on" };
+                context.Categories.Add(furniture);
+                await context.SaveChangesAsync();
+
+                context.Blueprints.AddRange(
+                    new Blueprint { Name = "Table", Description = "Four legs", Value = 30.0, Yield = 1, CategoryId = SeededAllCategoryId },
+                    new Blueprint { Name = "Chair", Description = "One seat", Value = 12.0, Yield = 1, CategoryId = furniture.Id });
+                await context.SaveChangesAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                Category furniture = (await context.Categories.ToListAsync()).Should().ContainSingle().Subject;
+                furniture.Name.Should().Be("Furniture");
+
+                (await context.Blueprints.SingleAsync(blueprint => blueprint.Name == "Table")).CategoryId.Should().BeNull();
+                (await context.Blueprints.SingleAsync(blueprint => blueprint.Name == "Chair")).CategoryId.Should().Be(furniture.Id);
             }
         }
         finally

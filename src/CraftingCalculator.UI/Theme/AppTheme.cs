@@ -3,8 +3,9 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Theme;
 
 /// <summary>
-/// The app's single <see cref="MudTheme" /> - the "Forge" palette (slate neutrals, copper primary) in
-/// light and dark, the Inter type scale, and the shared corner radius. Applied by <c>MainLayout</c>'s
+/// The app's single <see cref="MudTheme" /> - the "Forge" palette (slate neutrals, copper primary,
+/// verdigris tertiary) in light and dark, the Inter type scale, and the shared corner radius.
+/// Applied by <c>MainLayout</c>'s
 /// <c>MudThemeProvider</c>; which of the two palettes renders follows the user's
 /// <see cref="State.ThemeState" /> choice.
 /// </summary>
@@ -15,10 +16,11 @@ public static class AppTheme
     // noted inline.
     private static class ForgeColors
     {
-        public const string White = "#FFFFFF"; // PrimaryContrastText + SecondaryContrastText + AppbarText, light only
+        public const string White = "#FFFFFF"; // Primary/Secondary/TertiaryContrastText + AppbarText, light only
 
         // Light - white surfaces on a cool grey ground, copper primary, slate app bar
         public const string LightPrimary = "#B7601F";
+        public const string LightVerdigris = "#1D6F7C"; // Tertiary - oxidised copper, the primary's counterpart
         public const string LightSlate = "#2E3440"; // Secondary + AppbarBackground
         public const string LightSurface = "#FFFFFF"; // Surface + DrawerBackground
         public const string LightBackground = "#F5F6F8";
@@ -31,7 +33,8 @@ public static class AppTheme
 
         // Dark - near-black ground, lifted slate surfaces, warmed copper primary
         public const string DarkPrimary = "#E39A5C";
-        public const string DarkPrimaryText = "#1B1E24";
+        public const string DarkOnAccent = "#1B1E24"; // PrimaryContrastText + TertiaryContrastText
+        public const string DarkVerdigris = "#5FB8C6"; // Tertiary - oxidised copper, the primary's counterpart
         public const string DarkSlate = "#2C313B"; // Secondary + Divider + LinesDefault + TableLines
         public const string DarkSurface = "#1B1E24"; // Surface + AppbarBackground
         public const string DarkDrawer = "#171A20";
@@ -61,6 +64,8 @@ public static class AppTheme
             PrimaryContrastText = ForgeColors.White,
             Secondary = ForgeColors.LightSlate,
             SecondaryContrastText = ForgeColors.White,
+            Tertiary = ForgeColors.LightVerdigris,
+            TertiaryContrastText = ForgeColors.White,
             Background = ForgeColors.LightBackground,
             BackgroundGray = ForgeColors.LightBackgroundGray,
             Surface = ForgeColors.LightSurface,
@@ -81,9 +86,11 @@ public static class AppTheme
         PaletteDark = new PaletteDark
         {
             Primary = ForgeColors.DarkPrimary,
-            PrimaryContrastText = ForgeColors.DarkPrimaryText,
+            PrimaryContrastText = ForgeColors.DarkOnAccent,
             Secondary = ForgeColors.DarkSlate,
             SecondaryContrastText = ForgeColors.DarkInk,
+            Tertiary = ForgeColors.DarkVerdigris,
+            TertiaryContrastText = ForgeColors.DarkOnAccent,
             Background = ForgeColors.DarkBackground,
             BackgroundGray = ForgeColors.DarkBackgroundGray,
             Surface = ForgeColors.DarkSurface,
