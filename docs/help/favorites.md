@@ -27,15 +27,9 @@ whether you have improved the recipe or invented a new one.
 
 ## Loading one
 
-Two ways in:
-
-- **The Load Favorite dropdown**, at the top of the Selected Blueprints card on the Craft screen. This
-  is the quick one.
-- **The Favorites screen**, from the navigation bar, which is where you manage them.
-
-Either way, if you already have blueprints in your batch, the app stops and asks before replacing them.
-Loading is destructive to whatever you had selected, and one mis-tap on a phone should not cost you ten
-minutes of work.
+- Select your named favorite in **The Load Favorite dropdown**, at the top of the Selected Blueprints card on the Craft screen.
+- If you already have blueprints in your batch, the app stops and asks before replacing them.
+- Loading is destructive to whatever you had selected, and one mis-tap on a phone shouldn't cost you.
 
 ## The Favorites screen
 
