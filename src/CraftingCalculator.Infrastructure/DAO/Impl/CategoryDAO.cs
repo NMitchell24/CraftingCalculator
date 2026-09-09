@@ -12,7 +12,7 @@ public class CategoryDAO(IDbContextFactory<CraftingDataContext> contextFactory) 
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
         List<Category> entities = await context.Categories
             .AsNoTracking()
-            .OrderByDescending(categoryEntity => categoryEntity.Name == CategoryModel.ALL)
+            .OrderByDescending(categoryEntity => categoryEntity.Name == CategoryModel.All)
             .ThenBy(categoryEntity => categoryEntity.Name)
             .ToListAsync();
 

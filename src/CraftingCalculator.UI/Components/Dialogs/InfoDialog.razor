@@ -1,0 +1,105 @@
+<MudDialog>
+    <TitleContent>
+        @* Name and category share the title row rather than taking a body row each: the category
+           labels the name, and a row of its own would push the figures below the fold on a phone. *@
+        <div class="info-dialog-title">
+            <MudText Typo="Typo.h6" Class="info-dialog-title-name">@Record.Name</MudText>
+            @if (Blueprint?.Category?.Name is { Length: > 0 } category)
+            {
+                @* Same chip as the batch row's (Controls/BatchList.razor), so a category reads the same
+                   wherever it appears. *@
+                <MudChip T="string" Text="@category" Size="Size.Small" Variant="Variant.Outlined"
+                         Color="Color.Primary" Ripple="false" Class="info-dialog-category" />
+            }
+        </div>
+    </TitleContent>
+    <DialogContent>
+        @if (!string.IsNullOrWhiteSpace(Record.Description))
+        {
+            <MudText Typo="Typo.body2" Class="info-dialog-description">@Record.Description</MudText>
+        }
+
+        @* Same label/value grid as the Crafting Summary card - this is the same kind of read-only
+           figure list, so it reuses those classes rather than cloning them under a dialog- prefix. *@
+        <dl class="summary-grid">
+            @if (Blueprint is { } blueprint)
+            {
+                <dt>Value per Item</dt>
+                <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
+
+                <dt>Yield per Craft</dt>
+                <dd>@blueprint.Yield</dd>
+
+                <dt>Production Time per Craft</dt>
+                <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
+            }
+            else if (Component is { } component)
+            {
+                <dt>Cost per Item</dt>
+                <dd>@string.Format(FormatConstants.CurrencyFormat, component.Cost)</dd>
+
+                <dt>Production Time per Item</dt>
+                <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
+            }
+        </dl>
+
+        @if (Blueprint is not null)
+        {
+            @* Direct requirements only, collapsed by default: the dialog then opens at the same height
+               whatever the blueprint's size, and the full nested breakdown is what the Crafting Steps
+               view is for. *@
+            <MudExpansionPanels Elevation="0" Outlined="false" Gutters="false" Class="info-dialog-parts">
+                <MudExpansionPanel Gutters="false" Dense="true" Disabled="@(_parts.Count == 0)">
+                    <TitleContent>
+                        <div class="info-dialog-parts-summary">
+                            <span class="info-dialog-parts-label">Components</span>
+                            <span>@_parts.Count</span>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <dl class="summary-grid">
+                            @foreach (IBaseQuantityRecord part in _parts)
+                            {
+                                <dt>@part.Name</dt>
+                                <dd>x@(part.Quantity)</dd>
+                            }
+                        </dl>
+                    </ChildContent>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+
+        @if (Step is { } step)
+        {
+            <MudDivider Class="info-dialog-divider" />
+
+            <MudText Typo="Typo.subtitle2" Class="info-dialog-step-title">Crafting Step Details</MudText>
+
+            <dl class="summary-grid">
+                <dt>Quantity</dt>
+                <dd>@step.Quantity</dd>
+
+                @if (!step.IsComponent)
+                {
+                    @* Crafts and surplus only mean something for a blueprint. A component is gathered,
+                       so it has no craft count and cannot be overproduced. The surplus is only ever the
+                       remainder of rounding the quantity up to a whole number of crafts of the size the
+                       Yield per Craft row above gives. *@
+                    <dt>Crafts</dt>
+                    <dd>@step.Crafts</dd>
+
+                    <dt>Surplus</dt>
+                    <dd>@step.Surplus</dd>
+                }
+
+                <dt>Total Production Time</dt>
+                <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
+            </dl>
+
+            <MudText Typo="Typo.caption" Class="info-dialog-step-note">Crafting Step Details apply to this step only.</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>

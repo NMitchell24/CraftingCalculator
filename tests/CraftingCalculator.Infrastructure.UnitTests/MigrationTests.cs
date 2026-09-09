@@ -31,7 +31,7 @@ public class MigrationTests
                 List<Category> categories = await context.Categories.ToListAsync();
                 categories.Should().ContainSingle();
                 categories[0].Id.Should().Be(DatabaseSeedConstants.AllCategoryId);
-                categories[0].Name.Should().Be(CategoryModel.ALL);
+                categories[0].Name.Should().Be(CategoryModel.All);
 
                 (await context.Components.CountAsync()).Should().Be(0);
                 (await context.Blueprints.CountAsync()).Should().Be(0);

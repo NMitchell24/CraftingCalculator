@@ -5,7 +5,7 @@ namespace CraftingCalculator.Application.Common.Interfaces.DAO;
 public interface ICategoryDAO
 {
     /// <summary>
-    /// Returns all categories with the <see cref="CategoryModel.ALL"/> category first, then alphabetically.
+    /// Returns all categories with the <see cref="CategoryModel.All"/> category first, then alphabetically.
     /// </summary>
     Task<List<CategoryModel>> GetAllAsync();
 

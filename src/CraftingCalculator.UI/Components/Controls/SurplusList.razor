@@ -12,7 +12,7 @@
         <MudList T="BlueprintQuantity">
             @foreach (BlueprintQuantity blueprintQuantity in State.SurplusStock)
             {
-                <MudListItem T="BlueprintQuantity">
+                <MudListItem T="BlueprintQuantity" OnClick="@(() => ShowInfoAsync(blueprintQuantity))">
                     @* Same row shape as MaterialsList - name, then a paired label/value grid - so it
                        reuses those classes rather than cloning them under a surplus- prefix. *@
                     <div class="materials-row">

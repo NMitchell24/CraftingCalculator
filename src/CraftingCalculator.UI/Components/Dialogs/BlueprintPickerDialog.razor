@@ -6,7 +6,7 @@
         <div class="picker-chip-row mb-2">
             <MudChipSet T="string" SelectedValue="@_selectedCategoryName" SelectedValueChanged="OnCategoryChanged"
                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Primary">
-                <MudChip Text="@CategoryModel.ALL" Value="@CategoryModel.ALL" />
+                <MudChip Text="@CategoryModel.All" Value="@CategoryModel.All" />
                 @foreach (Domain.Models.CategoryModel category in _categories)
                 {
                     <MudChip Text="@category.Name" Value="@category.Name" />

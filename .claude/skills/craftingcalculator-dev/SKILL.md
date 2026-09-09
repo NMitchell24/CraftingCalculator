@@ -58,7 +58,7 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   `InvalidOperationException` on overlapping async handlers).
 - **Naming:** interfaces `IXxxService` / `IXxxDAO`; impls in `Impl/` folders. Models in
   `Domain/Models`, entities in `Domain/Entities`, magic strings/enums in `Domain/Constants` and
-  `Domain/Enums` (e.g. `Category.ALL`, the currency format string).
+  `Domain/Enums` (e.g. `CategoryModel.All`, the currency format string).
 - **Domain models vs. EF entities share names** (`Blueprint`, `Component`, `Category`) but live in
   different namespaces — `CraftingCalculator.Domain.Entities` vs. `CraftingCalculator.Domain.Models`.
   Alias at the few call sites (DAO impls) that need both in one file.
@@ -81,7 +81,7 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
 - **Seed data is SQL**, not C#: `src/CraftingCalculator.Infrastructure/Data/Seed/*.sql`, embedded as
   resources (`<EmbeddedResource Include="Data\**\*.sql" />`) and executed once by the `InsertSeedData`
   migration via `migrationBuilder.Sql(...)`. The seed is intentionally minimal — just the one category
-  row `(Id 1, Name 'All')` that the category dropdown and `Category.ALL` depend on. The `.sql` still
+  row `(Id 1, Name 'All')` that the category dropdown and `CategoryModel.All` depend on. The `.sql` still
   inserts into `RecipeFilters`, the table's pre-rename name, because it runs as applied history —
   `RenameToCraftingVocabulary` renames that table to `Categories` afterwards. **Once released,
   the seed is final — never edit the `.sql` or re-run the seed.** Any data change now ships as a **new

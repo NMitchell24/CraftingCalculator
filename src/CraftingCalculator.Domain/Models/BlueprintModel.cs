@@ -1,5 +1,4 @@
 using CraftingCalculator.Domain.Enums;
-using System.Text;
 
 namespace CraftingCalculator.Domain.Models;
 
@@ -38,53 +37,6 @@ public class BlueprintModel : IBaseDataRecord
         //could drive it below zero, so it is pinned to Zero rather than rejected - the editor's Min="0"
         //on each field is the user-facing validation.
         set => field = value < TimeSpan.Zero ? TimeSpan.Zero : value;
-    }
-
-    public string Tooltip
-    {
-        get
-        {
-            StringBuilder sb = new();
-            sb.AppendLine(Name);
-            sb.AppendLine(Category?.Name);
-            if (Value > 0)
-            {
-                sb.AppendLine("Value per Item: " + $"{Value:C2}");
-            }
-            if (Yield > 1)
-            {
-                sb.AppendLine("Yield per Craft: " + Yield);
-            }
-            sb.Append(Environment.NewLine);
-            if (Description is { Length: > 0 })
-            {
-                sb.AppendLine("Description:");
-                sb.AppendLine(Description);
-                sb.Append(Environment.NewLine);
-            }
-            sb.AppendLine("Components:");
-
-            foreach (ComponentQuantity component in Components.ComponentList)
-            {
-                sb.AppendLine(component.Name + " x" + component.Quantity);
-            }
-
-            if (ChildBlueprints != null)
-            {
-                foreach (BlueprintQuantity blueprint in ChildBlueprints.BlueprintList)
-                {
-                    sb.AppendLine(blueprint.Name + " x" + blueprint.Quantity);
-                }
-            }
-
-            return sb.ToString();
-        }
-        set
-        {
-            // Computed from Name/Description/Components - the setter exists only to satisfy
-            // IBaseDataRecord and is deliberately inert, as on every other model's Tooltip.
-            _ = value;
-        }
     }
 
     public DataType Type

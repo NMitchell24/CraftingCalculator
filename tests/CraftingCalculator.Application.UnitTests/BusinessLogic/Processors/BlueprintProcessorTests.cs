@@ -471,6 +471,46 @@ public class BlueprintProcessorTests
     }
 
     [Test]
+    public void BuildNode_CarriesTheSourceRecordOnEveryNode()
+    {
+        ComponentModel screw = NewComponent("Screw");
+        BlueprintModel child = NewBlueprint("Bracket");
+        child.Components.Add(screw, 3);
+
+        BlueprintModel parent = NewBlueprint("Frame");
+        parent.ChildBlueprints.Add(child, 2);
+
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1);
+
+        tree.Source.Should().BeSameAs(parent);
+        BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
+        childNode.Source.Should().BeSameAs(child);
+        childNode.Children.Should().ContainSingle().Subject.Source.Should().BeSameAs(screw);
+    }
+
+    [Test]
+    public void DirectParts_ListsComponentsThenChildBlueprints()
+    {
+        BlueprintModel child = NewBlueprint("Bracket");
+        child.Components.Add(NewComponent("Screw"), 3);
+
+        BlueprintModel parent = NewBlueprint("Frame");
+        parent.Components.Add(NewComponent("Plate"), 2);
+        parent.ChildBlueprints.Add(child, 4);
+
+        IReadOnlyList<IBaseQuantityRecord> parts = BlueprintProcessor.DirectParts(parent);
+
+        // The Screws inside the Bracket are deliberately absent: this is one level, not the tree.
+        parts.Select(part => (part.Name, part.Quantity)).Should().Equal(("Plate", 2L), ("Bracket", 4L));
+    }
+
+    [Test]
+    public void DirectParts_BlueprintWithNoRequirements_IsEmpty()
+    {
+        BlueprintProcessor.DirectParts(NewBlueprint("Frame")).Should().BeEmpty();
+    }
+
+    [Test]
     public void CountsByCraft_YieldLeavingFewerCraftsThanItems_IsTrue()
     {
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);

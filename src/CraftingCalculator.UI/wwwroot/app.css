@@ -876,9 +876,9 @@ html, body {
     max-height: calc(100dvh - 32px);
 }
 
-/* Every dialog title in the app is a literal passed to ShowAsync, so it is always the app's own voice
-   and never user data - which makes this a house-style rule alongside the ones above rather than
-   something to repeat at each call site. Mirrors .display-title; see it for why these values. */
+/* Applied to every dialog title from one place rather than repeated at each call site, alongside the
+   house-style rules above. Mirrors .display-title; see it for why these values. InfoDialog titles
+   itself with a record's own name, so this font carries user data as well as the app's own voice. */
 .mud-dialog-title .mud-typography {
     font-family: 'Jersey 20', 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 1.24em;
@@ -902,6 +902,78 @@ html, body {
    flush against the gesture nav bar's swipe area. */
 .mud-dialog-fullscreen .mud-dialog-actions {
     padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+/* Components/Dialogs/InfoDialog.razor. The name takes the row and the category chip trails it, so a
+   long name wraps within the space the chip leaves rather than pushing it off the title. */
+.info-dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-dialog-title-name {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.info-dialog-category {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+/* The description reads as prose above the figures, so it gets body spacing rather than a grid row. */
+.info-dialog-description {
+    display: block;
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+}
+
+/* The direct-components expander. MudExpansionPanels draws its own surface and border, which would
+   read as a second card inside the dialog; only the header's label/count row and the divider above it
+   are wanted here. */
+.info-dialog-parts {
+    margin-top: 8px;
+    background-color: transparent;
+}
+
+.info-dialog-parts .mud-expand-panel {
+    background-color: transparent;
+}
+
+/* MudExpansionPanel lays its title out beside the expand icon, so the count is pushed to the icon
+   rather than to the dialog edge - close enough to the summary grid's right-aligned values to read as
+   the same kind of row. */
+.info-dialog-parts-summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    font-variant-numeric: tabular-nums;
+}
+
+.info-dialog-parts-label {
+    color: var(--mud-palette-text-secondary);
+}
+
+/* Separates the figures that describe the record itself from the ones that apply only to the tapped
+   Crafting Steps row. */
+.info-dialog-divider {
+    margin: 12px 0;
+}
+
+/* Names the section the divider above opens, so the second grid's figures are not read as more of
+   the record's own. */
+.info-dialog-step-title {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.info-dialog-step-note {
+    display: block;
+    margin-top: 12px;
+    opacity: 0.7;
 }
 
 #blazor-error-ui {
@@ -950,12 +1022,6 @@ html, body {
 .steps-tree-time {
     opacity: 0.7;
     font-variant-numeric: tabular-nums;
-}
-
-.step-dialog-note {
-    display: block;
-    margin-top: 12px;
-    opacity: 0.7;
 }
 
 /* A Crafting Steps row whose count is crafts rather than items (BlueprintTreeNode.Label). Dotted

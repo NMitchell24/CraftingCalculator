@@ -6,7 +6,7 @@ public interface IBlueprintDAO
 {
     /// <summary>
     /// Returns every blueprint matching <paramref name="category"/>, or all blueprints when
-    /// <paramref name="category"/> is the <see cref="CategoryModel.ALL"/> category. Each blueprint is
+    /// <paramref name="category"/> is the <see cref="CategoryModel.All"/> category. Each blueprint is
     /// returned with its <see cref="BlueprintModel.Components"/> and <see cref="BlueprintModel.ChildBlueprints"/>
     /// populated.
     /// </summary>

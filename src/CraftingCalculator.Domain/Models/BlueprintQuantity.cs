@@ -52,15 +52,6 @@ public class BlueprintQuantity : IBaseQuantityRecord
 
     public double TotalValue => Blueprint.Value * Quantity;
 
-    public string Tooltip
-    {
-        get => Blueprint.Tooltip;
-        set
-        {
-            // Projected from Blueprint.Tooltip - inert for the reason given on Name.
-        }
-    }
-
     public bool IsSelected { get; set; }
 
     public string DisplayName => Name + " x" + Quantity;

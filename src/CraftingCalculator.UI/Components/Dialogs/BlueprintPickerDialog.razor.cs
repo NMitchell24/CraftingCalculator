@@ -16,11 +16,11 @@ public partial class BlueprintPickerDialog : ComponentBase
     private List<CategoryModel> _categories = [];
     private IReadOnlyCollection<BlueprintModel> _selected = [];
     private string _search = "";
-    private string _selectedCategoryName = CategoryModel.ALL;
+    private string _selectedCategoryName = CategoryModel.All;
 
     private List<BlueprintModel> _filteredBlueprints =>
         [.. _blueprints.Where(blueprint =>
-            (_selectedCategoryName == CategoryModel.ALL || blueprint.Category?.Name == _selectedCategoryName) &&
+            (_selectedCategoryName == CategoryModel.All || blueprint.Category?.Name == _selectedCategoryName) &&
             (string.IsNullOrWhiteSpace(_search) || (blueprint.Name?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false)))];
 
     protected override async Task OnInitializedAsync()
