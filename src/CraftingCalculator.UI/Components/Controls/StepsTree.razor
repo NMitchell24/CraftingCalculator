@@ -9,7 +9,10 @@
     }
     else
     {
-        <MudTreeView T="BlueprintNode" Class="steps-tree-view">
+        @* BlueprintNode is a record, so two identical rows - the same component under two blueprints -
+           are equal by value and MudTreeView's default comparer would select every one of them at once.
+           Selection is per row, so it compares by identity instead. *@
+        <MudTreeView T="BlueprintNode" Class="steps-tree-view" Comparer="ReferenceEqualityComparer.Instance">
             @foreach (BlueprintNode root in State.TreeRoots)
             {
                 <BlueprintTreeNode Node="root" />
