@@ -44,8 +44,8 @@ Two things worth knowing:
 - **The menu only offers categories that are actually in use** in the list you are looking at. Offering
   a category nothing is filed under would just be a way to make the screen go blank.
 - **Uncategorized** appears as its own entry — in a different colour, since it is not a category you
-  created — whenever the list contains records with no category. It is the fastest way to find records
-  you meant to label and never did.
+  created — whenever the list mixes categorized records with records that have none. It is the fastest
+  way to find records you meant to label and never did.
 
 The filter button is hidden entirely on lists where nothing is categorized, and on the Categories list
 itself, which would be a bit recursive.

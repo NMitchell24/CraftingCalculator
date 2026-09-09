@@ -31,10 +31,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private BrowserWindowSize? _windowSize;
 
     // Settings and Help are both app-bar overlays: they open over whatever page is showing, and their
-    // own icon closes them back to it rather than to a fixed route. One return address each, so opening
-    // Help from Settings and closing it again lands back on Settings instead of skipping past it.
-    private string? _preSettingsUri;
-    private string? _preHelpUri;
+    // own icon closes them back to it rather than to a fixed route. One shared stack rather than a
+    // return address each, because the overlays open over each other: opening Help from Settings has to
+    // close back to Settings, and closing that has to reach the page Settings was opened from. Two
+    // slots would point at each other there, and the pair would never unwind.
+    private readonly Stack<string> _overlayOrigins = new();
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
@@ -128,11 +129,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 
     private string HelpActionLabel => IsHelpOpen ? "Close help" : "Help for this screen";
 
-    private void ToggleSettings() => ToggleOverlay(IsSettingsOpen, ref _preSettingsUri, $"/{SettingsRoute}");
+    private void ToggleSettings() => ToggleOverlay(IsSettingsOpen, $"/{SettingsRoute}");
 
     // The target is resolved from the route the user is on now, which is why it is computed here rather
     // than by the Help page itself: once the navigation has happened that route is gone.
-    private void ToggleHelp() => ToggleOverlay(IsHelpOpen, ref _preHelpUri,
+    private void ToggleHelp() => ToggleOverlay(IsHelpOpen,
         $"/{HelpTopics.HelpRoot}/{HelpProcessor.ResolveTopic(CurrentRoute).Id}");
 
     /// <summary>Whether the current route is <paramref name="route"/> or a page beneath it.</summary>
@@ -141,18 +142,28 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         || CurrentRoute.StartsWith($"{route}/", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Opens <paramref name="target"/> over the current page, remembering where it was opened from in
-    /// <paramref name="origin"/>, or closes it by navigating back there.
+    /// Opens <paramref name="target"/> over the current page, or closes it by navigating back to
+    /// wherever the topmost open overlay was opened from.
     /// </summary>
-    private void ToggleOverlay(bool isOpen, ref string? origin, string target)
+    private void ToggleOverlay(bool isOpen, string target)
     {
         if (isOpen)
         {
-            Navigation.NavigateTo(origin ?? "/");
+            // Empty on a deep link straight into an overlay, or once the user has left one by the nav
+            // rail rather than by its own icon.
+            Navigation.NavigateTo(_overlayOrigins.Count > 0 ? _overlayOrigins.Pop() : "/");
             return;
         }
 
-        origin = Navigation.Uri;
+        // Opening an overlay from an ordinary page starts a new chain. Anything still on the stack was
+        // left by an overlay the user walked away from with the nav rail instead of closing, and popping
+        // it later would send them back to a page they had already moved on from.
+        if (!IsSettingsOpen && !IsHelpOpen)
+        {
+            _overlayOrigins.Clear();
+        }
+
+        _overlayOrigins.Push(Navigation.Uri);
         Navigation.NavigateTo(target);
     }
 

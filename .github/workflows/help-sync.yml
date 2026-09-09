@@ -28,9 +28,10 @@ jobs:
     name: Publish help to the wiki
     runs-on: ubuntu-latest
 
-    # Only the wiki is written, and it lives in a separate git repository from the code.
+    # The wiki is a separate git repository, but GITHUB_TOKEN scopes it under contents - a read-only
+    # token clones the wiki and then fails on push.
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout

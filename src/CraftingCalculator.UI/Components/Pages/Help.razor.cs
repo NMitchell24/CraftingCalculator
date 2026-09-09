@@ -19,6 +19,7 @@ public partial class Help : ComponentBase, IDisposable
 
     [Inject] private IHelpService HelpService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
 
     private HelpArticle? _article;
@@ -52,7 +53,11 @@ public partial class Help : ComponentBase, IDisposable
         if (_scrollPending)
         {
             _scrollPending = false;
-            await Js.InvokeVoidAsync("scrollTo", 0, 0);
+
+            // Not an unconditional reset to the top: pages link to each other's headings
+            // (calculations.md#surplus), and HelpProcessor.RewriteLink keeps that fragment, so the
+            // heading it names is where this render is supposed to land.
+            await Js.InvokeVoidAsync("helpScroll.toTarget", new Uri(Navigation.Uri).Fragment.TrimStart('#'));
         }
 
         await base.OnAfterRenderAsync(firstRender);

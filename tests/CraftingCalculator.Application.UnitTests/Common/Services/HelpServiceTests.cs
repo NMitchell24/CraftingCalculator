@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.RegularExpressions;
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Processors;
@@ -18,6 +19,12 @@ public class HelpServiceTests
 {
     /// <summary>Matches the in-app links <see cref="HelpProcessor.Render" /> produces.</summary>
     private static readonly Regex HelpLink = new("href=\"/help/([^\"#]+)", RegexOptions.Compiled);
+
+    /// <summary>Matches any image in the source Markdown, icon or not: <c>![Delete](assets/delete.svg)</c>.</summary>
+    private static readonly Regex MarkdownImage = new(@"!\[[^\]]*\]\([^)]*\)", RegexOptions.Compiled);
+
+    /// <summary>Matches an icon that <see cref="HelpProcessor.Render" /> inlined as SVG markup.</summary>
+    private static readonly Regex InlinedIcon = new("class=\"help-icon\"", RegexOptions.Compiled);
 
     private static IEnumerable<HelpTopic> Topics => HelpTopics.All;
 
@@ -94,15 +101,35 @@ public class HelpServiceTests
 
     /// <summary>
     /// Every image in the help content is an icon from docs/help/assets, and every one of those is
-    /// inlined at render time. A surviving img means the page names a file that is not there - which
-    /// renders as the alt text in the app and as a broken image on GitHub and the wiki.
+    /// inlined at render time. Counting them is what makes this a test: an image whose file is missing
+    /// degrades to its alt text, so the rendered HTML carries no img to look for either way - it simply
+    /// comes up one icon short, and shows as a broken image on GitHub and the wiki.
     /// </summary>
     [TestCaseSource(nameof(Topics))]
-    public async Task GetArticleAsync_EveryTopic_ReferencesOnlyIconsThatExist(HelpTopic topic)
+    public async Task GetArticleAsync_EveryTopic_InlinesEveryImageItReferences(HelpTopic topic)
     {
+        string markdown = ReadMarkdown(topic);
         HelpArticle? article = await _service.GetArticleAsync(topic.Id);
 
-        article!.Html.Should().NotContain("<img",
-            $"{topic.FileName} should only use images from docs/help/assets, and every one should exist");
+        int referenced = MarkdownImage.Matches(markdown).Count;
+
+        InlinedIcon.Matches(article!.Html).Count.Should().Be(referenced,
+            $"{topic.FileName} references {referenced} images, and every one should be an icon that "
+            + "exists under docs/help/assets");
+    }
+
+    /// <summary>The page's Markdown as the app ships it, read from the same assembly HelpService reads.</summary>
+    private static string ReadMarkdown(HelpTopic topic)
+    {
+        Assembly assembly = typeof(HelpService).Assembly;
+
+        // By suffix rather than by the full resource id, which is the LogicalName prefix in
+        // CraftingCalculator.Application.csproj and is private to HelpService.
+        string resource = assembly.GetManifestResourceNames()
+            .Single(name => name.EndsWith($".{topic.FileName}", StringComparison.Ordinal));
+
+        using StreamReader reader = new(assembly.GetManifestResourceStream(resource)!);
+
+        return reader.ReadToEnd();
     }
 }
