@@ -1170,6 +1170,15 @@ html, body {
     margin: 20px 0 4px;
 }
 
+/* Where a cross-page anchor (calculations.md#surplus) stops. The app bar is fixed over the document,
+   so scrollIntoView would otherwise park the heading under it; scroll-margin-top is the gap it measures
+   the stop against, and --app-bar-bottom is the same offset the sticky search bar pins itself to. */
+.help-article h1,
+.help-article h2,
+.help-article h3 {
+    scroll-margin-top: calc(var(--app-bar-bottom) + 8px);
+}
+
 .help-article p,
 .help-article ul,
 .help-article ol {

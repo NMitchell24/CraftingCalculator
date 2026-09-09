@@ -52,16 +52,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Everything the previous run wrote, so a deleted help page stops being a wiki page. The
-          # wiki's own .git and any hand-written page not named after a help topic are left alone.
-          for existing in wiki/*.md; do
-            [ -e "$existing" ] || continue
-            name=$(basename "$existing")
-            [ -e "docs/help/$name" ] && rm "$existing"
-          done
+          # The names the previous run wrote, which is the only record of them: a page deleted from
+          # docs/help has to stop being a wiki page, and by then there is nothing in docs/help left to
+          # recognise it by. Anything not on this list was written by hand in the wiki's web UI - a
+          # sidebar, a footer - and is left alone. The file has no markup extension, so the wiki does
+          # not serve it as a page.
+          manifest=wiki/.help-sync-pages
+
+          if [ -f "$manifest" ]; then
+            while IFS= read -r page; do
+              if [ -n "$page" ]; then
+                rm -f "wiki/$page"
+              fi
+            done < "$manifest"
+          fi
+
+          : > "$manifest"
 
           for source in docs/help/*.md; do
             name=$(basename "$source")
+            echo "$name" >> "$manifest"
 
             # Three edits, all because the wiki is not Jekyll and is its own git repository:
             #   - strip the YAML front matter, which the wiki renders as a horizontal rule and stray
@@ -81,6 +91,7 @@ jobs:
           # The wiki's landing page. Home.md is the only page name the wiki treats specially, and it is
           # what a visitor lands on, so the Welcome page is published under both names.
           cp wiki/welcome.md wiki/Home.md
+          echo "Home.md" >> "$manifest"
 
       - name: Commit and push
         working-directory: wiki
