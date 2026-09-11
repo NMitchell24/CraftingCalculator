@@ -102,10 +102,15 @@ Rules that keep all three working:
 - `HelpServiceTests` runs against the real embedded content: it fails if a topic has no Markdown, if a
   page has no `<h1>`, or if a cross-page link points at a topic that does not exist.
 
-**Tone.** The help is written for players, not developers: playful, second person, and framed around
-real survival crafting games (Minecraft, Rust, Valheim, Conan Exiles). It is the one place in this repo
+Content Rules (For Claude only):
+
+- **Tone.** The help is written for players, not developers: playful, second person, and framed around
+real survival crafting games (Minecraft, Rust, Valheim, Conan Exiles, No Man's Sky). It is the one place in this repo
 where the "explain with code" rule below does **not** apply — help pages explain with worked examples
 and plain language, and never with C#. Match the voice of the existing pages.
+- **Contractions** Don't be afraid to use them. "Don't" reads easier than "do not". It sounds more human, it sounds more normal.
+- **Em Dashes** Use them sparingly. Don't overuse them. It's okay to use them every now and then, when appropriate. But if a ; or a : works as well, use those instead. Sometimes breaking things into multiple sentences is the right call. Again, it just reads more human, our readers will thank us.
+-
 
 ---
 
@@ -310,3 +315,6 @@ refactor scope and timing decisions with the user.
 - **Commits** All commits need to go through Rider's precommit checks to enforce code quality and formatting rules
   If Claude cannot access tools through the Intellij MCP server to run these precommit checks, then all commits need to
   to be performed by the user so that these checks are enforced.
+- **American English** Always use American English. Don't use British English variants of words in comments, 
+  documentation, or any written prose. If you're changing something that has it, fix it. E.G. Use 'color' not 'colour', 
+  'materialized' not 'materialised', 'aluminum' not 'aluminium', 'modeling' not 'modelling', et cetera.
