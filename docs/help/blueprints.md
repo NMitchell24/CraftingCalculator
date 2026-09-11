@@ -14,14 +14,14 @@ Gunpowder are Blueprints. How much Ammo you can make just **depends** on how muc
 Every blueprint is a name plus a list of parts. Each part is either a [component](components.md) or **another 
 blueprint**. This last part is how you would link together the Ammo and Gunpowder blueprints from the example above. 
 Gunpowder is a blueprint by itself that requires raw components of Sulfur and Charcoal. Ammo then requires 
-Gunpowder and Metal. So the App now knows that to craft Ammo, you will need to collect Sulfur, Charcoal, and Metal. 
+Gunpowder and Metal. So the app now knows that to craft Ammo, you will need to collect Sulfur, Charcoal, and Metal. 
 The Blueprint chain just allows the app to calculate how much of each resource you need to farm — and how much 
 Gunpowder you need to make — to craft the quantity of Ammo you want.
 
 ## Creating one
 
 ![Dataset](assets/menu-book.svg) **Dataset** → ![Blueprints](assets/handyman.svg) **Blueprints** → ![New](assets/add.svg) **Add**, 
-or open  an existing blueprint by tapping its row.
+or open an existing blueprint by tapping its row.
 
 ### Name
 
@@ -34,7 +34,7 @@ What **one finished item** is worth if you were to sell it in the game. This fee
 lines on the Craft screen.
 
 This can be whatever makes sense for your game: Caps, Tokens, Scrap, Units, Coins, Gold, whatever your game calls 
-it's currency.
+its currency.
 
 Leave it at 0 if your game has no currency system or if you only care about materials. The Value and Profit lines 
 will simply read zero, and you can ignore them.
@@ -57,13 +57,13 @@ Here are some examples of games and recipes where this would come into play.
 
 If your game hands you a stack of things every time you queue up a craft, the size of that stack goes here. The app then
 works out how many times you have to craft the thing and rounds up. It always rounds up the crafting steps 
-required because you can't craft a recipe halfway, the stack it produces is fixed. Anything extra that you 
+required because you can't craft a recipe halfway; the stack it produces is fixed. Anything extra that you 
 don't need is reported as [surplus](calculations.md#surplus). After all, it's better to have a little bit extra than 
 not enough.
 
 > **Note:** Yield cannot be set to 0 or anything less than 0. A recipe that yields nothing *is* nothing and setting it 
 > to 0 would cause the app to divide by zero and break the universe. Negative yields also don't make sense. There's 
-> no use case where you craft something, and the result is that you have to give it the things you want to craft.
+> simply no case where crafting an item means you end up having to give back the materials you used.
 
 ### Production time per craft
 
@@ -110,8 +110,8 @@ Point a blueprint at another blueprint whenever the game makes you craft an inte
 > `Metal`. Then `Gunpowder` contains the *components* `Sulfur` and `Charcoal`.
 
 **It's not recommended** to flatten it yourself. If you fill in Ammo as "10 Metal, 30 Charcoal, and 20 Sulfur", you 
-lose the crafting steps, the time, and the yield rounding. The day the game rebalances the ammo recipe you then have 
-to redo the entire math by hand rather than just editing the recipe(s) that changed.
+lose the crafting steps, the time, and the yield rounding. The day the game rebalances the ammo recipe, you then have 
+to redo all the math by hand rather than just editing the recipe(s) that changed.
 
 Nest as deep as your game does. The app can follow the entire tree for a Stasis Device in No Man's Sky. I don't 
 think you'll have any issues.
@@ -124,7 +124,7 @@ for a recipe you accidentally pointed back at one of its own ancestors.
 
 ## What to do when you're done
 
-- ![Save](assets/save.svg) **Save** commits your changes. It stays greyed out until the blueprint has a
+- ![Save](assets/save.svg) **Save** commits your changes. It stays grayed out until the blueprint has a
   name.
 - **Cancel** or the back arrow abandons them. If you have unsaved edits, you get asked first.
 - ![Delete](assets/delete.svg) **Delete**, at the bottom left, removes the blueprint after a confirmation.

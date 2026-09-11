@@ -7,11 +7,10 @@ nav_order: 3
 This app has two bars for **Actions** and **Navigation**. Where they are and how they look will differ depending on 
 the device you are using.
 
-* **Actions:** Are something specific to a page. These are the things you can do with the screen you are on. Adding 
-  an item, saving something, and the like. These are different for most pages, so the icons and buttons available 
-  will change as you use the app.
+* **Actions:** things you can do with the screen you are on. Adding an item, saving something, and the like. These 
+  are different for most pages, so the icons and buttons available will change as you use the app.
 
-* **Navigations:** This is how you navigate between the three primary screens.
+* **Navigation:** how you move between the three primary screens.
 
 ## The Navigation Bar
 
@@ -40,6 +39,6 @@ below describes where you will find these bars for the different layouts.
 |---------------------------|--------------------------------|
 | A phone in portrait mode  | On the bottom of the screen    |
 | A phone in landscape mode | On the left side of the screen |
-| A tablet or pc            | On the left side of the screen |
+| A tablet or PC            | On the left side of the screen |
 
-> **Note:** On a tablet or pc the left side menu will expand to show the labels next to the icon buttons. 
+> **Note:** On a tablet or PC the left side menu will expand to show the labels next to the icon buttons. 

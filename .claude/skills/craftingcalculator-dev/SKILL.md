@@ -154,14 +154,14 @@ That is why the content is Markdown and not Razor, and why it has to stay portab
 `docs/help/assets/` are the Material Design icons MudBlazor itself draws — each is
 `<svg viewBox="0 0 24 24" fill="#888888">` wrapping the path data from the matching
 `Icons.Material.Filled.<Name>` constant. To add one, reference MudBlazor from a throwaway console
-project and print the constant, then wrap it in that same template; the grey is deliberate, since on
-GitHub the file renders as an `<img>` with no text colour to inherit. `HelpProcessor.ReplaceIcon` swaps
+project and print the constant, then wrap it in that same template; the gray is deliberate, since on
+GitHub the file renders as an `<img>` with no text color to inherit. `HelpProcessor.ReplaceIcon` swaps
 that fill for `currentColor` and inlines the markup, which is what makes the icon follow the app's
 palette; `.help-article .help-icon` (app.css) sizes it in `em` against the text it sits in. Icons are
 the only images the help may use, and an image with no matching file degrades to its alt text.
 
 **Never make these MauiImage.** They are `EmbeddedResource` on `CraftingCalculator.Application` on
-purpose: `MauiImage` runs every file through the resizetizer, which rasterises each SVG once per Android
+purpose: `MauiImage` runs every file through the resizetizer, which rasterizes each SVG once per Android
 density bucket and per iOS scale — twenty-odd icons would become a few hundred PNGs in the app package,
 for images the help renders as inline markup and never loads as a file. All 21 currently cost about 8 KB
 inside the assembly. Verify after a change with
@@ -179,10 +179,67 @@ is how `dataset/blueprint` beats `dataset` for `/dataset/Blueprint/3`.
 topic has no Markdown, a page has no `<h1>`, or a cross-page link names a topic that does not exist.
 `HelpProcessorTests` covers route resolution and the link/front-matter rewriting.
 
-**Tone.** Written for players, not developers: playful, second person, framed around real survival
-crafting games (Minecraft, Rust, Valheim, Conan Exiles). The repo's "explain with code" rule is for
+### Voice
+
+Written for players, not developers: playful, second person, framed around real survival crafting games
+(Minecraft, Rust, Valheim, Conan Exiles, No Man's Sky). The repo's "explain with code" rule is for
 conversation about the code and does not apply here — help pages explain with worked examples and plain
-language, never with C#. Match the existing pages.
+language, never with C#. Read two existing pages before writing a third.
+
+The pages were rewritten by hand in September 2026 to sound less like documentation. What that edit pass
+actually changed, so the next page matches instead of regressing:
+
+**Contract the verbs.** `does not` → `doesn't`, `there is` → `there's`, `you have decided` → `you've
+decided`. Formal auxiliaries are the single loudest tell that Claude wrote a page.
+
+**Break the em-dash habit.** Em dashes are allowed, but rarely; a colon, a semicolon, or a full stop is
+almost always the better cut. Definition bullets and callout labels take a colon, not a dash:
+
+```markdown
+- **Follow system** — matches your phone or desktop.   <!-- before -->
+- **Follow system:** matches your phone or desktop.    <!-- after -->
+```
+
+```markdown
+It is a short screen. Here is all of it.               <!-- before -->
+It's a short screen. Here's everything you need to know.   <!-- after -->
+```
+
+**The author is a person, and it is fine to hear them.** First person singular carries the jokes and the
+honest asides — "I'm not your mom", "I could keep going, but I think you get the point", "who doesn't
+care about money, amiright?". Never "we": `we recommend` is a corporate voice the pages do not have.
+
+**Plain words beat precise ones.** "crap", "junk", "stuff", "grindy", "a buttload of units" are in voice.
+"granularity", "arbitrary", "leverage", "utilize" are not.
+
+**Explain the payoff, not just the field.** Almost every section gained a sentence saying why the reader
+should bother, usually in terms of grind avoided: "The numbers don't have to be exact. Even a rough
+estimate can give you a better idea of how long it will take to collect 1000 of these than just leaving
+it at 0."
+
+**Examples are real recipes with real numbers, and the arithmetic has to hold.** Minecraft's 1 log → 4
+planks, Valheim's 2 Copper + 1 Tin Bronze, Rust's 25 wood + 10 stone → 2 arrows. The Bronze Axe example
+is carried across `getting-started.md` and `calculations.md`, so a number changed in one page has to be
+changed in the other — check the totals, the crafts, and the step count when you touch either.
+
+**Structural conventions the pages now share:**
+
+- A navigation path names the icon on every step:
+  `![Dataset](assets/menu-book.svg) **Dataset** → ![Components](assets/inventory-2.svg) **Components** → ![New](assets/add.svg) **Add**`
+- A screen is a link on first mention in a section: `[Craft screen](craft-screen.md)`.
+- A section a whole page covers ends by sending the reader there: `More detail: [Components](components.md).`
+- Asides are `> **Note:**`, `> **Tip:**` or `> **Example.**` blockquotes, not parentheses.
+- Troubleshooting headings are the complaint in the reader's own words: `### "It wants way more
+  materials than the game does"`.
+- Prose wraps at about 120 columns. Do not reflow a paragraph you are making a two-word fix to.
+- American English throughout: gray, license, color, modeling, summarized.
+
+**A hard line break is two trailing spaces. Never a backslash.** The three renderers disagree: CommonMark
+(Markdig, GitHub) reads a single trailing `\` as a break and `\\` as a literal backslash, while kramdown
+(Jekyll, so the project site) reads `\\` as the break and a single `\` as literal. Two or more trailing
+spaces are a break in all three. `[*.md]` in `.editorconfig` sets `trim_trailing_whitespace = false` so a
+reformat cannot silently eat one — which also means a stray double space anywhere becomes an unintended
+`<br>`. `grep -rn --include=*.md -e '  $' docs/help` lists every break in the content.
 
 ### MudBlazor docs MCP server (`mudblazor` / MudMCP)
 
@@ -247,7 +304,7 @@ semantic search).
   failures do not exist in Debug. `codeql-analysis.yml` builds the same `.slnf` with `build-mode:
   manual`, because CodeQL autobuild does not handle the MAUI head.
 - **Test stack:** NUnit + Moq + AwesomeAssertions (`result.Should()...`; the Apache-2.0 community fork
-  of FluentAssertions, which went to a paid Xceed licence at v8 — do not add `FluentAssertions` back).
+  of FluentAssertions, which went to a paid Xceed license at v8 — do not add `FluentAssertions` back).
   Tests mirror source folders. Mock DAOs and inject them into the service under test.
 - **`Infrastructure.UnitTests` uses a real SQLite database, never `UseInMemoryDatabase`.** The
   in-memory provider enforces neither foreign keys nor cascade delete — exactly the mechanisms the

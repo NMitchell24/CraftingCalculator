@@ -18,8 +18,8 @@ of how you play.
 
 Seriously. Nobody wants to spend several days entering every single resource, crafting recipe and intermediary
 component for a game only to have it change the next time the devs decide to *rebalance* it. To be honest, that's
-the exact reason why this game ships without any data built in. If the app contained all the data for every popular 
-crafting game out there, maintaining that data would be a lot more than a full time job.
+the exact reason why this app ships without any data built in. If the app contained all the data for every popular 
+crafting game out there, maintaining that data would be a lot more than a full-time job.
 
 ### Stop breaking things down when it stops being interesting
 
@@ -28,7 +28,7 @@ Bronze a [component](components.md) with a cost and stop there. The app doesn't 
 It's your data. Create it in the way that's most useful to you.
 
 The point of modeling something as a blueprint is that you want the app to count its components, count its crafting 
-step, track its production time, apply its yield rounding, and report its surplus. If none of that matters for a 
+steps, track its production time, apply its yield rounding, and report its surplus. If none of that matters for a 
 given item, a component is a quarter of the work.
 
 ### Watch the yield field

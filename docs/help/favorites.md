@@ -5,7 +5,7 @@ nav_order: 9
 
 # Favorites
 
-A favorite is a saved batch: a set of blueprints and a quantiy to craft, stored with a name you choose.
+A favorite is a saved batch: a set of blueprints and a quantity to craft, stored with a name you choose.
 
 The use case writes itself. You've worked out the exact shopping list for a full raid kit, the stack of stasis 
 devices that your farms produce enough resources for, or exactly how to build the base you're going to use. You're 
@@ -30,8 +30,8 @@ Build your batch on the [Craft screen](craft-screen.md), then tap ![Save as favo
 
 - Select your named favorite in **The Load Favorite dropdown** at the top of the Selected Blueprints card on the 
   Craft screen.
-- If you already have blueprints in your batch, the app stops and asks before replacing them.
-- Loading one would clear whatever you had selected, and one mis-tap on a phone shouldn't cost you.
+- If you already have blueprints in your batch, the app stops and asks before replacing them; one mis-tap on a phone 
+  shouldn't cost you.
 
 ## The Favorites screen
 

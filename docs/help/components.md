@@ -67,22 +67,22 @@ sort of thing. It shows on the detail card whenever you tap the component anywhe
 
 The honest answer: **whichever saves you work.**
 
-The app doesn't care. If the intermediate step isn't interesting to you, model it as a component. If hate crafting 
-the thing, and it's easy to buy, create it as a component and give it a cost so you can manage your Profit Margins.
+The app doesn't care. If the intermediate step isn't interesting to you, model it as a component. If you hate crafting 
+the thing, and it's easy to buy, create it as a component and give it a cost so you can manage your profit margins.
 
-> **Example.** In Rust, Charcoal is *technically* a recipe. You stick wood in a campfire, 
+> **Example:** In Rust, Charcoal is *technically* a recipe. You stick wood in a campfire, 
 > furnace, refinery, whatever, and it burns, producing Charcoal 1:1 on a tick rate that varies based on what you 
 > use. You could put that in as a blueprint. But, why? You're already going to get Charcoal through your other 
 > activities. So list it as a component. Then your Gunpowder recipe stops at the Charcoal and doesn't tell you 
 > that you need a bunch of wood to make charcoal to make GP.
 
-The one thing you gain by modeling it as a blueprint is that the app counts the crafting step, tracks
+The one thing you gain by modeling it as a blueprint is that the app counts the crafting steps, tracks
 the production time, applies the yield rounding, and reports the surplus. If none of that matters for a
 given item, a component is less work.
 
 ## Saving, duplicating and deleting
 
-Same as everywhere else: ![Save](assets/save.svg) **Save** is greyed out until there is a name,
+Same as everywhere else: ![Save](assets/save.svg) **Save** is grayed out until there is a name,
 **Cancel** and the back arrow warn you about unsaved edits, and ![Delete](assets/delete.svg) **Delete**
 asks before it acts.
 
@@ -90,4 +90,4 @@ Deleting a component that a blueprint uses removes it from that blueprint's part
 itself survives. It just needs one less thing.
 
 To create a copy of one, use ![Duplicate](assets/content-copy.svg) **Duplicate** on the Components list.
-See [The Dataset Screen](dataset.md) for more info
+See [The Dataset Screen](dataset.md) for more info.

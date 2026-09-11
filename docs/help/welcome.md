@@ -19,7 +19,7 @@ tells you exactly how many raw resources you need, and most importantly, how muc
 
 ## Three records to rule them all
 
-Everything here is built off of three generic records that are common to Survival Crafting games.
+Everything here is built on three generic records that are common to Survival Crafting games.
 
 | Word          | What it means                                                                                                                                               | In your game                              |
 | ------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
@@ -27,12 +27,12 @@ Everything here is built off of three generic records that are common to Surviva
 | **Blueprint** | A recipe. A list of components, or other blueprints, that makes the thing you need. Or even one of the things you need to make the thing you *really* need. | Iron Nails, Fine Wood Bow, Low Grade Fuel |
 | **Category**  | A label you stick on components and blueprints so you can find them later.                                                                                  | Ores, Food, Base Building, Tier 3 Gear    |
 
-Probably the *most* important part is that little parenthetical coordination in the Blueprint row: 
-**a blueprint can contain other blueprints**. In Rust, a Rocket needs 10 Explosives, 150 Gunpowder, and 2 Metal Pipes. 
-Explosives and Gunpowder are also things you can craft. They are their own **Blueprints**. You describe each recipe 
-once, exactly the way the game defines it, and the app does all the math on your behalf, all the way down to the raw 
-ore. The **Calculator** part is what allows you to then say "I need 100 of these, how much do I need to grind?" and 
-this app gives you the answer.
+Probably the *most* important part is that little comma clause in the Blueprint row: **a blueprint can contain other 
+blueprints**. In Rust, a Rocket needs 10 Explosives, 150 Gunpowder, and 2 Metal Pipes. Explosives and Gunpowder are 
+also things you can craft. They are their own **Blueprints**. You describe each recipe once, exactly the way the 
+game defines it, and the app does all the math on your behalf, all the way down to the raw ore. The **Calculator** 
+part is what allows you to then say "I need 100 of these, how much do I need to grind?" and this app gives you the 
+answer.
 
 ## Where to go next
 
@@ -43,7 +43,7 @@ this app gives you the answer.
 * Curious how it works out surplus, steps and profit? [How the Math Works](calculations.md).
 
 * Everything is stored on your device. No account, no sign-up, no internet, no telemetry. You have full control over 
-* how your data is used and who can see it.
+  how your data is used and who can see it.
 
 Help is always one tap away. The ![Help](assets/help-outline.svg) icon in the top bar opens the help page for whatever screen you are 
 looking at.

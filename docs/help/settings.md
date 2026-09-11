@@ -5,7 +5,7 @@ nav_order: 11
 
 # Settings
 
-The ![Settings](assets/settings.svg) icon in the top bar. It's accessible from anywhere in the app. Tap it again to go
+The ![Settings](assets/settings.svg) icon in the top bar is accessible from anywhere in the app. Tap it again to go
 back to whatever you were doing. It remembers where you came from.
 
 It's a short screen. Here's everything you need to know.
@@ -24,7 +24,7 @@ The change is instant. There's nothing to save and nothing to restart.
 
 ## About
 
-The app's name, its version and build number, the copyright, and the licence.
+The app's name, its version and build number, the copyright, and the license.
 
 Crafting Calculator is 100% free software under the **GPL 2.0**. You can use it, share it and modify it; the
 full terms are summarized on the screen.

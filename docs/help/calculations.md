@@ -66,23 +66,26 @@ child quantity = child quantity per craft × parent crafts
 This is what makes yield pay off all the way down. If a parent yields 2, you run half as many crafts,
 so all the requirements beneath are cut in half too.
 
-**Example.** A Valheim-flavored tree, asking for **3 Bronze Axes**:
+**Example.** A Valheim tree, asking for **3 Bronze Axes**:
 
 ```
-Bronze Axe  x3   -> 3 crafts (yield 1)
-  Bronze    x12  -> 12 crafts (4 per axe x 3 crafts)
-    Copper Ore x24  (2 per bronze x 12 crafts)
-    Tin Ore    x12  (1 per bronze x 12 crafts)
-  Wood      x6   (2 per axe x 3 crafts)
+Bronze Axe         x3   -> 3 crafts (yield 1)
+  Bronze           x24  -> 24 crafts (8 per axe x 3 crafts)
+    Copper         x48  (2 per bronze x 24 crafts)
+    Tin            x24  (1 per bronze x 24 crafts)
+  Wood             x12  (4 per axe x 3 crafts)
+  Leather Scraps   x6   (2 per axe x 3 crafts)
 ```
 
-The **Components** tab shows the bottom line only — 24 Copper Ore, 12 Tin Ore, 6 Wood — merged and
+The **Components** tab shows the bottom line only — 48 Copper, 24 Tin, 12 Wood, 6 Leather Scraps — merged and
 sorted. The **Steps** tab shows the whole shape above, with ![Blueprint](assets/handyman.svg) marking
 each blueprint you craft and ![Component](assets/inventory-2.svg) each component you gather.
 
 If two different blueprints in your batch both need Wood, the Components tab gives you **one** Wood row
 with the total. That merge is the entire reason this app was created. It answers the question: *"How much crap do I 
 have to get if I want to make all of these things?"* with one total per component.
+
+> **Note:** The smelting step for Copper and Tin were deliberately left out for the sake of simplifying the example.
 
 ## Crafting Steps
 
@@ -94,12 +97,11 @@ crafting steps = sum of the craft count of every blueprint in the tree
 
 Components don't count into steps. You gather, harvest, or purchase them. 
 
-From the example above: 3 Bronze Axe crafts + 12 Bronze crafts = **15 crafting steps**. That is
-genuinely 15 items that need to be crafted. You didn't need to *craft* the Copper Ore, Tin Ore or Wood. You 
-harvested them from the environment.
+From the example above: 3 Bronze Axe crafts + 24 Bronze crafts = **27 crafting steps**. That's
+genuinely 27 items that need to be crafted. 
 
-Yield reduces this directly. If Bronze yielded 2 per craft, you would need 6 Bronze crafts instead of
-12, and the whole project would drop to 9 steps.
+Yield reduces this directly. If Bronze yielded 2 per craft, you would need 12 Bronze crafts instead of
+24, and the whole project would drop to 15 steps.
 
 ## Cost, Value and Profit
 
@@ -150,18 +152,18 @@ Times are shown in the smallest form that fits:
 | `2:04:30`         | Hours, minutes, seconds                  |
 | `3 Days 02:04:30` | A day or more                            |
 
->**Note:** Once the time required goes over 1 minute the display will no longer show fractional seconds. It will 
+> **Note:** Once the time required goes over 1 minute the display will no longer show fractional seconds. It will 
 > always round down to the nearest second. The fractions still count toward the math, they just aren't shown in the 
 > Crafting Summary or Steps breakdown.
 > 
-> Example: You have a blueprint that takes 30.5s.\
-> A Quantity of 2 will show 1:01 (Exact)\
+> Example: You have a blueprint that takes 30.5s.  
+> A Quantity of 2 will show 1:01 (Exact)  
 > A Quantity of 3 will show 1:31 (Rounded down)
 
 ## Components Needed
 
 Every raw component in the batch, added together into one number. It counts *items*, not distinct
-kinds. 24 Copper Ore and 12 Tin Ore is 36 Components Needed, from two rows.
+kinds. 48 Copper, 24 Tin, 12 Wood and 6 Leather Scraps is 90 total Components Needed, from four rows.
 
 It is a rough gauge of "how much inventory space and how many trips", not a precise one, since your
 game's stack sizes are its own business.
@@ -179,5 +181,5 @@ craft has no meaning and it borks the math.
 craft something that gives you time back in your day. So use your time wisely.
 
 **A recipe that loops back on itself.** If blueprint A nests B and B nests A, there is no bottom to the
-tree. This creates an infinite loop, and I'm pretty sure there aren't any games that need this for exactly the 
-same reason that this app doesn't allow it. 
+tree. I’m pretty sure no game needs a recipe that loops endlessly back on itself, for exactly the same reason this 
+app doesn’t allow it. 

@@ -16,8 +16,8 @@ you'll wish you had used them in the beginning.
 
 **Dataset → Categories → ![New](assets/add.svg)**. There are exactly two fields:
 
-- **Name:** required. You can call it whatever you want. For example, you may want categories for `Ores`, `Food`, `Base 
-Building`, `Tier 3`, `Armor`, `Explosives`.
+- **Name:** required. You can call it whatever you want. For example, you may want categories for `Ores`, `Food`, 
+  `Base Building`, `Tier 3`, `Armor`, `Explosives`.
 - **Description:** optional. A free-form field to add in any notes you want. This is the only place in the app where 
   you will see them.
 

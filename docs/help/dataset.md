@@ -24,7 +24,7 @@ in this order allows you to make sure that each thing exists before you need to 
 Tap the ![Edit](assets/edit.svg) icon to open a list screen for any of the types. You don't have to tap the icon 
 directly. Tapping anywhere on the card does the same thing.
 
->**Note:** There are shortcut icons that match the cards in the [actions bar](actions-bar.md) for easy thumb 
+> **Note:** There are shortcut icons that match the cards in the [actions bar](actions-bar.md) for easy thumb 
 > access on your mobile device. 
 > 
 > The **![Delete all data](assets/delete-forever.svg) Delete all data** button is 
@@ -35,21 +35,22 @@ directly. Tapping anywhere on the card does the same thing.
 Every row shows the record's name, a caption, and its category.
 
 The caption changes with the type.
-- **Categories:** show their description
-- **Components:** show their cost
+
+- **Categories:** show their description.
+- **Components:** show their cost.
 - **Blueprints:** list how many components they have. 
 
 Tap ![Edit](assets/edit.svg) to edit a row. You don't have to tap the icon directly. Tapping anywhere on the card 
 does the same thing. ![Delete](assets/delete.svg) deletes that one record after a confirmation.
 
-> **Note:** On Blueprints list the caption says something like `3 components`. This is not the quantity of 
+> **Note:** On the Blueprints list the caption says something like `3 components`. This is not the quantity of 
 > components in the blueprint, but the number of individual components and other blueprints that have been linked 
 > with that specific blueprint. 
 > 
-> For example:\
+> For example:  
 > Suppose you have a blueprint for Iron Ingot that takes 5 Iron Ore and 10 Wood. You have a second blueprint for 
 > Iron Axe that takes 2 Iron Ingot and 5 Wood. On the Blueprint list, both the Iron Axe and Iron Ingot blueprints 
-> will show the caption `2 components`
+> will show the caption `2 components`.
 
 ### Search and filter
 
@@ -61,7 +62,7 @@ Next to it, the ![Filter](assets/filter-list.svg) icon narrows by category. See
 
 ### The actions
 
-These [actions](actions-bar.md) show up whenever you go to one of the lists for Categories, Components, or Blueprints
+These [actions](actions-bar.md) show up whenever you go to one of the lists for Categories, Components, or Blueprints.
 
 | Action                                                  | What it does                                |
 |---------------------------------------------------------|---------------------------------------------|
@@ -116,13 +117,14 @@ Records reference each other, so it is worth knowing what a delete ripples into:
 | A **blueprint** | It's removed from every blueprint that uses it, and from every favorite that included it. |
 
 Deletes are **permanent** and cannot be undone. This is exactly why every one of them asks you to confirm first. No one 
-wants to accidentally delete something they spent the past couple minutes creating.
+wants to accidentally delete something they spent the past couple of minutes creating.
 
 ## Delete all data
 
-The ![Delete all data](assets/delete-forever.svg) action on the Dataset landing page. This is the sledgehammer that you 
-probably won't use very often, if even at all. But it exists to give you the option to clear everything and start over.
-It removes **every** favorite, blueprint, category and component — the entire dataset, gone.
+You can Delete All Data with the ![Delete all data](assets/delete-forever.svg) action on the Dataset landing page. 
+This is the sledgehammer that you probably won't use very often, if even at all. But it exists to give you the 
+option to clear everything and start over. It removes **every** favorite, blueprint, category and component — the 
+entire dataset, gone.
 
 Because deletes are permanent, it doesn't settle for a yes/no box: you have to **type the word
 DELETE** to confirm. If a batch was in progress on the Craft screen, it is cleared too, since it would
