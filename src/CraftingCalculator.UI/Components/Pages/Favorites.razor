@@ -16,7 +16,7 @@
         <MudList T="BlueprintFavorite">
             @foreach (BlueprintFavorite favorite in _favorites)
             {
-                <MudListItem T="BlueprintFavorite" OnClick="@(() => RenameAsync(favorite))">
+                <MudListItem T="BlueprintFavorite" Class="@RowClass(favorite)" OnClick="@(() => OnRowClick(favorite))">
                     <div class="list-row">
                         <div class="list-row-info">
                             <MudText Class="list-row-name">@favorite.Name</MudText>
@@ -24,8 +24,8 @@
                                 @favorite.BlueprintCount blueprint@(favorite.BlueprintCount == 1 ? "" : "s")
                             </MudText>
                         </div>
-                        @* The row itself opens the rename dialog, so the row actions have to stop the
-                           event before it bubbles. @onclick:stopPropagation can only be applied to an
+                        @* The row itself has a tap action, so the row actions have to stop the event
+                           before it bubbles. @onclick:stopPropagation can only be applied to an
                            element, never a component tag, hence the wrapper div. *@
                         <div class="list-row-actions" @onclick="() => { }" @onclick:stopPropagation="true">
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"

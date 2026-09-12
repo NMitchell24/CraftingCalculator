@@ -11,7 +11,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
 
-        // Projected rather than materialised through ToModel: the list screen shows a per-favorite
+        // Projected rather than materialized through ToModel: the list screen shows a per-favorite
         // blueprint count, and counting in the query avoids loading every FavoriteBlueprints row to get it.
         return await context.Favorites
             .AsNoTracking()
@@ -82,10 +82,14 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
             .ExecuteUpdateAsync(s => s.SetProperty(f => f.Name, name));
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(IEnumerable<int> ids)
     {
+        // Materialized first so the translated IN clause gets a stable collection rather than a query
+        // that would be enumerated inside the expression tree.
+        List<int> idList = [.. ids];
+
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
-        await context.Favorites.Where(f => f.Id == id).ExecuteDeleteAsync();
+        await context.Favorites.Where(f => idList.Contains(f.Id)).ExecuteDeleteAsync();
     }
 
     public async Task<List<BlueprintQuantity>> GetBlueprintQuantitiesAsync(int favoriteId)

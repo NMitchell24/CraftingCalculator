@@ -13,7 +13,10 @@ public class FavoriteService(IBlueprintFavoritesDAO dao) : IFavoriteService
 
     public Task RenameFavoriteAsync(BlueprintFavorite favorite, string newName) => dao.RenameAsync(favorite.Id, newName);
 
-    public Task DeleteFavoriteAsync(BlueprintFavorite favorite) => dao.DeleteAsync(favorite.Id);
+    public Task DeleteFavoriteAsync(BlueprintFavorite favorite) => dao.DeleteAsync([favorite.Id]);
+
+    public Task DeleteFavoritesAsync(IEnumerable<BlueprintFavorite> favorites) =>
+        dao.DeleteAsync(favorites.Select(favorite => favorite.Id));
 
     public async Task<bool> DoesFavoriteExistAsync(string? name) => await dao.GetByNameAsync(name) != null;
 

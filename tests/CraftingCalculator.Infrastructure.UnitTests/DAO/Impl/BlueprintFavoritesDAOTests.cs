@@ -54,4 +54,32 @@ public class BlueprintFavoritesDAOTests
         List<BlueprintQuantity> quantities = await _favoritesDAO.GetBlueprintQuantitiesAsync(saved.Id);
         quantities.Should().ContainSingle(q => q.Blueprint.Name == "Plank" && q.Quantity == 7);
     }
+
+    [Test]
+    public async Task DeleteAsync_DeletesEveryNamedFavoriteAndCascadesToItsSavedQuantities()
+    {
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+
+        BlueprintFavorite one = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "One" },
+            [new BlueprintQuantity(plank, 3, 0)]);
+        BlueprintFavorite two = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Two" },
+            [new BlueprintQuantity(plank, 5, 0)]);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Kept" }, [new BlueprintQuantity(plank, 7, 0)]);
+
+        await _favoritesDAO.DeleteAsync([one.Id, two.Id]);
+
+        (await _favoritesDAO.GetAllAsync()).Select(f => f.Name).Should().Equal("Kept");
+        (await _favoritesDAO.GetBlueprintQuantitiesAsync(one.Id)).Should().BeEmpty();
+        (await _favoritesDAO.GetBlueprintQuantitiesAsync(two.Id)).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task DeleteAsync_EmptyIdList_DeletesNothing()
+    {
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Kept" }, []);
+
+        await _favoritesDAO.DeleteAsync([]);
+
+        (await _favoritesDAO.GetAllAsync()).Should().ContainSingle();
+    }
 }

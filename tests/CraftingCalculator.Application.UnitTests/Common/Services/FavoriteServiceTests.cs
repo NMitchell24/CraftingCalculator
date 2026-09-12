@@ -42,6 +42,28 @@ public class FavoriteServiceTests
     }
 
     [Test]
+    public async Task DeleteFavoriteAsync_DeletesThatOneIdThroughDAO()
+    {
+        await _service.DeleteFavoriteAsync(new BlueprintFavorite { Id = 4, Name = "Raid Kit" });
+
+        _dao.Verify(d => d.DeleteAsync(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 4 }))), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteFavoritesAsync_DeletesEveryIdThroughOneDAOCall()
+    {
+        List<BlueprintFavorite> favorites =
+        [
+            new BlueprintFavorite { Id = 2, Name = "Raid Kit" },
+            new BlueprintFavorite { Id = 7, Name = "Base Kit" }
+        ];
+
+        await _service.DeleteFavoritesAsync(favorites);
+
+        _dao.Verify(d => d.DeleteAsync(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 2, 7 }))), Times.Once);
+    }
+
+    [Test]
     public async Task DoesFavoriteExistAsync_KnownName_ReturnsTrue()
     {
         _dao.Setup(d => d.GetByNameAsync("My Batch")).ReturnsAsync(new BlueprintFavorite { Name = "My Batch" });
