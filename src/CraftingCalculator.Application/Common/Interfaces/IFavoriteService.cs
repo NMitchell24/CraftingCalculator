@@ -20,6 +20,9 @@ public interface IFavoriteService
 
     Task DeleteFavoriteAsync(BlueprintFavorite favorite);
 
+    /// <summary>Deletes every favorite in <paramref name="favorites"/>.</summary>
+    Task DeleteFavoritesAsync(IEnumerable<BlueprintFavorite> favorites);
+
     Task<bool> DoesFavoriteExistAsync(string? name);
 
     Task<List<BlueprintQuantity>> GetBlueprintQuantitiesForFavoriteAsync(BlueprintFavorite? favorite);

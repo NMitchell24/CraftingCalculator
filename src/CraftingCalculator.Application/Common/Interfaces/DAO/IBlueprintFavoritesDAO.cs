@@ -27,10 +27,10 @@ public interface IBlueprintFavoritesDAO
     Task RenameAsync(int id, string name);
 
     /// <summary>
-    /// Deletes the favorite. Its saved blueprint quantities are removed by the database's cascade
-    /// delete rather than by the caller.
+    /// Deletes every favorite in <paramref name="ids"/>. Their saved blueprint quantities are removed
+    /// by the database's cascade delete rather than by the caller.
     /// </summary>
-    Task DeleteAsync(int id);
+    Task DeleteAsync(IEnumerable<int> ids);
 
     Task<List<BlueprintQuantity>> GetBlueprintQuantitiesAsync(int favoriteId);
 }

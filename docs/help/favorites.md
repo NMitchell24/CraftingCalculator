@@ -49,6 +49,29 @@ There is no **New** action here, and that's deliberate: a favorite is made *from
 batch lives on the Craft screen. Build it there, save it there. This screen just exists for you to manage the 
 favorites you create.
 
+### The actions
+
+Two [actions](actions-bar.md), for when deleting one row at a time gets old. They work exactly the way they do on
+the [Dataset](dataset.md) lists.
+
+| Action                                                  | What it does                               |
+|---------------------------------------------------------|--------------------------------------------|
+| ![Delete](assets/delete.svg) **Delete**                 | Turns on Delete mode.                      |
+| ![Delete all](assets/delete-forever.svg) **Delete all** | Wipes every favorite after a confirmation. |
+
+Both gray out until you've saved a favorite, since there would be nothing to act on.
+
+### Delete mode (deleting several at once)
+
+Tap ![Delete](assets/delete.svg) **Delete**, then tap every favorite you want gone. Selected rows will highlight.
+Then tap it a second time to delete all the selected favorites. You get a confirmation naming how many are about to
+go. While the mode is on, tapping a row selects it instead of opening the rename dialog.
+
+> **Tip:** Changed your mind? **Press and hold the ![Delete](assets/delete.svg) action** to leave the mode with
+> nothing deleted and your selection discarded.
+
+None of this touches your blueprints. You're only throwing away the favorite, not the blueprints.
+
 ## What a favorite actually stores
 
 It stores **which blueprints, and how many**. It's **not** a frozen copy of their Crafting Summary, Components, Steps 

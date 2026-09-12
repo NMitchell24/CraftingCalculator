@@ -557,8 +557,9 @@ html, body {
     margin-bottom: 6px;
 }
 
-/* Delete Mode on the Dataset list. Scoped the same way as the card rule above rather than by class
-   alone, because that rule sets a background on every row and would otherwise win on specificity. */
+/* Delete Mode on the Dataset and Favorites lists. Scoped the same way as the card rule above rather
+   than by class alone, because that rule sets a background on every row and would otherwise win on
+   specificity. */
 .mud-list > .mud-list-item.list-row-selected {
     background-color: var(--mud-palette-primary-hover);
     border-color: var(--mud-palette-primary);

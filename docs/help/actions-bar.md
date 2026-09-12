@@ -26,9 +26,8 @@ app. See the table below for an overview of these options.
 ## The Actions Bar
 
 The actions bar options will change depending on which screen you are looking at. Some pages offer Add and Delete 
-options. Other pages may contain shortcuts to access the items that list on the screen. And the Favorites screen has 
-no actions bar at all. On any page you can tap the ![Help](assets/help-outline.svg) icon in the top right to see 
-what the actions for that page do.
+options. Other pages may contain shortcuts to access the items that list on the screen. On any page you can tap the 
+![Help](assets/help-outline.svg) icon in the top right to see what the actions for that page do.
 
 ## How these bars behave across devices
 
