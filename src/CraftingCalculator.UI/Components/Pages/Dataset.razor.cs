@@ -125,6 +125,43 @@ public partial class Dataset : ComponentBase, IDisposable
         await SwitchAsync(created.Id);
     }
 
+    private async Task CopyAsync()
+    {
+        if (Current is not { } current)
+        {
+            return;
+        }
+
+        // The suffix IBaseDataRecord.CopyForSave gives a duplicated record, so copying a dataset and
+        // copying one record in it name their copy the same way. It also sorts the copy next to the
+        // dataset it came from in the switcher, which is ordered by name.
+        string? name = await DatasetPrompts.PromptForDatasetNameAsync(
+            DialogService, DatasetService, "Copy Dataset", $"{current.Name} - Copy");
+
+        if (name is null)
+        {
+            return;
+        }
+
+        _busy = true;
+        StateHasChanged();
+
+        DatasetModel created;
+
+        try
+        {
+            created = await DatasetService.CopyAsync(current.Id, name);
+        }
+        finally
+        {
+            _busy = false;
+        }
+
+        // Switched to immediately, the same as a newly created dataset: the copy exists to be the one
+        // that gets the variations, so leaving the user on the original would be the wrong place to stand.
+        await SwitchAsync(created.Id);
+    }
+
     private async Task RenameAsync()
     {
         if (Current is not { } current)

@@ -25,6 +25,13 @@ public interface IDatasetService
     /// <summary>Adds an empty dataset and returns it with its assigned id.</summary>
     Task<DatasetModel> CreateAsync(string name);
 
+    /// <summary>
+    /// Adds a dataset holding its own copy of everything in <paramref name="sourceId"/> - every category,
+    /// component, blueprint and favorite - and returns it with its assigned id. The copies are independent
+    /// records, so editing either dataset afterwards leaves the other alone.
+    /// </summary>
+    Task<DatasetModel> CopyAsync(int sourceId, string name);
+
     Task RenameAsync(int id, string name);
 
     /// <summary>

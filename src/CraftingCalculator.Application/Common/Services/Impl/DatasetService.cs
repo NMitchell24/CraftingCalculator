@@ -36,6 +36,8 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
 
     public Task<DatasetModel> CreateAsync(string name) => dao.AddAsync(name.Trim());
 
+    public Task<DatasetModel> CopyAsync(int sourceId, string name) => dao.CopyAsync(sourceId, name.Trim());
+
     public Task RenameAsync(int id, string name) => dao.RenameAsync(id, name.Trim());
 
     public async Task DeleteAsync(int id)

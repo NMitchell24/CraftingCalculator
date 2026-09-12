@@ -183,6 +183,22 @@ public class DatasetServiceTests
         _dao.Verify(dao => dao.RenameAsync(7, "Valheim"), Times.Once);
     }
 
+    [Test]
+    public async Task CopyAsync_TrimsTheNameAndCopiesTheDatasetItIsGiven()
+    {
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(1);
+        _dao.Setup(dao => dao.CopyAsync(7, "Rust - Modded")).ReturnsAsync(new DatasetModel { Id = 9, Name = "Rust - Modded" });
+
+        DatasetModel copy = await _service.CopyAsync(7, "  Rust - Modded  ");
+
+        copy.Id.Should().Be(9);
+
+        // The selection is the caller's to move: copying a dataset other than the selected one is a
+        // supported call, and it does not make that one the one you are working in.
+        _selected.Id.Should().Be(1);
+    }
+
     /// <summary>Stands in for MAUI Preferences, which the Application layer never sees directly.</summary>
     private sealed class FakePreferenceStore : IPreferenceStore
     {

@@ -18,6 +18,14 @@ public interface IDatasetDAO
     /// <summary>Adds a dataset and returns it with its assigned <see cref="DatasetModel.Id"/>.</summary>
     Task<DatasetModel> AddAsync(string name);
 
+    /// <summary>
+    /// Adds a dataset named <paramref name="name"/> holding its own copy of every category, component,
+    /// blueprint and favorite in <paramref name="sourceId"/>, and returns it with its assigned
+    /// <see cref="DatasetModel.Id"/>. The copies are independent records: editing one dataset's afterwards
+    /// leaves the other's alone. The source dataset is not modified.
+    /// </summary>
+    Task<DatasetModel> CopyAsync(int sourceId, string name);
+
     Task RenameAsync(int id, string name);
 
     /// <summary>
