@@ -1,6 +1,6 @@
 ---
 title: Favorites
-nav_order: 9
+nav_order: 10
 ---
 
 # Favorites
@@ -11,6 +11,9 @@ The use case writes itself. You've worked out the exact shopping list for a full
 devices that your farms produce enough resources for, or exactly how to build the base you're going to use. You're 
 going to want that same list on the next server, the next wipe, the next character, the next time you want to make a 
 buttload of units. Save it once, load it in a tap.
+
+A favorite belongs to the [dataset](managing-datasets.md) it was saved in, the same as everything else.
+Switch datasets, and you'll see that dataset's favorites instead.
 
 ## Saving one
 

@@ -46,6 +46,10 @@ public static class HelpTopics
             "Recipes: what they cost, what they are worth, and how they nest.",
             ["dataset/blueprint"]),
 
+        new("managing-datasets", "Managing Datasets",
+            "Keep a separate set of records per game, and switch between them in a tap.",
+            []),
+
         new("dataset", "The Dataset Screen",
             "Browse, search, duplicate and delete your records.",
             ["dataset"]),
@@ -63,7 +67,7 @@ public static class HelpTopics
             ["settings"]),
 
         new("tips", "Tips and Troubleshooting",
-            "Modelling tricks for real games, and what to do when a number looks wrong.",
+            "Modeling tricks for real games, and what to do when a number looks wrong.",
             [])
     ];
 }

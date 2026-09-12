@@ -4,6 +4,36 @@
 <PageTitle>Dataset</PageTitle>
 
 <div class="dataset-page">
+    <div class="dataset-switcher">
+        @* Bound on the id rather than the DatasetModel, for the same reason CategorySelect and the
+           Craft screen's favorite select are: these models have no value equality, so MudSelect's
+           reference comparison would never preselect the one that is actually selected.
+           Keyed, and rebuilt rather than updated, for the reason the Craft screen's favorite select is:
+           MudSelect holds the text it set itself and does not take a new one back from its parameters,
+           which showed up here as a rename leaving the old name on screen.
+           OuterClass rather than Class: Class lands on the inner MudInputControl, and the flex width
+           has to sit on the outer div, which is this row's flex item. *@
+        <MudSelect T="int" @key="DatasetSelectKey" Value="SelectedDatasetId" ValueChanged="SwitchAsync"
+                   Label="Dataset" Variant="Variant.Outlined" Margin="Margin.Dense"
+                   OuterClass="dataset-switcher-select">
+            @foreach (DatasetModel dataset in _datasets)
+            {
+                <MudSelectItem T="int" Value="@dataset.Id">@dataset.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <div class="dataset-switcher-actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                           OnClick="RenameAsync" title="Rename dataset" aria-label="Rename dataset" />
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary"
+                           OnClick="AddAsync" title="New dataset" aria-label="New dataset" />
+            @* Disabled on the last one: a dataset is always selected, so there has to be one to select. *@
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                           Disabled="@(_datasets.Count <= 1)" OnClick="DeleteAsync"
+                           title="Delete dataset" aria-label="Delete dataset" />
+        </div>
+    </div>
+
     @foreach (DatasetSection section in Sections)
     {
         @* The click sits on a plain wrapper element rather than on MudPaper: MudPaper exposes no

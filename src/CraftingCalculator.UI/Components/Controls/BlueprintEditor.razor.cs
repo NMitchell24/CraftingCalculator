@@ -13,7 +13,7 @@ public partial class BlueprintEditor : ComponentBase
     /// <summary>Raised on every edit, so the hosting page can track unsaved changes.</summary>
     [Parameter] public EventCallback OnChanged { get; set; }
 
-    [Inject] private IDatasetService DatasetService { get; set; } = null!;
+    [Inject] private IRecordService RecordService { get; set; } = null!;
 
     private List<IBaseDataRecord> _components = [];
     private List<IBaseDataRecord> _childBlueprintCandidates = [];
@@ -26,13 +26,13 @@ public partial class BlueprintEditor : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        _components = await DatasetService.GetRecordsAsync(DataType.Component);
+        _components = await RecordService.GetRecordsAsync(DataType.Component);
 
         // Leaving out this blueprint and every blueprint that already nests it is the whole cycle
         // guard: a loop the crafting tree has no bottom to can only be written by picking one of
         // those, so the list never offers one.
         _childBlueprintCandidates =
-            [.. (await DatasetService.GetRecordsAsync(DataType.Blueprint))
+            [.. (await RecordService.GetRecordsAsync(DataType.Blueprint))
                 .OfType<BlueprintModel>()
                 .Where(candidate => !BlueprintProcessor.WouldCreateCycle(Model, candidate))];
     }

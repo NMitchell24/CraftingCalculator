@@ -1,31 +1,38 @@
-using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.Common.Interfaces;
 
 /// <summary>
-/// The Dataset screen's view of the three user-editable record types, addressed uniformly by
-/// <see cref="DataType"/> so callers do not each have to branch on it.
+/// The datasets themselves - the named containers a user switches between - as opposed to
+/// <see cref="IRecordService"/>, which is the records inside the selected one.
 /// </summary>
 public interface IDatasetService
 {
-    /// <summary>Every record of <paramref name="type"/>, ordered by name.</summary>
-    Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type);
-
-    /// <summary>Returns the record, or null when no record of that type has that id.</summary>
-    Task<IBaseDataRecord?> GetRecordAsync(DataType type, int id);
+    /// <summary>Every dataset, ordered alphabetically by name.</summary>
+    Task<List<DatasetModel>> GetAllAsync();
 
     /// <summary>
-    /// Saves or adds the record. If <see cref="IBaseDataRecord.Id"/> is 0 a new one is added,
-    /// otherwise the existing record is updated.
+    /// Resolves the dataset to open with and publishes it to <see cref="ISelectedDatasetState"/>: the
+    /// stored selection when that dataset still exists, otherwise the first dataset by name. Must run
+    /// at startup, after the database has migrated and before anything reads a record.
     /// </summary>
-    Task SaveRecordAsync(IBaseDataRecord? record);
+    Task InitializeAsync();
 
-    Task DeleteRecordAsync(IBaseDataRecord? record);
+    /// <summary>True when a dataset other than <paramref name="exceptId"/> already uses this name,
+    /// compared ignoring case.</summary>
+    Task<bool> NameExistsAsync(string name, int exceptId = 0);
 
-    /// <summary>Deletes every record in <paramref name="records"/>, of any mix of types.</summary>
-    Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records);
+    /// <summary>Adds an empty dataset and returns it with its assigned id.</summary>
+    Task<DatasetModel> CreateAsync(string name);
 
-    /// <summary>Deletes every record of <paramref name="type"/>.</summary>
-    Task DeleteAllOfTypeAsync(DataType type);
+    Task RenameAsync(int id, string name);
+
+    /// <summary>
+    /// Deletes the dataset and every record in it, selecting another dataset first when the deleted one
+    /// was selected. Does nothing when it is the only dataset left, since one is always selected.
+    /// </summary>
+    Task DeleteAsync(int id);
+
+    /// <summary>Selects <paramref name="id"/> and persists the choice across launches.</summary>
+    Task SwitchToAsync(int id);
 }

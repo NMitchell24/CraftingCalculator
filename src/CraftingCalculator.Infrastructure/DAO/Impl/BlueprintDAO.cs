@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
-public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IBlueprintDAO
+public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBlueprintDAO
 {
     public async Task<BlueprintModel?> GetByIdAsync(int id)
     {
@@ -23,7 +23,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
     public async Task<BlueprintModel> SaveAsync(BlueprintModel blueprint)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
 
         Blueprint entity = blueprint.Id > 0
             ? await context.Blueprints.Include(blueprintEntity => blueprintEntity.Components).FirstAsync(blueprintEntity => blueprintEntity.Id == blueprint.Id)
@@ -98,7 +98,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
     public async Task DeleteAsync(int id)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         await context.Blueprints.Where(blueprintEntity => blueprintEntity.Id == id).ExecuteDeleteAsync();
     }
 
@@ -109,7 +109,7 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     /// </summary>
     private async Task<BlueprintGraph> LoadGraphAsync()
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
 
         Dictionary<int, Component> componentsById =
             await context.Components.AsNoTracking().ToDictionaryAsync(component => component.Id);

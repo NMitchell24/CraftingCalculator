@@ -57,13 +57,19 @@ public static class MauiProgram
 
         MauiApp app = builder.Build();
 
-        // The DB must exist (and be migrated) before any page loads.
+        // The DB must exist (and be migrated) before any page loads, and a dataset must be selected
+        // before anything reads a record - every query is scoped to one, and DatasetScopedContextFactory
+        // throws rather than hand out a context with no dataset.
         using (IServiceScope scope = app.Services.CreateScope())
         {
             IDbContextFactory<CraftingDataContext> contextFactory =
                 scope.ServiceProvider.GetRequiredService<IDbContextFactory<CraftingDataContext>>();
             using CraftingDataContext context = contextFactory.CreateDbContext();
             context.Database.Migrate();
+
+            // Blocking, matching Migrate() above: CreateMauiApp is synchronous, and the app must not
+            // reach its first page until the selection is resolved.
+            scope.ServiceProvider.GetRequiredService<IDatasetService>().InitializeAsync().GetAwaiter().GetResult();
         }
 
         return app;

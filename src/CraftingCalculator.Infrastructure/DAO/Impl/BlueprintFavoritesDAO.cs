@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
-public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contextFactory, IBlueprintDAO blueprintDAO) : IBlueprintFavoritesDAO
+public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory, IBlueprintDAO blueprintDAO) : IBlueprintFavoritesDAO
 {
     public async Task<List<BlueprintFavorite>> GetAllAsync()
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
 
         // Projected rather than materialized through ToModel: the list screen shows a per-favorite
         // blueprint count, and counting in the query avoids loading every FavoriteBlueprints row to get it.
@@ -32,7 +32,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
             return new BlueprintFavorite();
         }
 
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         Favorite? entity = await context.Favorites.AsNoTracking().FirstOrDefaultAsync(f => f.Name == name);
 
         return entity != null ? ToModel(entity) : null;
@@ -40,7 +40,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
 
     public async Task<BlueprintFavorite> SaveAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
 
         Favorite? entity = favorite.Id > 0
             ? await context.Favorites.FirstOrDefaultAsync(f => f.Id == favorite.Id)
@@ -76,7 +76,7 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
 
     public async Task RenameAsync(int id, string name)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         await context.Favorites
             .Where(f => f.Id == id)
             .ExecuteUpdateAsync(s => s.SetProperty(f => f.Name, name));
@@ -88,13 +88,13 @@ public class BlueprintFavoritesDAO(IDbContextFactory<CraftingDataContext> contex
         // that would be enumerated inside the expression tree.
         List<int> idList = [.. ids];
 
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         await context.Favorites.Where(f => idList.Contains(f.Id)).ExecuteDeleteAsync();
     }
 
     public async Task<List<BlueprintQuantity>> GetBlueprintQuantitiesAsync(int favoriteId)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         List<FavoriteBlueprint> rows = await context.FavoriteBlueprints
             .AsNoTracking()
             .Where(fr => fr.FavoriteId == favoriteId)

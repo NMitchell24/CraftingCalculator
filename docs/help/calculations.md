@@ -1,6 +1,6 @@
 ---
 title: How the Math Works
-nav_order: 10
+nav_order: 11
 ---
 
 # How the Math Works

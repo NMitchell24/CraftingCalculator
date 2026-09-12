@@ -29,6 +29,11 @@ public static class DependencyInjection
 #endif
         });
 
+        // Every DAO but DatasetDAO reaches the database through this, which is what scopes them to
+        // the selected dataset.
+        services.AddScoped<DatasetScopedContextFactory>();
+
+        services.AddScoped<IDatasetDAO, DatasetDAO>();
         services.AddScoped<IComponentDAO, ComponentDAO>();
         services.AddScoped<ICategoryDAO, CategoryDAO>();
         services.AddScoped<IBlueprintDAO, BlueprintDAO>();

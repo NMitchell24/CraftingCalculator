@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
@@ -16,7 +17,9 @@ public partial class Dataset : ComponentBase, IDisposable
     /// <summary>One row of the landing page - a record type, its heading, icon, and current count.</summary>
     private sealed record DatasetSection(DataType Type, string Title, string Icon, string Caption);
 
+    [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
     [Inject] private IDatabaseAdminService DatabaseAdminService { get; set; } = null!;
     [Inject] private CraftState State { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
@@ -25,7 +28,14 @@ public partial class Dataset : ComponentBase, IDisposable
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     private List<DatasetSection> Sections { get; set; } = [];
+    private List<DatasetModel> _datasets = [];
     private bool _busy;
+
+    private int SelectedDatasetId => SelectedDataset.Id;
+
+    // The name is part of the key, not just the id: renaming the selected dataset changes neither the
+    // id nor the selection, and without it the select keeps rendering the name it was built with.
+    private (int Id, string? Name) DatasetSelectKey => (SelectedDatasetId, Current?.Name);
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,16 +65,18 @@ public partial class Dataset : ComponentBase, IDisposable
         (DataType.Blueprint, "Blueprints", Icons.Material.Filled.Handyman, "blueprint", "blueprints")
     ];
 
-    // Counting means loading each type in full, since IDatasetService exposes no count. That is the same
+    // Counting means loading each type in full, since IRecordService exposes no count. That is the same
     // work the list pages already do and the data is local SQLite, so it is not worth a service method
     // until one of these lists is large enough to notice.
     private async Task ReloadAsync()
     {
+        _datasets = await DatasetService.GetAllAsync();
+
         List<DatasetSection> sections = [];
 
         foreach ((DataType type, string title, string icon, string singular, string plural) in SectionSpecs)
         {
-            int count = (await DatasetService.GetRecordsAsync(type)).Count;
+            int count = (await RecordService.GetRecordsAsync(type)).Count;
             sections.Add(new DatasetSection(type, title, icon, $"{count} {(count == 1 ? singular : plural)}"));
         }
 
@@ -79,12 +91,99 @@ public partial class Dataset : ComponentBase, IDisposable
         return Task.CompletedTask;
     }
 
+    private async Task SwitchAsync(int id)
+    {
+        if (id == SelectedDataset.Id)
+        {
+            return;
+        }
+
+        await DatasetService.SwitchToAsync(id);
+
+        // The batch holds BlueprintModels loaded from the outgoing dataset - left alone it would keep
+        // pricing out blueprints this dataset does not have. Same reasoning as DeleteAllDataAsync below.
+        State.Clear();
+
+        await ReloadAsync();
+
+        Snackbar.Add($"Switched to '{NameOf(id)}'", Severity.Success);
+    }
+
+    private async Task AddAsync()
+    {
+        string? name = await DatasetPrompts.PromptForDatasetNameAsync(DialogService, DatasetService, "New Dataset");
+
+        if (name is null)
+        {
+            return;
+        }
+
+        DatasetModel created = await DatasetService.CreateAsync(name);
+
+        // Switched to immediately: creating a dataset is how a user starts a second game, and leaving
+        // them on the old one would make the new one look like it had not been created.
+        await SwitchAsync(created.Id);
+    }
+
+    private async Task RenameAsync()
+    {
+        if (Current is not { } current)
+        {
+            return;
+        }
+
+        string? name = await DatasetPrompts.PromptForDatasetNameAsync(
+            DialogService, DatasetService, "Rename Dataset", current.Name, current.Id);
+
+        if (name is null)
+        {
+            return;
+        }
+
+        await DatasetService.RenameAsync(current.Id, name);
+        await ReloadAsync();
+
+        Snackbar.Add($"Renamed to '{name}'", Severity.Success);
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (Current is not { } current || !await DatasetPrompts.ConfirmDeleteDatasetAsync(DialogService, current))
+        {
+            return;
+        }
+
+        _busy = true;
+        StateHasChanged();
+
+        try
+        {
+            await DatasetService.DeleteAsync(current.Id);
+
+            // The service has already moved the selection off the deleted dataset, so the batch is now
+            // holding blueprints from a dataset that no longer exists.
+            State.Clear();
+
+            await ReloadAsync();
+        }
+        finally
+        {
+            _busy = false;
+        }
+
+        Snackbar.Add($"Deleted '{current.Name}'", Severity.Success);
+    }
+
+    private DatasetModel? Current => _datasets.FirstOrDefault(dataset => dataset.Id == SelectedDataset.Id);
+
+    private string NameOf(int id) => _datasets.FirstOrDefault(dataset => dataset.Id == id)?.Name ?? "";
+
     private async Task DeleteAllDataAsync()
     {
         DialogParameters parameters = new()
         {
-            ["Message"] = "This removes every favorite, blueprint, category, and component from the app. "
-                          + "It cannot be undone.",
+            ["Message"] = "This removes every favorite, blueprint, category, and component from this "
+                          + "dataset. Your other datasets are not affected. It cannot be undone.",
             ["ConfirmWord"] = "DELETE",
             ["ConfirmText"] = "Delete everything"
         };
@@ -115,7 +214,7 @@ public partial class Dataset : ComponentBase, IDisposable
             _busy = false;
         }
 
-        Snackbar.Add("Deleted all data", Severity.Success);
+        Snackbar.Add($"Deleted all data in '{NameOf(SelectedDataset.Id)}'", Severity.Success);
     }
 
     public void Dispose() => PageShellState.Reset(this);

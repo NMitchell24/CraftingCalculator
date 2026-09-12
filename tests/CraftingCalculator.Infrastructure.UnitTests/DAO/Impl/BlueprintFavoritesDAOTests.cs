@@ -15,8 +15,8 @@ public class BlueprintFavoritesDAOTests
     public void SetUp()
     {
         _fixture = new SqliteTestFixture();
-        _blueprintDAO = new BlueprintDAO(_fixture.Factory);
-        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.Factory, _blueprintDAO);
+        _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
+        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory, _blueprintDAO);
     }
 
     [TearDown]

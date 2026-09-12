@@ -1,6 +1,6 @@
 ---
 title: Settings
-nav_order: 11
+nav_order: 12
 ---
 
 # Settings
@@ -42,6 +42,9 @@ Everything you create — every component, blueprint, category and favorite — 
 - **No internet.** The app makes no network calls at all. It works in a tent, on a plane, in a basement, or on the moon.
 - **No telemetry.** Nothing about you or your dataset is collected or sent anywhere. When I said 100% free, I meant 
   it. Your data is **not** some hidden cost.
+
+All of your [datasets](managing-datasets.md) share that one database file, so this applies to every one of
+them at once.
 
 It also means that the app comes with an honest caveat: **your dataset lives and dies with the app's storage.** 
 There's no cloud copy and no built-in export yet, so uninstalling the app, or clearing its data from your device's
