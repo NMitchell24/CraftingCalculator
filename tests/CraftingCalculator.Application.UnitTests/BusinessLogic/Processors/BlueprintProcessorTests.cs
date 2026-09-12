@@ -14,6 +14,12 @@ public class BlueprintProcessorTests
 
     private static BlueprintModel NewBlueprint(string name, long yield) => new BlueprintModel { Id = 1, Name = name, Yield = yield };
 
+    /// <summary>
+    /// Distinct ids, unlike <see cref="NewBlueprint(string)"/>: the cycle rule matches on id, so every
+    /// blueprint in these tests has to be told apart from the others.
+    /// </summary>
+    private static BlueprintModel NewBlueprint(int id, string name) => new BlueprintModel { Id = id, Name = name };
+
     [TestCase(0, 2, ExpectedResult = 0)]
     [TestCase(-5, 2, ExpectedResult = 0)]
     [TestCase(1, 1, ExpectedResult = 1)]
@@ -527,5 +533,113 @@ public class BlueprintProcessorTests
         BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1).Children.Should().ContainSingle().Subject;
 
         BlueprintProcessor.CountsByCraft(leaf).Should().BeFalse();
+    }
+
+    [Test]
+    public void WouldCreateCycle_TheBlueprintItself_IsTrue()
+    {
+        BlueprintModel bracket = NewBlueprint(1, "Bracket");
+
+        BlueprintProcessor.WouldCreateCycle(bracket, NewBlueprint(1, "Bracket")).Should().BeTrue();
+    }
+
+    [Test]
+    public void WouldCreateCycle_ItsDirectParent_IsTrue()
+    {
+        BlueprintModel bracket = NewBlueprint(1, "Bracket");
+        BlueprintModel frame = NewBlueprint(2, "Frame");
+        frame.ChildBlueprints.Add(bracket, 2);
+
+        // Frame already nests Bracket, so nesting Frame inside Bracket closes the loop.
+        BlueprintProcessor.WouldCreateCycle(bracket, frame).Should().BeTrue();
+    }
+
+    [Test]
+    public void WouldCreateCycle_AGrandparent_IsTrue()
+    {
+        BlueprintModel bracket = NewBlueprint(1, "Bracket");
+        BlueprintModel frame = NewBlueprint(2, "Frame");
+        frame.ChildBlueprints.Add(bracket, 2);
+        BlueprintModel hull = NewBlueprint(3, "Hull");
+        hull.ChildBlueprints.Add(frame, 4);
+
+        BlueprintProcessor.WouldCreateCycle(bracket, hull).Should().BeTrue();
+    }
+
+    [Test]
+    public void WouldCreateCycle_AnUnrelatedBlueprint_IsFalse()
+    {
+        BlueprintModel bracket = NewBlueprint(1, "Bracket");
+        BlueprintModel rope = NewBlueprint(2, "Rope");
+        rope.ChildBlueprints.Add(NewBlueprint(3, "Thread"), 3);
+
+        BlueprintProcessor.WouldCreateCycle(bracket, rope).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Nesting a blueprint that this one already nests is fine - the edge runs the same direction, so
+    /// the tree still has a bottom.
+    /// </summary>
+    [Test]
+    public void WouldCreateCycle_ABlueprintItAlreadyNests_IsFalse()
+    {
+        BlueprintModel bracket = NewBlueprint(1, "Bracket");
+        BlueprintModel frame = NewBlueprint(2, "Frame");
+        frame.ChildBlueprints.Add(bracket, 2);
+
+        BlueprintProcessor.WouldCreateCycle(frame, bracket).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// A blueprint that has never been saved has an id of 0 and is nested by nothing, so every existing
+    /// blueprint is a valid child of it.
+    /// </summary>
+    [Test]
+    public void WouldCreateCycle_AnUnsavedBlueprint_IsFalse()
+    {
+        BlueprintModel unsaved = new() { Name = "New Blueprint" };
+        BlueprintModel frame = NewBlueprint(2, "Frame");
+        frame.ChildBlueprints.Add(NewBlueprint(1, "Bracket"), 2);
+
+        BlueprintProcessor.WouldCreateCycle(unsaved, frame).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// The same blueprint reached down two branches is a diamond, not a loop, and the visited set must
+    /// not turn the second branch into a false negative for a blueprint only that branch reaches.
+    /// </summary>
+    [Test]
+    public void WouldCreateCycle_ADiamond_StillFindsTheBlueprintDownTheSecondBranch()
+    {
+        BlueprintModel screw = NewBlueprint(1, "Screw");
+
+        BlueprintModel bracket = NewBlueprint(2, "Bracket");
+        bracket.ChildBlueprints.Add(screw, 4);
+
+        BlueprintModel plate = NewBlueprint(3, "Plate");
+        plate.ChildBlueprints.Add(screw, 2);
+        plate.ChildBlueprints.Add(NewBlueprint(4, "Rivet"), 6);
+
+        BlueprintModel hull = NewBlueprint(5, "Hull");
+        hull.ChildBlueprints.Add(bracket, 2);
+        hull.ChildBlueprints.Add(plate, 3);
+
+        BlueprintProcessor.WouldCreateCycle(NewBlueprint(4, "Rivet"), hull).Should().BeTrue();
+        BlueprintProcessor.WouldCreateCycle(NewBlueprint(6, "Rope"), hull).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// The rule has to answer on a graph that is already cyclic, because the blueprints it reads come
+    /// from a database that a previous build could have written a loop into.
+    /// </summary>
+    [Test]
+    public void WouldCreateCycle_AnAlreadyCyclicGraph_Terminates()
+    {
+        BlueprintModel bracket = NewBlueprint(1, "Bracket");
+        BlueprintModel frame = NewBlueprint(2, "Frame");
+        frame.ChildBlueprints.Add(bracket, 2);
+        bracket.ChildBlueprints.Add(frame, 1);
+
+        BlueprintProcessor.WouldCreateCycle(NewBlueprint(3, "Rope"), frame).Should().BeFalse();
     }
 }

@@ -179,4 +179,73 @@ public class BlueprintDAOTests
 
         (await _blueprintDAO.GetByIdAsync(saved.Id)).Should().BeNull();
     }
+
+    /// <summary>
+    /// A database written by a build whose editor let a blueprint nest one of its own ancestors has a
+    /// loop in BlueprintChildren. Loading it used to throw, and because nothing in the UI catches that,
+    /// every screen reading a blueprint died with it and the app could not be recovered without wiping
+    /// the data. The back edge is dropped instead.
+    /// </summary>
+    [Test]
+    public async Task GetAllAsync_ABlueprintNestingItsOwnAncestor_LoadsWithTheLoopBrokenRatherThanThrowing()
+    {
+        BlueprintModel bracket = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" });
+
+        BlueprintModel frame = new() { Name = "Frame" };
+        frame.ChildBlueprints.Add(bracket, 2);
+        frame = await _blueprintDAO.SaveAsync(frame);
+
+        BlueprintModel cyclic = (await _blueprintDAO.GetByIdAsync(bracket.Id))!;
+        cyclic.ChildBlueprints.Add(frame, 1);
+        await _blueprintDAO.SaveAsync(cyclic);
+
+        List<BlueprintModel> all = await _blueprintDAO.GetAllAsync();
+
+        BlueprintModel loadedFrame = all.Single(blueprint => blueprint.Name == "Frame");
+        BlueprintModel nestedBracket = loadedFrame.ChildBlueprints.BlueprintList.Single().Blueprint;
+        nestedBracket.Name.Should().Be("Bracket");
+        nestedBracket.ChildBlueprints.BlueprintList.Should().BeEmpty();
+
+        // Read from the other end of the loop the nesting is the one that survives, because Frame is
+        // then the ancestor being skipped rather than the root.
+        BlueprintModel loadedBracket = all.Single(blueprint => blueprint.Name == "Bracket");
+        loadedBracket.ChildBlueprints.BlueprintList.Single().Blueprint.Name.Should().Be("Frame");
+    }
+
+    /// <summary>
+    /// The ancestor path is per-branch, not a visited set for the whole walk: one blueprint nested by
+    /// two siblings is a diamond, and both copies have to hydrate in full.
+    /// </summary>
+    [Test]
+    public async Task GetByIdAsync_OneBlueprintNestedByTwoSiblings_HydratesBothCopies()
+    {
+        ComponentModel iron = await _componentDAO.SaveAsync(new ComponentModel { Name = "Iron", Cost = 1 });
+
+        BlueprintModel screw = new() { Name = "Screw" };
+        screw.Components.Add(iron, 1);
+        screw = await _blueprintDAO.SaveAsync(screw);
+
+        BlueprintModel bracket = new() { Name = "Bracket" };
+        bracket.ChildBlueprints.Add(screw, 4);
+        bracket = await _blueprintDAO.SaveAsync(bracket);
+
+        BlueprintModel plate = new() { Name = "Plate" };
+        plate.ChildBlueprints.Add(screw, 2);
+        plate = await _blueprintDAO.SaveAsync(plate);
+
+        BlueprintModel hull = new() { Name = "Hull" };
+        hull.ChildBlueprints.Add(bracket, 1);
+        hull.ChildBlueprints.Add(plate, 1);
+        BlueprintModel saved = await _blueprintDAO.SaveAsync(hull);
+
+        BlueprintModel reloaded = (await _blueprintDAO.GetByIdAsync(saved.Id))!;
+
+        reloaded.ChildBlueprints.BlueprintList.Should().HaveCount(2);
+        foreach (BlueprintQuantity branch in reloaded.ChildBlueprints.BlueprintList)
+        {
+            BlueprintModel nestedScrew = branch.Blueprint.ChildBlueprints.BlueprintList.Single().Blueprint;
+            nestedScrew.Name.Should().Be("Screw");
+            nestedScrew.Components.ComponentList.Should().ContainSingle();
+        }
+    }
 }

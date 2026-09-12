@@ -118,9 +118,13 @@ think you'll have any issues.
 
 ### One thing it won't let you do
 
-A blueprint cannot contain **itself**. If a chain of blueprints ever loops back around on itself, the
-app stops with an error naming the blueprint rather than spinning forever. If you see that message, look
-for a recipe you accidentally pointed back at one of its own ancestors.
+A blueprint can't contain **itself**, and it can't contain anything that already contains it. Ammo uses
+Gunpowder, so Gunpowder can't turn around and use Ammo. That's a loop with no bottom: you'd need
+Gunpowder before you could make Ammo, and Ammo before you could make Gunpowder, forever.
+
+You don't have to watch for it. When you switch **Add component** over to **Blueprint**, the list
+already leaves out this blueprint and every blueprint that uses it, however deep. So if you're editing
+Gunpowder and Ammo isn't in the list, that's why.
 
 ## What to do when you're done
 

@@ -180,6 +180,7 @@ craft has no meaning and it borks the math.
 **Negative production time.** Not possible. This would cause it to subtract from the batch total time. You can't 
 craft something that gives you time back in your day. So use your time wisely.
 
-**A recipe that loops back on itself.** If blueprint A nests B and B nests A, there is no bottom to the
-tree. I’m pretty sure no game needs a recipe that loops endlessly back on itself, for exactly the same reason this 
-app doesn’t allow it. 
+**A recipe that loops back on itself.** Not possible. If blueprint A nests B and B nests A, there's no
+bottom to the tree, so there's no total to add up. The editor won't offer you a blueprint that already
+uses the one you're editing, so the loop never gets made. I'm pretty sure no game needs one anyway, for
+exactly the same reason. More detail: [Blueprints](blueprints.md).
