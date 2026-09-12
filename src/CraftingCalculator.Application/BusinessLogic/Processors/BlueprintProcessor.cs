@@ -11,10 +11,11 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 public static class BlueprintProcessor
 {
     /// <summary>
-    /// Recursion guard for the walks below. A graph loaded through IBlueprintDAO is acyclic and far
-    /// shallower than this, so the bound only matters for a model graph assembled in memory, where
-    /// nothing has stopped a caller from nesting a blueprint inside itself. Bounding the depth turns
-    /// that into a catchable exception instead of a process-killing StackOverflowException.
+    /// Recursion guard for the walks below. Two graphs can drive these walks past the stack: one
+    /// nested deeply enough, since nothing caps nesting depth at edit time, and one assembled in
+    /// memory, where nothing has stopped a caller from nesting a blueprint inside itself. Bounding
+    /// the depth turns either into a catchable exception instead of a process-killing
+    /// StackOverflowException.
     /// </summary>
     private const int MaxBlueprintDepth = 64;
 
