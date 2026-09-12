@@ -56,7 +56,32 @@ edit rather than making you type the whole thing again.
 
 > **Tip:** Starting a modded run, or a new wipe with different rules? Make a second dataset instead of
 > editing the one you already trust. Your old numbers stay intact, and you can flip between them to
-> compare.
+> compare. And if the new one is mostly the same as the old one, copy it rather than starting empty.
+
+## Copying one
+
+![Dataset](assets/menu-book.svg) **Dataset** → ![Copy](assets/content-copy.svg) **Copy dataset**
+
+Builds a new dataset that starts out as a duplicate of the one you're in. Every category, every
+component, every blueprint, and every favorite, all of it copied across.
+
+This is what you want when the second dataset is *mostly* the same as the first. Say you've spent a week
+building out `Rust - Vanilla`, and then you join a modded server that has custom Crafting Recipes. 
+Copy it, call the copy `Rust - Modded`, and change the things that actually differ. That beats 
+retyping two hundred components.
+
+The name comes prefilled as the original with `- Copy` on the end, the same way
+[duplicating a record](dataset.md#duplicate-mode) does, which also parks the copy right next to the
+original in the droplist. Type over it with whatever you want. The unique-name rule still applies.
+
+From there the two are completely separate. Changing the `Beancan Grenade` recipe in the copy does nothing to 
+`Beancan Grenade` in the original, changing a cost in one doesn't change it in the other, and deleting either 
+one leaves the other standing. They just happen to have started out identical.
+
+You're dropped straight into the copy when it's done, because that's the one you probably want to edit.
+
+> **Note:** A big dataset takes a moment to copy, and you'll get a spinner while it works. It's writing a
+> fresh row for every single record you have. Let it finish.
 
 ## Renaming one
 

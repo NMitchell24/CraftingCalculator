@@ -13,8 +13,8 @@ have for each. Tap on any card to go to a list of those records where you can vi
 
 The droplist at the very top says which dataset you're looking at. Everything below it, and everything
 on every other screen, belongs to it. Tap it to switch to another dataset, and use the
-![Rename](assets/edit.svg), ![New](assets/add.svg) and ![Delete](assets/delete.svg) icons beside it to
-manage it.
+![Rename](assets/edit.svg), ![New](assets/add.svg), ![Copy](assets/content-copy.svg) and
+![Delete](assets/delete.svg) icons beside it to manage it.
 
 If you only play one game, you can ignore that row entirely and never think about it again.
 

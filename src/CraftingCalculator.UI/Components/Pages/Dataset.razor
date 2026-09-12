@@ -27,6 +27,10 @@
                            OnClick="RenameAsync" title="Rename dataset" aria-label="Rename dataset" />
             <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary"
                            OnClick="AddAsync" title="New dataset" aria-label="New dataset" />
+            @* Same icon the Dataset list's Duplicate action carries, so copying a whole dataset and
+               copying one record in it read as the same gesture at two scales. *@
+            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary"
+                           OnClick="CopyAsync" title="Copy dataset" aria-label="Copy dataset" />
             @* Disabled on the last one: a dataset is always selected, so there has to be one to select. *@
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
                            Disabled="@(_datasets.Count <= 1)" OnClick="DeleteAsync"

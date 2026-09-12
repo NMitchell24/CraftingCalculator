@@ -715,7 +715,7 @@ html, body {
     margin: 0 auto;
 }
 
-/* The dataset switcher, above the record cards: which dataset the screen is showing, and the three
+/* The dataset switcher, above the record cards: which dataset the screen is showing, and the four
    actions that manage the set of them. */
 .dataset-switcher {
     display: flex;
@@ -724,7 +724,7 @@ html, body {
     margin-bottom: 16px;
 }
 
-/* Takes the row's slack so the three buttons keep their full tap targets at phone width. min-width
+/* Takes the row's slack so the four buttons keep their full tap targets at phone width. min-width
    overrides MudSelect's own intrinsic width, which would otherwise refuse to shrink below it and push
    the buttons off the edge on a narrow screen. */
 .dataset-switcher-select {
