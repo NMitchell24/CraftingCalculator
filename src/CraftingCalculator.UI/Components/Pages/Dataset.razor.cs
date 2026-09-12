@@ -65,21 +65,55 @@ public partial class Dataset : ComponentBase, IDisposable
         (DataType.Blueprint, "Blueprints", Icons.Material.Filled.Handyman, "blueprint", "blueprints")
     ];
 
+    /// <summary>
+    /// Runs <paramref name="sequence"/> with the busy overlay up. Every database call inside it belongs in
+    /// a <see cref="Task.Run(Func{Task})"/>; only the steps that touch component state - the snackbar,
+    /// <see cref="CraftState"/> - stay on the UI thread.
+    /// </summary>
+    /// <remarks>
+    /// Microsoft.Data.Sqlite has no asynchronous I/O: its Async methods run to completion on the thread
+    /// that calls them. Awaiting a service directly therefore holds the UI thread for the whole operation
+    /// and nothing repaints while it does, which is what made this overlay look like it did nothing - on a
+    /// large dataset the copy's name dialog stayed on screen with a live OK button for the entire copy,
+    /// no spinner ever appeared, and the main thread was blocked long enough for Android to offer to close
+    /// the app. One owner per user action: a sequence that calls another action's helper would take the
+    /// overlay down when the inner one finished.
+    /// </remarks>
+    private async Task WhileBusyAsync(Func<Task> sequence)
+    {
+        _busy = true;
+        StateHasChanged();
+
+        try
+        {
+            await sequence();
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
     // Counting means loading each type in full, since IRecordService exposes no count. That is the same
     // work the list pages already do and the data is local SQLite, so it is not worth a service method
     // until one of these lists is large enough to notice.
     private async Task ReloadAsync()
     {
-        _datasets = await DatasetService.GetAllAsync();
-
-        List<DatasetSection> sections = [];
-
-        foreach ((DataType type, string title, string icon, string singular, string plural) in SectionSpecs)
+        (List<DatasetModel> datasets, List<DatasetSection> sections) = await Task.Run(async () =>
         {
-            int count = (await RecordService.GetRecordsAsync(type)).Count;
-            sections.Add(new DatasetSection(type, title, icon, $"{count} {(count == 1 ? singular : plural)}"));
-        }
+            List<DatasetModel> loaded = await DatasetService.GetAllAsync();
+            List<DatasetSection> built = [];
 
+            foreach ((DataType type, string title, string icon, string singular, string plural) in SectionSpecs)
+            {
+                int count = (await RecordService.GetRecordsAsync(type)).Count;
+                built.Add(new DatasetSection(type, title, icon, $"{count} {(count == 1 ? singular : plural)}"));
+            }
+
+            return (loaded, built);
+        });
+
+        _datasets = datasets;
         Sections = sections;
     }
 
@@ -91,6 +125,9 @@ public partial class Dataset : ComponentBase, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <summary>The switcher's own action, which is the one case where switching is not part of another.</summary>
+    private Task OnDatasetSelectedAsync(int id) => WhileBusyAsync(() => SwitchAsync(id));
+
     private async Task SwitchAsync(int id)
     {
         if (id == SelectedDataset.Id)
@@ -98,7 +135,7 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await DatasetService.SwitchToAsync(id);
+        await Task.Run(() => DatasetService.SwitchToAsync(id));
 
         // The batch holds BlueprintModels loaded from the outgoing dataset - left alone it would keep
         // pricing out blueprints this dataset does not have. Same reasoning as DeleteAllDataAsync below.
@@ -118,11 +155,14 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        DatasetModel created = await DatasetService.CreateAsync(name);
+        await WhileBusyAsync(async () =>
+        {
+            DatasetModel created = await Task.Run(() => DatasetService.CreateAsync(name));
 
-        // Switched to immediately: creating a dataset is how a user starts a second game, and leaving
-        // them on the old one would make the new one look like it had not been created.
-        await SwitchAsync(created.Id);
+            // Switched to immediately: creating a dataset is how a user starts a second game, and leaving
+            // them on the old one would make the new one look like it had not been created.
+            await SwitchAsync(created.Id);
+        });
     }
 
     private async Task CopyAsync()
@@ -143,23 +183,14 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        _busy = true;
-        StateHasChanged();
-
-        DatasetModel created;
-
-        try
+        await WhileBusyAsync(async () =>
         {
-            created = await DatasetService.CopyAsync(current.Id, name);
-        }
-        finally
-        {
-            _busy = false;
-        }
+            DatasetModel created = await Task.Run(() => DatasetService.CopyAsync(current.Id, name));
 
-        // Switched to immediately, the same as a newly created dataset: the copy exists to be the one
-        // that gets the variations, so leaving the user on the original would be the wrong place to stand.
-        await SwitchAsync(created.Id);
+            // Switched to immediately, the same as a newly created dataset: the copy exists to be the one
+            // that gets the variations, so leaving the user on the original would be the wrong place to stand.
+            await SwitchAsync(created.Id);
+        });
     }
 
     private async Task RenameAsync()
@@ -177,8 +208,11 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await DatasetService.RenameAsync(current.Id, name);
-        await ReloadAsync();
+        await WhileBusyAsync(async () =>
+        {
+            await Task.Run(() => DatasetService.RenameAsync(current.Id, name));
+            await ReloadAsync();
+        });
 
         Snackbar.Add($"Renamed to '{name}'", Severity.Success);
     }
@@ -190,23 +224,16 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        _busy = true;
-        StateHasChanged();
-
-        try
+        await WhileBusyAsync(async () =>
         {
-            await DatasetService.DeleteAsync(current.Id);
+            await Task.Run(() => DatasetService.DeleteAsync(current.Id));
 
             // The service has already moved the selection off the deleted dataset, so the batch is now
             // holding blueprints from a dataset that no longer exists.
             State.Clear();
 
             await ReloadAsync();
-        }
-        finally
-        {
-            _busy = false;
-        }
+        });
 
         Snackbar.Add($"Deleted '{current.Name}'", Severity.Success);
     }
@@ -233,23 +260,16 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        _busy = true;
-        StateHasChanged();
-
-        try
+        await WhileBusyAsync(async () =>
         {
-            await DatabaseAdminService.DeleteAllDataAsync();
+            await Task.Run(() => DatabaseAdminService.DeleteAllDataAsync());
 
             // The batch on the Craft screen holds Blueprint models that no longer exist in the
             // database - left alone it would keep pricing out deleted blueprints.
             State.Clear();
 
             await ReloadAsync();
-        }
-        finally
-        {
-            _busy = false;
-        }
+        });
 
         Snackbar.Add($"Deleted all data in '{NameOf(SelectedDataset.Id)}'", Severity.Success);
     }

@@ -13,7 +13,7 @@
            which showed up here as a rename leaving the old name on screen.
            OuterClass rather than Class: Class lands on the inner MudInputControl, and the flex width
            has to sit on the outer div, which is this row's flex item. *@
-        <MudSelect T="int" @key="DatasetSelectKey" Value="SelectedDatasetId" ValueChanged="SwitchAsync"
+        <MudSelect T="int" @key="DatasetSelectKey" Value="SelectedDatasetId" ValueChanged="OnDatasetSelectedAsync"
                    Label="Dataset" Variant="Variant.Outlined" Margin="Margin.Dense"
                    OuterClass="dataset-switcher-select">
             @foreach (DatasetModel dataset in _datasets)
