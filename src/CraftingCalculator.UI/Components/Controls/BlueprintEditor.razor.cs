@@ -28,11 +28,13 @@ public partial class BlueprintEditor : ComponentBase
     {
         _components = await DatasetService.GetRecordsAsync(DataType.Component);
 
-        // Ports ConfigureBlueprintsViewModel.BlueprintSelectedType: a blueprint cannot be its own part.
-        // Nothing guards a longer A -> B -> A cycle here either, matching the WPF app - the depth cap
-        // in BlueprintProcessor is what keeps that catchable.
+        // Leaving out this blueprint and every blueprint that already nests it is the whole cycle
+        // guard: a loop the crafting tree has no bottom to can only be written by picking one of
+        // those, so the list never offers one.
         _childBlueprintCandidates =
-            [.. (await DatasetService.GetRecordsAsync(DataType.Blueprint)).Where(blueprint => blueprint.Id != Model.Id)];
+            [.. (await DatasetService.GetRecordsAsync(DataType.Blueprint))
+                .OfType<BlueprintModel>()
+                .Where(candidate => !BlueprintProcessor.WouldCreateCycle(Model, candidate))];
     }
 
     private Task<IEnumerable<IBaseDataRecord>> SearchAsync(string? search, CancellationToken cancellationToken)

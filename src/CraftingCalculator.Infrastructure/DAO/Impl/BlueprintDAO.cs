@@ -1,4 +1,3 @@
-using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
@@ -12,14 +11,14 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        return graph.BlueprintsById.TryGetValue(id, out Blueprint? entity) ? BuildModel(entity, graph, 0) : null;
+        return graph.BlueprintsById.TryGetValue(id, out Blueprint? entity) ? BuildModel(entity, graph, []) : null;
     }
 
     public async Task<List<BlueprintModel>> GetAllAsync()
     {
         BlueprintGraph graph = await LoadGraphAsync();
 
-        return [.. graph.BlueprintsById.Values.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, 0))];
+        return [.. graph.BlueprintsById.Values.OrderBy(blueprintEntity => blueprintEntity.Name).Select(blueprintEntity => BuildModel(blueprintEntity, graph, []))];
     }
 
     public async Task<BlueprintModel> SaveAsync(BlueprintModel blueprint)
@@ -128,19 +127,12 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
     /// <summary>
     /// Recursively hydrates a full <see cref="BlueprintModel"/> model (components and, recursively, child
-    /// blueprints) from the in-memory graph. The app does not otherwise detect a cycle in the blueprint
-    /// graph (see the "no cycle guard" parity issue), so an A -> B -> A pair would recurse
-    /// indefinitely; the shared <see cref="BlueprintProcessor.MaxBlueprintDepth"/> bound turns that into a
-    /// catchable exception instead of a StackOverflowException.
+    /// blueprints) from the in-memory graph. <paramref name="ancestors"/> carries the blueprint ids on the
+    /// path down to <paramref name="entity"/>, and a nested blueprint already on that path is left out of
+    /// the model, so the graph handed back is always acyclic.
     /// </summary>
-    private static BlueprintModel BuildModel(Blueprint entity, BlueprintGraph graph, int depth)
+    private static BlueprintModel BuildModel(Blueprint entity, BlueprintGraph graph, HashSet<int> ancestors)
     {
-        if (depth > BlueprintProcessor.MaxBlueprintDepth)
-        {
-            throw new InvalidOperationException(
-                $"Blueprint graph exceeded the maximum depth of {BlueprintProcessor.MaxBlueprintDepth}; check for a cycle involving '{entity.Name}'.");
-        }
-
         BlueprintModel model = new()
         {
             Id = entity.Id,
@@ -164,13 +156,24 @@ public class BlueprintDAO(IDbContextFactory<CraftingDataContext> contextFactory)
             }
         }
 
+        ancestors.Add(entity.Id);
+
         foreach (BlueprintChild blueprintChild in graph.ChildrenByParentId[entity.Id])
         {
-            if (graph.BlueprintsById.TryGetValue(blueprintChild.ChildBlueprintId, out Blueprint? childEntity))
+            // Dropping a child that is already an ancestor is what keeps a cyclic row set loadable.
+            // BlueprintEditor no longer offers an ancestor as a child, so nothing can write one now,
+            // but a database filled in before that could - and recursing into it threw out of every
+            // screen that reads a blueprint, which left the whole app unusable.
+            if (graph.BlueprintsById.TryGetValue(blueprintChild.ChildBlueprintId, out Blueprint? childEntity)
+                && !ancestors.Contains(childEntity.Id))
             {
-                model.ChildBlueprints.Add(BuildModel(childEntity, graph, depth + 1), blueprintChild.Quantity, blueprintChild.Id);
+                model.ChildBlueprints.Add(BuildModel(childEntity, graph, ancestors), blueprintChild.Quantity, blueprintChild.Id);
             }
         }
+
+        // Popped rather than left set, so a blueprint nested by two different branches of the same tree
+        // still hydrates under both.
+        ancestors.Remove(entity.Id);
 
         return model;
     }

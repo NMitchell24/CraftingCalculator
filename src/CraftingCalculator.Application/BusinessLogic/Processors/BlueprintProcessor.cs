@@ -11,12 +11,42 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 public static class BlueprintProcessor
 {
     /// <summary>
-    /// Recursion guard. The app does not otherwise detect a cycle in the blueprint graph (only
-    /// self-reference is prevented at edit time - see the "no cycle guard" parity issue), so an
-    /// A -> B -> A pair would otherwise recurse until the stack overflows. Bounding the depth turns
+    /// Recursion guard for the walks below. A graph loaded through IBlueprintDAO is acyclic and far
+    /// shallower than this, so the bound only matters for a model graph assembled in memory, where
+    /// nothing has stopped a caller from nesting a blueprint inside itself. Bounding the depth turns
     /// that into a catchable exception instead of a process-killing StackOverflowException.
     /// </summary>
-    public const int MaxBlueprintDepth = 64;
+    private const int MaxBlueprintDepth = 64;
+
+    /// <summary>
+    /// Whether nesting <paramref name="child"/> inside <paramref name="parent"/> would close a loop,
+    /// which is the case when <paramref name="child"/> is <paramref name="parent"/> itself or already
+    /// nests <paramref name="parent"/> somewhere below it. Both blueprints are read as they stand, so
+    /// the answer describes the graph before the nesting is made.
+    /// </summary>
+    public static bool WouldCreateCycle(BlueprintModel parent, BlueprintModel child) =>
+        Reaches(child, parent.Id, []);
+
+    /// <summary>
+    /// Whether <paramref name="blueprint"/> is, or nests at any depth, the blueprint with
+    /// <paramref name="id"/>.
+    /// </summary>
+    private static bool Reaches(BlueprintModel blueprint, int id, HashSet<int> visited)
+    {
+        if (blueprint.Id == id)
+        {
+            return true;
+        }
+
+        //Collapses a diamond - one blueprint nested by two others in the same tree - to a single
+        //visit, and keeps the walk terminating on a graph that is already cyclic.
+        if (!visited.Add(blueprint.Id))
+        {
+            return false;
+        }
+
+        return blueprint.ChildBlueprints.BlueprintList.Any(nested => Reaches(nested.Blueprint, id, visited));
+    }
 
     /// <summary>
     /// Whole crafts needed to produce <paramref name="quantity"/> items, rounded up: a craft is

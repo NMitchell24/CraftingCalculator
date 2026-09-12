@@ -97,11 +97,10 @@ to a bench, at every level of the tree. A four-row component list can easily be 
 lets you queue multiple crafts of an item, the steps will tell you how many to queue to get the result you're 
 looking for.
 
-### "It says the blueprint graph is too deep"
+### "A blueprint isn't in the list when I add a part"
 
-A recipe loops back on itself — A needs B, B needs A — so the tree has no bottom. The message names a
-blueprint involved in the loop. Open it and look for a nested blueprint that is really one of its own
-ancestors.
+The blueprint you're editing can't nest something that already nests it, so the **Add component** list
+leaves those out. If Ammo uses Gunpowder, then Gunpowder can't use Ammo. See [Blueprints](blueprints.md).
 
 ### "A blueprint lost one of its components"
 
