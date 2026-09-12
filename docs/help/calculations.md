@@ -120,7 +120,7 @@ Three things to note:
 2. **Value only counts the blueprints you actually asked for.** A nested blueprint's own Value isn't
    added, because you're not selling the Bronze. The Bronze was consumed during crafting. There's 
    nothing else to sell but the Axe you made out of it.
-3. **Surplus value is completely separate.** See [Surplus](#surplus) above.
+3. **Surplus value is completely separate.** See [Surplus](calculations.md#surplus) above.
 
 If you left every cost and value at zero, all three lines read zero. That's a perfectly reasonable way
 to use the app.

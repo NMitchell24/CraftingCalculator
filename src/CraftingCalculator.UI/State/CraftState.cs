@@ -77,21 +77,47 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     /// <summary>
     /// Sets the blueprint's quantity in the batch. Zero is a valid quantity that keeps the blueprint
-    /// selected; only a negative quantity removes it, which the stepper reaches by decrementing past
-    /// zero.
+    /// selected and contributing nothing; a negative quantity is ignored.
     /// </summary>
     public void SetQuantity(BlueprintQuantity target, long quantity)
     {
+        // The floor for the whole batch: a negative quantity reaches Recalculate and puts negative
+        // components, cost and value on the Crafting Summary. Both callers already clamp at zero
+        // (MudNumericField's Min, and Step), so this holds the invariant for whatever calls it next.
         if (quantity < 0)
         {
-            _blueprintMap.RemoveAll(target.Blueprint);
-        }
-        else
-        {
-            target.Quantity = quantity;
+            return;
         }
 
+        target.Quantity = quantity;
         Recalculate();
+    }
+
+    /// <summary>
+    /// Moves the blueprint's quantity by <paramref name="step"/>, which is negative to step down.
+    /// Stepping down settles at zero, and stepping down again from zero removes the blueprint from the
+    /// batch. Stepping up saturates at <see cref="long.MaxValue"/>.
+    /// </summary>
+    public void Step(BlueprintQuantity target, long step)
+    {
+        // Zero is the landing every step down passes through, so the step that starts there is a
+        // deliberate second tap rather than an overshoot. That is what lets a step of any size clamp
+        // without losing the remove gesture: -10 against a quantity of 4 settles on zero instead of
+        // dropping the blueprint out of the batch on one tap.
+        if (step < 0 && target.Quantity == 0)
+        {
+            Remove(target);
+            return;
+        }
+
+        // The addition is what overflows, so it cannot also be the test - compare against the headroom
+        // left below MaxValue instead. Only a step up can overflow: Quantity is never negative, so a
+        // step down lands at worst a single step below zero, which Math.Max takes care of.
+        long stepped = step > 0 && target.Quantity > long.MaxValue - step
+            ? long.MaxValue
+            : target.Quantity + step;
+
+        SetQuantity(target, Math.Max(stepped, 0));
     }
 
     public void Remove(BlueprintQuantity target)
