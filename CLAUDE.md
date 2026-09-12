@@ -257,6 +257,12 @@ duplication *today* — not that it might someday.
 - **Dead Code.** No defensive branches every caller already makes impossible, no unused parameters or
   imports, no commented-out code, no "kept for later" methods without the owner's explicit say-so. A
   genuinely load-bearing guard earns an inline comment saying so — otherwise delete it.
+  **If your change is what killed the branch, deleting it is part of that change, not a follow-up.**
+  When a new clamp, guard, or caller makes an existing path unreachable, prove it is unreachable by
+  naming every caller, then delete it in the same diff — and fix any doc comment that still describes
+  the behavior you just removed. "We might want it back someday" is the Speculative Generality rule
+  above wearing a different hat: `git` still has it, and the day a caller actually needs it is the day
+  to write it against that caller.
 - **Lazy Element.** A class, method, or file that no longer pulls its weight after a refactor gets
   inlined or deleted, not left behind.
 - **Duplicated Code.** Before writing new logic, find the existing seam and compose it. Two

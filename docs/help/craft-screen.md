@@ -24,12 +24,12 @@ everything you selected drops into your batch with a quantity of 1.
 
 **Each row in the batch gives you:**
 
-| Control                                             | What it does                                                                               |
-|-----------------------------------------------------|--------------------------------------------------------------------------------------------|
-| ![Minus](assets/remove.svg) ![Plus](assets/add.svg) | Step the quantity up or down by one.                                                       |
-| **The number**                                      | Tap it and type a quantity directly. Handy when you need 240 of something.                 |
-| ![Info](assets/info.svg)                            | Opens a detail card showing the value, yield, production time, and the recipe's own parts. |
-| ![Delete](assets/delete.svg)                        | Removes that blueprint from the batch.                                                     |
+| Control                                             | What it does                                                                                            |
+|-----------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| ![Minus](assets/remove.svg) ![Plus](assets/add.svg) | Step the quantity up or down by one, or by ten. See [Stepping by ten](craft-screen.md#stepping-by-ten). |
+| **The number**                                      | Tap it and type a quantity directly. Handy when you need 240 of something.                              |
+| ![Info](assets/info.svg)                            | Opens a detail card showing the value, yield, production time, and the recipe's own parts.              |
+| ![Delete](assets/delete.svg)                        | Removes that blueprint from the batch.                                                                  |
 
 Stepping the quantity **below zero removes the row**. Zero itself is a perfectly valid quantity. It
 keeps the blueprint in your batch while contributing nothing, which is a quick way to ask "what if I
@@ -37,6 +37,21 @@ skipped this one?" without losing your place.
 
 **Load Favorite** at the top of the card swaps your whole batch for a saved one. See
 [Favorites](favorites.md).
+
+### Stepping by ten
+
+Tapping ![Plus](assets/add.svg) sixty times to get to 60 arrows is the exact kind of grind this app is
+supposed to save you from. Tap the ![Step by 10](assets/x10.svg) **Step by 10** action and every row's
+stepper starts moving in tens instead. The buttons swap over to
+![Step down by ten](assets/keyboard-double-arrow-down.svg) and
+![Step up by ten](assets/keyboard-double-arrow-up.svg) so you can tell at a glance that it's on.
+
+It stays on until you tap the action again, so you can set up a whole batch in one go. Nothing else
+about the row changes. You can still tap the number and type a quantity straight in.
+
+> **Note:** stepping down by ten stops at zero. A row sitting at 4 lands on zero rather than -6, so one
+> mistimed tap can't quietly drop a blueprint out of your batch. Tap down once more while it's sitting
+> at zero and the row goes away, exactly like it does when you're stepping by one.
 
 ## Crafting Summary
 
@@ -113,6 +128,7 @@ These are the [actions](actions-bar.md) available from the craft screen.
 | ![Add blueprints](assets/add.svg) **Add blueprints**      | Opens the blueprint picker to add items into your batch.                                             |
 | ![Clear selection](assets/clear.svg) **Clear selection**  | Clears all selected blueprints from the current batch.                                               |
 | ![Save as favorite](assets/save.svg) **Save as favorite** | Stores the current batch under a name for you to easily recall later. See [Favorites](favorites.md). |
+| ![Step by 10](assets/x10.svg) **Step by 10**              | Switches every row's stepper between moving by one and moving by ten.                                |
 
 ## Nothing shows up when I tap ![Add](assets/add.svg)
 

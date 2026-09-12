@@ -23,12 +23,19 @@
                             <CategoryChip Record="@selected.Blueprint" Class="card-row-category" />
                         </div>
                         <div class="batch-row-actions">
+                            @* The two buttons carry the x10 mode rather than a toggle of their own: a third
+                               button in this row costs 44px it does not have on a 360px phone, so the
+                               mode changes the glyph and color of the buttons it already affects. *@
                             <div class="list-row-stepper">
-                                <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" OnClick="@(() => State.SetQuantity(selected, selected.Quantity - 1))" />
+                                <MudIconButton Icon="@DecrementIcon" Color="@StepColor" Size="Size.Medium"
+                                               title="@DecrementLabel" aria-label="@DecrementLabel"
+                                               OnClick="@(() => State.Step(selected, -StepSize))" />
                                 <MudNumericField T="long" Value="selected.Quantity" ValueChanged="@(v => State.SetQuantity(selected, v))"
                                                  Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field"
                                                  onfocus="this.select()" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" OnClick="@(() => State.SetQuantity(selected, selected.Quantity + 1))" />
+                                <MudIconButton Icon="@IncrementIcon" Color="@StepColor" Size="Size.Medium"
+                                               title="@IncrementLabel" aria-label="@IncrementLabel"
+                                               OnClick="@(() => State.Step(selected, StepSize))" />
                             </div>
                             <div class="batch-row-icons">
                                 <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="@(() => ShowInfoAsync(selected))" />
