@@ -86,6 +86,9 @@ Rules that keep all three working:
 - **Cross-page links are `other-page.md`**, optionally with an anchor (`calculations.md#surplus`).
   GitHub and the wiki resolve those; `HelpProcessor` rewrites them to `/help/other-page`.
 - **No external links** — there is nowhere for the `BlazorWebView` to send them.
+- **A hard line break is two trailing spaces,** never a backslash: Markdig and GitHub read a single
+  trailing `\` as the break, kramdown wants `\\`, and only trailing spaces work in all three.
+  `.editorconfig` exempts `*.md` from trailing-whitespace trimming so a reformat cannot eat one.
 - **Name a control with its icon**, written as an ordinary image: `![Delete](assets/delete.svg)`. The
   files under `docs/help/assets/` are the Material Design icons MudBlazor draws, extracted from
   `MudBlazor.dll`; GitHub, the wiki and Pages render the file, and `HelpProcessor` inlines its markup
@@ -93,7 +96,7 @@ Rules that keep all three working:
   may use — anything else degrades to its alt text.
 - **Adding an icon** means adding the `.svg` to `docs/help/assets/`. It must stay an `EmbeddedResource`
   on `CraftingCalculator.Application`; never add these to the MAUI project's `Resources\Images`, where
-  the resizetizer would rasterise each one per Android density and iOS scale.
+  the resizetizer would rasterize each one per Android density and iOS scale.
 - **Front matter (`title`, `nav_order`) on every page.**
 - **A new page** = the `.md` **plus** an entry in `Domain/Constants/HelpTopics.cs`. That catalog is what
   fills the contents list and maps app routes to pages.
@@ -102,10 +105,39 @@ Rules that keep all three working:
 - `HelpServiceTests` runs against the real embedded content: it fails if a topic has no Markdown, if a
   page has no `<h1>`, or if a cross-page link points at a topic that does not exist.
 
-**Tone.** The help is written for players, not developers: playful, second person, and framed around
-real survival crafting games (Minecraft, Rust, Valheim, Conan Exiles). It is the one place in this repo
-where the "explain with code" rule below does **not** apply — help pages explain with worked examples
-and plain language, and never with C#. Match the voice of the existing pages.
+Content Rules (For Claude only):
+
+The full voice guide, with before/after examples, lives in the `craftingcalculator-dev` skill. These are
+the rules that matter most often:
+
+- **Tone.** The help is written for players, not developers: playful, second person, and framed around
+  real survival crafting games (Minecraft, Rust, Valheim, Conan Exiles, No Man's Sky). It is the one place in this repo
+  where the "explain with code" rule below does **not** apply — help pages explain with worked examples
+  and plain language, and never with C#. Match the voice of the existing pages.
+- **Contractions:** Don't be afraid to use them. "Don't" reads easier than "do not". It sounds more human, it sounds more normal.
+- **Em Dashes:** Use them sparingly. Don't overuse them. It's okay to use them every now and then, when appropriate. But if a ; or a : works as well, use those instead. Sometimes breaking things into multiple sentences is the right call. Again, it just reads more human, our readers will thank us.
+- **The author is a person, and it's fine to hear them.** First person singular is allowed where it
+  lands a joke or an honest aside: "I'm not your mom", "I could keep going, but I think you get the
+  point", "I don't think you'll have any issues". Never first person plural for the app's opinions —
+  "we recommend" is corporate. Say "I", or drop the attribution and just state the thing.
+- **Definition bullets are `- **Label:** lowercase continuation`,** never `- **Label** — continuation`.
+  Callouts take the same shape: `> **Note:**`, `> **Tip:**`, `> **Example:**`. An example that introduces a table or a
+  code block is the exception: it drops the blockquote and stays a bare `**Example:**` lead, so the block it
+  introduces renders on its own.
+- **Let the aside be its own sentence.** An em-dash clause or a parenthetical is usually a sentence
+  waiting to get out. "It's a short screen. Here's everything you need to know." beats "It is a short
+  screen — here is all of it."
+- **Plain words beat precise ones.** "crap", "junk", "stuff", "grindy" are in voice. "granularity",
+  "arbitrary", "leverage", "utilize" are not.
+- **Examples are real recipes with real numbers,** and they have to add up: Minecraft's 1 log → 4
+  planks, Valheim's 2 Copper + 1 Tin Bronze, Rust's 25 wood + 10 stone → 2 arrows. Readers who play
+  the game will check the arithmetic, and the same worked example is often continued on another page,
+  so keep the numbers consistent across pages.
+- **Name a screen and link it** the first time a section mentions it: `[Craft screen](craft-screen.md)`.
+- **Write a navigation path with the icon on every step:**
+  `![Dataset](assets/menu-book.svg) **Dataset** → ![Components](assets/inventory-2.svg) **Components** → ![New](assets/add.svg) **Add**`
+- **Send the reader onward** at the end of a section a whole page covers: `More detail: [Components](components.md).`
+- **Wrap prose at about 120 columns.** Never reflow a paragraph you are only making a two-word fix to.
 
 ---
 
@@ -310,3 +342,6 @@ refactor scope and timing decisions with the user.
 - **Commits** All commits need to go through Rider's precommit checks to enforce code quality and formatting rules
   If Claude cannot access tools through the Intellij MCP server to run these precommit checks, then all commits need to
   to be performed by the user so that these checks are enforced.
+- **American English** Always use American English. Don't use British English variants of words in comments, 
+  documentation, or any written prose. If you're changing something that has it, fix it. E.G. Use 'color' not 'colour', 
+  'materialized' not 'materialised', 'aluminum' not 'aluminium', 'modeling' not 'modelling', et cetera.

@@ -7,6 +7,11 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+# Two trailing spaces are a hard line break in Markdown - the only form Markdig,
+# GitHub and kramdown all agree on - so they must survive a reformat.
+[*.md]
+trim_trailing_whitespace = false
+
 [*.{cs,razor,cshtml}]
 indent_size = 4
 
