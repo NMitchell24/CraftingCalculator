@@ -11,8 +11,9 @@ Games have lots of names for this stuff: Wood, Stone, Iron Ore, Fiber, Leather, 
 Flint, Chitin, Adhesive, Ceramic, I could keep going, but I think you get the point. Whatever your game makes you go 
 out and collect before you can craft something is a component.
 
-The rule of thumb: **if you get it by mining, chopping, farming, looting, killing or buying it — and it can't be 
-crafted by itself — it's a component. If you can craft it, it's a [blueprint](blueprints.md).**
+The rule of thumb: **if you want the app to stop at an item, or you would rather track an item's cost than its 
+crafting materials, model it as a component. If you want the app to expand how it's made, model it as 
+a [blueprint](blueprints.md).**
 
 Components are the last leaf on every branch in the tree. When the app flattens a recipe tree, components are where it
 stops. The **Components** tab on the [Craft screen](craft-screen.md) is what you need to gather or purchase before 

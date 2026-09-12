@@ -25,7 +25,7 @@ crafts = round up ( quantity needed / yield per craft )
 
 If your blueprint yields 1, crafts and items are the same number. If it yields more, they come apart.
 
-**Example.** Minecraft planks: 1 log yields **4** planks.
+**Example:** Minecraft planks: 1 log yields **4** planks.
 
 | You need | Crafts | You get | Left over |
 |----------|--------|---------|-----------|
@@ -66,7 +66,7 @@ child quantity = child quantity per craft × parent crafts
 This is what makes yield pay off all the way down. If a parent yields 2, you run half as many crafts,
 so all the requirements beneath are cut in half too.
 
-**Example.** A Valheim tree, asking for **3 Bronze Axes**:
+**Example:** A Valheim tree, asking for **3 Bronze Axes**:
 
 ```
 Bronze Axe         x3   -> 3 crafts (yield 1)
@@ -85,7 +85,7 @@ If two different blueprints in your batch both need Wood, the Components tab giv
 with the total. That merge is the entire reason this app was created. It answers the question: *"How much crap do I 
 have to get if I want to make all of these things?"* with one total per component.
 
-> **Note:** The smelting step for Copper and Tin were deliberately left out for the sake of simplifying the example.
+> **Note:** The smelting steps for Copper and Tin were deliberately left out for the sake of simplifying the example.
 
 ## Crafting Steps
 

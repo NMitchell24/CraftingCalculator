@@ -228,7 +228,8 @@ changed in the other — check the totals, the crafts, and the step count when y
   `![Dataset](assets/menu-book.svg) **Dataset** → ![Components](assets/inventory-2.svg) **Components** → ![New](assets/add.svg) **Add**`
 - A screen is a link on first mention in a section: `[Craft screen](craft-screen.md)`.
 - A section a whole page covers ends by sending the reader there: `More detail: [Components](components.md).`
-- Asides are `> **Note:**`, `> **Tip:**` or `> **Example.**` blockquotes, not parentheses.
+- Asides are `> **Note:**`, `> **Tip:**` or `> **Example:**` blockquotes, not parentheses. An example that introduces
+  a table or a code block is the exception: a bare `**Example:**` lead, no blockquote.
 - Troubleshooting headings are the complaint in the reader's own words: `### "It wants way more
   materials than the game does"`.
 - Prose wraps at about 120 columns. Do not reflow a paragraph you are making a two-word fix to.

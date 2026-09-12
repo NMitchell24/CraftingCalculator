@@ -59,7 +59,7 @@ just add them as Components. Let's add a few of those too.
 Repeat for the handful of raw materials your recipe needs. For this example you will need: `Tin`, `Copper`,
 `Wood`, `Leather Scraps`. Make sure you use the applicable category for each of these elements.
 
-> **Note:** The smelt step for Tin and Copper are deliberately left out for the sake of simplifying the recipe.
+> **Note:** The smelting steps for Tin and Copper are deliberately left out for the sake of simplifying the recipe.
 
 More detail: [Components](components.md).
 

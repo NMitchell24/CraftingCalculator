@@ -32,7 +32,7 @@ directly. Tapping anywhere on the card does the same thing.
 
 ## Inside a list
 
-Every row shows the record's name, a caption, and its category.
+Every row shows the record's name, a caption, and its category chip.
 
 The caption changes with the type.
 

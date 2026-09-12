@@ -23,7 +23,7 @@ Everything here is built on three generic records that are common to Survival Cr
 
 | Word          | What it means                                                                                                                                               | In your game                              |
 | ------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
-| **Component** | Raw stuff. Something you gather, mine, kill, farm or buy. It is never crafted and is something you find which allows you to craft things.                   | Wood, Stone, Iron Ore, Fiber, Leather     |
+| **Component** | Raw stuff. Something you gather, mine, kill, farm, buy, or something you can craft but you'd rather track as a component instead of a blueprint.            | Wood, Stone, Iron Ore, Fiber, Leather     |
 | **Blueprint** | A recipe. A list of components, or other blueprints, that makes the thing you need. Or even one of the things you need to make the thing you *really* need. | Iron Nails, Fine Wood Bow, Low Grade Fuel |
 | **Category**  | A label you stick on components and blueprints so you can find them later.                                                                                  | Ores, Food, Base Building, Tier 3 Gear    |
 

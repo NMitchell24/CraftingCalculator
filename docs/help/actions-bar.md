@@ -41,4 +41,5 @@ below describes where you will find these bars for the different layouts.
 | A phone in landscape mode | On the left side of the screen |
 | A tablet or PC            | On the left side of the screen |
 
-> **Note:** On a tablet or PC the left side menu will expand to show the labels next to the icon buttons. 
+> **Note:** On larger tablets and desktop windows (at least 960px wide and 600px high), the left side menu expands 
+> to show labels next to icon buttons.

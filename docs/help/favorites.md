@@ -5,7 +5,7 @@ nav_order: 9
 
 # Favorites
 
-A favorite is a saved batch: a set of blueprints and a quantity to craft, stored with a name you choose.
+A favorite is a saved batch: a set of blueprints with their quantities, stored with a name you choose.
 
 The use case writes itself. You've worked out the exact shopping list for a full raid kit, the stack of stasis 
 devices that your farms produce enough resources for, or exactly how to build the base you're going to use. You're 

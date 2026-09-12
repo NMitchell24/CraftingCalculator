@@ -121,7 +121,9 @@ the rules that matter most often:
   point", "I don't think you'll have any issues". Never first person plural for the app's opinions —
   "we recommend" is corporate. Say "I", or drop the attribution and just state the thing.
 - **Definition bullets are `- **Label:** lowercase continuation`,** never `- **Label** — continuation`.
-  Callouts take the same shape: `> **Note:**`, `> **Tip:**`, `> **Example.**`.
+  Callouts take the same shape: `> **Note:**`, `> **Tip:**`, `> **Example:**`. An example that introduces a table or a
+  code block is the exception: it drops the blockquote and stays a bare `**Example:**` lead, so the block it
+  introduces renders on its own.
 - **Let the aside be its own sentence.** An em-dash clause or a parenthetical is usually a sentence
   waiting to get out. "It's a short screen. Here's everything you need to know." beats "It is a short
   screen — here is all of it."
