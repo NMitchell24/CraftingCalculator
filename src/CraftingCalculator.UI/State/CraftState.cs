@@ -96,7 +96,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// <summary>
     /// Moves the blueprint's quantity by <paramref name="step"/>, which is negative to step down.
     /// Stepping down settles at zero, and stepping down again from zero removes the blueprint from the
-    /// batch.
+    /// batch. Stepping up saturates at <see cref="long.MaxValue"/>.
     /// </summary>
     public void Step(BlueprintQuantity target, long step)
     {
@@ -110,7 +110,14 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
             return;
         }
 
-        SetQuantity(target, Math.Max(target.Quantity + step, 0));
+        // The addition is what overflows, so it cannot also be the test - compare against the headroom
+        // left below MaxValue instead. Only a step up can overflow: Quantity is never negative, so a
+        // step down lands at worst a single step below zero, which Math.Max takes care of.
+        long stepped = step > 0 && target.Quantity > long.MaxValue - step
+            ? long.MaxValue
+            : target.Quantity + step;
+
+        SetQuantity(target, Math.Max(stepped, 0));
     }
 
     public void Remove(BlueprintQuantity target)
