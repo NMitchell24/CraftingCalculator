@@ -25,7 +25,7 @@ public static class HelpTopics
         new("getting-started", "Getting Started",
             "Go from an empty database to your first finished calculation.",
             []),
-        
+
         new("actions-bar", "Actions and Navigation",
             "How the navigation and actions bars adapt across mobile and desktop layouts.",
             []),
@@ -33,11 +33,11 @@ public static class HelpTopics
         new("craft-screen", "The Craft Screen",
             "Build a batch, read the totals, and dig into the breakdown.",
             [""]),
-        
+
         new("categories", "Categories",
             "Labels that keep a big dataset searchable.",
             ["dataset/category"]),
-        
+
         new("components", "Components",
             "The raw stuff at the bottom of every recipe tree.",
             ["dataset/component"]),
