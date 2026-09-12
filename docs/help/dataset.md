@@ -1,6 +1,6 @@
 ---
 title: The Dataset Screen
-nav_order: 8
+nav_order: 9
 ---
 
 # The Dataset Screen
@@ -8,6 +8,19 @@ nav_order: 8
 This screen is your library. This is where you will customize the data that you want to use within the Crafting 
 Calculator. The Dataset screen allows you to view the three different record types, and a live total of how many you 
 have for each. Tap on any card to go to a list of those records where you can view, add, edit and delete them.
+
+## Switching datasets
+
+The droplist at the very top says which dataset you're looking at. Everything below it, and everything
+on every other screen, belongs to it. Tap it to switch to another dataset, and use the
+![Rename](assets/edit.svg), ![New](assets/add.svg) and ![Delete](assets/delete.svg) icons beside it to
+manage it.
+
+If you only play one game, you can ignore that row entirely and never think about it again.
+
+More detail: [Managing Datasets](managing-datasets.md).
+
+## The record cards
 
 The landing page shows one card per record type:
 
@@ -123,8 +136,9 @@ wants to accidentally delete something they spent the past couple of minutes cre
 
 You can Delete All Data with the ![Delete all data](assets/delete-forever.svg) action on the Dataset landing page. 
 This is the sledgehammer that you probably won't use very often, if even at all. But it exists to give you the 
-option to clear everything and start over. It removes **every** favorite, blueprint, category and component — the 
-entire dataset, gone.
+option to clear everything and start over. It removes **every** favorite, blueprint, category and component in the 
+dataset you're currently in. Your other [datasets](managing-datasets.md) aren't touched, and the dataset itself 
+survives; it's just empty afterwards.
 
 Because deletes are permanent, it doesn't settle for a yes/no box: you have to **type the word
 DELETE** to confirm. If a batch was in progress on the Craft screen, it is cleared too, since it would
@@ -132,4 +146,5 @@ otherwise be pricing out blueprints that no longer exist.
 
 Use it if your dataset is no longer useful, and you want a clean slate. Don't use it because a list 
 looks cluttered. **Delete Mode**, inside the record lists, is the smaller hammer to clean up things you don't need 
-anymore.
+anymore. And if you want the dataset gone entirely rather than just emptied, that's
+[Delete dataset](managing-datasets.md#deleting-one).

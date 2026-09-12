@@ -15,8 +15,8 @@ public class BlueprintDAOTests
     public void SetUp()
     {
         _fixture = new SqliteTestFixture();
-        _blueprintDAO = new BlueprintDAO(_fixture.Factory);
-        _componentDAO = new ComponentDAO(_fixture.Factory);
+        _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
+        _componentDAO = new ComponentDAO(_fixture.DatasetFactory);
     }
 
     [TearDown]
@@ -50,7 +50,7 @@ public class BlueprintDAOTests
     [Test]
     public async Task GetByIdAsync_ComponentsInTheGraph_CarryTheirOwnCategory()
     {
-        CategoryDAO categoryDAO = new(_fixture.Factory);
+        CategoryDAO categoryDAO = new(_fixture.DatasetFactory);
         CategoryModel ores = await categoryDAO.SaveAsync(new CategoryModel { Name = "Ores" });
         CategoryModel parts = await categoryDAO.SaveAsync(new CategoryModel { Name = "Parts" });
 

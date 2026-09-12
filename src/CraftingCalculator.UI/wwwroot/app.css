@@ -715,6 +715,34 @@ html, body {
     margin: 0 auto;
 }
 
+/* The dataset switcher, above the record cards: which dataset the screen is showing, and the three
+   actions that manage the set of them. */
+.dataset-switcher {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+/* Takes the row's slack so the three buttons keep their full tap targets at phone width. min-width
+   overrides MudSelect's own intrinsic width, which would otherwise refuse to shrink below it and push
+   the buttons off the edge on a narrow screen. */
+.dataset-switcher-select {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.dataset-switcher-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+}
+
+.dataset-switcher-actions .mud-icon-button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
 /* The whole card is the tap target for opening a list, so signal that on the desktop head where
    there is a cursor to signal it with. */
 .dataset-summary-target {

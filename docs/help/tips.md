@@ -1,6 +1,6 @@
 ---
 title: Tips and Troubleshooting
-nav_order: 12
+nav_order: 13
 ---
 
 # Tips and Troubleshooting
@@ -49,11 +49,12 @@ Now **Cost** means "how much of a grind is this", **Value** means "how much do I
 
 ### One install, several games
 
-Make a category per game — `Valheim`, `Rust`, `Minecraft` — and tag every record with it. Filter to one
-and the rest of your dataset vanishes. See [Categories](categories.md).
+Give each game its own **dataset**. Switching between them swaps out every category, component,
+blueprint and favorite in one tap, so your Rust recipes never turn up while you're planning a Valheim
+build. See [Managing Datasets](managing-datasets.md).
 
-If two games both have a "Wood" that behaves differently, prefix the name: `V - Wood`, `R - Wood`. The
-search box will still find both with `wood`.
+This also means two games can both have a `Wood` at completely different costs without you having to
+invent names to tell them apart.
 
 ### Duplicate is your friend for tiers
 

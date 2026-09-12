@@ -20,7 +20,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
     /// <summary>Id of the record this one starts as a copy of. Only read when <see cref="Id"/> is 0.</summary>
     [Parameter, SupplyParameterFromQuery(Name = "copyFrom")] public int CopyFrom { get; set; }
 
-    [Inject] private IDatasetService DatasetService { get; set; } = null!;
+    [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -47,9 +47,9 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         }
 
         _record = Id > 0
-            ? await DatasetService.GetRecordAsync(_type, Id)
+            ? await RecordService.GetRecordAsync(_type, Id)
             : CopyFrom > 0
-                ? (await DatasetService.GetRecordAsync(_type, CopyFrom))?.CopyForSave()
+                ? (await RecordService.GetRecordAsync(_type, CopyFrom))?.CopyForSave()
                 : _type.GetDataRecord();
 
         if (_record is null)
@@ -73,7 +73,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
     private async Task SaveAsync()
     {
-        await DatasetService.SaveRecordAsync(_record);
+        await RecordService.SaveRecordAsync(_record);
 
         _isDirty = false;
         Snackbar.Add($"Saved '{_record?.Name}'", Severity.Success);
@@ -87,7 +87,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
             return;
         }
 
-        await DatasetService.DeleteRecordAsync(_record);
+        await RecordService.DeleteRecordAsync(_record);
 
         _isDirty = false;
         Snackbar.Add($"Deleted '{_record.Name}'", Severity.Success);

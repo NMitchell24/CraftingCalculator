@@ -1,56 +1,72 @@
 using CraftingCalculator.Application.Common.Interfaces;
-using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Application.Common.Interfaces.DAO;
+using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.Common.Services.Impl;
 
-public class DatasetService(
-    IComponentService componentService,
-    ICategoryService categoryService,
-    IBlueprintService blueprintService) : IDatasetService
+public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDataset) : IDatasetService
 {
-    public async Task<List<IBaseDataRecord>> GetRecordsAsync(DataType type) => type switch
-    {
-        DataType.Component => [.. await componentService.GetAllComponentsAsync()],
-        DataType.Category => [.. await categoryService.GetCategoriesAsync()],
-        DataType.Blueprint => [.. await blueprintService.GetAllBlueprintsAsync()],
-        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-    };
+    public Task<List<DatasetModel>> GetAllAsync() => dao.GetAllAsync();
 
-    public async Task<IBaseDataRecord?> GetRecordAsync(DataType type, int id) => type switch
+    public async Task InitializeAsync()
     {
-        DataType.Component => await componentService.GetComponentByIdAsync(id),
-        DataType.Category => await categoryService.GetCategoryByIdAsync(id),
-        DataType.Blueprint => await blueprintService.GetBlueprintByIdAsync(id),
-        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-    };
-
-    public Task SaveRecordAsync(IBaseDataRecord? record) => record switch
-    {
-        ComponentModel component => componentService.SaveComponentAsync(component),
-        CategoryModel category => categoryService.SaveCategoryAsync(category),
-        BlueprintModel blueprint => blueprintService.SaveBlueprintAsync(blueprint),
-        _ => Task.CompletedTask
-    };
-
-    public Task DeleteRecordAsync(IBaseDataRecord? record) => record switch
-    {
-        ComponentModel component => componentService.DeleteComponentAsync(component),
-        CategoryModel category => categoryService.DeleteCategoryAsync(category),
-        BlueprintModel blueprint => blueprintService.DeleteBlueprintAsync(blueprint),
-        _ => Task.CompletedTask
-    };
-
-    public async Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records)
-    {
-        // Sequential rather than Task.WhenAll: the per-type services share one DbContext factory and a
-        // delete cascades, so overlapping deletes would race each other's cascade.
-        foreach (IBaseDataRecord record in records)
+        if (selectedDataset.Id != 0 && await dao.GetByIdAsync(selectedDataset.Id) != null)
         {
-            await DeleteRecordAsync(record);
+            return;
         }
+
+        // Reached on a first launch, and again whenever the stored dataset has been deleted - by this
+        // app on another device restoring a backup, or by a hand-edited database. The first dataset by
+        // name is the arbitrary-but-stable choice; the migration guarantees at least one exists.
+        List<DatasetModel> datasets = await dao.GetAllAsync();
+
+        if (datasets.Count == 0)
+        {
+            DatasetModel created = await dao.AddAsync(DatasetConstants.DefaultName);
+            selectedDataset.Set(created.Id);
+            return;
+        }
+
+        selectedDataset.Set(datasets[0].Id);
     }
 
-    public async Task DeleteAllOfTypeAsync(DataType type) =>
-        await DeleteRecordsAsync(await GetRecordsAsync(type));
+    public async Task<bool> NameExistsAsync(string name, int exceptId = 0)
+        => await dao.GetByNameAsync(name.Trim(), exceptId) != null;
+
+    public Task<DatasetModel> CreateAsync(string name) => dao.AddAsync(name.Trim());
+
+    public Task RenameAsync(int id, string name) => dao.RenameAsync(id, name.Trim());
+
+    public async Task DeleteAsync(int id)
+    {
+        // One dataset is always selected, so the last one cannot go. The UI disables the action at the
+        // same threshold; this is the invariant behind that, not a duplicate of it.
+        if (await dao.CountAsync() <= 1)
+        {
+            return;
+        }
+
+        // Moved before the delete, not after: the cascade runs while this dataset is still selected, and
+        // a context created in between would be scoped to a dataset that no longer exists.
+        if (selectedDataset.Id == id)
+        {
+            DatasetModel replacement = (await dao.GetAllAsync()).First(dataset => dataset.Id != id);
+            selectedDataset.Set(replacement.Id);
+        }
+
+        await dao.DeleteAsync(id);
+    }
+
+    public async Task SwitchToAsync(int id)
+    {
+        // Guards against a stale dropdown selecting a dataset another path has already deleted, which
+        // would otherwise leave every screen scoped to a missing dataset and silently empty.
+        if (await dao.GetByIdAsync(id) == null)
+        {
+            return;
+        }
+
+        selectedDataset.Set(id);
+    }
 }

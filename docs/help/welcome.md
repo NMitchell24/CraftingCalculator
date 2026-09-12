@@ -27,6 +27,10 @@ Everything here is built on three generic records that are common to Survival Cr
 | **Blueprint** | A recipe. A list of components, or other blueprints, that makes the thing you need. Or even one of the things you need to make the thing you *really* need. | Iron Nails, Fine Wood Bow, Low Grade Fuel |
 | **Category**  | A label you stick on components and blueprints so you can find them later.                                                                                  | Ores, Food, Base Building, Tier 3 Gear    |
 
+All three live inside a **dataset**, which is just everything you've taught the app about one game. Start
+with one and forget it exists. Play a second game, and you can add a second dataset, so a Rust Rocket never
+turns up while you're costing out a Valheim longship. See [Managing Datasets](managing-datasets.md).
+
 Probably the *most* important part is that little comma clause in the Blueprint row: **a blueprint can contain other 
 blueprints**. In Rust, a Rocket needs 10 Explosives, 150 Gunpowder, and 2 Metal Pipes. Explosives and Gunpowder are 
 also things you can craft. They are their own **Blueprints**. You describe each recipe once, exactly the way the 

@@ -1,7 +1,7 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Application.Common.Services.Impl;
-using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using Moq;
 using NUnit.Framework;
@@ -11,166 +11,185 @@ namespace CraftingCalculator.Application.UnitTests.Common.Services;
 [TestFixture]
 public class DatasetServiceTests
 {
-    private Mock<IComponentService> _componentService = null!;
-    private Mock<ICategoryService> _categoryService = null!;
-    private Mock<IBlueprintService> _blueprintService = null!;
+    private const string SelectedDatasetKey = "selectedDatasetId";
+
+    private Mock<IDatasetDAO> _dao = null!;
+    private FakePreferenceStore _preferences = null!;
+    private SelectedDatasetState _selected = null!;
     private DatasetService _service = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _componentService = new Mock<IComponentService>();
-        _categoryService = new Mock<ICategoryService>();
-        _blueprintService = new Mock<IBlueprintService>();
-        _service = new DatasetService(_componentService.Object, _categoryService.Object, _blueprintService.Object);
+        _dao = new Mock<IDatasetDAO>();
+        _preferences = new FakePreferenceStore();
+    }
+
+    /// <summary>
+    /// Builds the service over a selection state that has already read <paramref name="storedId"/> back
+    /// from the preference store, which is the state a fresh launch starts in.
+    /// </summary>
+    private void GivenStoredSelection(int? storedId)
+    {
+        if (storedId is int id)
+        {
+            _preferences.Set(SelectedDatasetKey, id.ToString());
+        }
+
+        _selected = new SelectedDatasetState(_preferences);
+        _service = new DatasetService(_dao.Object, _selected);
+    }
+
+    private void GivenDatasets(params DatasetModel[] datasets)
+    {
+        _dao.Setup(dao => dao.GetAllAsync()).ReturnsAsync([.. datasets]);
+        _dao.Setup(dao => dao.CountAsync()).ReturnsAsync(datasets.Length);
+
+        foreach (DatasetModel dataset in datasets)
+        {
+            _dao.Setup(dao => dao.GetByIdAsync(dataset.Id)).ReturnsAsync(dataset);
+        }
     }
 
     [Test]
-    public async Task GetRecordsAsync_Component_ReturnsComponents()
+    public async Task InitializeAsync_StoredDatasetStillExists_KeepsIt()
     {
-        _componentService.Setup(s => s.GetAllComponentsAsync())
-            .ReturnsAsync([new ComponentModel { Id = 1, Name = "Screw" }]);
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(7);
 
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Component);
+        await _service.InitializeAsync();
 
-        records.Should().ContainSingle().Which.Name.Should().Be("Screw");
+        _selected.Id.Should().Be(7);
     }
 
     [Test]
-    public async Task GetRecordsAsync_Blueprint_ReturnsBlueprints()
+    public async Task InitializeAsync_NothingStored_SelectsTheFirstDatasetAndPersistsIt()
     {
-        _blueprintService.Setup(s => s.GetAllBlueprintsAsync())
-            .ReturnsAsync([new BlueprintModel { Id = 1, Name = "Widget" }]);
+        GivenDatasets(new DatasetModel { Id = 3, Name = "Ark" }, new DatasetModel { Id = 1, Name = "Default" });
+        GivenStoredSelection(null);
 
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Blueprint);
+        await _service.InitializeAsync();
 
-        records.Should().ContainSingle().Which.Name.Should().Be("Widget");
+        _selected.Id.Should().Be(3);
+
+        // Written back, so the fallback is resolved once rather than on every launch.
+        _preferences.Get(SelectedDatasetKey).Should().Be("3");
     }
 
     [Test]
-    public async Task GetRecordsAsync_Category_ReturnsCategories()
+    public async Task InitializeAsync_StoredDatasetIsGone_FallsBackToTheFirstDataset()
     {
-        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync(
-        [
-            new CategoryModel { Id = 2, Name = "Tools" },
-            new CategoryModel { Id = 7, Name = "All" }
-        ]);
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" });
+        GivenStoredSelection(99);
 
-        List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Category);
+        await _service.InitializeAsync();
 
-        records.Select(record => record.Name).Should().Equal("Tools", "All");
+        _selected.Id.Should().Be(1);
     }
 
     [Test]
-    public async Task GetRecordAsync_RoutesToTheServiceMatchingTheType()
+    public async Task InitializeAsync_NoDatasetsAtAll_CreatesDefault()
     {
-        _blueprintService.Setup(s => s.GetBlueprintByIdAsync(5)).ReturnsAsync(new BlueprintModel { Id = 5, Name = "Widget" });
+        GivenDatasets();
+        _dao.Setup(dao => dao.AddAsync("Default")).ReturnsAsync(new DatasetModel { Id = 1, Name = "Default" });
+        GivenStoredSelection(null);
 
-        IBaseDataRecord? record = await _service.GetRecordAsync(DataType.Blueprint, 5);
+        await _service.InitializeAsync();
 
-        record!.Name.Should().Be("Widget");
-        _componentService.Verify(s => s.GetComponentByIdAsync(It.IsAny<int>()), Times.Never);
+        _selected.Id.Should().Be(1);
+        _dao.Verify(dao => dao.AddAsync("Default"), Times.Once);
     }
 
     [Test]
-    public async Task SaveRecordAsync_Component_SavesThroughTheComponentService()
+    public async Task SwitchToAsync_PersistsTheNewSelection()
     {
-        ComponentModel component = new ComponentModel { Id = 3, Name = "Screw" };
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(1);
 
-        await _service.SaveRecordAsync(component);
+        await _service.SwitchToAsync(7);
 
-        _componentService.Verify(s => s.SaveComponentAsync(component), Times.Once);
+        _selected.Id.Should().Be(7);
+        _preferences.Get(SelectedDatasetKey).Should().Be("7");
     }
 
     [Test]
-    public async Task SaveRecordAsync_Category_SavesThroughTheCategoryService()
+    public async Task SwitchToAsync_DatasetNoLongerExists_LeavesTheSelectionAlone()
     {
-        CategoryModel category = new CategoryModel { Id = 2, Name = "Tools" };
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" });
+        GivenStoredSelection(1);
 
-        await _service.SaveRecordAsync(category);
+        await _service.SwitchToAsync(99);
 
-        _categoryService.Verify(s => s.SaveCategoryAsync(category), Times.Once);
+        _selected.Id.Should().Be(1);
     }
 
     [Test]
-    public async Task SaveRecordAsync_Blueprint_SavesThroughTheBlueprintService()
+    public async Task DeleteAsync_TheLastDataset_DeletesNothing()
     {
-        BlueprintModel blueprint = new BlueprintModel { Id = 4, Name = "Widget" };
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" });
+        GivenStoredSelection(1);
 
-        await _service.SaveRecordAsync(blueprint);
+        await _service.DeleteAsync(1);
 
-        _blueprintService.Verify(s => s.SaveBlueprintAsync(blueprint), Times.Once);
+        _dao.Verify(dao => dao.DeleteAsync(It.IsAny<int>()), Times.Never);
+        _selected.Id.Should().Be(1);
     }
 
     [Test]
-    public async Task DeleteRecordAsync_Blueprint_DeletesThroughTheBlueprintService()
+    public async Task DeleteAsync_TheSelectedDataset_MovesTheSelectionFirst()
     {
-        BlueprintModel blueprint = new BlueprintModel { Id = 4, Name = "Widget" };
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(7);
 
-        await _service.DeleteRecordAsync(blueprint);
+        await _service.DeleteAsync(7);
 
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(blueprint), Times.Once);
-        _componentService.Verify(s => s.DeleteComponentAsync(It.IsAny<ComponentModel>()), Times.Never);
+        // Moved before the delete: the cascade runs against a dataset nothing is scoped to any more.
+        _selected.Id.Should().Be(1);
+        _preferences.Get(SelectedDatasetKey).Should().Be("1");
+        _dao.Verify(dao => dao.DeleteAsync(7), Times.Once);
     }
 
     [Test]
-    public async Task DeleteRecordsAsync_DeletesEachRecordThroughItsOwnService()
+    public async Task DeleteAsync_ADatasetThatIsNotSelected_LeavesTheSelectionAlone()
     {
-        ComponentModel component = new ComponentModel { Id = 1, Name = "Screw" };
-        CategoryModel category = new CategoryModel { Id = 2, Name = "Tools" };
-        BlueprintModel blueprint = new BlueprintModel { Id = 3, Name = "Widget" };
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(1);
 
-        await _service.DeleteRecordsAsync([component, category, blueprint]);
+        await _service.DeleteAsync(7);
 
-        _componentService.Verify(s => s.DeleteComponentAsync(component), Times.Once);
-        _categoryService.Verify(s => s.DeleteCategoryAsync(category), Times.Once);
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(blueprint), Times.Once);
+        _selected.Id.Should().Be(1);
+        _dao.Verify(dao => dao.DeleteAsync(7), Times.Once);
     }
 
     [Test]
-    public async Task DeleteRecordsAsync_Empty_DoesNothing()
+    public async Task NameExistsAsync_TrimsBeforeComparing()
     {
-        await _service.DeleteRecordsAsync([]);
+        GivenStoredSelection(1);
+        _dao.Setup(dao => dao.GetByNameAsync("Rust", 0)).ReturnsAsync(new DatasetModel { Id = 7, Name = "Rust" });
 
-        _componentService.VerifyNoOtherCalls();
-        _categoryService.VerifyNoOtherCalls();
-        _blueprintService.VerifyNoOtherCalls();
+        (await _service.NameExistsAsync("  Rust  ")).Should().BeTrue();
     }
 
     [Test]
-    public async Task DeleteAllOfTypeAsync_Component_DeletesEveryComponent()
+    public async Task CreateAndRename_TrimTheName()
     {
-        ComponentModel screw = new ComponentModel { Id = 1, Name = "Screw" };
-        ComponentModel bolt = new ComponentModel { Id = 2, Name = "Bolt" };
-        _componentService.Setup(s => s.GetAllComponentsAsync()).ReturnsAsync([screw, bolt]);
+        GivenStoredSelection(1);
+        _dao.Setup(dao => dao.AddAsync("Rust")).ReturnsAsync(new DatasetModel { Id = 7, Name = "Rust" });
 
-        await _service.DeleteAllOfTypeAsync(DataType.Component);
+        await _service.CreateAsync("  Rust  ");
+        await _service.RenameAsync(7, "  Valheim  ");
 
-        _componentService.Verify(s => s.DeleteComponentAsync(screw), Times.Once);
-        _componentService.Verify(s => s.DeleteComponentAsync(bolt), Times.Once);
+        _dao.Verify(dao => dao.AddAsync("Rust"), Times.Once);
+        _dao.Verify(dao => dao.RenameAsync(7, "Valheim"), Times.Once);
     }
 
-    [Test]
-    public async Task DeleteAllOfTypeAsync_Category_DeletesEveryCategory()
+    /// <summary>Stands in for MAUI Preferences, which the Application layer never sees directly.</summary>
+    private sealed class FakePreferenceStore : IPreferenceStore
     {
-        CategoryModel building = new() { Id = 1, Name = "Building" };
-        CategoryModel tools = new() { Id = 2, Name = "Tools" };
-        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([building, tools]);
+        private readonly Dictionary<string, string> _values = [];
 
-        await _service.DeleteAllOfTypeAsync(DataType.Category);
+        public string? Get(string key) => _values.GetValueOrDefault(key);
 
-        _categoryService.Verify(s => s.DeleteCategoryAsync(building), Times.Once);
-        _categoryService.Verify(s => s.DeleteCategoryAsync(tools), Times.Once);
-    }
-
-    [Test]
-    public async Task SaveRecordAsync_Null_DoesNothing()
-    {
-        await _service.SaveRecordAsync(null);
-        await _service.DeleteRecordAsync(null);
-
-        _componentService.VerifyNoOtherCalls();
-        _categoryService.VerifyNoOtherCalls();
-        _blueprintService.VerifyNoOtherCalls();
+        public void Set(string key, string value) => _values[key] = value;
     }
 }

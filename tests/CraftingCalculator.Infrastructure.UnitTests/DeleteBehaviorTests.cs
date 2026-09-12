@@ -1,5 +1,6 @@
 using AwesomeAssertions;
 using CraftingCalculator.Domain.Entities;
+using CraftingCalculator.Infrastructure.DAO.Impl;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftingCalculator.Infrastructure.UnitTests;
@@ -30,7 +31,7 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Blueprints.Where(blueprint => blueprint.Id == blueprint.Id).ExecuteDeleteAsync();
+        await act.Blueprints.Where(bp => bp.Id == blueprint.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
         (await verify.BlueprintComponents.CountAsync(blueprintComponent => blueprintComponent.BlueprintId == blueprint.Id)).Should().Be(0);
@@ -155,11 +156,48 @@ public class DeleteBehaviorTests
         await seed.SaveChangesAsync();
 
         await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
-        await act.Blueprints.Where(blueprint => blueprint.Id == blueprint.Id).ExecuteDeleteAsync();
+        await act.Blueprints.Where(bp => bp.Id == blueprint.Id).ExecuteDeleteAsync();
 
         await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
         (await verify.FavoriteBlueprints.CountAsync(fr => fr.BlueprintId == blueprint.Id)).Should().Be(0);
         // The favorite itself survives - only its entry for the deleted blueprint goes.
         (await verify.Favorites.AnyAsync(f => f.Id == favorite.Id)).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task DeletingDataset_CascadesEveryRecordFiledUnderIt()
+    {
+        DatasetDAO datasetDAO = new(_fixture.RawFactory);
+        int rustId = (await datasetDAO.AddAsync("Rust")).Id;
+
+        _fixture.SelectDataset(rustId);
+
+        await using (CraftingDataContext seed = _fixture.Factory.CreateDbContext())
+        {
+            Category tools = new() { Name = "Tools" };
+            Component wood = new() { Name = "Wood" };
+            Blueprint arrow = new() { Name = "Arrow", Category = tools };
+            arrow.Components.Add(new BlueprintComponent { Component = wood, Quantity = 25 });
+            Favorite raidKit = new() { Name = "Raid kit" };
+            raidKit.FavoriteBlueprints.Add(new FavoriteBlueprint { Blueprint = arrow, Quantity = 2 });
+
+            seed.Favorites.Add(raidKit);
+            seed.Blueprints.Add(arrow);
+            await seed.SaveChangesAsync();
+        }
+
+        await datasetDAO.DeleteAsync(rustId);
+
+        // Read unfiltered: a filtered read would come back empty whether the rows were deleted or
+        // merely hidden, which is the one thing this test must be able to tell apart.
+        await using CraftingDataContext verify = _fixture.RawFactory.CreateDbContext();
+        (await verify.Categories.IgnoreQueryFilters().CountAsync(c => c.DatasetId == rustId)).Should().Be(0);
+        (await verify.Components.IgnoreQueryFilters().CountAsync(c => c.DatasetId == rustId)).Should().Be(0);
+        (await verify.Blueprints.IgnoreQueryFilters().CountAsync(b => b.DatasetId == rustId)).Should().Be(0);
+        (await verify.Favorites.IgnoreQueryFilters().CountAsync(f => f.DatasetId == rustId)).Should().Be(0);
+
+        // And the link rows their parents owned went with them.
+        (await verify.BlueprintComponents.IgnoreQueryFilters().CountAsync()).Should().Be(0);
+        (await verify.FavoriteBlueprints.IgnoreQueryFilters().CountAsync()).Should().Be(0);
     }
 }

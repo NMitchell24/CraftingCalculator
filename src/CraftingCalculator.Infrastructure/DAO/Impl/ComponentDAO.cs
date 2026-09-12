@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
-public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory) : IComponentDAO
+public class ComponentDAO(DatasetScopedContextFactory contextFactory) : IComponentDAO
 {
     public async Task<List<ComponentModel>> GetAllAsync()
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         List<Component> entities = await context.Components
             .AsNoTracking()
             .Include(componentEntity => componentEntity.Category)
@@ -21,7 +21,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
     public async Task<ComponentModel?> GetByIdAsync(int id)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         Component? entity = await context.Components.AsNoTracking()
             .Include(componentEntity => componentEntity.Category)
             .FirstOrDefaultAsync(componentEntity => componentEntity.Id == id);
@@ -31,7 +31,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
     public async Task<ComponentModel> SaveAsync(ComponentModel component)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
 
         Component entity = component.Id > 0
             ? await context.Components.FirstAsync(componentEntity => componentEntity.Id == component.Id)
@@ -60,7 +60,7 @@ public class ComponentDAO(IDbContextFactory<CraftingDataContext> contextFactory)
 
     public async Task DeleteAsync(int id)
     {
-        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
         await context.Components.Where(componentEntity => componentEntity.Id == id).ExecuteDeleteAsync();
     }
 

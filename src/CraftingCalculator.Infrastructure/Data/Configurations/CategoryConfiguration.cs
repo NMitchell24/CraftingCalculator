@@ -13,5 +13,14 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(category => category.Name).IsRequired();
         builder.Property(category => category.Description).IsRequired();
         builder.HasIndex(category => category.Name);
+
+        builder.HasIndex(category => category.DatasetId);
+
+        //Cascade: a dataset is the container for its records, so deleting one takes its
+        //contents with it.
+        builder.HasOne(category => category.Dataset)
+            .WithMany(dataset => dataset.Categories)
+            .HasForeignKey(category => category.DatasetId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -23,6 +23,15 @@ public class BlueprintConfiguration : IEntityTypeConfiguration<Blueprint>
         builder.HasIndex(blueprint => blueprint.Name);
         builder.HasIndex(blueprint => blueprint.CategoryId);
 
+        builder.HasIndex(blueprint => blueprint.DatasetId);
+
+        //Cascade: a dataset is the container for its records, so deleting one takes its
+        //contents with it.
+        builder.HasOne(blueprint => blueprint.Dataset)
+            .WithMany(dataset => dataset.Blueprints)
+            .HasForeignKey(blueprint => blueprint.DatasetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(blueprint => blueprint.Category)
             .WithMany(category => category.Blueprints)
             .HasForeignKey(blueprint => blueprint.CategoryId)

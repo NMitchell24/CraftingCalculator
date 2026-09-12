@@ -14,6 +14,9 @@ public class MigrationTests
     /// <summary>Id the InsertSeedData migration gave the "All" category row it used to create.</summary>
     private const int SeededAllCategoryId = 1;
 
+    /// <summary>Id the AddDatasets migration gives the dataset it files every pre-existing row into.</summary>
+    private const int DefaultDatasetId = 1;
+
     [Test]
     public async Task Migrate_OnAnEmptyFile_CreatesTheSchemaWithNoRows()
     {
@@ -27,7 +30,7 @@ public class MigrationTests
                 await context.Database.MigrateAsync();
             }
 
-            await using (CraftingDataContext context = new(options))
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
             {
                 (await context.Categories.CountAsync()).Should().Be(0);
                 (await context.Components.CountAsync()).Should().Be(0);
@@ -82,7 +85,7 @@ public class MigrationTests
                 await context.Database.MigrateAsync();
             }
 
-            await using (CraftingDataContext context = new(options))
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
             {
                 Blueprint table = await context.Blueprints
                     .Include(b => b.Category)
@@ -153,7 +156,7 @@ public class MigrationTests
                 await context.Database.MigrateAsync();
             }
 
-            await using (CraftingDataContext context = new(options))
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
             {
                 Blueprint table = await context.Blueprints.SingleAsync();
                 table.Name.Should().Be("Table");
@@ -194,7 +197,7 @@ public class MigrationTests
                 await context.Database.MigrateAsync();
             }
 
-            await using (CraftingDataContext context = new(options))
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
             {
                 Blueprint soup = await context.Blueprints.SingleAsync();
                 soup.Name.Should().Be("Soup");
@@ -228,15 +231,16 @@ public class MigrationTests
             {
                 await context.GetService<IMigrator>().MigrateAsync("AddProductionTime");
 
-                // Rows only, no schema change, so these go in through the model rather than raw SQL.
-                Category furniture = new() { Name = "Furniture", Description = "Things to sit on" };
-                context.Categories.Add(furniture);
-                await context.SaveChangesAsync();
-
-                context.Blueprints.AddRange(
-                    new Blueprint { Name = "Table", Description = "Four legs", Value = 30.0, Yield = 1, CategoryId = SeededAllCategoryId },
-                    new Blueprint { Name = "Chair", Description = "One seat", Value = 12.0, Yield = 1, CategoryId = furniture.Id });
-                await context.SaveChangesAsync();
+                // Raw SQL, though this migration changes no schema: the entities now carry a DatasetId
+                // that AddDatasets has not added yet at this point, so writing through the model would
+                // insert a column the table does not have.
+                const int furnitureId = 2;
+                await context.Database.ExecuteSqlRawAsync(
+                    $"""
+                     INSERT INTO Categories (Id, Name, Description) VALUES ({furnitureId}, 'Furniture', 'Things to sit on');
+                     INSERT INTO Blueprints (Id, Name, Description, Value, Yield, CategoryId) VALUES (1, 'Table', 'Four legs', 30.0, 1, {SeededAllCategoryId});
+                     INSERT INTO Blueprints (Id, Name, Description, Value, Yield, CategoryId) VALUES (2, 'Chair', 'One seat', 12.0, 1, {furnitureId});
+                     """);
             }
 
             await using (CraftingDataContext context = new(options))
@@ -244,7 +248,7 @@ public class MigrationTests
                 await context.Database.MigrateAsync();
             }
 
-            await using (CraftingDataContext context = new(options))
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
             {
                 Category furniture = (await context.Categories.ToListAsync()).Should().ContainSingle().Subject;
                 furniture.Name.Should().Be("Furniture");
@@ -258,6 +262,84 @@ public class MigrationTests
             Cleanup(dbPath);
         }
     }
+
+    /// <summary>
+    /// Datasets arrived after the app shipped, so every record written before them has to land in one
+    /// dataset rather than in dataset 0, which matches no row - the scaffolded migration's
+    /// defaultValue of 0 would have left an upgraded install showing an empty app and failing the new
+    /// foreign key.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeDatasets_FilesExistingRecordsUnderDefault()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("AddComponentCategory");
+
+                // Raw SQL because no entity describes these tables without a DatasetId column now.
+                await context.Database.ExecuteSqlRawAsync(
+                    """
+                    INSERT INTO Categories (Id, Name, Description) VALUES (2, 'Ores', 'Dug up');
+                    INSERT INTO Components (Id, Name, Description, Cost, ProductionTime, CategoryId) VALUES (1, 'Copper', 'Ore', 2.0, 0, 2);
+                    INSERT INTO Blueprints (Id, Name, Description, Value, Yield, ProductionTime, CategoryId) VALUES (1, 'Bronze', 'Alloy', 9.0, 1, 0, 2);
+                    INSERT INTO BlueprintComponents (Id, BlueprintId, ComponentId, Quantity) VALUES (1, 1, 1, 2);
+                    INSERT INTO Favorites (Id, Name) VALUES (1, 'Starter kit');
+                    INSERT INTO FavoriteBlueprints (Id, FavoriteId, BlueprintId, Quantity) VALUES (1, 1, 1, 4);
+                    """);
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
+            {
+                // One dataset, named so the upgrading user has something to rename rather than a blank.
+                Dataset dataset = await context.Datasets.SingleAsync();
+                dataset.Id.Should().Be(DefaultDatasetId);
+                dataset.Name.Should().Be("Default");
+
+                // Every record reads back through the dataset filter, which is only true if the column
+                // was backfilled with this dataset's id.
+                Blueprint bronze = await context.Blueprints
+                    .Include(b => b.Category)
+                    .Include(b => b.Components).ThenInclude(bc => bc.Component)
+                    .SingleAsync();
+                bronze.Name.Should().Be("Bronze");
+                bronze.DatasetId.Should().Be(DefaultDatasetId);
+                bronze.Category!.Name.Should().Be("Ores");
+                bronze.Components.Should().ContainSingle().Which.Component.Name.Should().Be("Copper");
+
+                Favorite favorite = await context.Favorites
+                    .Include(f => f.FavoriteBlueprints)
+                    .SingleAsync();
+                favorite.Name.Should().Be("Starter kit");
+                favorite.FavoriteBlueprints.Should().ContainSingle().Which.Quantity.Should().Be(4);
+
+                (await context.Categories.SingleAsync()).DatasetId.Should().Be(DefaultDatasetId);
+                (await context.Components.SingleAsync()).DatasetId.Should().Be(DefaultDatasetId);
+                favorite.DatasetId.Should().Be(DefaultDatasetId);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
+    /// <summary>
+    /// A context scoped to the dataset AddDatasets files every pre-existing row into. Reads through an
+    /// unscoped context come back empty: every record type carries a dataset query filter, and a
+    /// hand-built context has no DatasetId until something sets one.
+    /// </summary>
+    private static CraftingDataContext DefaultDatasetContext(DbContextOptions<CraftingDataContext> options) =>
+        new(options) { DatasetId = DefaultDatasetId };
 
     private static string NewDbPath() =>
         Path.Combine(Path.GetTempPath(), $"crafting_migration_{Guid.NewGuid():N}.db3");

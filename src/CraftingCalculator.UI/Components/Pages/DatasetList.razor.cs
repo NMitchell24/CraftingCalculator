@@ -33,7 +33,7 @@ public partial class DatasetList : ComponentBase, IDisposable
     /// <summary>The <see cref="DataType"/> being listed, as its enum name.</summary>
     [Parameter] public string Type { get; set; } = "";
 
-    [Inject] private IDatasetService DatasetService { get; set; } = null!;
+    [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -106,7 +106,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private async Task ReloadAsync()
     {
-        _records = await DatasetService.GetRecordsAsync(_type);
+        _records = await RecordService.GetRecordsAsync(_type);
 
         // The actions carry both the mode and whether there is anything left to act on, so they are
         // re-declared on every reload rather than only when the mode changes.
@@ -207,7 +207,7 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await DatasetService.DeleteRecordAsync(record);
+        await RecordService.DeleteRecordAsync(record);
         Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
         await ReloadAsync();
     }
@@ -225,7 +225,7 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await DatasetService.DeleteRecordsAsync(selected);
+        await RecordService.DeleteRecordsAsync(selected);
         await ReloadAsync();
 
         Snackbar.Add($"Deleted {selected.Count} {NounFor(_type, selected.Count)}", Severity.Success);
@@ -239,7 +239,7 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await DatasetService.DeleteAllOfTypeAsync(_type);
+        await RecordService.DeleteAllOfTypeAsync(_type);
         await ReloadAsync();
 
         Snackbar.Add($"Deleted all {TitleFor(_type)}", Severity.Success);

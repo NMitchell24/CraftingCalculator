@@ -7,7 +7,7 @@
 {
     <div class="dataset-editor">
         @* The one place this screen branches on the record type. Every data operation goes through
-           IDatasetService instead, which is why there is no matching switch for load/save/delete. *@
+           IRecordService instead, which is why there is no matching switch for load/save/delete. *@
         @switch (_record)
         {
             case ComponentModel component:

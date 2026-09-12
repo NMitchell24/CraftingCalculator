@@ -1,6 +1,6 @@
 namespace CraftingCalculator.Domain.Entities;
 
-public class Blueprint
+public class Blueprint : IDatasetScoped
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -12,6 +12,9 @@ public class Blueprint
 
     /// <summary>How long one craft of this blueprint takes. Zero is instant.</summary>
     public TimeSpan ProductionTime { get; set; }
+
+    public int DatasetId { get; set; }
+    public Dataset Dataset { get; set; } = null!;
 
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }

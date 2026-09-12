@@ -17,7 +17,7 @@ public partial class CategorySelect : ComponentBase
     /// <summary>Raised on every change, so the hosting editor can track unsaved changes.</summary>
     [Parameter] public EventCallback OnChanged { get; set; }
 
-    [Inject] private IDatasetService DatasetService { get; set; } = null!;
+    [Inject] private IRecordService RecordService { get; set; } = null!;
 
     private List<CategoryModel> _categories = [];
     private int? _categoryId;
@@ -25,7 +25,7 @@ public partial class CategorySelect : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         _categoryId = Model.Category?.Id;
-        _categories = [.. (await DatasetService.GetRecordsAsync(DataType.Category)).Cast<CategoryModel>()];
+        _categories = [.. (await RecordService.GetRecordsAsync(DataType.Category)).Cast<CategoryModel>()];
     }
 
     private async Task OnCategoryChangedAsync(int? categoryId)

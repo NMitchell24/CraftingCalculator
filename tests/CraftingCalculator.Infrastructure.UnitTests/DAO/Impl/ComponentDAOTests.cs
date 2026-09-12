@@ -15,8 +15,8 @@ public class ComponentDAOTests
     public void SetUp()
     {
         _fixture = new SqliteTestFixture();
-        _componentDAO = new ComponentDAO(_fixture.Factory);
-        _categoryDAO = new CategoryDAO(_fixture.Factory);
+        _componentDAO = new ComponentDAO(_fixture.DatasetFactory);
+        _categoryDAO = new CategoryDAO(_fixture.DatasetFactory);
     }
 
     [TearDown]
