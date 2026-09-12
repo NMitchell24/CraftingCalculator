@@ -36,7 +36,16 @@ public partial class Favorites : ComponentBase, IDisposable
     // equality, so a selection held as favorites would not survive a reload.
     private readonly HashSet<int> _selected = [];
 
-    protected override async Task OnInitializedAsync() => await ReloadAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        // Declared before anything is awaited: until the favorites arrive the shell would otherwise
+        // still carry the outgoing page's title and actions, whose callbacks belong to that component.
+        // The empty list makes both actions disabled, which is what an empty Favorites screen shows
+        // anyway; ReloadAsync re-declares them against the loaded list.
+        ConfigureShell();
+
+        await ReloadAsync();
+    }
 
     // Declares no New action: a favorite is made from a batch, and the batch lives on the Craft screen,
     // which owns saving it. This screen only renames and deletes what is already saved.
