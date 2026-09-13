@@ -40,13 +40,16 @@ public static class MauiProgram
             config.SnackbarConfiguration.HideTransitionDuration = 300;
         });
 
-        CraftingCalculator.Application.DependencyInjection.AddApplicationServices(builder.Services);
+        Application.DependencyInjection.AddApplicationServices(builder.Services);
         builder.Services.AddDatabaseServices(GetDatabasePath());
+        builder.Services.AddExportFileServices(GetExportsPath());
 
         builder.Services.AddSingleton<IClipboardService, ClipboardService>();
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
+        builder.Services.AddSingleton<IShareService, ShareService>();
 
         builder.Services.AddScoped<CraftState>();
+        builder.Services.AddScoped<ExportState>();
         builder.Services.AddScoped<PageShellState>();
         builder.Services.AddScoped<ThemeState>();
 
@@ -60,21 +63,30 @@ public static class MauiProgram
         // The DB must exist (and be migrated) before any page loads, and a dataset must be selected
         // before anything reads a record - every query is scoped to one, and DatasetScopedContextFactory
         // throws rather than hand out a context with no dataset.
-        using (IServiceScope scope = app.Services.CreateScope())
-        {
-            IDbContextFactory<CraftingDataContext> contextFactory =
-                scope.ServiceProvider.GetRequiredService<IDbContextFactory<CraftingDataContext>>();
-            using CraftingDataContext context = contextFactory.CreateDbContext();
-            context.Database.Migrate();
+        using IServiceScope scope = app.Services.CreateScope();
+        IDbContextFactory<CraftingDataContext> contextFactory =
+            scope.ServiceProvider.GetRequiredService<IDbContextFactory<CraftingDataContext>>();
+        using CraftingDataContext context = contextFactory.CreateDbContext();
+        context.Database.Migrate();
 
-            // Blocking, matching Migrate() above: CreateMauiApp is synchronous, and the app must not
-            // reach its first page until the selection is resolved.
-            scope.ServiceProvider.GetRequiredService<IDatasetService>().InitializeAsync().GetAwaiter().GetResult();
-        }
+        // Blocking, matching Migrate() above: CreateMauiApp is synchronous, and the app must not
+        // reach its first page until the selection is resolved.
+        scope.ServiceProvider.GetRequiredService<IDatasetService>().InitializeAsync().GetAwaiter().GetResult();
 
         return app;
     }
 
     private static string GetDatabasePath()
         => Path.Combine(FileSystem.AppDataDirectory, "CraftingCalculator.db3");
+
+    // Resolved on every launch and never stored: the iOS sandbox path carries a container id that changes when
+    // the app is reinstalled.
+    private static string GetExportsPath()
+#if IOS
+        // Documents is what the Files app shows under On My iPhone once Info.plist enables file sharing;
+        // AppDataDirectory is Library, which no user can reach.
+        => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Exports");
+#else
+        => Path.Combine(FileSystem.AppDataDirectory, "Exports");
+#endif
 }

@@ -1,0 +1,46 @@
+<MudExpansionPanels MultiExpansion="true" Class="transfer-panels">
+    @foreach (PanelSpec panel in Panels)
+    {
+        SelectionState state = TransferSelectionProcessor.StateOf(Graph, Selected, panel.Kind);
+        List<Row> rows = _rows[panel.Kind];
+
+        @* KeepContentAlive off: a collapsed panel's rows would otherwise stay in the DOM at zero height, where
+           Virtualize cannot tell how many fit and renders far more than a screenful. *@
+        <MudExpansionPanel @key="panel.Kind" KeepContentAlive="false" Disabled="@(rows.Count == 0)"
+                           HeaderClass="@(state == SelectionState.None ? "" : "transfer-panel-selected")">
+            <TitleContent>
+                <div class="transfer-panel-header">
+                    <MudIcon Icon="@panel.Icon" Class="transfer-panel-icon" />
+                    <MudText Typo="Typo.subtitle1" Class="transfer-panel-title">@panel.Title</MudText>
+                    <MudText Typo="Typo.body2" Class="transfer-panel-count">@rows.Count</MudText>
+                    @* The header toggles the panel on any click inside it, so the select-all button stops its
+                       click (and a keyboard Enter) before it gets there. *@
+                    <span class="transfer-panel-toggle" @onclick="() => { }" @onclick:stopPropagation="true"
+                          @onkeydown="() => { }" @onkeydown:stopPropagation="true">
+                        <MudIconButton Icon="@ToggleIcon(state)" Color="@ToggleColor(state)"
+                                       Disabled="@(rows.Count == 0)"
+                                       title="@ToggleLabel(panel, state)" aria-label="@ToggleLabel(panel, state)"
+                                       OnClick="@(() => ToggleAllAsync(panel, state))" />
+                    </span>
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <div class="transfer-rows">
+                    <Virtualize Items="rows" ItemSize="RowHeight" Context="row">
+                        <div @key="row.Key" class="@RowClass(row)" role="button" tabindex="0"
+                             aria-pressed="@(Selected.Contains(row.Key) ? "true" : "false")"
+                             @onclick="@(() => ToggleRowAsync(row))" @onkeydown="@(args => OnRowKeyDownAsync(args, row))">
+                            <span class="transfer-row-name">@row.Name</span>
+                            <span @onclick="() => { }" @onclick:stopPropagation="true"
+                                  @onkeydown="() => { }" @onkeydown:stopPropagation="true">
+                                <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Primary"
+                                               title="@($"About {row.Name}")" aria-label="@($"About {row.Name}")"
+                                               OnClick="@(() => ShowInfoAsync(row))" />
+                            </span>
+                        </div>
+                    </Virtualize>
+                </div>
+            </ChildContent>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>

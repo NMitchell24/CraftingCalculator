@@ -110,13 +110,17 @@ dataset and leaves it standing.
 
 ![Dataset](assets/menu-book.svg) **Dataset** → ![Import/Export](assets/import-export.svg) **Import/Export**
 
-This is where exporting a dataset to a file, and importing one back in, is going to live. It isn't finished yet, so
-for now both of its cards just say "Coming Soon!". See [Import and Export](import-export.md).
+This is where you export a dataset to a file, and where importing one back in is going to live. Export works now:
+pick what goes in, save it, and share the file wherever you like. Import isn't finished yet, so its card still says
+"Coming Soon!". See [Import and Export](import-export.md).
 
 ## Where they're stored
 
 All of your datasets live side by side in the same database file on your device. There's still no
 account, no cloud, and no sync. That also means the caveat from [Settings](settings.md) applies to all
 of them at once: uninstall the app or clear its data, and every dataset goes with it.
+
+If you'd hate to lose one, [export it](import-export.md#export-data) and share the file somewhere that isn't this
+device. An export holds one dataset, so backing up three games means three exports.
 
 More detail: [The Dataset Screen](dataset.md).

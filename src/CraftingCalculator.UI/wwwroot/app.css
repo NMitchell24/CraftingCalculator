@@ -870,6 +870,115 @@ html, body {
     color: var(--mud-palette-text-secondary);
 }
 
+/* Export (Components/Pages/Export.razor) and the selection panels it shares with Import
+   (Components/Controls/TransferSelectionPanels.razor). */
+
+.transfer-panels {
+    /* TransferSelectionPanels.RowHeight holds the same number: Virtualize positions rows by it. */
+    --transfer-row-height: 48px;
+    margin-bottom: 16px;
+}
+
+.transfer-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+.transfer-panel-icon {
+    flex: 0 0 auto;
+}
+
+.transfer-panel-title {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.transfer-panel-count {
+    color: var(--mud-palette-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.transfer-panel-toggle .mud-icon-button,
+.transfer-row .mud-icon-button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* MudBlazor puts the expand arrow flush against the title content, so it touched the select-all button. The
+   arrow has no tap handler of its own; the header does, but Chromium's touch adjustment prefers a tappable
+   descendant (the button) over its tappable ancestor (the header) whenever the finger's contact area overlaps
+   both, so taps on the arrow landed on select-all. The gap keeps the button out of a fingertip centered on the
+   arrow. */
+.transfer-panels .mud-expand-panel-header .mud-expand-panel-icon {
+    margin-inline-start: 16px;
+}
+
+/* Selected panels and rows. primary-hover alone is a 6% tint, which Delete Mode gets away with because its
+   selected rows also take a primary border; here there is no card border to recolor, and on the dark theme
+   the tint by itself was indistinguishable from an unselected row on the emulator. So: a stronger tint, and a
+   primary bar down the leading edge that reads without relying on the fill at all. The primary-hover line is
+   the fallback for iOS 15, whose Safari predates color-mix. */
+.mud-expand-panel .mud-expand-panel-header.transfer-panel-selected,
+.transfer-row-selected {
+    background-color: var(--mud-palette-primary-hover);
+    background-color: color-mix(in srgb, var(--mud-palette-primary) 18%, transparent);
+    box-shadow: inset 4px 0 0 var(--mud-palette-primary);
+}
+
+/* Ten rows show at a time; the rest scroll inside the panel rather than stretching the page. */
+.transfer-rows {
+    max-height: calc(10 * var(--transfer-row-height));
+    overflow-y: auto;
+}
+
+/* A compact row rather than the card-style MudListItem other lists use: cards nested inside the panel's own
+   card would double every border. Fixed height, because Virtualize places rows by it. */
+.transfer-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    height: var(--transfer-row-height);
+    padding-left: 12px;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+    cursor: pointer;
+}
+
+.transfer-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.transfer-action,
+.transfer-alert,
+.transfer-status {
+    margin-bottom: 16px;
+}
+
+.transfer-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.transfer-latest {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* A Windows path has no spaces to break at, and would otherwise run off the card. */
+.transfer-latest-location {
+    color: var(--mud-palette-text-secondary);
+    overflow-wrap: anywhere;
+}
+
 /* Settings (Components/Pages/Settings.razor) */
 
 /* Capped for the same reason as .dataset-editor: a single column of controls and body text stretched

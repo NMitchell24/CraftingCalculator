@@ -47,10 +47,15 @@ All of your [datasets](managing-datasets.md) share that one database file, so th
 them at once.
 
 It also means that the app comes with an honest caveat: **your dataset lives and dies with the app's storage.** 
-There's no cloud copy and no built-in export yet, so uninstalling the app, or clearing its data from your device's
-settings, takes your recipes with it. Worth knowing before you spend an evening entering a modpack.
+There's no cloud copy, so uninstalling the app, or clearing its data from your device's settings, takes your recipes
+with it. Worth knowing before you spend an evening entering a modpack.
 
-If you want a copy of a batch outside the app today, the ![Copy](assets/content-copy.svg) **Copy**
+The way around that is an export. ![Dataset](assets/menu-book.svg) **Dataset** →
+![Import/Export](assets/import-export.svg) **Import/Export** → ![Export Data](assets/output.svg) **Export Data**
+saves your records to a file, and ![Share](assets/share.svg) **Share** gets that file off the device and somewhere
+safe. See [Import and Export](import-export.md).
+
+If you only want a batch's lists outside the app, the ![Copy](assets/content-copy.svg) **Copy**
 buttons on the Craft screen's Components and Surplus tabs put the list on your clipboard, ready to
 paste anywhere.
 

@@ -11,6 +11,7 @@ public static class DependencyInjection
         // Singleton: startup resolves the selection in its own scope, not the one BlazorWebView
         // holds for the session.
         services.AddSingleton<ISelectedDatasetState, SelectedDatasetState>();
+        services.AddSingleton(TimeProvider.System);
 
         services.AddScoped<IDatasetService, DatasetService>();
         services.AddScoped<IComponentService, ComponentService>();
@@ -20,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
         services.AddScoped<IRecordService, RecordService>();
         services.AddScoped<IHelpService, HelpService>();
+        services.AddScoped<IDatasetTransferService, DatasetTransferService>();
 
         return services;
     }

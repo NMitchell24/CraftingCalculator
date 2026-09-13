@@ -1,6 +1,7 @@
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.Domain.Models.Transfer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -90,6 +91,75 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         await transaction.CommitAsync();
 
         return ToModel(copy);
+    }
+
+    public async Task<DatasetSnapshot> GetSnapshotAsync(int datasetId)
+    {
+        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+
+        // The same scoping CopyAsync uses: the query filters keep every read below inside this dataset.
+        context.DatasetId = datasetId;
+
+        string name = await context.Datasets
+            .AsNoTracking()
+            .Where(dataset => dataset.Id == datasetId)
+            .Select(dataset => dataset.Name)
+            .SingleAsync();
+
+        List<SnapshotCategory> categories = await context.Categories
+            .AsNoTracking()
+            .OrderBy(category => category.Id)
+            .Select(category => new SnapshotCategory(category.Id, category.Name, category.Description))
+            .ToListAsync();
+
+        List<SnapshotComponent> components = await context.Components
+            .AsNoTracking()
+            .OrderBy(component => component.Id)
+            .Select(component => new SnapshotComponent(
+                component.Id, component.Name, component.Description, component.Cost, component.ProductionTime,
+                component.CategoryId))
+            .ToListAsync();
+
+        // The link tables are read whole and grouped in memory, the way BlueprintDAO's LoadGraphAsync reads
+        // them, rather than through an Include per blueprint.
+        ILookup<int, QuantityLink> componentLinks = (await context.BlueprintComponents
+                .AsNoTracking()
+                .OrderBy(link => link.Id)
+                .Select(link => new { link.BlueprintId, link.ComponentId, link.Quantity })
+                .ToListAsync())
+            .ToLookup(link => link.BlueprintId, link => new QuantityLink(link.ComponentId, link.Quantity));
+
+        ILookup<int, QuantityLink> childLinks = (await context.BlueprintChildren
+                .AsNoTracking()
+                .OrderBy(link => link.Id)
+                .Select(link => new { link.ParentBlueprintId, link.ChildBlueprintId, link.Quantity })
+                .ToListAsync())
+            .ToLookup(link => link.ParentBlueprintId, link => new QuantityLink(link.ChildBlueprintId, link.Quantity));
+
+        ILookup<int, QuantityLink> favoriteLinks = (await context.FavoriteBlueprints
+                .AsNoTracking()
+                .OrderBy(link => link.Id)
+                .Select(link => new { link.FavoriteId, link.BlueprintId, link.Quantity })
+                .ToListAsync())
+            .ToLookup(link => link.FavoriteId, link => new QuantityLink(link.BlueprintId, link.Quantity));
+
+        List<Blueprint> blueprints = await context.Blueprints.AsNoTracking().OrderBy(blueprint => blueprint.Id).ToListAsync();
+        List<Favorite> favorites = await context.Favorites.AsNoTracking().OrderBy(favorite => favorite.Id).ToListAsync();
+
+        return new DatasetSnapshot(
+            name,
+            categories,
+            components,
+            [
+                .. blueprints.Select(blueprint => new SnapshotBlueprint(
+                    blueprint.Id, blueprint.Name, blueprint.Description, blueprint.Value, blueprint.Yield,
+                    blueprint.ProductionTime, blueprint.CategoryId,
+                    [.. componentLinks[blueprint.Id]], [.. childLinks[blueprint.Id]]))
+            ],
+            [
+                .. favorites.Select(favorite => new SnapshotFavorite(
+                    favorite.Id, favorite.Name, [.. favoriteLinks[favorite.Id]]))
+            ]);
     }
 
     public async Task RenameAsync(int id, string name)

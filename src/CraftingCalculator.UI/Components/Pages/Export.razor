@@ -1,0 +1,60 @@
+@page "/dataset/import-export/export"
+@implements IDisposable
+
+<PageTitle>Export Data</PageTitle>
+
+<div class="dataset-page transfer-page">
+    @if (_loadError is not null)
+    {
+        <MudAlert Severity="Severity.Error" Class="transfer-alert">@_loadError</MudAlert>
+    }
+    else if (_snapshot is null || _graph is null)
+    {
+        <div class="transfer-status">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">Loading your dataset…</MudText>
+        </div>
+    }
+    else
+    {
+        @if (CycleMessage is { } cycleMessage)
+        {
+            <MudAlert Severity="Severity.Warning" Class="transfer-alert">@cycleMessage</MudAlert>
+        }
+
+        <TransferSelectionPanels Snapshot="_snapshot" Graph="_graph" Selected="_selected"
+                                 SelectionChanged="ConfigureShell" />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="transfer-action"
+                   StartIcon="@Icons.Material.Filled.Output" Disabled="@(!CanExport)" OnClick="ExportAsync">
+            Export Data
+        </MudButton>
+    }
+
+    @* Inline rather than the busy overlay: the export runs in the background, and the user is free to leave
+       and come back to it. *@
+    @if (ExportState.IsRunning)
+    {
+        <div class="transfer-status">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">Building your export…</MudText>
+        </div>
+    }
+    else
+    {
+        @if (ExportState.LastError is { } error)
+        {
+            <MudAlert Severity="Severity.Error" Class="transfer-alert">@error</MudAlert>
+        }
+
+        @if (ExportState.Latest is { } latest)
+        {
+            <div class="app-card transfer-latest">
+                <MudText Typo="Typo.subtitle1" Class="transfer-latest-title">Latest export: @latest.DatasetName</MudText>
+                <MudText Typo="Typo.body2">@latest.CreatedAt.ToLocalTime().ToString("f")</MudText>
+                <MudText Typo="Typo.caption" Class="transfer-latest-location">@latest.FileName</MudText>
+                <MudText Typo="Typo.caption" Class="transfer-latest-location">@LocationOf(latest)</MudText>
+            </div>
+        }
+    }
+</div>
