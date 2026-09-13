@@ -20,8 +20,8 @@ public static class TransferFormat
     /// <summary>The extension every export file is saved with, dot included.</summary>
     public const string FileExtension = ".ccdata";
 
-    // Platforms/iOS/Info.plist declares the same identifier. It is derived from the app id, so the app id rename
-    // before release changes it in both places.
+    // Platforms/iOS/Info.plist declares the same identifier. It is derived from the app id, so a change to the app id
+    // changes it in both places.
     /// <summary>The uniform type identifier iOS knows an export file by.</summary>
-    public const string UniformTypeIdentifier = "com.nathanmitchell.craftingcalculator.ccdata";
+    public const string UniformTypeIdentifier = "com.sterlingturd.craftingcalculator.ccdata";
 }

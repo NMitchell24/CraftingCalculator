@@ -21,7 +21,7 @@
     <Nullable>enable</Nullable>
 
     <ApplicationTitle>Crafting Calculator</ApplicationTitle>
-    <ApplicationId>com.nathanmitchell.craftingcalculator</ApplicationId>
+    <ApplicationId>com.sterlingturd.craftingcalculator</ApplicationId>
     <ApplicationDisplayVersion>2.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
