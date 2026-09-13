@@ -11,6 +11,7 @@ insert_final_newline = true
 # GitHub and kramdown all agree on - so they must survive a reformat.
 [*.md]
 trim_trailing_whitespace = false
+max_line_length = 120
 
 [*.{cs,razor,cshtml}]
 indent_size = 4

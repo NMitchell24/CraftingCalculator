@@ -47,6 +47,7 @@ public partial class Dataset : ComponentBase, IDisposable
             [
                 .. SectionSpecs.Select(spec =>
                     new PageAction(spec.Title, spec.Icon, () => OpenList(spec.Type))),
+                new PageAction("Import/Export", Icons.Material.Filled.ImportExport, OpenImportExport),
                 new PageAction("Delete all data", Icons.Material.Filled.DeleteForever, DeleteAllDataAsync)
             ]
         });
@@ -122,6 +123,12 @@ public partial class Dataset : ComponentBase, IDisposable
     private Task OpenList(DataType type)
     {
         Navigation.NavigateTo($"/dataset/{type}");
+        return Task.CompletedTask;
+    }
+
+    private Task OpenImportExport()
+    {
+        Navigation.NavigateTo("/dataset/import-export");
         return Task.CompletedTask;
     }
 

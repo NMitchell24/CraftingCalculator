@@ -106,6 +106,13 @@ want a clean slate without losing the dataset itself, use
 ![Delete all data](assets/delete-forever.svg) **Delete all data** instead. That empties the current
 dataset and leaves it standing.
 
+## Backing one up or sharing it
+
+![Dataset](assets/menu-book.svg) **Dataset** → ![Import/Export](assets/import-export.svg) **Import/Export**
+
+This is where exporting a dataset to a file, and importing one back in, is going to live. It isn't finished yet, so
+for now both of its cards just say "Coming Soon!". See [Import and Export](import-export.md).
+
 ## Where they're stored
 
 All of your datasets live side by side in the same database file on your device. There's still no

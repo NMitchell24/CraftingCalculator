@@ -28,8 +28,11 @@ public partial class ActionsBar : IDisposable
 
     [Parameter, EditorRequired] public ActionsBarMode Mode { get; set; }
 
-    /// <summary>The most slots the bar will use, the overflow menu included.</summary>
-    [Parameter] public int MaxVisible { get; set; } = 4;
+    /// <summary>
+    /// The most slots the bar will use, the overflow menu included. <see cref="int.MaxValue"/> means the
+    /// actions never overflow.
+    /// </summary>
+    [Parameter, EditorRequired] public int MaxVisible { get; set; }
 
     // At or under the cap everything fits; past it the last slot is spent on the overflow menu itself.
     // The floor is what keeps OverflowCount honest: MaxVisible is a public parameter, and a caller
