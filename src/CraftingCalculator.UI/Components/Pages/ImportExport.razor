@@ -1,0 +1,17 @@
+@page "/dataset/import-export"
+@implements IDisposable
+
+<PageTitle>Import/Export Data</PageTitle>
+
+<div class="transfer-hub">
+    @foreach (TransferCard card in Cards)
+    {
+        @* A native button rather than a div with role="button": focus and Enter/Space activation come with
+           the element. Its content has to stay phrasing content, which is why both MudTexts render spans. *@
+        <button type="button" class="app-card transfer-hub-card" @key="card.Title" @onclick="ShowComingSoon">
+            <MudIcon Icon="@card.Icon" Color="Color.Primary" Class="transfer-hub-icon" />
+            <MudText HtmlTag="span" Typo="Typo.h5" Class="display-title transfer-hub-title">@card.Title</MudText>
+            <MudText HtmlTag="span" Typo="Typo.body2" Class="transfer-hub-description">@card.Description</MudText>
+        </button>
+    }
+</div>

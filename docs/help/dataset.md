@@ -1,6 +1,6 @@
 ---
 title: The Dataset Screen
-nav_order: 9
+nav_order: 10
 ---
 
 # The Dataset Screen
@@ -42,6 +42,9 @@ directly. Tapping anywhere on the card does the same thing.
 > 
 > The **![Delete all data](assets/delete-forever.svg) Delete all data** button is 
 > covered at the bottom of this page.
+>
+> The ![Import/Export](assets/import-export.svg) **Import/Export** action opens the screen for backing up and sharing
+> your records. See [Import and Export](import-export.md).
 
 ## Inside a list
 

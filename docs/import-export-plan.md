@@ -9,15 +9,18 @@
 
 | Phase | State | Branch | PR |
 |---|---|---|---|
-| 1 — Framework (page shell, MaxVisible, drawer collapse) | **next** | `Import-Export-Phase-1` | — |
-| 2 — Data Export | not started | `Import-Export-Phase-2` | — |
+| 1 — Framework (page shell, MaxVisible, drawer collapse) | **built, awaiting commit + PR** | `Import-Export-Phase-1` | — |
+| 2 — Data Export | **next** (after Phase 1 merges) | `Import-Export-Phase-2` | — |
 | 3 — Data Import | not started | `Import-Export-Phase-3` | — |
 
-**Next session starts at:** Phase 1, step 1.1.
+**Next session starts at:** Phase 2, step 2.1, on a fresh `Import-Export-Phase-2` branch cut from `main` once
+Phase 1's PR has merged. Read **1.6 Phase 1 results** first.
 
 **Session log** (append one line per session: date, phase, what landed, what's left):
 
 - 2026-09-12 — research & design. Plan written. Decisions below settled with Nathan.
+- 2026-09-12 — Phase 1. All of 1.1–1.4 landed and verified on the Android phone emulator and Windows (see 1.6).
+  Left: Nathan commits through Rider pre-commit and opens the PR; the tablet and iOS rows of 1.5 were not run.
 
 ### Rules every session follows
 
@@ -26,8 +29,8 @@
    **Settled decisions** win.
 2. **Fresh branch per phase**, never reuse a merged one (repo squash-merges):
    `git switch main && git pull && git switch --no-track -c Import-Export-Phase-N`; first push
-   `git push -u origin Import-Export-Phase-N`. The existing `Import-Export-Phase-1` branch currently has an
-   uncommitted `.editorconfig` change — check with Nathan what it is before starting Phase 1.
+   `git push -u origin Import-Export-Phase-N`. Phase 1's branch `Import-Export-Phase-1` already exists; use
+   it rather than creating it.
 3. Before finishing: `dotnet format CraftingCalculator.Tests.slnf --verify-no-changes`, `dotnet test`,
    build warning-free, help pages updated in the same change. Commits go through Rider pre-commit (Nathan
    commits unless the Rider MCP can run those checks).
@@ -177,20 +180,20 @@ each device really has; the labeled drawer can be collapsed and remembers it.
 
 ### 1.1 Import/Export action and page
 
-- [ ] `Dataset.razor.cs:46-51` — add
+- [x] `Dataset.razor.cs:46-51` — add
   `new PageAction("Import/Export", Icons.Material.Filled.ImportExport, () => Navigate("/dataset/import-export"))`
   after the `SectionSpecs` actions, before "Delete all data".
-- [ ] New `UI/Components/Pages/ImportExport.razor` + `.razor.cs` — `@page "/dataset/import-export"`,
+- [x] New `UI/Components/Pages/ImportExport.razor` + `.razor.cs` — `@page "/dataset/import-export"`,
   `PageShellConfig("Import/Export Data") { BackHref = "/dataset" }`, `Reset(this)` in `Dispose`
   (pattern: `Settings.razor.cs`).
-- [ ] Two large square tappable cards (a shared private markup block, not a new control — single use):
+- [x] Two large square tappable cards (a shared private markup block, not a new control — single use):
   - **Export Data** — `Icons.Material.Filled.Output` — "Export any of your Categories, Components,
     Blueprints, or Favorites to back them up or share with friends."
   - **Import Data** — `Icons.Material.Filled.Input` — "Import Categories, Components, Blueprints, or
     Favorites from a backup file that you created, or one that a friend shared with you."
   - Tap → `Snackbar.Add("Coming Soon!", Severity.Info)` (Phase 2/3 replace with navigation).
   - ≥44px targets; `role="button"`, keyboard-activatable.
-- [ ] CSS in `wwwroot/app.css` (new `.transfer-hub` block near `.dataset-page`):
+- [x] CSS in `wwwroot/app.css` (new `.transfer-hub` block near `.dataset-page`):
   - portrait: one column, two rows; landscape (`@media (orientation: landscape)`): two columns.
   - each card `aspect-ratio: 1`, sized to the smaller of the track's width and height so both fit without
     scrolling: compute available height from `100dvh` minus the existing chrome vars
@@ -212,14 +215,14 @@ instances (`MainLayout.razor:57,68`):
 | Drawer, tablet | `Idiom == Tablet` | fit to height: `max(4, floor((windowHeight − appBarBottom − 3 × navLinkHeight − divider) / navLinkHeight))` |
 | Drawer, desktop | `Idiom == Desktop` (Windows now, Mac Catalyst later) | `int.MaxValue` — no overflow menu; drawer content scrolls independently |
 
-- [ ] `private int ActionsMaxVisible` in `MainLayout.razor.cs`, next to `ShowFullDrawer`. Nav-link and
+- [x] `private int ActionsMaxVisible` in `MainLayout.razor.cs`, next to `ShowFullDrawer`. Nav-link and
   divider heights: measure the rendered `MudNavLink` in the Browser pane / WebView devtools and declare
   them as named constants with an inline comment saying where the number came from.
-- [ ] Desktop scroll: `.mud-drawer .mud-drawer-content { overflow-y: auto; }` (scoped so the bottom-bar
+- [x] Desktop scroll: `.mud-drawer .mud-drawer-content { overflow-y: auto; }` (scoped so the bottom-bar
   `ActionsBar` is unaffected); verify the main content does not scroll with it.
-- [ ] Re-evaluated on every viewport notification (already re-renders via
+- [x] Re-evaluated on every viewport notification (already re-renders via
   `NotifyBrowserViewportChangeAsync`, `MainLayout.razor.cs:172`).
-- [ ] Update the `MaxVisible` XML doc to state the contract ("slots including overflow; `int.MaxValue`
+- [x] Update the `MaxVisible` XML doc to state the contract ("slots including overflow; `int.MaxValue`
   means never overflow").
 
 > **Existing smell to surface, not fix silently:** drawer-mode overflow items ignore `Active` and
@@ -229,33 +232,33 @@ instances (`MainLayout.razor:57,68`):
 
 ### 1.3 Collapsible labeled drawer
 
-- [ ] `MainLayout.razor.cs`: inject `IPreferenceStore`; `private const string DrawerCollapsedKey = "drawer_collapsed";`
+- [x] `MainLayout.razor.cs`: inject `IPreferenceStore`; `private const string DrawerCollapsedKey = "drawer_collapsed";`
   (snake_case to match `ThemeState`'s `theme_mode`). Read once in `OnInitialized`; write on toggle. No new
   state class — MainLayout is its only consumer.
-- [ ] `private bool DrawerExpanded => ShowFullDrawer && !_drawerCollapsed;` and on `MudDrawer`
+- [x] `private bool DrawerExpanded => ShowFullDrawer && !_drawerCollapsed;` and on `MudDrawer`
   (`MainLayout.razor:52`): `Open="@DrawerExpanded"`, `Variant="@(DrawerExpanded ? Persistent : Mini)"` —
   keep the existing "never `Open=true` on Mini" rule from the comment at `:47-51`.
-- [ ] App bar `.app-bar-start` (`MainLayout.razor:24-30`): when `ShowFullDrawer`, render first a
+- [x] App bar `.app-bar-start` (`MainLayout.razor:24-30`): when `ShowFullDrawer`, render first a
   `MudIconButton` with `Icons.Material.Filled.MenuOpen` (expanded) / `Icons.Material.Filled.Menu`
   (collapsed), `aria-label` "Collapse menu"/"Expand menu", then the existing back arrow. Check both fit the
   88px side track (`--app-bar-side-width`, `app.css:129`) — two 44px buttons do exactly; widen the var only
   if they don't.
-- [ ] No auto-expand/collapse: `OpenMiniOnHover` stays unset. Shrinking below 960×600 shows the Mini rail
+- [x] No auto-expand/collapse: `OpenMiniOnHover` stays unset. Shrinking below 960×600 shows the Mini rail
   as today regardless of the preference; growing back restores the user's choice.
 
 ### 1.4 Help (same change)
 
-- [ ] New `docs/help/import-export.md` (front matter `title: Import and Export`, `nav_order` after
+- [x] New `docs/help/import-export.md` (front matter `title: Import and Export`, `nav_order` after
   managing-datasets; renumber following pages' `nav_order` only if they collide). Phase 1 content: what the
   screen is for, the two cards, and an honest "both are coming soon" note.
-- [ ] `HelpTopics.cs`: `new("import-export", "Import and Export", "...", ["dataset/import-export"])` after
+- [x] `HelpTopics.cs`: `new("import-export", "Import and Export", "...", ["dataset/import-export"])` after
   `managing-datasets`.
-- [ ] `docs/help/actions-bar.md`: how many actions each device shows, the ![More](assets/more-vert.svg)
+- [x] `docs/help/actions-bar.md`: how many actions each device shows, the ![More](assets/more-vert.svg)
   overflow menu, desktop scrolling, and the ![Collapse](assets/menu-open.svg) / ![Expand](assets/menu.svg)
   toggle (update the note at `:43-44`).
-- [ ] `docs/help/dataset.md` + `managing-datasets.md`: the ![Import/Export](assets/import-export.svg)
+- [x] `docs/help/dataset.md` + `managing-datasets.md`: the ![Import/Export](assets/import-export.svg)
   action; link to `import-export.md`.
-- [ ] New icons in `docs/help/assets/` (template per skill): `import-export.svg`, `menu-open.svg`,
+- [x] New icons in `docs/help/assets/` (template per skill): `import-export.svg`, `menu-open.svg`,
   `menu.svg`, `more-vert.svg`, `output.svg`, `input.svg`. Embedded resource on Application only.
 
 ### 1.5 Phase 1 verification
@@ -266,6 +269,38 @@ instances (`MainLayout.razor:57,68`):
   height), Windows desktop (all actions, drawer scrolls when window is short, toggle collapses/expands,
   state survives restart), iOS simulator (cards fit portrait and landscape, iOS 15 `dvh`).
 - Tap both cards → "Coming Soon!". **?** on the new page opens `import-export` help.
+
+### 1.6 Phase 1 results (2026-09-12)
+
+**Verified:** format clean, 311 tests pass, Android and Windows heads build with 0 warnings.
+
+- Android phone (Pixel 9 emulator, API 37), portrait: Dataset bar shows Categories, Components, Blueprints +
+  More (Import/Export, Delete all data). Hub cards are 360px squares above the bottom nav; both toast "Coming
+  Soon!". **?** opens `import-export` and closes back to the hub.
+- Same phone, landscape: Mini rail shows 3 + More. Cards are 292px squares side by side, no scrolling.
+- Keyboard: with the IME open (viewport 997 → 685px) the list search keeps focus and filters normally.
+- Windows: all 5 actions in the drawer, no overflow menu. Collapse/expand works and survives a restart.
+  Height-only shrink below 600px hides the toggle and shows the Mini rail; growing restores the choice. A
+  short window scrolls the drawer on its own; the page does not move.
+
+**Deviations from the steps above:**
+
+- Cards are native `<button>`s rather than `div role="button"`; keyboard activation comes with the element.
+- Measured constants: `NavLinkHeight = 40`, `AppBarHeight = 48`, `ActionsDividerHeight = 17`.
+- `MainLayout` sets `ResizeOptions.NotifyOnBreakpointOnly = false`. MudBlazor's default only notifies on
+  breakpoint (width) changes, so `ShowFullDrawer`'s height gate never updated on a height-only resize, and
+  the tablet fit-to-height would have been stale.
+- The toggle uses `Edge="Edge.Start"` so its icon lines up with the drawer icons (Nathan's review). App-bar
+  icon buttons are 48px, not 44px; toggle + back arrow come to 84px and fit the 88px track.
+- `ActionsBar.MaxVisible` is now `EditorRequired` with no default, since both callers pass it.
+- `import-export.md` is `nav_order: 9`; dataset, favorites, calculations, settings and tips moved to 10–14.
+
+**Not run:** the Android tablet emulator (fit-to-height path) and the iOS simulator (`dvh`; iOS < 15.4 falls
+back to `vh` through `@supports`).
+
+**Surfaced, not fixed:** drawer overflow items ignore `Active`/`OnLongPress` (`ActionsBar.razor:58-66`). The
+right-hand app-bar pair is 96px in the 88px track (pre-existing, absorbed by the title's 8px padding; the
+`--app-bar-side-width` comment in `app.css` still says 44px buttons).
 
 ---
 

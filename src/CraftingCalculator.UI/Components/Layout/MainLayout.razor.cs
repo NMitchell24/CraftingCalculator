@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.UI.State;
 using CraftingCalculator.UI.Theme;
@@ -13,16 +14,33 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 {
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ThemeState ThemeState { get; set; } = null!;
+    [Inject] private IPreferenceStore PreferenceStore { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
     [Inject] private IBrowserViewportService ViewportService { get; set; } = null!;
 
     private const string SettingsRoute = "settings";
 
+    private const string DrawerCollapsedKey = "drawer_collapsed";
+
+    // The bottom actions bar's slot count, and a phone's in the drawer too: a landscape phone's rail is
+    // too short to hold more than that below the three destinations.
+    private const int PhoneActionsMaxVisible = 4;
+
+    // The drawer's geometry in CSS px, for fitting a tablet's actions to its height. Measured with
+    // getBoundingClientRect in the Android WebView (Pixel 9 emulator, landscape Mini rail, MudBlazor
+    // 9.7.0): the Dense app bar without its status-bar padding, one MudNavLink row, and
+    // .actions-bar-divider's 1px rule plus its 8px margins. Re-measure after a MudBlazor upgrade.
+    private const int DestinationCount = 3;
+    private const double AppBarHeight = 48;
+    private const double NavLinkHeight = 40;
+    private const double ActionsDividerHeight = 17;
+
     private MudThemeProvider _themeProvider = null!;
     private bool _isDarkMode;
     private bool _themeResolved;
     private bool _cloakDismissed;
+    private bool _drawerCollapsed;
     // The viewport subscription is opened from OnAfterRenderAsync, so the first frame is painted
     // before NotifyBrowserViewportChangeAsync has ever run. Null is that unmeasured state for this
     // component's own layout decisions; MainLayout.razor currently cascades Breakpoint.Xs as a fallback
@@ -63,6 +81,42 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // two-column craft-columns media query in app.css.
     private bool ShowFullDrawer => _windowSize is { Width: >= 960, Height: >= 600 };
 
+    // The user's collapse choice only applies where the labelled drawer could show; below the threshold
+    // the Mini rail wins regardless, and growing the window back restores the choice.
+    private bool DrawerExpanded => ShowFullDrawer && !_drawerCollapsed;
+
+    private string DrawerToggleIcon => _drawerCollapsed ? Icons.Material.Filled.Menu : Icons.Material.Filled.MenuOpen;
+
+    private string DrawerToggleLabel => _drawerCollapsed ? "Expand menu" : "Collapse menu";
+
+    private int ActionsMaxVisible
+    {
+        get
+        {
+            DeviceIdiom idiom = DeviceInfo.Current.Idiom;
+
+            if (ShowBottomNav || idiom == DeviceIdiom.Phone)
+            {
+                return PhoneActionsMaxVisible;
+            }
+
+            // A desktop window has a scroll wheel and is resized at will, so it shows every action and the
+            // drawer scrolls (app.css) rather than hiding actions behind a menu.
+            if (idiom == DeviceIdiom.Desktop)
+            {
+                return int.MaxValue;
+            }
+
+            // Every other idiom is a tablet in practice. The status-bar inset above the app bar is not known
+            // here (Android injects it into CSS only), so this can overcount by one slot on a tall inset;
+            // the drawer's own scroll absorbs that.
+            double free = (_windowSize?.Height ?? 0) - AppBarHeight - DestinationCount * NavLinkHeight
+                          - ActionsDividerHeight;
+
+            return Math.Max(PhoneActionsMaxVisible, (int)Math.Floor(free / NavLinkHeight));
+        }
+    }
+
     // Retires the startup cloak (wwwroot/index.html). Both flags are set from OnAfterRenderAsync
     // callbacks, so the first frame this is true is also the first frame the layout is fully resolved.
     private bool IsReady => _themeResolved && _breakpoint is not null;
@@ -76,6 +130,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     {
         PageShellState.Changed += StateHasChanged;
         ThemeState.Changed += OnThemeChanged;
+
+        // An absent or unrecognized stored value leaves the drawer expanded.
+        bool.TryParse(PreferenceStore.Get(DrawerCollapsedKey), out _drawerCollapsed);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -117,6 +174,12 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         };
 
         _themeResolved = true;
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerCollapsed = !_drawerCollapsed;
+        PreferenceStore.Set(DrawerCollapsedKey, _drawerCollapsed.ToString());
     }
 
     private string CurrentRoute => Navigation.ToBaseRelativePath(Navigation.Uri).TrimStart('/');
@@ -168,6 +231,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     }
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+
+    // MudBlazor notifies on breakpoint changes only by default, and breakpoints are width-only, so a
+    // height-only resize (a desktop window dragged shorter) never reached ShowFullDrawer's height gate or
+    // ActionsMaxVisible's fit-to-height.
+    ResizeOptions IBrowserViewportObserver.ResizeOptions { get; } = new() { NotifyOnBreakpointOnly = false };
 
     Task IBrowserViewportObserver.NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs args)
     {

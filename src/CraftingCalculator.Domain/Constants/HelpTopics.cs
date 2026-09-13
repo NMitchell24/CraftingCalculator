@@ -50,6 +50,10 @@ public static class HelpTopics
             "Keep a separate set of records per game, and switch between them in a tap.",
             []),
 
+        new("import-export", "Import and Export",
+            "Get your records out of the app, and someone else's in.",
+            ["dataset/import-export"]),
+
         new("dataset", "The Dataset Screen",
             "Browse, search, duplicate and delete your records.",
             ["dataset"]),

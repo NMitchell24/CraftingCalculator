@@ -147,6 +147,8 @@ html, body {
 
 .app-bar-start {
     justify-self: start;
+    display: flex;
+    align-items: center;
 }
 
 .app-bar-end {
@@ -301,6 +303,13 @@ html, body {
    The negative side margins undo MudNavMenu's own item inset so the rule spans the full rail. */
 .actions-bar-divider {
     margin: 8px -8px;
+}
+
+/* MainLayout gives a desktop drawer every one of the page's actions rather than an overflow menu, so a
+   short window has to scroll the drawer on its own. MudBlazor already caps the content at the drawer's
+   height; this is the missing overflow rule. Scoped to the drawer, so the bottom actions bar is untouched. */
+.mud-drawer .mud-drawer-content {
+    overflow-y: auto;
 }
 
 /* Cards. One shared shape for every panel on Calculate and the Dataset landing, so a "card" means the
@@ -780,6 +789,85 @@ html, body {
 .dataset-summary-card .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
+}
+
+/* Import/Export hub (Components/Pages/ImportExport.razor) */
+
+/* Both cards fit on screen without scrolling in either orientation: each is the largest square the free
+   height and its column allow. The free height is the viewport minus the chrome MainLayout draws around
+   .page-content - the app bar and its 16px gap above, and below it the page's bottom padding (16px) or,
+   at xs, the bottom nav. This page has no actions, so no actions bar. */
+.transfer-hub {
+    --transfer-hub-viewport: 100vh;
+    --transfer-hub-gap: 16px;
+    --transfer-hub-chrome: calc(var(--app-bar-bottom) + 32px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    --transfer-hub-height: calc(var(--transfer-hub-viewport) - var(--transfer-hub-chrome));
+    display: grid;
+    /* 360px caps a card so a desktop window does not grow them into billboards. */
+    grid-template-columns: minmax(0, 360px);
+    justify-content: center;
+    gap: var(--transfer-hub-gap);
+}
+
+/* dvh is the height that is actually visible once mobile browser chrome shows, and it needs Safari 15.4;
+   the iOS head's minimum is 15.0. Declared through @supports because a custom property never fails to
+   parse, so a plain second declaration could not fall back. */
+@supports (height: 100dvh) {
+    .transfer-hub {
+        --transfer-hub-viewport: 100dvh;
+    }
+}
+
+@media (max-width: 599.98px) {
+    .transfer-hub {
+        --transfer-hub-chrome: calc(var(--app-bar-bottom) + 16px + var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    }
+}
+
+/* The card is a native <button> (ImportExport.razor), so it resets the button's own font and color. */
+.transfer-hub-card {
+    width: min(100%, calc((var(--transfer-hub-height) - var(--transfer-hub-gap)) / 2));
+    aspect-ratio: 1;
+    justify-self: center;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    overflow: hidden;
+    font: inherit;
+    color: inherit;
+    text-align: center;
+    cursor: pointer;
+}
+
+.transfer-hub-card:hover {
+    background-color: var(--mud-palette-action-default-hover);
+}
+
+@media (orientation: landscape) {
+    .transfer-hub {
+        grid-template-columns: repeat(2, minmax(0, 360px));
+    }
+
+    .transfer-hub-card {
+        width: min(100%, var(--transfer-hub-height));
+    }
+}
+
+.transfer-hub-icon {
+    font-size: 3rem;
+}
+
+.transfer-hub-title,
+.transfer-hub-description {
+    display: block;
+}
+
+.transfer-hub-description {
+    color: var(--mud-palette-text-secondary);
 }
 
 /* Settings (Components/Pages/Settings.razor) */
