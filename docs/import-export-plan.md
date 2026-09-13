@@ -1,7 +1,8 @@
 # Dataset Import/Export — implementation plan
 
 > Source spec: `Z:\Scratch\Dataset-Import-Export.md`. Written 2026-09-12 in a research-and-design session;
-> Phases 1 and 2 are built; Phase 3 has not started. One phase per session. Every session updates the checkpoint below.
+> All three phases are built; Phase 3 is device-tested and waiting on its commit and PR. One phase per session. Every
+> session updates the checkpoint below.
 
 ---
 
@@ -10,12 +11,13 @@
 | Phase | State | Branch | PR |
 |---|---|---|---|
 | 1 — Framework (page shell, MaxVisible, drawer collapse) | **merged** | `Import-Export-Phase-1` | #66 |
-| 2 — Data Export | **built, awaiting commit + PR** | `Import-Export-Phase-2` | — |
-| 3 — Data Import | **next** (after Phase 2 merges) | `Import-Export-Phase-3` | — |
+| 2 — Data Export | **merged** | `Import-Export-Phase-2` | #67 |
+| 3 — Data Import | **in review** | `Import-Export-Phase-3` | #68 |
 
-**Next session starts at:** Phase 3, step 3.1, on a fresh `Import-Export-Phase-3` branch cut from `main` once
-Phase 2's PR has merged. Read **2.9 Phase 2 results** first: several Phase 3 steps lean on its deviations
-(`FindCycles` returns keys, the fixture tests' Phase 3 extension, the deferred UTI constant).
+**Next session starts at:** the PR #68 Copilot review fixes are in the working tree. Nathan device-checks "Opening
+file…" (pick, back out of the picker, pick again) on an Android API 29 image and on API 37, commits through Rider
+pre-commit, and replies to the review threads. Before merge, run the iOS simulator and iPad rows of 3.7 on the Mac.
+Replace Mine performance is a follow-up after merge: `Z:\Scratch\Import-ReplaceMine-Perf-Followup.md`.
 
 **Session log** (append one line per session: date, phase, what landed, what's left):
 
@@ -25,6 +27,24 @@ Phase 2's PR has merged. Read **2.9 Phase 2 results** first: several Phase 3 ste
 - 2026-09-12 — Phase 2. All of 2.1–2.7 landed; verified on the Android phone emulator (Valheim seed and the
   10,000-component dataset) and Windows (see 2.9). Left: Nathan commits through Rider pre-commit and opens the PR;
   the iOS simulator, Android tablet and on-device cycle-refusal rows of 2.8 were not run.
+- 2026-09-13 — Phase 3. All of 3.1–3.6 landed, plus Nathan's change to show the selected count in the panel headers
+  (see 3.8). Format clean, 473 tests pass, Windows and Android heads build with 0 warnings. Left: the whole 3.7 device
+  matrix, handed off to a fresh session; then Nathan commits through Rider pre-commit and opens the PR.
+- 2026-09-13 — Phase 3 device testing. The whole 3.7 matrix passed on the Android phone emulator (API 37) and
+  Windows, including the Windows → Android round trip and the 15,300-record file (see 3.8). No code changed. Left:
+  Nathan commits and opens the PR; iOS simulator, iPad and Android tablet not run.
+- 2026-09-13 — Phase 3 Import UI rework (see 3.9). Step cards, inline conflicts, Choose Each as panels, scroll reset
+  on step change. Left: Nathan device-checks the reworked steps, then commits and opens the PR.
+- 2026-09-13 — Phase 3 follow-up. Choose Each panel headers get select all / deselect all (see 3.9). Left: Nathan
+  device-checks it, then commits and opens the PR.
+- 2026-09-13 — Phase 3 follow-up. Audited the wizard for dead ends: Review and Invalid gain **Cancel** (start over),
+  and `MergeChosenAsync` takes the chosen snapshot as a parameter, so no early return can strand `CheckingConflicts`.
+  Windows head builds clean. Left: Nathan device-checks both Cancel buttons, then commits and opens the PR.
+- 2026-09-13 — PR #68 Copilot review. Validation caps its error list as it collects it; a new `ImportStep.OpeningFile`
+  stops a second pick or an import from starting while the picker is open or copying; `CraftState.ReloadBlueprintsAsync`
+  swaps reloaded blueprints into the live batch instead of rebuilding it from a stale copy; Android minimum API lowered
+  from 35 to 29 (D9, 3.2). Replace Mine performance deferred to a follow-up. Left: Nathan device-checks Opening file
+  on Android API 29 and 37, commits, and replies to the review.
 
 ### Rules every session follows
 
@@ -66,7 +86,7 @@ everywhere, and the labeled drawer can't be collapsed.
 | D6 | Routes: `/dataset/import-export`, `/dataset/import-export/export`, `/dataset/import-export/import`. | Literal segments beat `DatasetList`'s `/dataset/{Type}`; the Dataset nav link stays highlighted; help resolves by prefix. |
 | D7 | Defaults the spec left open, decided here: "Latest export" is the newest file in the folder regardless of dataset, and the card names the dataset it came from. Import **As New Dataset** does *not* switch to the new dataset (toast names it). Select-all on Categories asks the same "also select what uses these?" prompt as a single category. A panel header is highlighted when *any* of its records is selected. | Keep the spec's behavior, fill its gaps. Confirm with Nathan at phase start only if something reads wrong in the device run. |
 | D8 | **Cyclic blueprint data is invalid everywhere.** An import file with a cycle fails validation. An export of legacy cyclic data is refused with the blueprint names. A merge that would create a cycle is blocked. | The editor already prevents cycles; `BlueprintDAO.BuildModel`'s guard only keeps old data from crashing the app. |
-| D9 | **Android minimum API goes from 24 to 35 in Phase 3** (step 3.2). | Nathan's intended release floor; no storage permission is needed for the picker. |
+| D9 | **Android minimum API goes from 24 to 29 in Phase 3** (step 3.2). First set to 35, lowered to 29 after the PR #68 review. | 24–34 is about 55% of active devices. From 29 on MAUI's picker copies the file into the app's cache, so no storage permission is needed; below 29 it opens the file in place, which needs `READ_EXTERNAL_STORAGE`. |
 | D10 | App id becomes `com.sterlingtp.craftingcalculator` before release. No action in this feature beyond keeping the `.ccdata` UTI in one constant. | See Risks. |
 
 ---
@@ -516,7 +536,7 @@ new dataset or merge into the current one with conflict resolution. Survives nav
 
 ### 3.1 Reading and validating
 
-- [ ] `Application/BusinessLogic/Transfer/TransferDocumentReader.cs`:
+- [x] `Application/BusinessLogic/Transfer/TransferDocumentReader.cs`:
   `static ImportValidationResult Read(Stream stream)` →
   `ImportValidationResult(DatasetSnapshot? Snapshot, IReadOnlyList<string> Errors)`.
   1. Size cap before parsing (e.g. 50 MB — pick from the very-large fixture's size × 10).
@@ -535,41 +555,43 @@ new dataset or merge into the current one with conflict resolution. Survives nav
   5. Map to `DatasetSnapshot` with refs as ids.
   - No polymorphic `$type`, no reflection-based deserialization, nothing from the file is ever rendered as
     markup (Blazor text encoding) or used as a path.
-- [ ] Tests: one per error class, malicious shapes (deep nesting, huge strings, duplicate refs, dangling
+- [x] Tests: one per error class, malicious shapes (deep nesting, huge strings, duplicate refs, dangling
   refs, cycles, wrong version, truncated file), every fixture passes.
 
 ### 3.2 Picking the file
 
-- [ ] `IImportFilePicker` (Application interface) + `UI/Platform/ImportFilePicker.cs` wrapping
+- [x] `IImportFilePicker` (Application interface) + `UI/Platform/ImportFilePicker.cs` wrapping
   `FilePicker.Default.PickAsync` on the UI thread; **immediately copy** the picked stream to
   `CacheDirectory/import/current.ccdata` (iOS picker opens a security-scoped URL; Android returns a
   `content://` URI) and return that path. Validation then runs on the cached copy in `Task.Run`.
-- [ ] File types: iOS `TransferFormat.UniformTypeIdentifier` (declared in 2.3); Android — custom
+- [x] File types: iOS `TransferFormat.UniformTypeIdentifier` (declared in 2.3); Android — custom
   extensions have no MIME type, so pass `*/*` and rely on validation; Windows `.ccdata`; macOS `ccdata`.
-- [ ] **Bump Android `SupportedOSPlatformVersion` from 24 to 35** (`UI.csproj:31`), settled with Nathan.
-  On API 33+ the SAF picker needs no storage permission, so no manifest permission is added. Also update
-  `docs/dev-environment.md`'s Android section to state the minimum API, and make sure the emulator
-  images used for verification are API 35+.
-- [ ] Mac Catalyst (future head, no action now): record in `docs/dev-environment.md` that the sandbox needs
+- [x] **Raise Android `SupportedOSPlatformVersion` from 24 to 29** (`UI.csproj:31`), settled with Nathan. First
+  landed as 35 and lowered after the PR #68 review. MAUI's `FilePicker` requests no permission, but below API 29
+  `FileSystemUtils.ResolvePhysicalPath` hands back the file's real `/storage/emulated/...` path and
+  `FileResult.OpenReadAsync` opens it with `File.OpenRead`, which needs `READ_EXTERNAL_STORAGE`. From 29 on it copies
+  the file into `CacheDir`, so no manifest permission is added. `docs/dev-environment.md`'s Android section states the
+  minimum API; emulator images used for verification must be API 29+.
+- [x] Mac Catalyst (future head, no action now): record in `docs/dev-environment.md` that the sandbox needs
   `com.apple.security.app-sandbox` + `com.apple.security.files.user-selected.read-write` in
   `Platforms/MacCatalyst/Entitlements.plist` wired through `CodesignEntitlements`.
 
 ### 3.3 Writing imported data
 
-- [ ] `IDatasetDAO.ImportAsNewAsync(string name, DatasetSnapshot snapshot) → DatasetModel` — same
+- [x] `IDatasetDAO.ImportAsNewAsync(string name, DatasetSnapshot snapshot) → DatasetModel` — same
   one-context, one-transaction, navigation-linked shape as `CopyAsync` (`DatasetDAO.cs:62-243`), sourcing
   from the snapshot instead of the database. Explicit `DatasetId` on each record (`StampDataset`,
   `CraftingDataContext.cs:61-68`, already expects this).
-- [ ] **Smell to surface:** `CopyAsync` then equals `ImportAsNewAsync(name, await GetSnapshotAsync(source))`.
+- [x] **Smell to surface:** `CopyAsync` then equals `ImportAsNewAsync(name, await GetSnapshotAsync(source))`.
   Tell Nathan; offer to re-point `CopyAsync` (covered by `DatasetCopyTests`, 8 tests). Default: leave it.
-- [ ] Conflicts: `Application/BusinessLogic/Transfer/ImportConflictProcessor.cs`
+- [x] Conflicts: `Application/BusinessLogic/Transfer/ImportConflictProcessor.cs`
   `static IReadOnlyList<ImportConflict> Find(DatasetSnapshot incoming, IReadOnlySet<RecordKey> selected, DatasetSnapshot current)`
   — match by kind + name, trimmed, ordinal-ignore-case. If the current dataset already holds duplicate
   names, match the lowest id and note it inline. `ImportConflict(RecordKind Kind, int IncomingId, int ExistingId, string Name)`.
-- [ ] `MergePlan` (Domain/Models/Transfer): incoming snapshot, selected keys, and
+- [x] `MergePlan` (Domain/Models/Transfer): incoming snapshot, selected keys, and
   `IReadOnlySet<RecordKey> Replace` (incoming keys whose existing twin is overwritten; every other conflict
   is kept). Keep Mine = empty set; Replace Mine = all conflicts; Select Individually = user's picks.
-- [ ] `ImportConflictProcessor.BuildMergedGraph(MergePlan plan, DatasetSnapshot current) → DependencyGraph`,
+- [x] `ImportConflictProcessor.BuildMergedGraph(MergePlan plan, DatasetSnapshot current) → DependencyGraph`,
   checked with the shared `DependencyGraphProcessor.FindCycles` (the same finder export and validation use).
   **Answer to the spec's "double-check me":** selection dependencies don't matter for conflict choices —
   every reference resolves by name to exactly one row either way. **But mixing can create a cycle** that
@@ -578,35 +600,35 @@ new dataset or merge into the current one with conflict resolution. Survives nav
   Full Keep Mine and full Replace Mine can't produce one (proof in a test comment); Select Individually can.
   Run the check on the merged graph before writing; block with a message naming the blueprints so the user
   changes a pick.
-- [ ] `IDatasetDAO.MergeAsync(int datasetId, MergePlan plan)` — one transaction: map incoming id → target
+- [x] `IDatasetDAO.MergeAsync(int datasetId, MergePlan plan)` — one transaction: map incoming id → target
   id (existing id for conflicts, new entity for the rest); for replaced records overwrite scalar fields and,
   for blueprints/favorites, replace link rows; kept records untouched; new records' links point at mapped
   ids (existing or new).
-- [ ] DAO tests (real SQLite fixture): as-new round trip equals the source; Keep Mine links new blueprints
+- [x] DAO tests (real SQLite fixture): as-new round trip equals the source; Keep Mine links new blueprints
   to existing components; Replace Mine updates values and links and existing parents still point at the
   replaced row; individual mix; transaction rollback on failure; other datasets untouched.
 
 ### 3.4 Service + wizard state
 
-- [ ] Extend `IDatasetTransferService`: `ValidateAsync(string cachedPath)`, `ImportAsNewAsync(snapshot, selected, name)`,
+- [x] Extend `IDatasetTransferService`: `ValidateAsync(string cachedPath)`, `ImportAsNewAsync(snapshot, selected, name)`,
   `FindConflictsAsync(snapshot, selected)` (loads the current snapshot), `MergeAsync(MergePlan)`
   (runs `FindCycles` first).
-- [ ] `UI/State/ImportState.cs` (scoped): `ImportStep Step` (`SelectFile`, `Validating`, `Invalid`,
+- [x] `UI/State/ImportState.cs` (scoped): `ImportStep Step` (`SelectFile`, `Validating`, `Invalid`,
   `Review`, `CheckingConflicts`, `ResolveConflicts`, `Importing`) plus the step's data (errors, staged
   snapshot, graph, `HashSet<RecordKey>` selection, conflicts, individual picks), `event Changed`, and one
   method per transition. Every background step: `Task.Run`, catch into an error step, raise `Changed`;
   subscribers marshal with `InvokeAsync`. Selection **lives here** so the user comes back to their picks.
   `Reset()` returns to `SelectFile` and deletes the cached file.
-- [ ] After a merge into the current dataset, the Craft batch may hold stale blueprint models. **Check at
+- [x] After a merge into the current dataset, the Craft batch may hold stale blueprint models. **Check at
   phase start** what `CraftState` does after a blueprint edit in the editor today and do the same; if it
   does nothing, reload the batch's blueprints by id (don't `Clear()` the user's batch).
 
 ### 3.5 UI — `UI/Components/Pages/Import.razor(.cs)`, `@page "/dataset/import-export/import"`
 
-- [ ] `SelectFile`: one Primary button "Select Import File".
-- [ ] `Validating`: inline spinner + "Validating file…" (non-blocking).
-- [ ] `Invalid`: "This file can't be imported" + a card listing errors + "Choose another file".
-- [ ] `Review`: `TransferSelectionPanels` (from Phase 2) + Primary **Import Data** button and matching
+- [x] `SelectFile`: one Primary button "Select Import File".
+- [x] `Validating`: inline spinner + "Validating file…" (non-blocking).
+- [x] `Invalid`: "This file can't be imported" + a card listing errors + "Choose another file".
+- [x] `Review`: `TransferSelectionPanels` (from Phase 2) + Primary **Import Data** button and matching
   `PageAction` (`Icons.Material.Filled.Input`), disabled when nothing is selected. Import Data →
   `ShowMessageBoxAsync` "How would you like to import this data?" → **As New Dataset** /
   **Into '{current name}'**.
@@ -616,22 +638,22 @@ new dataset or merge into the current one with conflict resolution. Survives nav
     away; otherwise prompt built only from non-zero kinds ("3 components and 1 blueprint already exist in
     '{current}'…") → **Keep Mine** / **Replace Mine** / **Choose Each** (MudDialog with three buttons — verify
     API with the MudBlazor MCP; `ShowMessageBoxAsync` offers yes/no/cancel which fits if labeled).
-- [ ] `ResolveConflicts`: header "Tap the ones you want to replace. Everything you don't pick stays as
+- [x] `ResolveConflicts`: header "Tap the ones you want to replace. Everything you don't pick stays as
   it is."; list grouped by kind, `list-row-selected` rows; an **Import Selected** Primary button docked above
   the nav (sticky bottom container honoring `--bottom-nav-height` / safe areas; no actions bar on this
   step). Cycle-check failure → dialog naming the blueprints, stay on the step.
-- [ ] Every finish path: toast "Data Imported" (or the As-New variant), `Reset()`, and if the target was
+- [x] Every finish path: toast "Data Imported" (or the As-New variant), `Reset()`, and if the target was
   the current dataset, refresh per 3.4.
-- [ ] `ImportExport.razor.cs`: Import card navigates to the import page.
+- [x] `ImportExport.razor.cs`: Import card navigates to the import page.
 
 ### 3.6 Help
 
-- [ ] `import-export.md` import section: picking a file (per platform), what "invalid" means with the
+- [x] `import-export.md` import section: picking a file (per platform), what "invalid" means with the
   common causes as troubleshooting headings in the reader's words, review/selection (link the export
   section), As New vs Into Current, Keep/Replace/Choose Each with a worked Valheim example, the cycle
   message, cross-platform (export on PC, import on phone).
-- [ ] `managing-datasets.md`: importing creates a dataset → link.
-- [ ] Icons as needed (e.g. `input.svg` already added in Phase 1).
+- [x] `managing-datasets.md`: importing creates a dataset → link.
+- [x] Icons as needed (e.g. `input.svg` already added in Phase 1).
 
 ### 3.7 Phase 3 verification
 
@@ -642,6 +664,159 @@ new dataset or merge into the current one with conflict resolution. Survives nav
   return. Pick a `.txt` renamed to `.ccdata`, a truncated file, and a v999 file → clear errors, app stays
   responsive. Very-large fixture: validation and import keep the UI responsive; watch memory with the
   approach used for the Copy Dataset measurements (import is one insert per row too, and so is its speed).
+- [x] Run 2026-09-13 on the Android phone emulator and Windows: everything above except the iOS simulator, with the
+  Windows export imported on Android. Results in 3.8.
+
+### 3.8 Phase 3 results (2026-09-13)
+
+**Verified:** format clean, 473 tests pass (382 Application, 91 Infrastructure), Windows and Android Debug heads build
+with 0 warnings. The 3.7 device run is under **Device results** below.
+
+**Added at Nathan's request (not in 3.1–3.6):** every panel header in `TransferSelectionPanels` shows how many of its
+records are **selected**, not the static total, on Export and Import alike (`TransferSelectionProcessor.CountSelected`;
+`StateOf` now builds on it).
+
+**Deviations from the steps above:**
+
+- There is no `IDatasetTransferService.ValidateAsync`: it would only have passed a stream through. `ImportState` opens
+  the cached copy and calls `TransferDocumentReader.Read` itself, inside `Task.Run`.
+- Reader limits:
+  - file size 64 MB, checked before parsing, and the picker's copy stops one byte past it;
+  - names 10,000 characters, descriptions 1,000,000 (the editor has no limits of its own);
+  - 100,000 records per kind;
+  - refs must be at least 1.
+- Quantities have to be **at least 0**, not at least 1: the blueprint editor's row field and the Craft batch both allow
+  0, so an export can carry it. Yield is still at least 1.
+- Parsing is `JsonDocument` (`MaxDepth` 16, no comments or trailing commas), then the source-generated deserializer.
+  There is no upgrader scaffolding while V1 is the only version; a comment in `Read` marks where V2's upgrade goes.
+- The depth check counts the way `BlueprintProcessor` does (root at 0, reject above 64) and reports the deepest
+  blueprint only. `BlueprintProcessor.MaxBlueprintDepth` is now `internal`.
+- Import works on an extracted snapshot: `TransferSelectionProcessor.Extract(snapshot, selected)` (asserts `IsClosed`)
+  feeds as-new, conflicts and merge, so `ImportConflictProcessor.Find` takes `(incoming, current)` without a selection.
+- `Find` matches each existing record **at most once**: the first incoming record with that name. A second same-named
+  incoming record is added as a new one, so two incoming records never land on one row.
+- `MergePlan` is `(Incoming, Conflicts, Replace)`. `DatasetTransferService.MergeAsync(datasetId, incoming, replace)`
+  loads a fresh snapshot, finds the conflicts again, runs `ImportConflictProcessor.FindNewCycles`, and either returns
+  the blueprint names or writes. `FindNewCycles` leaves out loops the target already had, so legacy cyclic data doesn't
+  block every merge. `BuildMergedGraph` is private (`Merge`) inside it.
+- Conflict checks and merges take an explicit dataset id, captured when the user picks **Into '{name}'**. A switch
+  mid-wizard can't redirect the import.
+- `DatasetDAO.ImportAsNewAsync` is a merge with no conflicts into the freshly added dataset: both go through one
+  `StageAsync`. `MergeAsync` is a single `SaveChanges`, which is already atomic, so it opens no explicit transaction.
+- `ImportStep` gained `ConflictsFound` between `CheckingConflicts` and `ResolveConflicts`, so the Keep Mine / Replace
+  Mine / Choose Each prompt reopens if the user left during the check. The prompt is `ShowMessageBoxAsync` with
+  yes/no/cancel relabeled, backdrop click and Escape disabled. The step's page body keeps **Choose What to Do** and
+  **Cancel** buttons as a fallback.
+- A merge refused for a loop shows a persistent warning alert on `ResolveConflicts`, not a dialog, and keeps the picks.
+  A failed write goes back to Review with an error alert.
+- Review has a second action, **Choose Another File** (`FileOpen`; `docs/help/assets/file-open.svg`), for swapping the
+  staged file. `ResolveConflicts` docks **Cancel** (back to Review) beside **Import Selected**.
+- Every step the user can act on has a way back: Review and Invalid have **Cancel** (`ImportState.Reset`, back to
+  Select File), Conflicts Found and Choose Each have **Cancel** (`BackToReview`). The running steps have no controls, so
+  every path out of `Validating`, `CheckingConflicts` and `Importing` sets `Step` before it returns.
+- Checked at phase start: saving in the blueprint editor does nothing to `CraftState`. So, per 3.4, a merge into the
+  selected dataset calls the new `CraftState.ReloadBlueprintsAsync`, which reloads each batch blueprint by id and keeps
+  its quantity.
+- `UI/Components/Controls/TransferRecordKinds.cs` holds the per-kind title and icon, shared by the panels and the
+  conflict list's headings. `--transfer-row-height` moved from `.transfer-panels` to `.transfer-page` for the same
+  reason.
+- Fixtures: `TransferFixtureTests.EveryFixture_PassesImportValidation` (Application), plus
+  `TransferFixtureImportTests` (Infrastructure), which links the same fixture files through its csproj and imports each
+  one into SQLite.
+- The hub's `TransferCard.Route` is no longer nullable; the "Coming Soon!" branch is gone.
+
+**Device results (2026-09-13):** Android phone emulator (Pixel 9, API 37, APK built with `EmbedAssembliesIntoApk=true`)
+and the Windows Debug head. Format clean, 473 tests pass, both heads build with 0 warnings. Every row below was driven
+on the device and checked against the database pulled off it.
+
+- **Entry points and counts:** the Import card opens Import Data and **?** opens the Import section. Panel headers show
+  the selected count on Export and on Import's Review: deselecting Copper Ore takes 18 / 33 / 2 to 17 / 21 / 1.
+  Reselecting it brings back only the component. Blueprints come back through a category select-all, since only a
+  category offers "Select linked items?" (`TransferSelectionPanels.razor.cs`), so that's by design.
+- **Picking and validating:** backing out of the picker leaves Select as it was. Valheim validates in 261 ms, and the
+  Info dialog works on a staged blueprint and a favorite. A renamed `.txt` and a truncated file both say "damaged or
+  isn't a Crafting Calculator export file"; v999 asks for an update; a self-nesting Coal is named.
+- **As New:** name prefilled; a taken name re-asks with the name kept; toast; the user stays in their dataset. The new
+  dataset matches the source field for field and link for link. Selecting only the Longship Run favorite imports
+  exactly its dependencies (4 / 6 / 5 / 1).
+- **Into Current:** an empty dataset imports with no prompt. The prompt lists only non-zero kinds and ignores backdrop
+  taps and Escape. With a file whose Copper Ore cost and Bronze recipe were changed:
+  - Keep Mine leaves both untouched, adds no duplicates, and links new blueprints to existing rows.
+  - Replace Mine updates both, ids unchanged, all seven parents still on Bronze's id. A Craft batch of Bronze ×2 shows
+    the new recipe ($618 cost, $90 value) at the same quantity.
+  - Choose Each groups under headings and highlights picks. Cancel returns to Review with the selection kept,
+    re-entering starts with no picks, and Import Selected replaces only the pick. The docked bar sits on the nav and the
+    last row scrolls clear of it.
+  - A 70-character dataset name wraps **Into '…'** onto three lines in the how-to-import dialog. It still reads.
+- **Constructed cycle** (Cycle A / Cycle B built as files rather than exported): picking only Bronze Plate shows the
+  warning naming both blueprints, writes nothing and keeps the pick; unpicking imports.
+- **Leaving and coming back:**
+  - Review keeps its selection; ResolveConflicts keeps its picks.
+  - Validating and Importing show the right spinner or result on return.
+  - Leaving with the conflict prompt open closes it, and it reopens exactly once on return. The Android back gesture
+    does the same, stepping back in WebView history.
+  - An As New toast that finishes while the user is on Craft shows there, and Craft keeps working.
+- **Large data** (the 6.2 MB export of the 100 / 10,000 / 5,000 / 200 fixture):
+  - Validation about 3.7 s, including a trip to Craft; PSS grew about 15 MB while parsing.
+  - Review expands 10,000 components in 126 ms and scrolls at a 16 ms median frame; select all and deselect all paint
+    in under 70 ms.
+  - As New: 41 s, about 1,280 rows/s. Craft scrolled at a 16.5 ms median frame during it. PSS peaked near 515 MB,
+    up from 358 MB. The result matches the source.
+  - Merged into itself: conflict check 515 ms. Choose Each renders 29 of 15,303 rows and scrolls. Replace Mine took
+    124 s and left every id, value and link unchanged; `integrity_check` ok.
+- **Windows:** the picker filters to `.ccdata` (labeled "All files (*.ccdata)"). As New and Into Current with Keep Mine
+  work. The Windows export imports As New on Android and matches the file and the fixture exactly.
+
+**Fixed:** nothing. No row found a defect in the Phase 3 code.
+
+**Observed, left for Nathan to decide:**
+
+- Flinging fast through the 15,303-row conflict list paints blank space until `Virtualize` catches up, which takes
+  under a second. A larger `OverscanCount` would shorten it.
+- `ImportFilePicker` copies the file before the step becomes `Validating`, so the copy shows no feedback. That's well
+  under a second at 6 MB, but it could be a few seconds near the 64 MB cap. **Fixed in the PR #68 review:** the new
+  `ImportStep.OpeningFile` shows "Opening file…".
+- Replace Mine over every record is about 3× slower than As New on the same data (124 s against 41 s), because each
+  replaced blueprint's link rows are removed and added again. **Deferred** to a follow-up after Phase 3 merges (also
+  raised on PR #68); write-up in `Z:\Scratch\Import-ReplaceMine-Perf-Followup.md`.
+- Windows exports use CRLF line endings (`WriteIndented` follows `Environment.NewLine`) and a four-part `appVersion`
+  (`1.0.0.1`). Both import fine everywhere.
+- Opening Craft's blueprint picker on the 5,000-blueprint dataset took PSS to 1.35 GB. That's the known large-list
+  cost, not import.
+- `ExportFileStoreTests.GetLatest_ReturnsTheNewestExport` (Phase 2) failed once in four runs. Two saves can share a
+  `LastWriteTimeUtc`, and the name tiebreak in `ExportFileStore.Exports` then puts "Valheim…" ahead of "Rust…".
+
+**Not run:** iOS simulator and iPad (Mac), Android tablet.
+
+**Surfaced, not fixed:**
+
+- `DatasetDAO.CopyAsync` now equals `ImportAsNewAsync(name, await GetSnapshotAsync(source))`; plan default kept.
+- `TransferDocumentProcessor.ToDocument` repeats `Extract`'s closed-selection check and filter.
+- The blueprint editor still leaves a stale blueprint in the Craft batch after a save.
+
+### 3.9 Import UI rework (2026-09-13)
+
+Asked for by Nathan after the device run. It supersedes the conflict prompt and docked bar described in 3.8.
+
+- `Import.razor` renders one control per step from `UI/Components/Controls/Import`. `BaseImportControl` injects
+  `ImportState`; `ImportStepCard` is the titled card each step opens with (Step 1: Select a file, Step 2: Choose what
+  you want to import, Step 3: Resolve conflicts, Step 4: Select records to replace). Validating, CheckingConflicts and
+  Importing stay inline spinners.
+- Step 2's card shows the dataset name, `ExportedAt` and `AppVersion`. `TransferDocumentReader` now returns an
+  `ImportFile(Snapshot, ExportedAt, AppVersion)` in `ImportValidationResult.File`, and checks the app version's length
+  the way it checks a name's. `ImportState.Snapshot` became `ImportState.ImportFile`; `ImportState.CanImport` is shared
+  by the page's action and Step 2's button.
+- Conflicts no longer open a dialog. `TransferPrompts.AskConflictHandlingAsync` and `ConflictHandling` are gone;
+  `TransferPrompts.DescribeConflicts` builds Step 3's text, and its Keep Mine / Replace Mine / Choose Each / Cancel
+  buttons call `ImportState` directly.
+- Choose Each is one expansion panel per kind with a picked count, a full-width Import Selected plus the same page
+  action, and Cancel below. The heading rows and the docked `.editor-action-bar` are gone. Each header has the same
+  select-all button as the transfer panels, now the shared `SelectAllToggle` control: it calls
+  `ImportState.ReplaceAll` / `KeepAll`, with no dependency rules and no prompts.
+- Every step change scrolls the page to the top. The cause of "only 'it.' shows after an import": `.mud-main-content`'s
+  `margin-top` collapses through `.mud-layout`, so every page overhangs the viewport by 16px plus the top inset
+  (measured on Windows: a 182px page scrolls 16px). The document kept the long list's offset, clamped to that overhang.
+  The overhang itself was left for Nathan to decide.
 
 ---
 

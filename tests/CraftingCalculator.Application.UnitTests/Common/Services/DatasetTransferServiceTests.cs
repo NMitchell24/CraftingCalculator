@@ -4,6 +4,8 @@ using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Application.Common.Services.Impl;
 using CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer;
+using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using Moq;
 using NUnit.Framework;
@@ -75,6 +77,66 @@ public class DatasetTransferServiceTests
         _exportFileStore.Setup(store => store.GetLatest()).Returns(latest);
 
         _service.GetLatestExport().Should().BeSameAs(latest);
+    }
+
+    [Test]
+    public async Task ImportAsNewAsync_AddsADatasetWithTheTrimmedName()
+    {
+        DatasetModel created = new() { Id = 3, Name = "Valheim" };
+        _datasetDAO.Setup(dao => dao.ImportAsNewAsync("Valheim", BronzeChain.Snapshot)).ReturnsAsync(created);
+
+        (await _service.ImportAsNewAsync(BronzeChain.Snapshot, "  Valheim ")).Should().BeSameAs(created);
+    }
+
+    [Test]
+    public async Task FindConflictsAsync_ComparesWithTheNamedDataset()
+    {
+        DatasetSnapshot incoming = BronzeChain.Snapshot with { Categories = [], Components = [], Blueprints = [], Favorites = [BronzeChain.Snapshot.Favorites[0] with { Blueprints = [] }] };
+        _datasetDAO.Setup(dao => dao.GetSnapshotAsync(4)).ReturnsAsync(BronzeChain.Snapshot);
+
+        IReadOnlyList<ImportConflict> conflicts = await _service.FindConflictsAsync(4, incoming);
+
+        conflicts.Should().Equal(new ImportConflict(RecordKind.Favorite, 1, 1, "Bronze Axe run"));
+    }
+
+    [Test]
+    public async Task MergeAsync_WithNoLoop_WritesThePlanWithTheConflictsFoundNow()
+    {
+        HashSet<RecordKey> replace = [BronzeChain.Copper];
+        MergePlan? written = null;
+        _datasetDAO.Setup(dao => dao.GetSnapshotAsync(4)).ReturnsAsync(BronzeChain.Snapshot);
+        _datasetDAO.Setup(dao => dao.MergeAsync(4, It.IsAny<MergePlan>()))
+            .Callback<int, MergePlan>((_, plan) => written = plan)
+            .Returns(Task.CompletedTask);
+
+        IReadOnlyList<string> cycles = await _service.MergeAsync(4, BronzeChain.Snapshot, replace);
+
+        cycles.Should().BeEmpty();
+        written!.Incoming.Should().BeSameAs(BronzeChain.Snapshot);
+        written.Conflicts.Should().HaveCount(11);
+        written.Replace.Should().BeSameAs(replace);
+    }
+
+    [Test]
+    public async Task MergeAsync_ThatWouldNestABlueprintInsideItself_ReturnsItsNamesWithoutWriting()
+    {
+        // Mine: the Bronze Axe nests Bronze. The file: Bronze nests the Bronze Axe. Keeping my Axe and replacing
+        // Bronze makes a loop.
+        DatasetSnapshot incoming = BronzeChain.Snapshot with
+        {
+            Blueprints =
+            [
+                BronzeChain.Snapshot.Blueprints[0] with { Blueprints = [new QuantityLink(BronzeChain.BronzeAxe.Id, 1)] },
+                BronzeChain.Snapshot.Blueprints[1] with { Blueprints = [] }
+            ],
+            Favorites = []
+        };
+        _datasetDAO.Setup(dao => dao.GetSnapshotAsync(4)).ReturnsAsync(BronzeChain.Snapshot);
+
+        IReadOnlyList<string> cycles = await _service.MergeAsync(4, incoming, new HashSet<RecordKey> { BronzeChain.Bronze });
+
+        cycles.Should().Equal("Bronze", "Bronze Axe");
+        _datasetDAO.Verify(dao => dao.MergeAsync(It.IsAny<int>(), It.IsAny<MergePlan>()), Times.Never);
     }
 
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider

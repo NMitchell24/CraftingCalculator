@@ -33,6 +33,19 @@ public interface IDatasetDAO
     /// </summary>
     Task<DatasetSnapshot> GetSnapshotAsync(int datasetId);
 
+    /// <summary>
+    /// Adds a dataset named <paramref name="name"/> holding every record of <paramref name="snapshot"/>, linked
+    /// the way the snapshot links them, and returns it with its assigned <see cref="DatasetModel.Id"/>. Nothing is
+    /// added when any part of it fails.
+    /// </summary>
+    Task<DatasetModel> ImportAsNewAsync(string name, DatasetSnapshot snapshot);
+
+    /// <summary>
+    /// Writes <paramref name="plan"/> into <paramref name="datasetId"/> the way <see cref="MergePlan"/> describes.
+    /// Nothing is written when any part of it fails. The dataset does not have to be the selected one.
+    /// </summary>
+    Task MergeAsync(int datasetId, MergePlan plan);
+
     Task RenameAsync(int id, string name);
 
     /// <summary>

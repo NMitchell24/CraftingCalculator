@@ -1,0 +1,18 @@
+@inherits BaseImportControl
+
+<ImportStepCard Title="Step 1: Select a file">
+    <MudAlert Severity="Severity.Error">This file can't be imported.</MudAlert>
+    <ul class="transfer-errors">
+        @foreach (string problem in ImportState.ValidationErrors)
+        {
+            <li>@problem</li>
+        }
+    </ul>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
+               StartIcon="@Icons.Material.Filled.FileOpen" OnClick="ImportState.PickFileAsync">
+        Choose Another File
+    </MudButton>
+    <MudButton Variant="Variant.Text" FullWidth="true" OnClick="ImportState.Reset">
+        Cancel
+    </MudButton>
+</ImportStepCard>

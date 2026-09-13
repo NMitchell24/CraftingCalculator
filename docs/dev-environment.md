@@ -35,6 +35,10 @@ file is the "how do I actually launch it on each platform" companion.
   ```
   dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-android -c Release
   ```
+- **Minimum API is 29** (`SupportedOSPlatformVersion` in `CraftingCalculator.UI.csproj`), so emulator images and
+  devices used for testing must run API 29 or newer. From API 29 on, MAUI's file picker copies the picked file into
+  the app's cache instead of opening it where it sits, so the import needs no storage permission and the manifest
+  declares none. Below 29 it would need `READ_EXTERNAL_STORAGE` granted at runtime.
 
 ## Apple — iOS (CraftingCalculator.UI, `net10.0-ios`) — working on the Mac directly
 
@@ -73,6 +77,14 @@ pairing from Windows.
   supported combination with EF Core.
 - Data layer (`Microsoft.EntityFrameworkCore.Sqlite`) bundles native SQLite for iOS — no extra
   native-SQLite work needed.
+
+## Mac Catalyst (future head, not built yet)
+
+There is no `net10.0-maccatalyst` target today. When one is added, the import file picker needs the App Sandbox to
+allow files the user chooses: put `com.apple.security.app-sandbox` and
+`com.apple.security.files.user-selected.read-write` (both `true`) in `Platforms/MacCatalyst/Entitlements.plist`, and
+wire that file in through `CodesignEntitlements` in `CraftingCalculator.UI.csproj`. Without them the picker opens but
+the chosen file can't be read.
 
 ## No `MacOS.slnf` needed
 

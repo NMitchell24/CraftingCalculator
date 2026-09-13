@@ -45,11 +45,13 @@ public static class MauiProgram
         builder.Services.AddExportFileServices(GetExportsPath());
 
         builder.Services.AddSingleton<IClipboardService, ClipboardService>();
+        builder.Services.AddSingleton<IImportFilePicker, ImportFilePicker>();
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
         builder.Services.AddSingleton<IShareService, ShareService>();
 
         builder.Services.AddScoped<CraftState>();
         builder.Services.AddScoped<ExportState>();
+        builder.Services.AddScoped<ImportState>();
         builder.Services.AddScoped<PageShellState>();
         builder.Services.AddScoped<ThemeState>();
 

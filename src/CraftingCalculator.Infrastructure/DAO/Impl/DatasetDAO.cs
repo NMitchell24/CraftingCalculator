@@ -1,5 +1,7 @@
+using System.Collections.Frozen;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Entities;
+using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using Microsoft.EntityFrameworkCore;
@@ -162,6 +164,41 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
             ]);
     }
 
+    public async Task<DatasetModel> ImportAsNewAsync(string name, DatasetSnapshot snapshot)
+    {
+        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+
+        // Two SaveChanges calls for the reason CopyAsync gives: the records carry the new dataset's id, so its row
+        // goes in first, and the transaction keeps a failure from leaving a half-filled dataset behind.
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        Dataset dataset = new() { Name = name };
+        context.Datasets.Add(dataset);
+        await context.SaveChangesAsync();
+
+        // An empty dataset has nothing for an incoming record to land on, so this is a merge that adds every record.
+        context.DatasetId = dataset.Id;
+        await StageAsync(context, new MergePlan(snapshot, [], FrozenSet<RecordKey>.Empty));
+
+        await context.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return ToModel(dataset);
+    }
+
+    public async Task MergeAsync(int datasetId, MergePlan plan)
+    {
+        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+
+        // Scopes the reads of the matched rows, and files every added record under this dataset through StampDataset.
+        context.DatasetId = datasetId;
+
+        await StageAsync(context, plan);
+
+        // One SaveChanges, which runs in a transaction of its own, so a failure writes none of it.
+        await context.SaveChangesAsync();
+    }
+
     public async Task RenameAsync(int id, string name)
     {
         await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
@@ -310,6 +347,212 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         }
 
         context.Favorites.AddRange(copies.Values);
+    }
+
+    /// <summary>
+    /// Stages every record of <paramref name="plan"/>'s incoming snapshot into the context's dataset, landing each on
+    /// the row the plan gives it, with every link pointing at the row its target landed on.
+    /// </summary>
+    private static async Task StageAsync(CraftingDataContext context, MergePlan plan)
+    {
+        Landing landing = new(plan);
+
+        // Ordered by what a record points at, the same as CopyAsync, and for the same reason: each step hands the next
+        // a map from incoming id to the row that record landed on.
+        Dictionary<int, Category> categories = await StageCategoriesAsync(context, plan.Incoming, landing);
+        Dictionary<int, Component> components = await StageComponentsAsync(context, plan.Incoming, landing, categories);
+        Dictionary<int, Blueprint> blueprints = await StageBlueprintsAsync(context, plan.Incoming, landing, categories, components);
+        await StageFavoritesAsync(context, plan.Incoming, landing, blueprints);
+    }
+
+    private static async Task<Dictionary<int, Category>> StageCategoriesAsync(
+        CraftingDataContext context, DatasetSnapshot incoming, Landing landing)
+    {
+        List<int> matchedIds = landing.MatchedIds(RecordKind.Category);
+        Dictionary<int, Category> matched = await context.Categories
+            .Where(category => matchedIds.Contains(category.Id))
+            .ToDictionaryAsync(category => category.Id);
+        Dictionary<int, Category> rows = [];
+
+        foreach (SnapshotCategory record in incoming.Categories)
+        {
+            (Category row, bool write) = landing.Resolve(
+                RecordKind.Category, record.Id, matched, () => context.Categories.Add(new Category()).Entity);
+            rows[record.Id] = row;
+
+            if (write)
+            {
+                row.Name = record.Name;
+                row.Description = record.Description;
+            }
+        }
+
+        return rows;
+    }
+
+    private static async Task<Dictionary<int, Component>> StageComponentsAsync(
+        CraftingDataContext context, DatasetSnapshot incoming, Landing landing, Dictionary<int, Category> categories)
+    {
+        List<int> matchedIds = landing.MatchedIds(RecordKind.Component);
+        Dictionary<int, Component> matched = await context.Components
+            .Where(component => matchedIds.Contains(component.Id))
+            .ToDictionaryAsync(component => component.Id);
+        Dictionary<int, Component> rows = [];
+
+        foreach (SnapshotComponent record in incoming.Components)
+        {
+            (Component row, bool write) = landing.Resolve(
+                RecordKind.Component, record.Id, matched, () => context.Components.Add(new Component()).Entity);
+            rows[record.Id] = row;
+
+            if (!write)
+            {
+                continue;
+            }
+
+            row.Name = record.Name;
+            row.Description = record.Description;
+            row.Cost = record.Cost;
+            row.ProductionTime = record.ProductionTime;
+            row.Category = record.CategoryId is { } categoryId ? categories[categoryId] : null;
+
+            // Nulling a navigation that was never loaded is no change as far as EF can tell, so a replaced row's key
+            // is cleared directly.
+            if (row.Category is null)
+            {
+                row.CategoryId = null;
+            }
+        }
+
+        return rows;
+    }
+
+    private static async Task<Dictionary<int, Blueprint>> StageBlueprintsAsync(
+        CraftingDataContext context,
+        DatasetSnapshot incoming,
+        Landing landing,
+        Dictionary<int, Category> categories,
+        Dictionary<int, Component> components)
+    {
+        List<int> matchedIds = landing.MatchedIds(RecordKind.Blueprint);
+
+        // The links come along so a replaced blueprint's can be removed before the incoming ones go in.
+        Dictionary<int, Blueprint> matched = await context.Blueprints
+            .Include(blueprint => blueprint.Components)
+            .Include(blueprint => blueprint.Children)
+            .AsSplitQuery()
+            .Where(blueprint => matchedIds.Contains(blueprint.Id))
+            .ToDictionaryAsync(blueprint => blueprint.Id);
+        Dictionary<int, Blueprint> rows = [];
+        List<(SnapshotBlueprint Record, Blueprint Row)> written = [];
+
+        foreach (SnapshotBlueprint record in incoming.Blueprints)
+        {
+            (Blueprint row, bool write) = landing.Resolve(
+                RecordKind.Blueprint, record.Id, matched, () => context.Blueprints.Add(new Blueprint()).Entity);
+            rows[record.Id] = row;
+
+            if (!write)
+            {
+                continue;
+            }
+
+            row.Name = record.Name;
+            row.Description = record.Description;
+            row.Value = record.Value;
+            row.Yield = record.Yield;
+            row.ProductionTime = record.ProductionTime;
+            row.Category = record.CategoryId is { } categoryId ? categories[categoryId] : null;
+
+            // See StageComponentsAsync.
+            if (row.Category is null)
+            {
+                row.CategoryId = null;
+            }
+
+            context.BlueprintComponents.RemoveRange(row.Components);
+            context.BlueprintChildren.RemoveRange(row.Children);
+            row.Components.Clear();
+            row.Children.Clear();
+
+            row.Components.AddRange(record.Components.Select(link => new BlueprintComponent
+            {
+                Component = components[link.TargetId],
+                Quantity = link.Quantity
+            }));
+
+            written.Add((record, row));
+        }
+
+        // Both ends of a child link are blueprints, so these wait until every incoming blueprint has a row: the one
+        // nested inside another is as likely as not to be further down the list.
+        foreach ((SnapshotBlueprint record, Blueprint row) in written)
+        {
+            row.Children.AddRange(record.Blueprints.Select(link => new BlueprintChild
+            {
+                Child = rows[link.TargetId],
+                Quantity = link.Quantity
+            }));
+        }
+
+        return rows;
+    }
+
+    private static async Task StageFavoritesAsync(
+        CraftingDataContext context, DatasetSnapshot incoming, Landing landing, Dictionary<int, Blueprint> blueprints)
+    {
+        List<int> matchedIds = landing.MatchedIds(RecordKind.Favorite);
+        Dictionary<int, Favorite> matched = await context.Favorites
+            .Include(favorite => favorite.FavoriteBlueprints)
+            .Where(favorite => matchedIds.Contains(favorite.Id))
+            .ToDictionaryAsync(favorite => favorite.Id);
+
+        foreach (SnapshotFavorite record in incoming.Favorites)
+        {
+            (Favorite row, bool write) = landing.Resolve(
+                RecordKind.Favorite, record.Id, matched, () => context.Favorites.Add(new Favorite()).Entity);
+
+            if (!write)
+            {
+                continue;
+            }
+
+            row.Name = record.Name;
+
+            context.FavoriteBlueprints.RemoveRange(row.FavoriteBlueprints);
+            row.FavoriteBlueprints.Clear();
+            row.FavoriteBlueprints.AddRange(record.Blueprints.Select(link => new FavoriteBlueprint
+            {
+                Blueprint = blueprints[link.TargetId],
+                Quantity = link.Quantity
+            }));
+        }
+    }
+
+    /// <summary>Which row of the dataset each incoming record of a <see cref="MergePlan"/> lands on.</summary>
+    private sealed class Landing(MergePlan plan)
+    {
+        private readonly Dictionary<RecordKey, int> _matchedIds = plan.Conflicts.ToDictionary(
+            conflict => new RecordKey(conflict.Kind, conflict.IncomingId), conflict => conflict.ExistingId);
+
+        /// <summary>The ids of the dataset's records of <paramref name="kind"/> that an incoming record lands on.</summary>
+        public List<int> MatchedIds(RecordKind kind) =>
+            [.. plan.Conflicts.Where(conflict => conflict.Kind == kind).Select(conflict => conflict.ExistingId)];
+
+        /// <summary>
+        /// The row the incoming record <paramref name="incomingId"/> of <paramref name="kind"/> lands on, and whether
+        /// its fields are written to it: the matched row from <paramref name="matchedRows"/>, written only when the
+        /// plan replaces it, or else a new row from <paramref name="addRow"/>.
+        /// </summary>
+        public (TEntity Row, bool Write) Resolve<TEntity>(
+            RecordKind kind, int incomingId, Dictionary<int, TEntity> matchedRows, Func<TEntity> addRow)
+        {
+            RecordKey key = new(kind, incomingId);
+
+            return _matchedIds.TryGetValue(key, out int existingId)
+                ? (matchedRows[existingId], plan.Replace.Contains(key))
+                : (addRow(), true);
+        }
     }
 
     private static DatasetModel ToModel(Dataset entity) => new()

@@ -1,0 +1,7 @@
+@* The expansion panel header toggles the panel on any click inside it, so this stops its click (and a keyboard Enter)
+   before it gets there. *@
+<span class="transfer-panel-toggle" @onclick="() => { }" @onclick:stopPropagation="true"
+      @onkeydown="() => { }" @onkeydown:stopPropagation="true">
+    <MudIconButton Icon="@Icon" Color="@IconColor" Disabled="@Disabled" title="@Label" aria-label="@Label"
+                   OnClick="@(() => OnToggle.InvokeAsync())" />
+</span>

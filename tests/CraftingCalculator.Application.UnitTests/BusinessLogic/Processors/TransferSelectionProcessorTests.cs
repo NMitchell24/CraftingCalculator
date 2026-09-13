@@ -287,6 +287,15 @@ public class TransferSelectionProcessorTests
         TransferSelectionProcessor.StateOf(empty, new HashSet<RecordKey>(), RecordKind.Favorite).Should().Be(SelectionState.None);
     }
 
+    [TestCase(0, 3, SelectionState.None)]
+    [TestCase(2, 3, SelectionState.Some)]
+    [TestCase(3, 3, SelectionState.All)]
+    [TestCase(0, 0, SelectionState.None)]
+    public void StateOf_Counts_ReportsNoneSomeAndAll(int selected, int count, SelectionState expected)
+    {
+        TransferSelectionProcessor.StateOf(selected, count).Should().Be(expected);
+    }
+
     [Test]
     public void IsClosed_EverySelectionTheRulesProduce_IsClosed()
     {
@@ -316,5 +325,37 @@ public class TransferSelectionProcessorTests
 
         TransferSelectionProcessor.Select(graph, new HashSet<RecordKey>(), new RecordKey(RecordKind.Blueprint, 1))
             .Added.Should().HaveCount(2);
+    }
+
+    [Test]
+    public void CountSelected_CountsOnlyTheKindAsked()
+    {
+        HashSet<RecordKey> selected = [Metals, Copper, Tin, Bronze];
+
+        TransferSelectionProcessor.CountSelected(Graph, selected, RecordKind.Component).Should().Be(2);
+        TransferSelectionProcessor.CountSelected(Graph, selected, RecordKind.Favorite).Should().Be(0);
+    }
+
+    [Test]
+    public void Extract_KeepsTheSelectedRecordsWithTheirIdsAndLinks()
+    {
+        HashSet<RecordKey> selected = [Metals, Copper, Tin, Bronze];
+
+        DatasetSnapshot extract = TransferSelectionProcessor.Extract(Snapshot, selected);
+
+        extract.Should().BeEquivalentTo(new DatasetSnapshot(
+            "Valheim",
+            [Snapshot.Categories[0]],
+            [Snapshot.Components[0], Snapshot.Components[1]],
+            [Snapshot.Blueprints[0]],
+            []));
+    }
+
+    [Test]
+    public void Extract_ASelectionMissingADependency_Throws()
+    {
+        Action act = () => TransferSelectionProcessor.Extract(Snapshot, new HashSet<RecordKey> { Bronze });
+
+        act.Should().Throw<InvalidOperationException>();
     }
 }

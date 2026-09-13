@@ -1,0 +1,67 @@
+@page "/dataset/import-export/import"
+@using CraftingCalculator.UI.Components.Controls.Import
+@implements IDisposable
+
+<PageTitle>Import Data</PageTitle>
+
+@{
+    // Inline rather than the busy overlay: every step runs in the background, and the user is free to leave and come
+    // back to it.
+    RenderFragment Status(string message) =>
+        @<div class="transfer-status">
+             <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary"/>
+             <MudText Typo="Typo.body1">@message</MudText>
+         </div>;
+}
+
+<div class="dataset-page transfer-page">
+    @if (ImportState.Error is { } error)
+    {
+        <MudAlert Severity="Severity.Error" Class="transfer-alert">@error</MudAlert>
+    }
+
+    @switch (ImportState.Step)
+    {
+        case ImportStep.SelectFile:
+            <ImportSelectFile />
+            break;
+
+        case ImportStep.OpeningFile:
+            @Status("Opening file…")
+            break;
+
+        case ImportStep.Validating:
+            @Status("Validating file…")
+            break;
+
+        case ImportStep.Invalid:
+            <ImportInvalidFile />
+            break;
+
+        case ImportStep.Review:
+            <ImportReview OnImport="ImportDataAsync" SelectionChanged="ConfigureShell" />
+            break;
+
+        case ImportStep.CheckingConflicts:
+            @Status("Checking for conflicts…")
+            break;
+
+        case ImportStep.ConflictsFound:
+            <ImportConflicts />
+            break;
+
+        case ImportStep.ResolveConflicts:
+            <ImportChooseEach OnImport="ImportSelectedAsync" />
+            break;
+
+        case ImportStep.Importing:
+            @Status("Importing your data…")
+            break;
+        default:
+            // IMPORTANT: Any new Import State must have a UI component created before release. To skip that would leave
+            // Import in a broken state. The following component was added as a default. Users of the app should NEVER
+            // see this.
+            <ImportStepUndefined />
+            break;
+    }
+</div>

@@ -54,6 +54,10 @@ same way you built the first one.
 Names have to be unique. If you try to reuse one, the app says so and hands your text back to you to
 edit rather than making you type the whole thing again.
 
+Got an export file instead, from a friend or from your own PC?
+[Import it as a new dataset](import-export.md#as-a-new-dataset-or-into-this-one) and it starts out full rather than
+empty.
+
 > **Tip:** Starting a modded run, or a new wipe with different rules? Make a second dataset instead of
 > editing the one you already trust. Your old numbers stay intact, and you can flip between them to
 > compare. And if the new one is mostly the same as the old one, copy it rather than starting empty.
@@ -110,9 +114,9 @@ dataset and leaves it standing.
 
 ![Dataset](assets/menu-book.svg) **Dataset** → ![Import/Export](assets/import-export.svg) **Import/Export**
 
-This is where you export a dataset to a file, and where importing one back in is going to live. Export works now:
-pick what goes in, save it, and share the file wherever you like. Import isn't finished yet, so its card still says
-"Coming Soon!". See [Import and Export](import-export.md).
+This is where you export a dataset to a file, and where you bring one back in. Export saves what you pick to a file
+you can share wherever you like. Import reads a file like that and turns it into a new dataset, or adds it to the one
+you're in. See [Import and Export](import-export.md).
 
 ## Where they're stored
 
