@@ -123,6 +123,30 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   the full list. `Microsoft.Data.Sqlite` enables `PRAGMA foreign_keys` per connection so DB-side
   cascade actually fires; don't reintroduce hand-written cleanup loops in services.
 
+## Export file format (`.ccdata`) — backward compatibility is mandatory
+
+Every export file a released build has ever written has to import into every later build. **Any change to
+an exported entity, to the `Snapshot*` records, or to the document types in
+`Application/BusinessLogic/Transfer/Format` follows
+[`docs/transfer-format-maintenance.md`](../../../docs/transfer-format-maintenance.md)** — read it before
+touching them. The short version:
+
+- One set of document types describes the newest version only; a new member is added last, with a default
+  an older file implies, and is never required.
+- `TransferFormat.CurrentVersion` is bumped **at most once per released app version**, and only when the
+  file changed. If it equals `TransferFormat.LatestShippedVersion`, users have files of it: bump it and check
+  a fresh export in under `tests/.../Transfer/Fixtures/v{n}`. If it is already ahead, it is in development:
+  regenerate `Fixtures/v{CurrentVersion}` in place and do **not** bump (`WriteTheCurrentBronzeChainFixture`,
+  an explicit test, regenerates `bronze-chain.ccdata`; `valheim.ccdata` is exported from a running app).
+  Shipped versions' fixtures are never edited.
+- A change that cannot be additive to a **shipped** version gets a JSON-level upgrade step in
+  `TransferDocumentReader.Read`, never a `V2` copy of the types. An unshipped version needs no upgrade step.
+- After a release: bump `ApplicationDisplayVersion` and set `LatestShippedVersion = CurrentVersion` in the
+  same commit.
+- `TransferSchemaTripwireTests` fails when an exported entity gains, loses or renames a column: decide
+  whether the file carries it, follow the doc, then update its pinned list. `TransferFixtureTests` fails
+  until the current version's fixture matches the writer's output.
+
 ## UI (Blazor + MudBlazor)
 
 - Pages in `src/CraftingCalculator.UI/Components/Pages` (`@page "/..."`), reusable controls in

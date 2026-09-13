@@ -2,7 +2,6 @@ using System.Text.Json;
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
 using CraftingCalculator.Domain.Models.Transfer;
 using CraftingCalculator.Infrastructure.Files;
 
@@ -32,9 +31,9 @@ public class ExportFileStoreTests
         }
     }
 
-    private static TransferDocumentV1 Document(string datasetName, DateTimeOffset exportedAt) =>
+    private static TransferDocument Document(string datasetName, DateTimeOffset exportedAt) =>
         new(TransferFormat.Name, TransferFormat.CurrentVersion, exportedAt, "1.0", datasetName,
-            [new CategoryV1(1, "Metals", "")], [], [], []);
+            [new TransferCategory(1, "Metals", "")], [], [], []);
 
     private static string ExpectedName(string stem, DateTimeOffset exportedAt) =>
         $"{stem}-{exportedAt.ToLocalTime():yyyyMMdd-HHmmss}{TransferFormat.FileExtension}";
@@ -70,14 +69,14 @@ public class ExportFileStoreTests
     [Test]
     public async Task SaveAsync_WritesTheDocumentAndNoTempFile()
     {
-        TransferDocumentV1 document = Document("Valheim", FirstExport);
+        TransferDocument document = Document("Valheim", FirstExport);
 
         ExportFileInfo saved = await _store.SaveAsync(document);
 
         Directory.GetFiles(_directory).Should().Equal(saved.FullPath);
 
         await using FileStream stream = File.OpenRead(saved.FullPath);
-        (await JsonSerializer.DeserializeAsync(stream, TransferJsonContext.Default.TransferDocumentV1))
+        (await JsonSerializer.DeserializeAsync(stream, TransferJsonContext.Default.TransferDocument))
             .Should().BeEquivalentTo(document);
     }
 

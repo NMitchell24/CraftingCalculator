@@ -22,7 +22,7 @@
 
     <ApplicationTitle>Crafting Calculator</ApplicationTitle>
     <ApplicationId>com.nathanmitchell.craftingcalculator</ApplicationId>
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>2.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <!-- 15.0: the BlazorWebView surface this app is built on is annotated [SupportedOSPlatform("ios15.0")]

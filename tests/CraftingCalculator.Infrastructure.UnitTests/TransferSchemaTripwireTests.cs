@@ -5,15 +5,17 @@ using Microsoft.EntityFrameworkCore.Metadata;
 namespace CraftingCalculator.Infrastructure.UnitTests;
 
 /// <summary>
-/// Fails when an entity that export files carry gains, loses or renames a column. The export format is
-/// frozen per version, so a schema change has to be a decision: does the file need a new format version,
-/// or is the new column deliberately left out of it? Make that call, then update the list here.
+/// Fails when an entity that export files carry gains, loses or renames a column. A schema change has to be a
+/// decision: does the export file carry it, or is it deliberately left out? A column the file carries changes the
+/// format: a version bump and a new fixture if the current version has shipped, regenerated fixtures if it has not
+/// (docs/transfer-format-maintenance.md). Make that call, then update the list here.
 /// </summary>
 [TestFixture]
 public class TransferSchemaTripwireTests
 {
     private const string Decide =
-        "an exported entity changed: decide whether the export format needs a new version, then update this list";
+        "an exported entity changed: decide whether the export file carries the change, then follow "
+        + "docs/transfer-format-maintenance.md and update this list";
 
     private static readonly (Type Entity, string[] Properties)[] Pinned =
     [

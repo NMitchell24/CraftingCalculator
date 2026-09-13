@@ -2,7 +2,7 @@
   "format": "crafting-calculator-dataset",
   "formatVersion": 1,
   "exportedAt": "2026-09-13T04:15:22.5432853+00:00",
-  "appVersion": "1.0",
+  "appVersion": "2.0",
   "datasetName": "Valheim",
   "categories": [
     {

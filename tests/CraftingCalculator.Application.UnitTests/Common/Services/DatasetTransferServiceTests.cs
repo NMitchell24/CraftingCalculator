@@ -1,5 +1,5 @@
 using AwesomeAssertions;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
+using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Application.Common.Services.Impl;
@@ -46,9 +46,9 @@ public class DatasetTransferServiceTests
     {
         HashSet<RecordKey> selected = [BronzeChain.Metals, BronzeChain.Copper];
         ExportFileInfo saved = new("/exports/Valheim.ccdata", "Valheim.ccdata", "Valheim", Now);
-        TransferDocumentV1? written = null;
-        _exportFileStore.Setup(store => store.SaveAsync(It.IsAny<TransferDocumentV1>()))
-            .Callback<TransferDocumentV1>(document => written = document)
+        TransferDocument? written = null;
+        _exportFileStore.Setup(store => store.SaveAsync(It.IsAny<TransferDocument>()))
+            .Callback<TransferDocument>(document => written = document)
             .ReturnsAsync(saved);
 
         ExportFileInfo result = await _service.ExportAsync(BronzeChain.Snapshot, selected, "1.2");
@@ -67,7 +67,7 @@ public class DatasetTransferServiceTests
         Func<Task> act = () => _service.ExportAsync(BronzeChain.Snapshot, selected, "1.0");
 
         await act.Should().ThrowAsync<InvalidOperationException>();
-        _exportFileStore.Verify(store => store.SaveAsync(It.IsAny<TransferDocumentV1>()), Times.Never);
+        _exportFileStore.Verify(store => store.SaveAsync(It.IsAny<TransferDocument>()), Times.Never);
     }
 
     [Test]

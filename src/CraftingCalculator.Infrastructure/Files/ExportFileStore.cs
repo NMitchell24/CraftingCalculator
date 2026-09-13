@@ -2,7 +2,6 @@ using System.Buffers;
 using System.Text.Json;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models.Transfer;
 
@@ -26,7 +25,7 @@ public class ExportFileStore(string directory) : IExportFileStore
     // of the dataset. Generous against a long dataset name.
     private const int HeaderBytes = 64 * 1024;
 
-    public async Task<ExportFileInfo> SaveAsync(TransferDocumentV1 document)
+    public async Task<ExportFileInfo> SaveAsync(TransferDocument document)
     {
         Directory.CreateDirectory(directory);
 
@@ -44,7 +43,7 @@ public class ExportFileStore(string directory) : IExportFileStore
         // be picked up as the latest export.
         await using (FileStream stream = File.Create(tempPath))
         {
-            await JsonSerializer.SerializeAsync(stream, document, TransferJsonContext.Default.TransferDocumentV1);
+            await JsonSerializer.SerializeAsync(stream, document, TransferJsonContext.Default.TransferDocument);
         }
 
         File.Move(tempPath, path);
@@ -111,15 +110,15 @@ public class ExportFileStore(string directory) : IExportFileStore
                 string property = reader.GetString()!;
                 reader.Read();
 
-                if (property == HeaderName(nameof(TransferDocumentV1.Format)))
+                if (property == HeaderName(nameof(TransferDocument.Format)))
                 {
                     format = reader.GetString();
                 }
-                else if (property == HeaderName(nameof(TransferDocumentV1.ExportedAt)))
+                else if (property == HeaderName(nameof(TransferDocument.ExportedAt)))
                 {
                     exportedAt = reader.GetDateTimeOffset();
                 }
-                else if (property == HeaderName(nameof(TransferDocumentV1.DatasetName)))
+                else if (property == HeaderName(nameof(TransferDocument.DatasetName)))
                 {
                     datasetName = reader.GetString();
                 }

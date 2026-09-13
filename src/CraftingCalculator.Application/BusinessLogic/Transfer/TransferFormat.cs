@@ -9,6 +9,14 @@ public static class TransferFormat
     /// <summary>The <c>formatVersion</c> this build of the app writes.</summary>
     public const int CurrentVersion = 1;
 
+    /// <summary>
+    /// The newest <c>formatVersion</c> a released build of the app has written, or 0 before the first release that
+    /// exports. Fixtures up to this version are frozen; the current version's are regenerated while it is in
+    /// development (docs/transfer-format-maintenance.md).
+    /// </summary>
+    // Set to CurrentVersion as the first step after every release, together with the ApplicationDisplayVersion bump.
+    public const int LatestShippedVersion = 0;
+
     /// <summary>The extension every export file is saved with, dot included.</summary>
     public const string FileExtension = ".ccdata";
 

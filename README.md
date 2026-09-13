@@ -96,6 +96,15 @@ dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-w
 dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-ios -c Release   # macOS only
 ```
 
+### The export file format
+
+Datasets export to `.ccdata` files, and **every file a released build has ever written has to import into
+every later build.** Adding a column or a table to an exported record therefore follows a fixed procedure: a
+defaulted member on the document types and a regenerated fixture export that CI imports forever, plus a
+format version bump when the current version has already shipped (at most one per release). The steps, with
+code, are in [docs/transfer-format-maintenance.md](docs/transfer-format-maintenance.md).
+`TransferSchemaTripwireTests` fails when an exported entity changes, which is the prompt to go there.
+
 `global.json` pins the SDK to stable .NET 10. Running the app from an IDE, the Android JDK/SDK
 requirements and the Apple toolchain setup are in [docs/dev-environment.md](docs/dev-environment.md);
 architecture and code conventions are in [CLAUDE.md](CLAUDE.md) and the `craftingcalculator-dev`

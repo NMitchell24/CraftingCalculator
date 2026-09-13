@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
 
 namespace CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 
@@ -14,5 +13,5 @@ namespace CraftingCalculator.Application.BusinessLogic.Transfer.Format;
     UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
     RespectNullableAnnotations = true,
     RespectRequiredConstructorParameters = true)]
-[JsonSerializable(typeof(TransferDocumentV1))]
+[JsonSerializable(typeof(TransferDocument))]
 public partial class TransferJsonContext : JsonSerializerContext;
