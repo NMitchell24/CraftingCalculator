@@ -4,7 +4,6 @@ using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using CraftingCalculator.UI.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 
 // MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
@@ -110,9 +109,6 @@ public partial class TransferSelectionPanels : ComponentBase
             await OfferUsersAsync([row.Key], subject);
         }
     }
-
-    private Task OnRowKeyDownAsync(KeyboardEventArgs args, Row row) =>
-        args.Key is "Enter" or " " ? ToggleRowAsync(row) : Task.CompletedTask;
 
     private async Task ToggleAllAsync(PanelSpec panel, SelectionState state)
     {

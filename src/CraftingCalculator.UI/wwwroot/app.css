@@ -942,8 +942,22 @@ html, body {
     gap: 4px;
     box-sizing: border-box;
     height: var(--transfer-row-height);
-    padding-left: 12px;
     border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+/* Fills the row up to the Info button, so a tap anywhere else on the row selects it. */
+.transfer-row-select {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0 0 12px;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
     cursor: pointer;
 }
 

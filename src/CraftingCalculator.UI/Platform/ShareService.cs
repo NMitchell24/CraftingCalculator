@@ -1,3 +1,6 @@
+#if ANDROID
+using CraftingCalculator.Application.BusinessLogic.Transfer;
+#endif
 using CraftingCalculator.Application.Common.Interfaces;
 
 namespace CraftingCalculator.UI.Platform;
@@ -29,6 +32,17 @@ public class ShareService : IShareService
         Directory.CreateDirectory(root);
 
         string copy = Path.Combine(root, Path.GetFileName(path));
+
+        // Only the newest export is ever shared, so earlier copies go now rather than once RequestAsync returns:
+        // it returns when the share sheet opens, while the app the file went to may still be reading it. Only
+        // export files are removed, so anything else shared through this folder is left alone.
+        foreach (string earlier in Directory.EnumerateFiles(
+                     root, $"*{TransferFormat.FileExtension}")
+                     .Where(file => file != copy))
+        {
+            File.Delete(earlier);
+        }
+
         File.Copy(path, copy, overwrite: true);
 
         return copy;

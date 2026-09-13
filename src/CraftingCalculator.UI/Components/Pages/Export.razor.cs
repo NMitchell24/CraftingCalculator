@@ -26,6 +26,7 @@ public partial class Export : ComponentBase, IDisposable
     private IReadOnlySet<RecordKey> _cyclic = new HashSet<RecordKey>();
     private string? _loadError;
     private readonly HashSet<RecordKey> _selected = [];
+    private bool _disposed;
 
     /// <summary>The selected blueprints that end up nested inside themselves, which no export may contain.</summary>
     private List<string> SelectedCycleNames =>
@@ -84,6 +85,13 @@ public partial class Export : ComponentBase, IDisposable
             // No ErrorBoundary exists, so a throw out of a load path freezes the whole app.
             Debug.WriteLine(exception);
             _loadError = "Your dataset couldn't be loaded for export. Go back and try again.";
+        }
+
+        // The user can leave while the load runs. Blazor configures the incoming page before disposing this
+        // one, so configuring now would take the shell back from that page with nothing left to reset it.
+        if (_disposed)
+        {
+            return;
         }
 
         ConfigureShell();
@@ -151,6 +159,7 @@ public partial class Export : ComponentBase, IDisposable
 
     public void Dispose()
     {
+        _disposed = true;
         ExportState.Changed -= OnExportChanged;
         PageShellState.Reset(this);
     }

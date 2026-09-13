@@ -27,16 +27,18 @@
             <ChildContent>
                 <div class="transfer-rows">
                     <Virtualize Items="rows" ItemSize="RowHeight" Context="row">
-                        <div @key="row.Key" class="@RowClass(row)" role="button" tabindex="0"
-                             aria-pressed="@(Selected.Contains(row.Key) ? "true" : "false")"
-                             @onclick="@(() => ToggleRowAsync(row))" @onkeydown="@(args => OnRowKeyDownAsync(args, row))">
-                            <span class="transfer-row-name">@row.Name</span>
-                            <span @onclick="() => { }" @onclick:stopPropagation="true"
-                                  @onkeydown="() => { }" @onkeydown:stopPropagation="true">
-                                <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Primary"
-                                               title="@($"About {row.Name}")" aria-label="@($"About {row.Name}")"
-                                               OnClick="@(() => ShowInfoAsync(row))" />
-                            </span>
+                        @* Select and Info are sibling native buttons: a button cannot hold another interactive
+                           control, and the native element brings focus and Enter/Space activation without the
+                           page scrolling on Space. *@
+                        <div @key="row.Key" class="@RowClass(row)">
+                            <button type="button" class="transfer-row-select"
+                                    aria-pressed="@(Selected.Contains(row.Key) ? "true" : "false")"
+                                    @onclick="@(() => ToggleRowAsync(row))">
+                                <span class="transfer-row-name">@row.Name</span>
+                            </button>
+                            <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Primary"
+                                           title="@($"About {row.Name}")" aria-label="@($"About {row.Name}")"
+                                           OnClick="@(() => ShowInfoAsync(row))" />
                         </div>
                     </Virtualize>
                 </div>

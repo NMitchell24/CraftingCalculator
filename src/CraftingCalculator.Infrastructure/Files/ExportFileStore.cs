@@ -49,18 +49,21 @@ public class ExportFileStore(string directory) : IExportFileStore
 
         File.Move(tempPath, path);
 
-        foreach (FileInfo old in ExportFiles().Skip(KeptExports))
+        foreach (ExportFileInfo old in Exports().Skip(KeptExports))
         {
-            old.Delete();
+            File.Delete(old.FullPath);
         }
 
         return new ExportFileInfo(path, Path.GetFileName(path), document.DatasetName, document.ExportedAt);
     }
 
-    public ExportFileInfo? GetLatest() => ExportFiles().Select(TryReadHeader).FirstOrDefault(info => info is not null);
+    public ExportFileInfo? GetLatest() => Exports().FirstOrDefault();
 
     /// <summary>The export files in the folder, newest first.</summary>
-    private IEnumerable<FileInfo> ExportFiles()
+    private IEnumerable<ExportFileInfo> Exports() => FilesWithExportExtension().Select(TryReadHeader).OfType<ExportFileInfo>();
+
+    /// <summary>The files in the folder with the export extension, newest first, whether or not they are exports.</summary>
+    private IEnumerable<FileInfo> FilesWithExportExtension()
     {
         DirectoryInfo folder = new(directory);
 

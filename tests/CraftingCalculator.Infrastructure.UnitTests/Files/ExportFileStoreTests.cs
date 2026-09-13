@@ -135,6 +135,25 @@ public class ExportFileStoreTests
     }
 
     [Test]
+    public async Task SaveAsync_AFileThatIsNotAnExport_DoesNotTakeTheSlotOfARealOne()
+    {
+        Directory.CreateDirectory(_directory);
+        string impostor = Path.Combine(_directory, $"Renamed{TransferFormat.FileExtension}");
+        await File.WriteAllTextAsync(impostor, "definitely not json");
+        File.SetLastWriteTimeUtc(impostor, DateTime.UtcNow.AddHours(1));
+        List<ExportFileInfo> saved = [];
+
+        for (int export = 0; export < 6; export++)
+        {
+            saved.Add(await _store.SaveAsync(Document("Valheim", FirstExport.AddMinutes(export))));
+        }
+
+        File.Exists(impostor).Should().BeTrue();
+        File.Exists(saved[0].FullPath).Should().BeFalse();
+        saved.Skip(1).Should().OnlyContain(export => File.Exists(export.FullPath));
+    }
+
+    [Test]
     public void GetLatest_NoFolderYet_ReturnsNull() => _store.GetLatest().Should().BeNull();
 
     [Test]
