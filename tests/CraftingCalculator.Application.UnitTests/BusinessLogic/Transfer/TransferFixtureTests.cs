@@ -112,6 +112,7 @@ public class TransferFixtureTests
             BronzeChain.AxeRun, BronzeChain.KarvePrep
         ];
 
+        // Fixed inputs, not the clock or the build's version, so the fixture is reproducible.
         return TransferDocumentProcessor.ToDocument(
             BronzeChain.Snapshot, everything, new DateTimeOffset(2026, 9, 12, 18, 4, 0, TimeSpan.Zero), "2.0");
     }

@@ -225,12 +225,14 @@ Example: `cost` on a component becomes `unitCost`, and it is per unit rather tha
    the parsed JSON. Sketch, to be written against the real change:
 
    ```csharp
-   // TransferDocumentReader.Read, replacing the plain Deserialize call
-   JsonNode root = JsonNode.Parse(stream, documentOptions: ParseOptions)!;
+   // TransferDocumentReader.Read, inside the using after CheckFormat, replacing the plain Deserialize call.
+   // The stream is already consumed, so the node is built from the parsed root, which must stay undisposed.
+   JsonObject root = JsonObject.Create(json.RootElement)!;
 
-   for (int version = FormatVersionOf(root); version < TransferFormat.CurrentVersion; version++)
+   for (int version = json.RootElement.GetProperty(JsonName(nameof(TransferDocument.FormatVersion))).GetInt32();
+        version < TransferFormat.CurrentVersion; version++)
    {
-       TransferUpgrades.Apply(root.AsObject(), version);   // version → version + 1
+       TransferUpgrades.Apply(root, version);   // version → version + 1
    }
 
    document = root.Deserialize(TransferJsonContext.Default.TransferDocument) ?? throw new JsonException();
