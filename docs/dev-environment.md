@@ -35,9 +35,10 @@ file is the "how do I actually launch it on each platform" companion.
   ```
   dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-android -c Release
   ```
-- **Minimum API is 35** (`SupportedOSPlatformVersion` in `CraftingCalculator.UI.csproj`), so emulator images and
-  devices used for testing must run API 35 or newer. The import file picker goes through the Storage Access
-  Framework, which needs no storage permission from API 33 on, so the manifest declares none.
+- **Minimum API is 29** (`SupportedOSPlatformVersion` in `CraftingCalculator.UI.csproj`), so emulator images and
+  devices used for testing must run API 29 or newer. From API 29 on, MAUI's file picker copies the picked file into
+  the app's cache instead of opening it where it sits, so the import needs no storage permission and the manifest
+  declares none. Below 29 it would need `READ_EXTERNAL_STORAGE` granted at runtime.
 
 ## Apple — iOS (CraftingCalculator.UI, `net10.0-ios`) — working on the Mac directly
 

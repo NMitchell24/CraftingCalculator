@@ -6,6 +6,9 @@ public enum ImportStep
     /// <summary>No file is chosen.</summary>
     SelectFile,
 
+    /// <summary>The file picker is open, or the picked file is being copied.</summary>
+    OpeningFile,
+
     /// <summary>The chosen file is being read and checked in the background.</summary>
     Validating,
 

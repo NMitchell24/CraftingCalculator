@@ -152,26 +152,32 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// </summary>
     public async Task ReloadBlueprintsAsync()
     {
-        List<BlueprintQuantity> batch = [.. _blueprintMap.BlueprintList];
+        List<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
 
         // SQLite blocks the thread it runs on, so the reads go to the background and only the batch changes here.
-        List<BlueprintModel?> reloaded = await Task.Run(async () =>
+        Dictionary<int, BlueprintModel> reloaded = await Task.Run(async () =>
         {
-            List<BlueprintModel?> blueprints = [];
+            Dictionary<int, BlueprintModel> blueprints = [];
 
-            foreach (BlueprintQuantity entry in batch)
+            foreach (int id in ids)
             {
-                blueprints.Add(await blueprintService.GetBlueprintByIdAsync(entry.Blueprint.Id));
+                if (await blueprintService.GetBlueprintByIdAsync(id) is { } blueprint)
+                {
+                    blueprints[id] = blueprint;
+                }
             }
 
             return blueprints;
         });
 
-        _blueprintMap.Reset();
-
-        foreach ((BlueprintQuantity entry, BlueprintModel? blueprint) in batch.Zip(reloaded))
+        // The user can change the batch while the reads run, so the blueprints are swapped into the batch as it is
+        // now. Rebuilding it from the ids read above would undo those changes.
+        foreach (BlueprintQuantity entry in _blueprintMap.BlueprintList)
         {
-            _blueprintMap.Add(blueprint ?? entry.Blueprint, entry.Quantity);
+            if (reloaded.TryGetValue(entry.Blueprint.Id, out BlueprintModel? blueprint))
+            {
+                entry.Blueprint = blueprint;
+            }
         }
 
         Recalculate();

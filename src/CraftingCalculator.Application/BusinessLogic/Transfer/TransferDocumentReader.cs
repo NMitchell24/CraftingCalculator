@@ -86,7 +86,7 @@ public static class TransferDocumentReader
 
         if (errors.Count > 0)
         {
-            return new ImportValidationResult(null, Capped(errors));
+            return new ImportValidationResult(null, errors);
         }
 
         DatasetSnapshot snapshot = ToSnapshot(document);
@@ -120,11 +120,6 @@ public static class TransferDocumentReader
     }
 
     private static string JsonName(string member) => JsonNamingPolicy.CamelCase.ConvertName(member);
-
-    private static List<string> Capped(List<string> errors) =>
-        errors.Count <= MaxListedErrors
-            ? errors
-            : [.. errors.Take(MaxListedErrors), $"…and {errors.Count - MaxListedErrors} more problems."];
 
     /// <summary>The blueprints that nest themselves, or nest deeper than the app can work out.</summary>
     /// <remarks>Only run on a snapshot every link of which resolves.</remarks>
@@ -233,8 +228,9 @@ public static class TransferDocumentReader
     }
 
     /// <summary>
-    /// The record-by-record checks on a deserialized document, which collect every problem rather than stopping at
-    /// the first. One instance serves one <see cref="Run"/>.
+    /// The record-by-record checks on a deserialized document, which find every problem rather than stopping at the
+    /// first, list the first <see cref="MaxListedErrors"/> and count the rest. One instance serves one
+    /// <see cref="Run"/>.
     /// </summary>
     private sealed class DocumentChecker(TransferDocumentV1 document)
     {
@@ -244,13 +240,14 @@ public static class TransferDocumentReader
         private const string Favorite = "favorite";
 
         private readonly List<string> _errors = [];
+        private int _unlisted;
 
         public List<string> Run()
         {
             // The serializer enforces the nullability of every member except the entries of a list.
             if (HasNullEntry())
             {
-                _errors.Add("Part of this file is empty where a record should be.");
+                Add("Part of this file is empty where a record should be.");
                 return _errors;
             }
 
@@ -289,7 +286,7 @@ public static class TransferDocumentReader
 
                 if (blueprint.Yield < 1)
                 {
-                    _errors.Add($"{subject} makes fewer than 1 item per craft.");
+                    Add($"{subject} makes fewer than 1 item per craft.");
                 }
 
                 CheckLinks(subject, Component, blueprint.Components, components);
@@ -305,7 +302,21 @@ public static class TransferDocumentReader
                 CheckLinks(subject, Blueprint, favorite.Blueprints, blueprints);
             }
 
-            return _errors;
+            return _unlisted == 0 ? _errors : [.. _errors, $"…and {_unlisted} more problems."];
+        }
+
+        // Capped as the checks run rather than afterwards: a file within the size limit can still hold millions of bad
+        // links, and a list of every one would cost far more memory than the file.
+        private void Add(string error)
+        {
+            if (_errors.Count < MaxListedErrors)
+            {
+                _errors.Add(error);
+            }
+            else
+            {
+                _unlisted++;
+            }
         }
 
         private bool HasNullEntry() =>
@@ -323,7 +334,7 @@ public static class TransferDocumentReader
         {
             if (records.Count > MaxRecordsPerKind)
             {
-                _errors.Add($"This file has more than {MaxRecordsPerKind:N0} {pluralNoun}.");
+                Add($"This file has more than {MaxRecordsPerKind:N0} {pluralNoun}.");
             }
 
             HashSet<int> refs = [];
@@ -334,11 +345,11 @@ public static class TransferDocumentReader
 
                 if (reference < 1)
                 {
-                    _errors.Add($"{Named(noun, nameOf(record))} has an invalid ref ({reference}).");
+                    Add($"{Named(noun, nameOf(record))} has an invalid ref ({reference}).");
                 }
                 else if (!refs.Add(reference))
                 {
-                    _errors.Add($"More than one {noun} uses ref {reference}, including {Quoted(nameOf(record))}.");
+                    Add($"More than one {noun} uses ref {reference}, including {Quoted(nameOf(record))}.");
                 }
             }
 
@@ -355,7 +366,7 @@ public static class TransferDocumentReader
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                _errors.Add($"A {noun} has no name (ref {reference}).");
+                Add($"A {noun} has no name (ref {reference}).");
             }
         }
 
@@ -363,7 +374,7 @@ public static class TransferDocumentReader
         {
             if (text.Length > maxLength)
             {
-                _errors.Add($"{what} is longer than {maxLength:N0} characters.");
+                Add($"{what} is longer than {maxLength:N0} characters.");
             }
         }
 
@@ -371,7 +382,7 @@ public static class TransferDocumentReader
         {
             if (productionTime < TimeSpan.Zero)
             {
-                _errors.Add($"{subject} has a negative production time.");
+                Add($"{subject} has a negative production time.");
             }
         }
 
@@ -379,7 +390,7 @@ public static class TransferDocumentReader
         {
             if (category is { } reference && !categories.Contains(reference))
             {
-                _errors.Add($"{subject} is filed under a category that isn't in the file (ref {reference}).");
+                Add($"{subject} is filed under a category that isn't in the file (ref {reference}).");
             }
         }
 
@@ -389,13 +400,13 @@ public static class TransferDocumentReader
             {
                 if (!targets.Contains(link.Ref))
                 {
-                    _errors.Add($"{subject} uses a {targetNoun} that isn't in the file (ref {link.Ref}).");
+                    Add($"{subject} uses a {targetNoun} that isn't in the file (ref {link.Ref}).");
                 }
 
                 // Zero is allowed: the editor and the Craft screen both let a quantity sit at 0.
                 if (link.Quantity < 0)
                 {
-                    _errors.Add($"{subject} uses a negative quantity of a {targetNoun} (ref {link.Ref}).");
+                    Add($"{subject} uses a negative quantity of a {targetNoun} (ref {link.Ref}).");
                 }
             }
         }

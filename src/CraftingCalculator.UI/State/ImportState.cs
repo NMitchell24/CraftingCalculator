@@ -64,7 +64,8 @@ public sealed class ImportState(
     /// <summary>The blueprints the last merge would have nested inside themselves, by name; empty otherwise.</summary>
     public IReadOnlyList<string> CycleNames { get; private set; } = [];
 
-    public bool IsRunning => Step is ImportStep.Validating or ImportStep.CheckingConflicts or ImportStep.Importing;
+    public bool IsRunning =>
+        Step is ImportStep.OpeningFile or ImportStep.Validating or ImportStep.CheckingConflicts or ImportStep.Importing;
 
     /// <summary>Whether the selection can be imported: on <see cref="ImportStep.Review"/>, with a record selected.</summary>
     public bool CanImport => Step == ImportStep.Review && Selected.Count > 0;
@@ -81,6 +82,13 @@ public sealed class ImportState(
         {
             return;
         }
+
+        // The picker only returns once the file is copied, which near the size limit takes seconds. Until then every
+        // other transition has to refuse: a second pick would copy over the same file, and a finished import would
+        // delete it.
+        ImportStep previous = Step;
+        Step = ImportStep.OpeningFile;
+        Changed?.Invoke();
 
         string? path;
 
@@ -100,6 +108,8 @@ public sealed class ImportState(
 
         if (path is null)
         {
+            Step = previous;
+            Changed?.Invoke();
             return;
         }
 

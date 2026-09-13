@@ -26,6 +26,10 @@
             <ImportSelectFile />
             break;
 
+        case ImportStep.OpeningFile:
+            @Status("Opening file…")
+            break;
+
         case ImportStep.Validating:
             @Status("Validating file…")
             break;

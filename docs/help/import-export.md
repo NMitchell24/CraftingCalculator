@@ -22,7 +22,7 @@ friend who's starting the same game.
 The screen opens with **everything selected**. If a full backup is all you're after, tap **Export Data** and you're
 done.
 
-### Picking what goes in
+### Picking what goes out
 
 Your records are split into four panels: ![Categories](assets/label.svg) **Categories**,
 ![Components](assets/inventory-2.svg) **Components**, ![Blueprints](assets/handyman.svg) **Blueprints** and
@@ -58,7 +58,7 @@ Bronze and 2 Leather Scraps, and you've saved a favorite called `Bronze Axe run`
   then Bronze, Copper, Tin, Leather Scraps and the categories they're filed under come with it. No questions asked.
 - **Selecting a favorite:** does the same for every blueprint in it.
 - **Selecting a component:** selects its category too.
-- **Deselecting anything else:** deselects everything that needs it, all the way up. If you deselect Copper then  
+- **Deselecting anything else:** deselects everything that needs it, all the way up. If you deselect Copper then 
   Bronze has to go, which means the Bronze Axe goes, which means `Bronze Axe run` goes. That's more than you tapped,
   so the app asks first and tells you how many of each would go.
 - **Deselecting a favorite:** only deselects that favorite. Nothing is made out of a favorite.
@@ -85,7 +85,7 @@ where it's saved. That's the newest export on the device, whichever dataset it c
 > **Note:** If a blueprint you've selected is nested inside itself, the export is refused and the screen names the
 > blueprints involved. A file like that could never be imported. Fix the blueprint in the
 > [editor](blueprints.md), or deselect it, and try again. You'll only see this on old data, because the editor
-> won't let you build a loop anymore.
+> won't let you build a loop.
 
 ### Where the file goes
 
@@ -126,8 +126,8 @@ opens.
 - **iPhone and iPad:** your own exports are under **On My iPhone → Crafting Calculator → Exports** (**On My iPad** on
   an iPad). A file somebody sent you is wherever you saved it.
 
-The app makes its own copy of the file and checks it in the background. You'll see "Validating file…" while it works,
-and you don't have to sit and wait for it. The file you picked is never changed.
+The app makes its own copy of the file and checks it in the background. You'll see "Opening file…" while it copies
+and "Validating file…" while it checks. You don't have to sit and wait for either. The file you picked is never changed.
 
 > **Tip:** Built your dataset on your PC and want it on your phone? Export it on the PC, get the file onto the phone
 > however you like (email it to yourself, drop it in a cloud drive), then import it there. An export made on one

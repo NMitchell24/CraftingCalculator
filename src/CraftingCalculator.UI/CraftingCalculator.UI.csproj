@@ -28,8 +28,9 @@
     <!-- 15.0: the BlazorWebView surface this app is built on is annotated [SupportedOSPlatform("ios15.0")]
          as of .NET 10, so declaring anything lower claims support that cannot run and raises CA1416. -->
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
-    <!-- 35: the release floor. The import file picker needs no storage permission from API 33 on. -->
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">35.0</SupportedOSPlatformVersion>
+    <!-- 29: from Android 10 on, MAUI's file picker copies the picked file into the app's cache, so the import needs
+         no storage permission. Below 29 it opens the file where it sits, which needs READ_EXTERNAL_STORAGE. -->
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">29.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
   </PropertyGroup>

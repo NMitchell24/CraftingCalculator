@@ -12,11 +12,12 @@
 |---|---|---|---|
 | 1 — Framework (page shell, MaxVisible, drawer collapse) | **merged** | `Import-Export-Phase-1` | #66 |
 | 2 — Data Export | **merged** | `Import-Export-Phase-2` | #67 |
-| 3 — Data Import | **device-tested, awaiting commit + PR** | `Import-Export-Phase-3` | — |
+| 3 — Data Import | **in review** | `Import-Export-Phase-3` | #68 |
 
-**Next session starts at:** Nathan commits `Import-Export-Phase-3` through Rider pre-commit and opens the PR. Before
-merge, run the iOS simulator and iPad rows of 3.7 on the Mac. **3.8 Phase 3 results** lists what the device run
-observed but left alone, for Nathan to decide on.
+**Next session starts at:** the PR #68 Copilot review fixes are in the working tree. Nathan device-checks "Opening
+file…" (pick, back out of the picker, pick again) on an Android API 29 image and on API 37, commits through Rider
+pre-commit, and replies to the review threads. Before merge, run the iOS simulator and iPad rows of 3.7 on the Mac.
+Replace Mine performance is a follow-up after merge: `Z:\Scratch\Import-ReplaceMine-Perf-Followup.md`.
 
 **Session log** (append one line per session: date, phase, what landed, what's left):
 
@@ -39,6 +40,11 @@ observed but left alone, for Nathan to decide on.
 - 2026-09-13 — Phase 3 follow-up. Audited the wizard for dead ends: Review and Invalid gain **Cancel** (start over),
   and `MergeChosenAsync` takes the chosen snapshot as a parameter, so no early return can strand `CheckingConflicts`.
   Windows head builds clean. Left: Nathan device-checks both Cancel buttons, then commits and opens the PR.
+- 2026-09-13 — PR #68 Copilot review. Validation caps its error list as it collects it; a new `ImportStep.OpeningFile`
+  stops a second pick or an import from starting while the picker is open or copying; `CraftState.ReloadBlueprintsAsync`
+  swaps reloaded blueprints into the live batch instead of rebuilding it from a stale copy; Android minimum API lowered
+  from 35 to 29 (D9, 3.2). Replace Mine performance deferred to a follow-up. Left: Nathan device-checks Opening file
+  on Android API 29 and 37, commits, and replies to the review.
 
 ### Rules every session follows
 
@@ -80,7 +86,7 @@ everywhere, and the labeled drawer can't be collapsed.
 | D6 | Routes: `/dataset/import-export`, `/dataset/import-export/export`, `/dataset/import-export/import`. | Literal segments beat `DatasetList`'s `/dataset/{Type}`; the Dataset nav link stays highlighted; help resolves by prefix. |
 | D7 | Defaults the spec left open, decided here: "Latest export" is the newest file in the folder regardless of dataset, and the card names the dataset it came from. Import **As New Dataset** does *not* switch to the new dataset (toast names it). Select-all on Categories asks the same "also select what uses these?" prompt as a single category. A panel header is highlighted when *any* of its records is selected. | Keep the spec's behavior, fill its gaps. Confirm with Nathan at phase start only if something reads wrong in the device run. |
 | D8 | **Cyclic blueprint data is invalid everywhere.** An import file with a cycle fails validation. An export of legacy cyclic data is refused with the blueprint names. A merge that would create a cycle is blocked. | The editor already prevents cycles; `BlueprintDAO.BuildModel`'s guard only keeps old data from crashing the app. |
-| D9 | **Android minimum API goes from 24 to 35 in Phase 3** (step 3.2). | Nathan's intended release floor; no storage permission is needed for the picker. |
+| D9 | **Android minimum API goes from 24 to 29 in Phase 3** (step 3.2). First set to 35, lowered to 29 after the PR #68 review. | 24–34 is about 55% of active devices. From 29 on MAUI's picker copies the file into the app's cache, so no storage permission is needed; below 29 it opens the file in place, which needs `READ_EXTERNAL_STORAGE`. |
 | D10 | App id becomes `com.sterlingtp.craftingcalculator` before release. No action in this feature beyond keeping the `.ccdata` UTI in one constant. | See Risks. |
 
 ---
@@ -560,10 +566,12 @@ new dataset or merge into the current one with conflict resolution. Survives nav
   `content://` URI) and return that path. Validation then runs on the cached copy in `Task.Run`.
 - [x] File types: iOS `TransferFormat.UniformTypeIdentifier` (declared in 2.3); Android — custom
   extensions have no MIME type, so pass `*/*` and rely on validation; Windows `.ccdata`; macOS `ccdata`.
-- [x] **Bump Android `SupportedOSPlatformVersion` from 24 to 35** (`UI.csproj:31`), settled with Nathan.
-  On API 33+ the SAF picker needs no storage permission, so no manifest permission is added. Also update
-  `docs/dev-environment.md`'s Android section to state the minimum API, and make sure the emulator
-  images used for verification are API 35+.
+- [x] **Raise Android `SupportedOSPlatformVersion` from 24 to 29** (`UI.csproj:31`), settled with Nathan. First
+  landed as 35 and lowered after the PR #68 review. MAUI's `FilePicker` requests no permission, but below API 29
+  `FileSystemUtils.ResolvePhysicalPath` hands back the file's real `/storage/emulated/...` path and
+  `FileResult.OpenReadAsync` opens it with `File.OpenRead`, which needs `READ_EXTERNAL_STORAGE`. From 29 on it copies
+  the file into `CacheDir`, so no manifest permission is added. `docs/dev-environment.md`'s Android section states the
+  minimum API; emulator images used for verification must be API 29+.
 - [x] Mac Catalyst (future head, no action now): record in `docs/dev-environment.md` that the sandbox needs
   `com.apple.security.app-sandbox` + `com.apple.security.files.user-selected.read-write` in
   `Platforms/MacCatalyst/Entitlements.plist` wired through `CodesignEntitlements`.
@@ -766,9 +774,11 @@ on the device and checked against the database pulled off it.
 - Flinging fast through the 15,303-row conflict list paints blank space until `Virtualize` catches up, which takes
   under a second. A larger `OverscanCount` would shorten it.
 - `ImportFilePicker` copies the file before the step becomes `Validating`, so the copy shows no feedback. That's well
-  under a second at 6 MB, but it could be a few seconds near the 64 MB cap.
+  under a second at 6 MB, but it could be a few seconds near the 64 MB cap. **Fixed in the PR #68 review:** the new
+  `ImportStep.OpeningFile` shows "Opening file…".
 - Replace Mine over every record is about 3× slower than As New on the same data (124 s against 41 s), because each
-  replaced blueprint's link rows are removed and added again.
+  replaced blueprint's link rows are removed and added again. **Deferred** to a follow-up after Phase 3 merges (also
+  raised on PR #68); write-up in `Z:\Scratch\Import-ReplaceMine-Perf-Followup.md`.
 - Windows exports use CRLF line endings (`WriteIndented` follows `Environment.NewLine`) and a four-part `appVersion`
   (`1.0.0.1`). Both import fine everywhere.
 - Opening Craft's blueprint picker on the 5,000-blueprint dataset took PSS to 1.35 GB. That's the known large-list

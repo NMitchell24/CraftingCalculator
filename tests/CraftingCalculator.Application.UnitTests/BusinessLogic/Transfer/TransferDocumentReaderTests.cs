@@ -280,6 +280,16 @@ public class TransferDocumentReaderTests
         result.Errors.Should().HaveCount(51);
         result.Errors[^1].Should().Be("…and 10 more problems.");
     }
+
+    [Test]
+    public void Read_MoreBadLinksThanTheListShows_CountsTheRest()
+    {
+        ImportValidationResult result = ReadEdited(root => Record(root, "blueprints", 0)["components"] = new JsonArray(
+            Enumerable.Range(0, 1_000).Select(_ => (JsonNode?)new JsonObject { ["ref"] = 42, ["quantity"] = 1 }).ToArray()));
+
+        result.Errors.Should().HaveCount(51);
+        result.Errors[^1].Should().Be("…and 950 more problems.");
+    }
 }
 
 /// <summary>A stream that reports a length and fails if anything tries to read it.</summary>
