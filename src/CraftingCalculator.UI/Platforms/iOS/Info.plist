@@ -28,5 +28,55 @@
     </array>
     <key>XSAppIconAssets</key>
     <string>Assets.xcassets/appicon.appiconset</string>
+
+    <!-- Exports are saved under Documents/Exports; these two make that folder visible in the Files app as
+         On My iPhone > Crafting Calculator. -->
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+
+    <!-- The .ccdata export file type. The identifier is derived from the app id, so the app id rename before
+         release has to change it here too (and in the C# constant the import file picker will use). -->
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeIdentifier</key>
+            <string>com.nathanmitchell.craftingcalculator.ccdata</string>
+            <key>UTTypeDescription</key>
+            <string>Crafting Calculator Data</string>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.json</string>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>ccdata</string>
+                </array>
+                <key>public.mime-type</key>
+                <array>
+                    <string>application/x-ccdata</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Crafting Calculator Data</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.nathanmitchell.craftingcalculator.ccdata</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

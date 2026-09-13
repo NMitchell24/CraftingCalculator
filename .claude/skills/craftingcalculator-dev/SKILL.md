@@ -70,6 +70,18 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   in `OnInitialized` and unsubscribe in `Dispose`.
 - C# style: `Nullable` and `ImplicitUsings` enabled everywhere; file-scoped namespaces; collection
   expressions (`[]`, `[.. x]`). Match the file you're editing.
+- **A `using` that only platform-specific code needs gets the same `#if` as that code.** Rider organizes
+  imports on save, and while the file is analyzed for another target framework an unconditional
+  platform-only `using` looks unused and is deleted, breaking that platform's build.
+
+  ```csharp
+  #if ANDROID
+  using Android.Content;
+  #endif
+  ```
+
+  Leave the `using` unguarded if code outside the `#if` also needs it; if blocks for several platforms
+  need it, guard it with the combined condition (`#if ANDROID || IOS`).
 
 ## Database, migrations & seed data
 

@@ -21,4 +21,9 @@
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 
+  <!-- Real export files, one folder per format version, read by TransferFixtureTests. -->
+  <ItemGroup>
+    <None Update="BusinessLogic\Transfer\Fixtures\**\*.ccdata" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

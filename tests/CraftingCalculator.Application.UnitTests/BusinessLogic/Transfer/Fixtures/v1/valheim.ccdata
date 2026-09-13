@@ -1,0 +1,933 @@
+{
+  "format": "crafting-calculator-dataset",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-13T04:15:22.5432853+00:00",
+  "appVersion": "1.0",
+  "datasetName": "Valheim",
+  "categories": [
+    {
+      "ref": 1,
+      "name": "Raw Materials",
+      "description": "Anything you chop, mine, skin, or pick up off the ground."
+    },
+    {
+      "ref": 2,
+      "name": "Refined Materials",
+      "description": "What comes back out of a kiln, a smelter, or a forge."
+    },
+    {
+      "ref": 3,
+      "name": "Tools",
+      "description": "Axes, picks, and the rest of the things you build with."
+    },
+    {
+      "ref": 4,
+      "name": "Weapons",
+      "description": "Pointy. Arrows count."
+    },
+    {
+      "ref": 5,
+      "name": "Armor",
+      "description": "What stands between you and a Greydwarf."
+    },
+    {
+      "ref": 6,
+      "name": "Building",
+      "description": "Stations, storage, and boats."
+    }
+  ],
+  "components": [
+    {
+      "ref": 1,
+      "name": "Wood",
+      "description": "Beech, birch, whatever fell over. The backbone of everything.",
+      "cost": 1,
+      "productionTime": "00:00:05",
+      "category": 1
+    },
+    {
+      "ref": 2,
+      "name": "Core Wood",
+      "description": "Pine. Handles, shafts, and anything that needs to not bend.",
+      "cost": 2,
+      "productionTime": "00:00:08",
+      "category": 1
+    },
+    {
+      "ref": 3,
+      "name": "Fine Wood",
+      "description": "Birch and oak, and you need a bronze axe before either will fall.",
+      "cost": 3,
+      "productionTime": "00:00:10",
+      "category": 1
+    },
+    {
+      "ref": 4,
+      "name": "Ancient Bark",
+      "description": "Off an Ancient in the swamp. Bring a friend.",
+      "cost": 8,
+      "productionTime": "00:00:15",
+      "category": 1
+    },
+    {
+      "ref": 5,
+      "name": "Stone",
+      "description": "It is everywhere and you will still run out.",
+      "cost": 1,
+      "productionTime": "00:00:04",
+      "category": 1
+    },
+    {
+      "ref": 6,
+      "name": "Flint",
+      "description": "Along riverbanks and shorelines. Free upgrade over stone tools.",
+      "cost": 2,
+      "productionTime": "00:00:03",
+      "category": 1
+    },
+    {
+      "ref": 7,
+      "name": "Copper Ore",
+      "description": "Black Forest deposits. Heavy, so bring the cart.",
+      "cost": 5,
+      "productionTime": "00:00:20",
+      "category": 1
+    },
+    {
+      "ref": 8,
+      "name": "Tin Ore",
+      "description": "Shoreline rocks in the Black Forest. Easier than copper.",
+      "cost": 4,
+      "productionTime": "00:00:12",
+      "category": 1
+    },
+    {
+      "ref": 9,
+      "name": "Iron Scrap",
+      "description": "Muddy scrap piles in the swamp crypts.",
+      "cost": 10,
+      "productionTime": "00:00:25",
+      "category": 1
+    },
+    {
+      "ref": 10,
+      "name": "Silver Ore",
+      "description": "Buried in the mountains. You need the wishbone to find it.",
+      "cost": 20,
+      "productionTime": "00:00:30",
+      "category": 1
+    },
+    {
+      "ref": 11,
+      "name": "Surtling Core",
+      "description": "Out of burial chambers. Kilns and smelters both want them.",
+      "cost": 15,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 12,
+      "name": "Greydwarf Eye",
+      "description": "They drop these constantly. You will never be short.",
+      "cost": 2,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 13,
+      "name": "Resin",
+      "description": "Torch fuel, and the stuff that keeps a Karve afloat.",
+      "cost": 1,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 14,
+      "name": "Feathers",
+      "description": "Off birds and the odd chest. Arrows need them.",
+      "cost": 2,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 15,
+      "name": "Leather Scraps",
+      "description": "Boar. Early armor and early shields.",
+      "cost": 3,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 16,
+      "name": "Deer Hide",
+      "description": "Deer. Better than scraps and it shows.",
+      "cost": 5,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 17,
+      "name": "Troll Hide",
+      "description": "You have to kill a troll for it, which is the whole problem.",
+      "cost": 12,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 18,
+      "name": "Bone Fragments",
+      "description": "Skeletons in the burial chambers.",
+      "cost": 2,
+      "productionTime": "00:00:00",
+      "category": 1
+    }
+  ],
+  "blueprints": [
+    {
+      "ref": 1,
+      "name": "Coal",
+      "description": "Charcoal kiln. One wood in, one coal out, and it never feels fast enough.",
+      "value": 2,
+      "yield": 1,
+      "productionTime": "00:00:25",
+      "category": 2,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 1
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 2,
+      "name": "Copper",
+      "description": "Smelter. Ore plus coal, and the coal is the part you keep running out of.",
+      "value": 12,
+      "yield": 1,
+      "productionTime": "00:00:30",
+      "category": 2,
+      "components": [
+        {
+          "ref": 7,
+          "quantity": 1
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "ref": 3,
+      "name": "Tin",
+      "description": "Smelter. Same deal as copper, cheaper ore.",
+      "value": 10,
+      "yield": 1,
+      "productionTime": "00:00:30",
+      "category": 2,
+      "components": [
+        {
+          "ref": 8,
+          "quantity": 1
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "ref": 4,
+      "name": "Bronze",
+      "description": "Forge. Two copper and a tin, and the Black Forest is finally over.",
+      "value": 40,
+      "yield": 1,
+      "productionTime": "00:00:05",
+      "category": 2,
+      "components": [],
+      "blueprints": [
+        {
+          "ref": 2,
+          "quantity": 2
+        },
+        {
+          "ref": 3,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "ref": 5,
+      "name": "Iron",
+      "description": "Smelter. Scrap plus coal. The swamp was worth it.",
+      "value": 20,
+      "yield": 1,
+      "productionTime": "00:00:30",
+      "category": 2,
+      "components": [
+        {
+          "ref": 9,
+          "quantity": 1
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "ref": 6,
+      "name": "Silver",
+      "description": "Smelter. Mountain ore plus coal.",
+      "value": 35,
+      "yield": 1,
+      "productionTime": "00:00:30",
+      "category": 2,
+      "components": [
+        {
+          "ref": 10,
+          "quantity": 1
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "ref": 7,
+      "name": "Bronze Nails",
+      "description": "Forge. One bronze gives twenty, which is the only reason carts are affordable.",
+      "value": 3,
+      "yield": 20,
+      "productionTime": "00:00:05",
+      "category": 2,
+      "components": [],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "ref": 8,
+      "name": "Iron Nails",
+      "description": "Forge. One iron gives ten. The longship needs a hundred.",
+      "value": 2,
+      "yield": 10,
+      "productionTime": "00:00:05",
+      "category": 2,
+      "components": [],
+      "blueprints": [
+        {
+          "ref": 5,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "ref": 9,
+      "name": "Hammer",
+      "description": "The first thing you make and the one you never put down.",
+      "value": 10,
+      "yield": 1,
+      "productionTime": "00:00:02",
+      "category": 3,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 3
+        },
+        {
+          "ref": 5,
+          "quantity": 2
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 10,
+      "name": "Stone Axe",
+      "description": "Chops trees badly, but it chops trees.",
+      "value": 12,
+      "yield": 1,
+      "productionTime": "00:00:02",
+      "category": 3,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 5
+        },
+        {
+          "ref": 5,
+          "quantity": 4
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 11,
+      "name": "Flint Axe",
+      "description": "The upgrade you make the moment you find a river.",
+      "value": 20,
+      "yield": 1,
+      "productionTime": "00:00:02",
+      "category": 3,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 4
+        },
+        {
+          "ref": 6,
+          "quantity": 6
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 12,
+      "name": "Hoe",
+      "description": "Flattens ground. Your base will thank you.",
+      "value": 10,
+      "yield": 1,
+      "productionTime": "00:00:02",
+      "category": 3,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 5
+        },
+        {
+          "ref": 5,
+          "quantity": 2
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 13,
+      "name": "Cultivator",
+      "description": "Plant carrots, plant trees, stop starving.",
+      "value": 220,
+      "yield": 1,
+      "productionTime": "00:00:03",
+      "category": 3,
+      "components": [
+        {
+          "ref": 2,
+          "quantity": 5
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "ref": 14,
+      "name": "Bronze Axe",
+      "description": "The one that finally cuts birch.",
+      "value": 340,
+      "yield": 1,
+      "productionTime": "00:00:03",
+      "category": 3,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 4
+        },
+        {
+          "ref": 15,
+          "quantity": 2
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 8
+        }
+      ]
+    },
+    {
+      "ref": 15,
+      "name": "Iron Pickaxe",
+      "description": "Mountains and silver open up here.",
+      "value": 500,
+      "yield": 1,
+      "productionTime": "00:00:03",
+      "category": 3,
+      "components": [
+        {
+          "ref": 2,
+          "quantity": 3
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 5,
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "ref": 16,
+      "name": "Wood Arrow",
+      "description": "Eight wood, twenty arrows. Cheap and it shows.",
+      "value": 1,
+      "yield": 20,
+      "productionTime": "00:00:02",
+      "category": 4,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 8
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 17,
+      "name": "Flint Arrow",
+      "description": "Worth the detour to the river.",
+      "value": 2,
+      "yield": 20,
+      "productionTime": "00:00:02",
+      "category": 4,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 8
+        },
+        {
+          "ref": 6,
+          "quantity": 2
+        },
+        {
+          "ref": 14,
+          "quantity": 2
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 18,
+      "name": "Bronze Arrow",
+      "description": "One bronze per twenty. Feels expensive until you need them.",
+      "value": 4,
+      "yield": 20,
+      "productionTime": "00:00:02",
+      "category": 4,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 8
+        },
+        {
+          "ref": 14,
+          "quantity": 2
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "ref": 19,
+      "name": "Iron Arrow",
+      "description": "One iron per twenty, and better than bronze at it.",
+      "value": 3,
+      "yield": 20,
+      "productionTime": "00:00:02",
+      "category": 4,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 8
+        },
+        {
+          "ref": 14,
+          "quantity": 2
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 5,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "ref": 20,
+      "name": "Finewood Bow",
+      "description": "The bow you keep the whole Black Forest.",
+      "value": 80,
+      "yield": 1,
+      "productionTime": "00:00:04",
+      "category": 4,
+      "components": [
+        {
+          "ref": 3,
+          "quantity": 10
+        },
+        {
+          "ref": 2,
+          "quantity": 10
+        },
+        {
+          "ref": 16,
+          "quantity": 2
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 21,
+      "name": "Wood Shield",
+      "description": "Blocks. Barely. Better than not blocking.",
+      "value": 30,
+      "yield": 1,
+      "productionTime": "00:00:03",
+      "category": 4,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 10
+        },
+        {
+          "ref": 13,
+          "quantity": 4
+        },
+        {
+          "ref": 15,
+          "quantity": 4
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 22,
+      "name": "Bronze Helmet",
+      "description": "Five bronze for a hat, and you will still make it.",
+      "value": 220,
+      "yield": 1,
+      "productionTime": "00:00:04",
+      "category": 5,
+      "components": [
+        {
+          "ref": 16,
+          "quantity": 2
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "ref": 23,
+      "name": "Bronze Plate Cuirass",
+      "description": "The chest piece that carries you to the swamp.",
+      "value": 220,
+      "yield": 1,
+      "productionTime": "00:00:04",
+      "category": 5,
+      "components": [
+        {
+          "ref": 16,
+          "quantity": 2
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "ref": 24,
+      "name": "Bronze Plate Leggings",
+      "description": "Matches the cuirass. Slows you down a little.",
+      "value": 220,
+      "yield": 1,
+      "productionTime": "00:00:04",
+      "category": 5,
+      "components": [
+        {
+          "ref": 16,
+          "quantity": 2
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 4,
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "ref": 25,
+      "name": "Troll Leather Helmet",
+      "description": "Light, quiet, and you look ridiculous. Worth it.",
+      "value": 70,
+      "yield": 1,
+      "productionTime": "00:00:04",
+      "category": 5,
+      "components": [
+        {
+          "ref": 17,
+          "quantity": 5
+        },
+        {
+          "ref": 18,
+          "quantity": 3
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 26,
+      "name": "Workbench",
+      "description": "Ten wood. Nothing else happens until this exists.",
+      "value": 10,
+      "yield": 1,
+      "productionTime": "00:00:05",
+      "category": 6,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 10
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 27,
+      "name": "Charcoal Kiln",
+      "description": "Turns wood into coal while you do something else.",
+      "value": 100,
+      "yield": 1,
+      "productionTime": "00:00:10",
+      "category": 6,
+      "components": [
+        {
+          "ref": 5,
+          "quantity": 20
+        },
+        {
+          "ref": 11,
+          "quantity": 5
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 28,
+      "name": "Smelter",
+      "description": "Ore in, bars out. Feed it coal.",
+      "value": 100,
+      "yield": 1,
+      "productionTime": "00:00:10",
+      "category": 6,
+      "components": [
+        {
+          "ref": 5,
+          "quantity": 20
+        },
+        {
+          "ref": 11,
+          "quantity": 5
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 29,
+      "name": "Forge",
+      "description": "Where bronze and everything after it gets made.",
+      "value": 120,
+      "yield": 1,
+      "productionTime": "00:00:10",
+      "category": 6,
+      "components": [
+        {
+          "ref": 5,
+          "quantity": 4
+        },
+        {
+          "ref": 1,
+          "quantity": 10
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 4
+        },
+        {
+          "ref": 2,
+          "quantity": 6
+        }
+      ]
+    },
+    {
+      "ref": 30,
+      "name": "Portal",
+      "description": "Build them in pairs and stop walking everywhere.",
+      "value": 110,
+      "yield": 1,
+      "productionTime": "00:00:10",
+      "category": 6,
+      "components": [
+        {
+          "ref": 3,
+          "quantity": 20
+        },
+        {
+          "ref": 11,
+          "quantity": 2
+        },
+        {
+          "ref": 12,
+          "quantity": 10
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 31,
+      "name": "Cart",
+      "description": "Hauls ore. Hates hills, hates trees, hates you.",
+      "value": 80,
+      "yield": 1,
+      "productionTime": "00:00:10",
+      "category": 6,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 20
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 7,
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "ref": 32,
+      "name": "Karve",
+      "description": "The small boat. Fast, and it sinks if you are careless.",
+      "value": 300,
+      "yield": 1,
+      "productionTime": "00:00:20",
+      "category": 6,
+      "components": [
+        {
+          "ref": 3,
+          "quantity": 30
+        },
+        {
+          "ref": 16,
+          "quantity": 10
+        },
+        {
+          "ref": 13,
+          "quantity": 20
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 7,
+          "quantity": 80
+        }
+      ]
+    },
+    {
+      "ref": 33,
+      "name": "Longship",
+      "description": "A hundred iron nails. Worth every one of them.",
+      "value": 900,
+      "yield": 1,
+      "productionTime": "00:00:30",
+      "category": 6,
+      "components": [
+        {
+          "ref": 3,
+          "quantity": 40
+        },
+        {
+          "ref": 4,
+          "quantity": 40
+        },
+        {
+          "ref": 16,
+          "quantity": 10
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 8,
+          "quantity": 100
+        }
+      ]
+    }
+  ],
+  "favorites": [
+    {
+      "ref": 1,
+      "name": "Bronze Gear Up",
+      "blueprints": [
+        {
+          "ref": 22,
+          "quantity": 1
+        },
+        {
+          "ref": 23,
+          "quantity": 1
+        },
+        {
+          "ref": 24,
+          "quantity": 1
+        },
+        {
+          "ref": 14,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "ref": 2,
+      "name": "Longship Run",
+      "blueprints": [
+        {
+          "ref": 33,
+          "quantity": 1
+        },
+        {
+          "ref": 19,
+          "quantity": 5
+        }
+      ]
+    }
+  ]
+}

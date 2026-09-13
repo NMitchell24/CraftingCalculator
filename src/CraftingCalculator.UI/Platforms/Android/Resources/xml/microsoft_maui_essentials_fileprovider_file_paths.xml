@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Replaces MAUI Essentials' default FileProvider paths, which would let a shared file's URI reach the app's
+     whole cache and data directories. ShareService copies an export into cache/sharing-root before sharing it,
+     so that folder is the only one the provider can serve. -->
+<paths>
+    <cache-path name="internal_cache" path="sharing-root" />
+</paths>

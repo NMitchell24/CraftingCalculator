@@ -1,4 +1,5 @@
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.Domain.Models.Transfer;
 
 namespace CraftingCalculator.Application.Common.Interfaces.DAO;
 
@@ -25,6 +26,12 @@ public interface IDatasetDAO
     /// leaves the other's alone. The source dataset is not modified.
     /// </summary>
     Task<DatasetModel> CopyAsync(int sourceId, string name);
+
+    /// <summary>
+    /// Every category, component, blueprint and favorite in <paramref name="datasetId"/>, with the links
+    /// between them, each list in id order. The dataset does not have to be the selected one.
+    /// </summary>
+    Task<DatasetSnapshot> GetSnapshotAsync(int datasetId);
 
     Task RenameAsync(int id, string name);
 

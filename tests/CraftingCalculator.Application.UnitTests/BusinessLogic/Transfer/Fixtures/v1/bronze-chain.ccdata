@@ -1,0 +1,135 @@
+{
+  "format": "crafting-calculator-dataset",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-12T18:04:00+00:00",
+  "appVersion": "1.0",
+  "datasetName": "Valheim",
+  "categories": [
+    {
+      "ref": 1,
+      "name": "Metals",
+      "description": "Smelted in the furnace"
+    },
+    {
+      "ref": 2,
+      "name": "Tools",
+      "description": ""
+    },
+    {
+      "ref": 3,
+      "name": "Food",
+      "description": ""
+    }
+  ],
+  "components": [
+    {
+      "ref": 1,
+      "name": "Copper",
+      "description": "Ore",
+      "cost": 2,
+      "productionTime": "00:00:30",
+      "category": 1
+    },
+    {
+      "ref": 2,
+      "name": "Tin",
+      "description": "",
+      "cost": 1,
+      "productionTime": "00:00:00",
+      "category": 1
+    },
+    {
+      "ref": 3,
+      "name": "Wood",
+      "description": "",
+      "cost": 0.5,
+      "productionTime": "00:00:00",
+      "category": null
+    }
+  ],
+  "blueprints": [
+    {
+      "ref": 1,
+      "name": "Bronze",
+      "description": "Alloy",
+      "value": 6,
+      "yield": 1,
+      "productionTime": "00:01:00",
+      "category": 1,
+      "components": [
+        {
+          "ref": 1,
+          "quantity": 2
+        },
+        {
+          "ref": 2,
+          "quantity": 1
+        }
+      ],
+      "blueprints": []
+    },
+    {
+      "ref": 2,
+      "name": "Bronze Axe",
+      "description": "",
+      "value": 40,
+      "yield": 1,
+      "productionTime": "00:00:00",
+      "category": 2,
+      "components": [
+        {
+          "ref": 3,
+          "quantity": 4
+        }
+      ],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 8
+        }
+      ]
+    },
+    {
+      "ref": 3,
+      "name": "Bronze Nails",
+      "description": "",
+      "value": 1,
+      "yield": 20,
+      "productionTime": "00:00:00",
+      "category": 1,
+      "components": [],
+      "blueprints": [
+        {
+          "ref": 1,
+          "quantity": 1
+        }
+      ]
+    }
+  ],
+  "favorites": [
+    {
+      "ref": 1,
+      "name": "Bronze Axe run",
+      "blueprints": [
+        {
+          "ref": 2,
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "ref": 2,
+      "name": "Karve prep",
+      "blueprints": [
+        {
+          "ref": 3,
+          "quantity": 10
+        },
+        {
+          "ref": 2,
+          "quantity": 1
+        }
+      ]
+    }
+  ]
+}

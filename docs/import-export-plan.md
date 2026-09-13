@@ -1,7 +1,7 @@
 # Dataset Import/Export — implementation plan
 
 > Source spec: `Z:\Scratch\Dataset-Import-Export.md`. Written 2026-09-12 in a research-and-design session;
-> Phase 1 code is now in this branch; later phases have not started. One phase per session. Every session updates the checkpoint below.
+> Phases 1 and 2 are built; Phase 3 has not started. One phase per session. Every session updates the checkpoint below.
 
 ---
 
@@ -9,18 +9,22 @@
 
 | Phase | State | Branch | PR |
 |---|---|---|---|
-| 1 — Framework (page shell, MaxVisible, drawer collapse) | **built, awaiting commit + PR** | `Import-Export-Phase-1` | — |
-| 2 — Data Export | **next** (after Phase 1 merges) | `Import-Export-Phase-2` | — |
-| 3 — Data Import | not started | `Import-Export-Phase-3` | — |
+| 1 — Framework (page shell, MaxVisible, drawer collapse) | **merged** | `Import-Export-Phase-1` | #66 |
+| 2 — Data Export | **built, awaiting commit + PR** | `Import-Export-Phase-2` | — |
+| 3 — Data Import | **next** (after Phase 2 merges) | `Import-Export-Phase-3` | — |
 
-**Next session starts at:** Phase 2, step 2.1, on a fresh `Import-Export-Phase-2` branch cut from `main` once
-Phase 1's PR has merged. Read **1.6 Phase 1 results** first.
+**Next session starts at:** Phase 3, step 3.1, on a fresh `Import-Export-Phase-3` branch cut from `main` once
+Phase 2's PR has merged. Read **2.9 Phase 2 results** first: several Phase 3 steps lean on its deviations
+(`FindCycles` returns keys, the fixture tests' Phase 3 extension, the deferred UTI constant).
 
 **Session log** (append one line per session: date, phase, what landed, what's left):
 
 - 2026-09-12 — research & design. Plan written. Decisions below settled with Nathan.
 - 2026-09-12 — Phase 1. All of 1.1–1.4 landed and verified on the Android phone emulator and Windows (see 1.6).
   Left: Nathan commits through Rider pre-commit and opens the PR; the tablet and iOS rows of 1.5 were not run.
+- 2026-09-12 — Phase 2. All of 2.1–2.7 landed; verified on the Android phone emulator (Valheim seed and the
+  10,000-component dataset) and Windows (see 2.9). Left: Nathan commits through Rider pre-commit and opens the PR;
+  the iOS simulator, Android tablet and on-device cycle-refusal rows of 2.8 were not run.
 
 ### Rules every session follows
 
@@ -311,8 +315,8 @@ five, show the latest, share it.
 
 ### 2.1 Domain + engine (see Cross-phase architecture)
 
-- [ ] `RecordKind`, `RecordKey`, snapshot types, `DependencyGraph`, `SelectionChange`, `SelectionState`.
-- [ ] `DependencyGraphProcessor`, `TransferSelectionProcessor` + exhaustive tests
+- [x] `RecordKind`, `RecordKey`, snapshot types, `DependencyGraph`, `SelectionChange`, `SelectionState`.
+- [x] `DependencyGraphProcessor`, `TransferSelectionProcessor` + exhaustive tests
   (`tests/CraftingCalculator.Application.UnitTests/BusinessLogic/Processors/`): every rule in the spec's
   "Selection behaviors" list is one or more tests using the Valheim Bronze chain (Copper + Tin → Bronze →
   Bronze Axe; a "Metals" category; a favorite holding Bronze Axe). Include a shared sub-recipe
@@ -321,25 +325,25 @@ five, show the latest, share it.
 
 ### 2.2 Loading the snapshot
 
-- [ ] `IDatasetDAO.GetSnapshotAsync(int datasetId)` in `DatasetDAO` — same scoping trick as `CopyAsync`
+- [x] `IDatasetDAO.GetSnapshotAsync(int datasetId)` in `DatasetDAO` — same scoping trick as `CopyAsync`
   (`context.DatasetId = datasetId`), seven `AsNoTracking` queries (4 records + 3 link tables), mapped to
   snapshot records. Do **not** go through `BlueprintFavoritesDAO.GetBlueprintQuantitiesAsync` — it reloads
   the whole blueprint graph per row.
-- [ ] `DatasetDAOTests`/new `DatasetSnapshotTests`: every field and link round-trips; another dataset's rows
+- [x] `DatasetDAOTests`/new `DatasetSnapshotTests`: every field and link round-trips; another dataset's rows
   never appear.
 
 ### 2.3 Writing the file
 
-- [ ] `Application/BusinessLogic/Transfer/TransferDocumentProcessor.cs`:
+- [x] `Application/BusinessLogic/Transfer/TransferDocumentProcessor.cs`:
   `static TransferDocumentV1 ToDocument(DatasetSnapshot snapshot, IReadOnlySet<RecordKey> selected, DateTimeOffset now, string appVersion)`
   — renumbers refs, drops unselected, asserts `IsClosed` (throws `InvalidOperationException` — callers
   only pass closed selections; the service catches, see 2.5).
-- [ ] Cycle check before writing: the one cycle finder lives in
+- [x] Cycle check before writing: the one cycle finder lives in
   `Application/BusinessLogic/Processors/DependencyGraphProcessor.cs` (`FindCycles(DependencyGraph) → names`)
   and is shared by export, import validation (3.1), and the merge check (3.3). On export, a non-empty result
   becomes the page's error ("Bronze Plate and Bronze Nails contain each other — fix one of them in the
   editor, then export again") and no file is written.
-- [ ] `Application/Common/Interfaces/IExportFileStore.cs` + `Infrastructure/Files/ExportFileStore.cs`
+- [x] `Application/Common/Interfaces/IExportFileStore.cs` + `Infrastructure/Files/ExportFileStore.cs`
   (constructed with the export directory; registered in `Infrastructure/DependencyInjection.cs` — add an
   `exportsPath` parameter to `AddDatabaseServices` or a sibling `AddFileServices(exportsPath)`):
   - `Task<ExportFileInfo> SaveAsync(TransferDocumentV1 doc, string datasetName)` — file name
@@ -349,10 +353,10 @@ five, show the latest, share it.
   - `ExportFileInfo` record (Domain/Models/Transfer): `FullPath`, `FileName`, `DatasetName`,
     `CreatedAt` — dataset name read from the envelope only if cheap; otherwise parse it from the file name.
   - Tests with a temp directory: naming, atomic write, prune-to-5, latest after manual delete, empty folder.
-- [ ] `MauiProgram.cs`: pick the directory per D3 —
+- [x] `MauiProgram.cs`: pick the directory per D3 —
   `#if IOS Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Exports")`
   `#else Path.Combine(FileSystem.AppDataDirectory, "Exports")`. Never persist the absolute path.
-- [ ] `Platforms/iOS/Info.plist`: `UIFileSharingEnabled`, `LSSupportsOpeningDocumentsInPlace`,
+- [x] `Platforms/iOS/Info.plist`: `UIFileSharingEnabled`, `LSSupportsOpeningDocumentsInPlace`,
   `UTExportedTypeDeclarations` for `com.nathanmitchell.craftingcalculator.ccdata` (conforms to
   `public.json`, `public.data`; extension `ccdata`; MIME `application/x-ccdata`), and
   `CFBundleDocumentTypes` (role Editor, rank Owner). Declared in Phase 2 because export creates the type;
@@ -360,7 +364,7 @@ five, show the latest, share it.
 
 ### 2.4 Sharing
 
-- [ ] `Application/Common/Interfaces/IShareService.cs` + `UI/Platform/ShareService.cs` (pattern:
+- [x] `Application/Common/Interfaces/IShareService.cs` + `UI/Platform/ShareService.cs` (pattern:
   `ClipboardService`): `Task ShareFileAsync(string path, string title)` → `Share.Default.RequestAsync(new ShareFileRequest { … })`.
   - **Android:** copy the file into `FileSystem.CacheDirectory/sharing-root/` first and add
     `Platforms/Android/Resources/xml/microsoft_maui_essentials_fileprovider_file_paths.xml` restricting the
@@ -371,24 +375,24 @@ five, show the latest, share it.
 
 ### 2.5 Service + session state
 
-- [ ] `IDatasetTransferService` / `DatasetTransferService` (Application, registered in
+- [x] `IDatasetTransferService` / `DatasetTransferService` (Application, registered in
   `Application/DependencyInjection.cs`):
   - `Task<DatasetSnapshot> LoadCurrentSnapshotAsync()`
   - `Task<ExportFileInfo> ExportAsync(DatasetSnapshot snapshot, IReadOnlySet<RecordKey> selected)`
   - `ExportFileInfo? GetLatestExport()`
-- [ ] `UI/State/ExportState.cs` (scoped, registered in `MauiProgram.cs:49-51`) — owns only what must
+- [x] `UI/State/ExportState.cs` (scoped, registered in `MauiProgram.cs:49-51`) — owns only what must
   outlive the page: `bool IsRunning`, `ExportFileInfo? Latest`, `string? LastError`, `event Action? Changed`,
   and `Task StartAsync(snapshot, selected)` which runs `Task.Run(() => service.ExportAsync(...))`, catches
   every exception into `LastError` (**no ErrorBoundary exists** — a throw that reaches the renderer freezes
   the whole app), refreshes `Latest`, raises `Changed`. Page selection is *not* in the state: every visit
   reloads the snapshot and starts all-selected.
-- [ ] Subscribers marshal: `State.Changed += OnExportChanged; void OnExportChanged() => _ = InvokeAsync(StateHasChanged);`
+- [x] Subscribers marshal: `State.Changed += OnExportChanged; void OnExportChanged() => _ = InvokeAsync(StateHasChanged);`
   (pattern: `MainLayout.OnThemeChanged`, `MainLayout.razor.cs:104-108`) — `Changed` can fire off the
   dispatcher.
 
 ### 2.6 UI
 
-- [ ] `UI/Components/Controls/TransferSelectionPanels.razor(.cs)` — **shared with Phase 3.** Parameters:
+- [x] `UI/Components/Controls/TransferSelectionPanels.razor(.cs)` — **shared with Phase 3.** Parameters:
   `DatasetSnapshot Snapshot`, `DependencyGraph Graph`, `HashSet<RecordKey> Selected`,
   `EventCallback SelectionChanged`. Renders `MudExpansionPanels MultiExpansion` with four panels
   (Categories/Label, Components/Inventory2, Blueprints/Handyman, Favorites/Star — reuse the icons from
@@ -403,7 +407,7 @@ five, show the latest, share it.
     `Z:\Scratch\DatasetList-Memory-Followup.md`). Row = name left, Info icon right (`@onclick:stopPropagation`),
     `list-row-selected` when selected (`app.css:563-566`). Tap row → select/deselect via the processor.
   - All prompts go through `TransferPrompts` (see engine section).
-- [ ] InfoDialog for snapshot records (`InfoDialog.razor.cs:17-26` takes `IBaseDataRecord` and only
+- [x] InfoDialog for snapshot records (`InfoDialog.razor.cs:17-26` takes `IBaseDataRecord` and only
   handles Blueprint/Component today):
   - Add Category support (description) and a Favorite view (its blueprints × quantity).
   - Feed it from a snapshot via `Application/BusinessLogic/Processors/SnapshotModelProcessor.cs`
@@ -412,7 +416,7 @@ five, show the latest, share it.
   - **Smell to surface:** that builder overlaps `BlueprintDAO.BuildModel` (`BlueprintDAO.cs:159-176`).
     Tell Nathan; options are (a) accept two builders over two input shapes, (b) have `BlueprintDAO` build
     through a snapshot. Default (a) unless he opts in.
-- [ ] `UI/Components/Pages/Export.razor(.cs)` — `@page "/dataset/import-export/export"`, title "Export
+- [x] `UI/Components/Pages/Export.razor(.cs)` — `@page "/dataset/import-export/export"`, title "Export
   Data", `BackHref = "/dataset/import-export"`:
   - load snapshot in `Task.Run`, build graph, select all.
   - `TransferSelectionPanels`, then a `Color.Primary` filled **Export Data** button.
@@ -421,17 +425,17 @@ five, show the latest, share it.
   - below the button: running → `MudProgressCircular` + "Building your export…" (non-blocking — **no
     overlay**; the user may navigate away); done → card "Latest export: {dataset} — {local datetime}" + path
     line per D3; `LastError` → error alert.
-- [ ] `ImportExport.razor.cs`: Export card navigates to the export page.
+- [x] `ImportExport.razor.cs`: Export card navigates to the export page.
 
 ### 2.7 Help
 
-- [ ] `import-export.md` export section (selection rules in player terms with the Bronze Axe example,
+- [x] `import-export.md` export section (selection rules in player terms with the Bronze Axe example,
   where the file goes per platform, share, keep-last-five, "uninstalling still deletes files you didn't
   share").
-- [ ] `settings.md:49-55` — replace "no built-in export yet" with a pointer to Import/Export.
-- [ ] `managing-datasets.md` "Where they're stored" — mention backing up.
-- [ ] Icons: `check-circle.svg`, `check-circle-outline.svg`, `indeterminate-check-box.svg`, `share.svg`.
-- [ ] `HelpTopics` route prefix already covers `dataset/import-export/export`.
+- [x] `settings.md:49-55` — replace "no built-in export yet" with a pointer to Import/Export.
+- [x] `managing-datasets.md` "Where they're stored" — mention backing up.
+- [x] Icons: `check-circle.svg`, `check-circle-outline.svg`, `indeterminate-check-box.svg`, `share.svg`.
+- [x] `HelpTopics` route prefix already covers `dataset/import-export/export`.
 
 ### 2.8 Phase 2 verification
 
@@ -445,6 +449,63 @@ five, show the latest, share it.
   `Z:\Scratch\CopyDatasetPerf\device-very-large.db3` and confirm the page loads, panels scroll smoothly,
   UI stays responsive during export. iOS simulator: file visible in Files app; iPad share popover. Windows:
   path shown, share sheet opens.
+
+### 2.9 Phase 2 results (2026-09-12)
+
+**Verified:** format clean, 401 tests pass (323 Application, 78 Infrastructure), Android and Windows heads build
+with 0 warnings. SonarQube's three findings on the first pass (S3358 ×2, S3267) are fixed.
+
+- Android phone (Pixel 9 emulator, API 37), Valheim seed (6 / 18 / 33 / 2): the page opens all-selected. Deselect
+  Copper Ore → prompt "12 blueprints and 1 favorite" → Continue deselects exactly the bronze chain and Bronze Gear
+  Up. Selecting Bronze Gear Up reselects its whole chain with no prompt. Deselect all categories → prompt (18 / 27 / 2);
+  select all categories → "filed under" offer (18 components, 33 blueprints), favorites stay unselected.
+- Export, leave for Craft mid-export, return: the latest card is there. Six exports → five files, oldest removed.
+  Favorite Info dialog lists its blueprints × quantity. Share opens the Android chooser (Drive, Gmail, Quick
+  Share) with no FileProvider error. `Fixtures/v1/valheim.ccdata` is a full export pulled off this device.
+- Same emulator, `device-very-large.db3` (100 / 10,000 / 5,000 / 200): Dataset landing 1.7 s, Export page snapshot +
+  graph 0.9 s. The 10,000-row panel scrolls end to end with at most 19 rows in the DOM. Deselect all components
+  (cascading 5,000 blueprints and 200 favorites) and each select-all apply in about 0.9 s. Export: spinner in about
+  1 s, navigating to Craft mid-export takes 346 ms, the `.tmp` file was caught mid-write, and the 6.2 MB file lands in
+  about 1.8 s.
+- Windows: the card shows the Exports folder, the file is written there, and Share opens the Windows share UI
+  (confirmed by Nathan).
+
+**Deviations from the steps above:**
+
+- `FindCycles` returns the blueprint **keys** on a loop (`IReadOnlySet<RecordKey>`), not names; callers map names.
+  It is iterative Tarjan, so a 100,000-deep chain cannot overflow the stack (3.1 reads untrusted files with it).
+- The export's cycle check runs when the page loads, and blocks Export only while a blueprint on a loop is
+  **selected**: deselecting those blueprints exports the rest. `TransferDocumentProcessor.ToDocument` still asserts
+  `IsClosed`.
+- `IExportFileStore.SaveAsync(TransferDocumentV1)` takes the dataset name from the document. `ExportFileInfo`'s
+  dataset name and time are read from the file's header (first 64 KB), and `GetLatest` skips any `.ccdata` that
+  isn't a valid export. Same-second exports get a `-2` suffix; a stale `.tmp` is deleted on the next save.
+  Windows' reserved file-name characters are stripped on every platform (name capped at 100, fallback `Dataset`).
+- `IDatasetTransferService.ExportAsync` takes `appVersion` (`AppInfo` is MAUI; `ExportState` passes it).
+  `TimeProvider.System` is registered in `Application/DependencyInjection.cs`.
+- `TransferFormat` (name, version, extension) lives in `Application/BusinessLogic/Transfer`. The
+  `UniformTypeIdentifier` constant is **deferred to 3.2**: the file picker is its only C# consumer. The Info.plist
+  comment says so.
+- `TransferJsonContext` reads strictly: unmapped members disallowed, required constructor parameters and nullable
+  annotations respected. `TransferFixtureTests` currently checks that every fixture deserializes under those rules
+  and that `bronze-chain.ccdata` equals the writer's output; **3.1 extends it** to validate and import each fixture.
+- Rows are fixed 48 px divs, not `MudListItem` cards (no cards inside the panel's card). Panels use
+  `KeepContentAlive="false"` so collapsed panels render no rows.
+- Selected rows and headers use an 18% primary tint (`color-mix`, with `primary-hover` as the iOS 15 fallback) plus a
+  4 px primary bar. `primary-hover` alone, as planned, was indistinguishable from unselected on the dark theme.
+- `InfoDialog.Record` is nullable; a favorite opens through `Favorite` + `FavoriteBlueprints`. A category shows its
+  name and description only.
+- The Android FileProvider override declares only `cache-path` → `sharing-root`, the one location `ShareService`
+  copies to. The iPad popover anchors at `Rect(0, 20, 0, 0)`.
+- The hub's Import card keeps "Coming Soon!" through a null route on its card.
+
+**Not run:** the iOS simulator (Files → On My iPhone visibility, iPad share popover), the Android tablet emulator,
+an actual send through Gmail or Drive (the chooser opened), and the cycle refusal on a device (no cyclic data to
+hand; `FindCycles` and the selection rules are unit-tested).
+
+**Surfaced, not fixed:** `SnapshotModelProcessor.ToBlueprintModel` repeats `BlueprintDAO.BuildModel`'s shape over a
+different input (plan default (a), kept). The Windows unpackaged `AppDataDirectory` contains a `User Name` segment,
+MAUI's placeholder publisher; it predates this phase and affects the database path too.
 
 ---
 

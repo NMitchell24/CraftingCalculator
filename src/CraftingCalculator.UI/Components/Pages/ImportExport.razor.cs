@@ -10,23 +10,36 @@ namespace CraftingCalculator.UI.Components.Pages;
 /// </summary>
 public partial class ImportExport : ComponentBase, IDisposable
 {
-    private sealed record TransferCard(string Title, string Icon, string Description);
+    /// <summary>One card. <paramref name="Route"/> is null for a card whose screen does not exist yet.</summary>
+    private sealed record TransferCard(string Title, string Icon, string Description, string? Route);
 
     private static readonly TransferCard[] Cards =
     [
         new("Export Data", Icons.Material.Filled.Output,
-            "Export any of your Categories, Components, Blueprints, or Favorites to back them up or share with friends."),
+            "Export any of your Categories, Components, Blueprints, or Favorites to back them up or share with friends.",
+            "/dataset/import-export/export"),
         new("Import Data", Icons.Material.Filled.Input,
-            "Import Categories, Components, Blueprints, or Favorites from a backup file that you created, or one that a friend shared with you.")
+            "Import Categories, Components, Blueprints, or Favorites from a backup file that you created, or one that a friend shared with you.",
+            null)
     ];
 
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     protected override void OnInitialized() =>
         PageShellState.Configure(this, new PageShellConfig("Import/Export Data") { BackHref = "/dataset" });
 
-    private void ShowComingSoon() => Snackbar.Add("Coming Soon!", Severity.Info);
+    private void Open(TransferCard card)
+    {
+        if (card.Route is null)
+        {
+            Snackbar.Add("Coming Soon!", Severity.Info);
+            return;
+        }
+
+        Navigation.NavigateTo(card.Route);
+    }
 
     public void Dispose() => PageShellState.Reset(this);
 }
