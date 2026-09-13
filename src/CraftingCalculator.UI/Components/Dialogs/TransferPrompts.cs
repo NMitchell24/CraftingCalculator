@@ -4,9 +4,10 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
-/// The prompts the export and import selection panels run when a tap would change more records than the one
-/// tapped. <c>subject</c> is how the prompt names what was tapped: a quoted record name, or a phrase such as
-/// "your categories" for a whole panel.
+/// The prompts the export and import screens run: the selection panels' prompts when a tap would change more records
+/// than the one tapped, and the import's question about records that are already in the dataset. <c>subject</c> is
+/// how a selection prompt names what was tapped: a quoted record name, or a phrase such as "your categories" for a
+/// whole panel.
 /// </summary>
 public static class TransferPrompts
 {
@@ -37,6 +38,17 @@ public static class TransferPrompts
             yesText: "Yes", cancelText: "No");
 
         return confirmed == true;
+    }
+
+    /// <summary>
+    /// "Some of these records are already in 'Valheim': 3 components and 1 blueprint.", for imported records that share
+    /// a name with records already in <paramref name="datasetName"/>, <paramref name="conflicts"/> counting them by kind.
+    /// </summary>
+    public static string DescribeConflicts(string datasetName, IReadOnlyDictionary<RecordKind, int> conflicts)
+    {
+        string subject = conflicts.Values.Sum() == 1 ? "One of these records is" : "Some of these records are";
+
+        return $"{subject} already in '{datasetName}': {Describe(conflicts)}.";
     }
 
     private static string DeselectMessage(string subject, IReadOnlyDictionary<RecordKind, int> cascaded)

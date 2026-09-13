@@ -1,0 +1,29 @@
+@inherits BaseImportControl
+
+@if (ImportState is { ImportFile: { } file, Graph: { } graph })
+{
+    <ImportStepCard Title="Step 2: Choose what you want to import">
+        <div class="transfer-file">
+            @if (!string.IsNullOrWhiteSpace(file.Snapshot.DatasetName))
+            {
+                <MudText Typo="Typo.subtitle1">Import Dataset: @file.Snapshot.DatasetName</MudText>
+            }
+            <MudText Typo="Typo.body2">Exported @file.ExportedAt.ToLocalTime().ToString("f")</MudText>
+            <MudText Typo="Typo.caption" Class="transfer-file-version">From Crafting Calculator @file.AppVersion</MudText>
+        </div>
+    </ImportStepCard>
+
+    <TransferSelectionPanels Snapshot="file.Snapshot" Graph="graph" Selected="ImportState.Selected"
+                             SelectionChanged="SelectionChanged" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="transfer-action"
+               StartIcon="@Icons.Material.Filled.Input" Disabled="@(!ImportState.CanImport)" OnClick="OnImport">
+        Import Data
+    </MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Class="transfer-action"
+               StartIcon="@Icons.Material.Filled.FileOpen" OnClick="ImportState.PickFileAsync">
+        Choose Another File
+    </MudButton>
+    <MudButton Variant="Variant.Text" FullWidth="true" Class="transfer-action" OnClick="ImportState.Reset">
+        Cancel
+    </MudButton>
+}

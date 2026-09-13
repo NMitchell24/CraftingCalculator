@@ -35,6 +35,9 @@ file is the "how do I actually launch it on each platform" companion.
   ```
   dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-android -c Release
   ```
+- **Minimum API is 35** (`SupportedOSPlatformVersion` in `CraftingCalculator.UI.csproj`), so emulator images and
+  devices used for testing must run API 35 or newer. The import file picker goes through the Storage Access
+  Framework, which needs no storage permission from API 33 on, so the manifest declares none.
 
 ## Apple — iOS (CraftingCalculator.UI, `net10.0-ios`) — working on the Mac directly
 
@@ -73,6 +76,14 @@ pairing from Windows.
   supported combination with EF Core.
 - Data layer (`Microsoft.EntityFrameworkCore.Sqlite`) bundles native SQLite for iOS — no extra
   native-SQLite work needed.
+
+## Mac Catalyst (future head, not built yet)
+
+There is no `net10.0-maccatalyst` target today. When one is added, the import file picker needs the App Sandbox to
+allow files the user chooses: put `com.apple.security.app-sandbox` and
+`com.apple.security.files.user-selected.read-write` (both `true`) in `Platforms/MacCatalyst/Entitlements.plist`, and
+wire that file in through `CodesignEntitlements` in `CraftingCalculator.UI.csproj`. Without them the picker opens but
+the chosen file can't be read.
 
 ## No `MacOS.slnf` needed
 

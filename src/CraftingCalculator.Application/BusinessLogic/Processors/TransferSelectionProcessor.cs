@@ -48,35 +48,52 @@ public static class TransferSelectionProcessor
     /// <summary>How many of the records of <paramref name="kind"/> are in <paramref name="selected"/>.</summary>
     public static SelectionState StateOf(DependencyGraph graph, IReadOnlySet<RecordKey> selected, RecordKind kind)
     {
-        int total = 0;
-        int chosen = 0;
+        int chosen = CountSelected(graph, selected, kind);
 
-        foreach (RecordKey key in graph.All)
-        {
-            if (key.Kind != kind)
-            {
-                continue;
-            }
+        return chosen == 0 ? SelectionState.None : StateOf(chosen, graph.All.Count(key => key.Kind == kind));
+    }
 
-            total++;
-
-            if (selected.Contains(key))
-            {
-                chosen++;
-            }
-        }
-
-        if (chosen == 0)
+    /// <summary>The state of a group of <paramref name="count"/> records, <paramref name="selected"/> of them selected.</summary>
+    public static SelectionState StateOf(int selected, int count)
+    {
+        if (selected == 0)
         {
             return SelectionState.None;
         }
 
-        return chosen == total ? SelectionState.All : SelectionState.Some;
+        return selected == count ? SelectionState.All : SelectionState.Some;
     }
+
+    /// <summary>The number of records of <paramref name="kind"/> in <paramref name="selected"/>.</summary>
+    public static int CountSelected(DependencyGraph graph, IReadOnlySet<RecordKey> selected, RecordKind kind) =>
+        graph.All.Count(key => key.Kind == kind && selected.Contains(key));
 
     /// <summary>Whether every record <paramref name="selected"/> depends on is selected too.</summary>
     public static bool IsClosed(DependencyGraph graph, IReadOnlySet<RecordKey> selected) =>
         selected.All(key => graph.DependsOn[key].All(selected.Contains));
+
+    /// <summary>
+    /// The <paramref name="selected"/> records of <paramref name="snapshot"/> as a snapshot of their own, each list
+    /// in the order <paramref name="snapshot"/> has it and every id unchanged.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="selected"/> leaves out a record that a selected record depends on.
+    /// </exception>
+    public static DatasetSnapshot Extract(DatasetSnapshot snapshot, IReadOnlySet<RecordKey> selected)
+    {
+        // A link to a record left out would point at nothing once the extract is written.
+        if (!IsClosed(DependencyGraphProcessor.Build(snapshot), selected))
+        {
+            throw new InvalidOperationException("The selection leaves out a record that a selected record depends on.");
+        }
+
+        return new DatasetSnapshot(
+            snapshot.DatasetName,
+            [.. snapshot.Categories.Where(category => selected.Contains(new RecordKey(RecordKind.Category, category.Id)))],
+            [.. snapshot.Components.Where(component => selected.Contains(new RecordKey(RecordKind.Component, component.Id)))],
+            [.. snapshot.Blueprints.Where(blueprint => selected.Contains(new RecordKey(RecordKind.Blueprint, blueprint.Id)))],
+            [.. snapshot.Favorites.Where(favorite => selected.Contains(new RecordKey(RecordKind.Favorite, favorite.Id)))]);
+    }
 
     private static SelectionChange SelectClosure(
         DependencyGraph graph, IReadOnlySet<RecordKey> selected, IEnumerable<RecordKey> roots, IReadOnlySet<RecordKey> acted)

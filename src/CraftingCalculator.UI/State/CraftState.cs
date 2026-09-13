@@ -146,6 +146,37 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         Recalculate();
     }
 
+    /// <summary>
+    /// Reads every blueprint in the batch again, keeping its quantity, so the batch prices what is saved now rather
+    /// than what was loaded. A blueprint that no longer exists keeps the copy the batch already had.
+    /// </summary>
+    public async Task ReloadBlueprintsAsync()
+    {
+        List<BlueprintQuantity> batch = [.. _blueprintMap.BlueprintList];
+
+        // SQLite blocks the thread it runs on, so the reads go to the background and only the batch changes here.
+        List<BlueprintModel?> reloaded = await Task.Run(async () =>
+        {
+            List<BlueprintModel?> blueprints = [];
+
+            foreach (BlueprintQuantity entry in batch)
+            {
+                blueprints.Add(await blueprintService.GetBlueprintByIdAsync(entry.Blueprint.Id));
+            }
+
+            return blueprints;
+        });
+
+        _blueprintMap.Reset();
+
+        foreach ((BlueprintQuantity entry, BlueprintModel? blueprint) in batch.Zip(reloaded))
+        {
+            _blueprintMap.Add(blueprint ?? entry.Blueprint, entry.Quantity);
+        }
+
+        Recalculate();
+    }
+
     public Task<bool> FavoriteExistsAsync(string? name) => favoriteService.DoesFavoriteExistAsync(name);
 
     public async Task SaveAsFavoriteAsync(string name)

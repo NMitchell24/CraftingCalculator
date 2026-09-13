@@ -6,9 +6,6 @@ using CraftingCalculator.UI.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-// MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
-using Color = MudBlazor.Color;
-
 namespace CraftingCalculator.UI.Components.Controls;
 
 /// <summary>
@@ -19,19 +16,7 @@ namespace CraftingCalculator.UI.Components.Controls;
 /// </summary>
 public partial class TransferSelectionPanels : ComponentBase
 {
-    /// <summary>One panel: the kind of record it lists, its heading, and its icon.</summary>
-    private sealed record PanelSpec(RecordKind Kind, string Title, string Icon);
-
     private sealed record Row(RecordKey Key, string Name);
-
-    // The Dataset landing page's icons for the same record types (Dataset.razor.cs).
-    private static readonly PanelSpec[] Panels =
-    [
-        new(RecordKind.Category, "Categories", Icons.Material.Filled.Label),
-        new(RecordKind.Component, "Components", Icons.Material.Filled.Inventory2),
-        new(RecordKind.Blueprint, "Blueprints", Icons.Material.Filled.Handyman),
-        new(RecordKind.Favorite, "Favorites", Icons.Material.Filled.Star)
-    ];
 
     // Matches .transfer-row's height in app.css, which is fixed so Virtualize can position rows exactly.
     private const float RowHeight = 48;
@@ -73,23 +58,6 @@ public partial class TransferSelectionPanels : ComponentBase
 
     private static List<Row> Sorted(IEnumerable<Row> rows) => [.. rows.OrderBy(row => row.Name, StringComparer.OrdinalIgnoreCase)];
 
-    private static string ToggleIcon(SelectionState state) => state switch
-    {
-        SelectionState.All => Icons.Material.Filled.CheckCircle,
-        SelectionState.Some => Icons.Material.Filled.IndeterminateCheckBox,
-        _ => Icons.Material.Filled.CheckCircleOutline
-    };
-
-    private static Color ToggleColor(SelectionState state) => state switch
-    {
-        SelectionState.All => Color.Primary,
-        SelectionState.Some => Color.Tertiary,
-        _ => Color.Secondary
-    };
-
-    private static string ToggleLabel(PanelSpec panel, SelectionState state) =>
-        state == SelectionState.All ? $"Deselect all {panel.Title.ToLowerInvariant()}" : $"Select all {panel.Title.ToLowerInvariant()}";
-
     private string RowClass(Row row) => Selected.Contains(row.Key) ? "transfer-row transfer-row-selected" : "transfer-row";
 
     private async Task ToggleRowAsync(Row row)
@@ -110,7 +78,7 @@ public partial class TransferSelectionPanels : ComponentBase
         }
     }
 
-    private async Task ToggleAllAsync(PanelSpec panel, SelectionState state)
+    private async Task ToggleAllAsync(TransferRecordKinds.Display panel, SelectionState state)
     {
         string subject = $"your {panel.Title.ToLowerInvariant()}";
 

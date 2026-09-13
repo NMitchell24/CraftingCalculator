@@ -33,4 +33,11 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <!-- The export fixtures live beside TransferFixtureTests in the Application tests; linked here so every one is also
+       imported into a real database. -->
+  <ItemGroup>
+    <None Include="..\CraftingCalculator.Application.UnitTests\BusinessLogic\Transfer\Fixtures\**\*.ccdata"
+          Link="Transfer\Fixtures\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

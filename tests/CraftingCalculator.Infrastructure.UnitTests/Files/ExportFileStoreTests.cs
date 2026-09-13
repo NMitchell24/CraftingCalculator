@@ -159,7 +159,9 @@ public class ExportFileStoreTests
     [Test]
     public async Task GetLatest_ReturnsTheNewestExport()
     {
-        await _store.SaveAsync(Document("Valheim", FirstExport));
+        ExportFileInfo older = await _store.SaveAsync(Document("Valheim", FirstExport));
+        // Two saves back to back can share a write time, and the name tiebreak would then put Valheim first.
+        File.SetLastWriteTimeUtc(older.FullPath, DateTime.UtcNow.AddHours(-1));
         ExportFileInfo newest = await _store.SaveAsync(Document("Rust", FirstExport.AddMinutes(1)));
 
         _store.GetLatest().Should().Be(newest with { FullPath = new FileInfo(newest.FullPath).FullName });

@@ -1,0 +1,12 @@
+@inherits BaseImportControl
+
+<ImportStepCard Title="Step 1: Select a file">
+    <MudText Typo="Typo.body1">
+        Pick an export file you made, or one a friend sent you. Nothing goes into your data until you've seen what's in
+        it.
+    </MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
+               StartIcon="@Icons.Material.Filled.FileOpen" OnClick="ImportState.PickFileAsync">
+        Select Import File
+    </MudButton>
+</ImportStepCard>

@@ -1,0 +1,20 @@
+@inherits BaseImportControl
+
+<ImportStepCard Title="Step 3: Resolve conflicts">
+    <MudText Typo="Typo.body1">@_description</MudText>
+    <MudText Typo="Typo.body1">
+        Keep yours, replace yours with the ones from the file, or choose each one yourself?
+    </MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="KeepMineAsync">
+        Keep Mine
+    </MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="ReplaceMineAsync">
+        Replace Mine
+    </MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="ImportState.ChooseEach">
+        Choose Each
+    </MudButton>
+    <MudButton Variant="Variant.Text" FullWidth="true" OnClick="@ImportState.BackToReview">
+        Cancel
+    </MudButton>
+</ImportStepCard>

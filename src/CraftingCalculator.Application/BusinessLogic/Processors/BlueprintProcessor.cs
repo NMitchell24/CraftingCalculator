@@ -17,7 +17,7 @@ public static class BlueprintProcessor
     /// the depth turns either into a catchable exception instead of a process-killing
     /// StackOverflowException.
     /// </summary>
-    private const int MaxBlueprintDepth = 64;
+    internal const int MaxBlueprintDepth = 64;
 
     /// <summary>
     /// Whether nesting <paramref name="child"/> inside <paramref name="parent"/> would close a loop,

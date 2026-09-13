@@ -38,6 +38,18 @@ public class TransferFixtureTests
         $"v{document.FormatVersion}".Should().Be(Path.GetDirectoryName(fixture));
     }
 
+    [TestCaseSource(nameof(Fixtures))]
+    public void EveryFixture_PassesImportValidation(string fixture)
+    {
+        using FileStream stream = File.OpenRead(Path.Combine(FixturesRoot, fixture));
+
+        ImportValidationResult result = TransferDocumentReader.Read(stream);
+
+        // Infrastructure's TransferFixtureImportTests writes each one to a database as well.
+        result.Errors.Should().BeEmpty();
+        result.File.Should().NotBeNull();
+    }
+
     [Test]
     public void TheBronzeChainFixture_IsWhatTheWriterProducesForTheBronzeChain()
     {

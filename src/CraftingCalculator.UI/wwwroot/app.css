@@ -870,12 +870,15 @@ html, body {
     color: var(--mud-palette-text-secondary);
 }
 
-/* Export (Components/Pages/Export.razor) and the selection panels it shares with Import
+/* Export and Import (Components/Pages/Export.razor, Import.razor) and the selection panels they share
    (Components/Controls/TransferSelectionPanels.razor). */
 
-.transfer-panels {
-    /* TransferSelectionPanels.RowHeight holds the same number: Virtualize positions rows by it. */
+.transfer-page {
+    /* TransferSelectionPanels.RowHeight and ImportChooseEach.RowHeight hold the same number: Virtualize positions rows by it. */
     --transfer-row-height: 48px;
+}
+
+.transfer-panels {
     margin-bottom: 16px;
 }
 
@@ -981,7 +984,8 @@ html, body {
     gap: 12px;
 }
 
-.transfer-latest {
+.transfer-latest,
+.transfer-file {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -990,6 +994,38 @@ html, body {
 /* A Windows path has no spaces to break at, and would otherwise run off the card. */
 .transfer-latest-location {
     color: var(--mud-palette-text-secondary);
+    overflow-wrap: anywhere;
+}
+
+/* Everything in it is read out of the import file, where a dataset name or app version can be one long unbroken
+   word. */
+.transfer-file {
+    overflow-wrap: anywhere;
+}
+
+.transfer-file-version {
+    color: var(--mud-palette-text-secondary);
+}
+
+/* The card each import step opens with (Components/Controls/Import/ImportStepCard.razor). Roomier than a plain
+   .app-card because it leads the screen and holds the step's buttons. The gap spaces whatever the step puts in it,
+   so those children carry no margins of their own. */
+.transfer-step {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.transfer-step .app-card-title {
+    margin-bottom: 0;
+}
+
+/* The errors quote names straight out of the file, which can be one long unbroken word. */
+.transfer-errors {
+    margin: 0;
+    padding-inline-start: 20px;
     overflow-wrap: anywhere;
 }
 
