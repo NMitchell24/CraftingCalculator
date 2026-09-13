@@ -1,7 +1,7 @@
 # Dataset Import/Export — implementation plan
 
 > Source spec: `Z:\Scratch\Dataset-Import-Export.md`. Written 2026-09-12 in a research-and-design session;
-> no code has changed yet. One phase per session. Every session updates the checkpoint below.
+> Phase 1 code is now in this branch; later phases have not started. One phase per session. Every session updates the checkpoint below.
 
 ---
 
