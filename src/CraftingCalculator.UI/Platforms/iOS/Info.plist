@@ -36,13 +36,13 @@
     <key>LSSupportsOpeningDocumentsInPlace</key>
     <true/>
 
-    <!-- The .ccdata export file type. The identifier is derived from the app id, so the app id rename before
-         release has to change it here too (and in the C# constant the import file picker will use). -->
+    <!-- The .ccdata export file type. The identifier is derived from the app id, so a change to the app id
+         changes it here and in TransferFormat.UniformTypeIdentifier. -->
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>
             <key>UTTypeIdentifier</key>
-            <string>com.nathanmitchell.craftingcalculator.ccdata</string>
+            <string>com.sterlingturd.craftingcalculator.ccdata</string>
             <key>UTTypeDescription</key>
             <string>Crafting Calculator Data</string>
             <key>UTTypeConformsTo</key>
@@ -74,7 +74,7 @@
             <string>Owner</string>
             <key>LSItemContentTypes</key>
             <array>
-                <string>com.nathanmitchell.craftingcalculator.ccdata</string>
+                <string>com.sterlingturd.craftingcalculator.ccdata</string>
             </array>
         </dict>
     </array>
