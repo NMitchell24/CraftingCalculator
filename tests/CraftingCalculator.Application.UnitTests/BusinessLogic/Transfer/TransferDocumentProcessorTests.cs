@@ -1,6 +1,6 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
+using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 using static CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer.BronzeChain;
@@ -19,7 +19,7 @@ public class TransferDocumentProcessorTests
     [Test]
     public void ToDocument_WritesTheHeader()
     {
-        TransferDocumentV1 document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
 
         document.Format.Should().Be(TransferFormat.Name);
         document.FormatVersion.Should().Be(TransferFormat.CurrentVersion);
@@ -39,7 +39,7 @@ public class TransferDocumentProcessorTests
     [Test]
     public void ToDocument_LeavesOutWhatIsNotSelected()
     {
-        TransferDocumentV1 document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
 
         document.Categories.Select(category => category.Name).Should().Equal("Metals", "Food");
         document.Components.Select(component => component.Name).Should().Equal("Copper", "Tin");
@@ -50,7 +50,7 @@ public class TransferDocumentProcessorTests
     [Test]
     public void ToDocument_NumbersRefsFromOnePerKind()
     {
-        TransferDocumentV1 document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
 
         document.Categories.Select(category => category.Ref).Should().Equal(1, 2);
         document.Blueprints.Select(blueprint => blueprint.Ref).Should().Equal(1, 2);
@@ -59,15 +59,15 @@ public class TransferDocumentProcessorTests
     [Test]
     public void ToDocument_PointsEveryLinkAtARef()
     {
-        TransferDocumentV1 document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, NailsOnly, ExportedAt, "1.0");
 
-        BlueprintV1 bronze = document.Blueprints.Single(blueprint => blueprint.Name == "Bronze");
-        BlueprintV1 nails = document.Blueprints.Single(blueprint => blueprint.Name == "Bronze Nails");
+        TransferBlueprint bronze = document.Blueprints.Single(blueprint => blueprint.Name == "Bronze");
+        TransferBlueprint nails = document.Blueprints.Single(blueprint => blueprint.Name == "Bronze Nails");
 
         // Bronze Nails is blueprint id 3 in the snapshot and ref 2 in the file.
         nails.Ref.Should().Be(2);
-        nails.Blueprints.Should().Equal(new QuantityRefV1(bronze.Ref, 1));
-        bronze.Components.Should().Equal(new QuantityRefV1(1, 2), new QuantityRefV1(2, 1));
+        nails.Blueprints.Should().Equal(new QuantityRef(bronze.Ref, 1));
+        bronze.Components.Should().Equal(new QuantityRef(1, 2), new QuantityRef(2, 1));
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class TransferDocumentProcessorTests
     {
         HashSet<RecordKey> selected = [Food, Wood, Metals, Copper];
 
-        TransferDocumentV1 document = TransferDocumentProcessor.ToDocument(Snapshot, selected, ExportedAt, "1.0");
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, selected, ExportedAt, "1.0");
 
         // Metals is category id 1 but comes after nothing selected before it, so ref 1; Food is id 3, ref 2.
         document.Components.Single(component => component.Name == "Copper").Category.Should().Be(1);
@@ -87,10 +87,10 @@ public class TransferDocumentProcessorTests
     {
         HashSet<RecordKey> selected = [Metals, Copper];
 
-        TransferDocumentV1 document = TransferDocumentProcessor.ToDocument(Snapshot, selected, ExportedAt, "1.0");
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, selected, ExportedAt, "1.0");
 
-        document.Categories.Single().Should().Be(new CategoryV1(1, "Metals", "Smelted in the furnace"));
-        document.Components.Single().Should().Be(new ComponentV1(1, "Copper", "Ore", 2, TimeSpan.FromSeconds(30), 1));
+        document.Categories.Single().Should().Be(new TransferCategory(1, "Metals", "Smelted in the furnace"));
+        document.Components.Single().Should().Be(new TransferComponent(1, "Copper", "Ore", 2, TimeSpan.FromSeconds(30), 1));
     }
 
     [Test]

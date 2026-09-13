@@ -5,7 +5,6 @@ using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 
@@ -21,7 +20,7 @@ public class TransferDocumentReaderTests
     // BlueprintProcessor.MaxBlueprintDepth, which is internal to the Application assembly.
     private const int MaxBlueprintDepth = 64;
 
-    private static TransferDocumentV1 BronzeChainDocument() =>
+    private static TransferDocument BronzeChainDocument() =>
         TransferDocumentProcessor.ToDocument(
             BronzeChain.Snapshot,
             new HashSet<RecordKey>(DependencyGraphProcessor.Build(BronzeChain.Snapshot).All),
@@ -34,13 +33,13 @@ public class TransferDocumentReaderTests
         return TransferDocumentReader.Read(stream);
     }
 
-    private static ImportValidationResult Read(TransferDocumentV1 document) =>
-        Read(JsonSerializer.Serialize(document, TransferJsonContext.Default.TransferDocumentV1));
+    private static ImportValidationResult Read(TransferDocument document) =>
+        Read(JsonSerializer.Serialize(document, TransferJsonContext.Default.TransferDocument));
 
     /// <summary>Reads the bronze chain export after <paramref name="edit"/> has changed its JSON.</summary>
     private static ImportValidationResult ReadEdited(Action<JsonObject> edit)
     {
-        JsonObject root = JsonSerializer.SerializeToNode(BronzeChainDocument(), TransferJsonContext.Default.TransferDocumentV1)!
+        JsonObject root = JsonSerializer.SerializeToNode(BronzeChainDocument(), TransferJsonContext.Default.TransferDocument)!
             .AsObject();
         edit(root);
 
@@ -50,12 +49,12 @@ public class TransferDocumentReaderTests
     private static JsonObject Record(JsonObject root, string list, int index) => root[list]![index]!.AsObject();
 
     /// <summary>A document holding only a chain of <paramref name="length"/> blueprints, each nesting the next.</summary>
-    private static TransferDocumentV1 ChainOf(int length) => new(
+    private static TransferDocument ChainOf(int length) => new(
         TransferFormat.Name, TransferFormat.CurrentVersion, DateTimeOffset.UnixEpoch, "1.0", "Deep", [], [],
         [
-            .. Enumerable.Range(1, length).Select(reference => new BlueprintV1(
+            .. Enumerable.Range(1, length).Select(reference => new TransferBlueprint(
                 reference, $"Tier {reference}", "", 0, 1, TimeSpan.Zero, null, [],
-                reference < length ? [new QuantityRefV1(reference + 1, 1)] : []))
+                reference < length ? [new QuantityRef(reference + 1, 1)] : []))
         ],
         []);
 
@@ -101,7 +100,7 @@ public class TransferDocumentReaderTests
     [Test]
     public void Read_AnExportCutOffPartway_SaysTheFileIsDamaged()
     {
-        string json = JsonSerializer.Serialize(BronzeChainDocument(), TransferJsonContext.Default.TransferDocumentV1);
+        string json = JsonSerializer.Serialize(BronzeChainDocument(), TransferJsonContext.Default.TransferDocument);
 
         ShouldBeRejectedWith(Read(json[..(json.Length / 2)]), "damaged");
     }
@@ -219,9 +218,9 @@ public class TransferDocumentReaderTests
     [Test]
     public void Read_MoreRecordsOfAKindThanAnyDataset_IsReported()
     {
-        TransferDocumentV1 document = BronzeChainDocument() with
+        TransferDocument document = BronzeChainDocument() with
         {
-            Components = [.. Enumerable.Range(1, 100_001).Select(reference => new ComponentV1(reference, "Stone", "", 0, TimeSpan.Zero, null))],
+            Components = [.. Enumerable.Range(1, 100_001).Select(reference => new TransferComponent(reference, "Stone", "", 0, TimeSpan.Zero, null))],
             Blueprints = [],
             Favorites = []
         };
@@ -268,9 +267,9 @@ public class TransferDocumentReaderTests
     [Test]
     public void Read_MoreProblemsThanTheListShows_CountsTheRest()
     {
-        TransferDocumentV1 document = BronzeChainDocument() with
+        TransferDocument document = BronzeChainDocument() with
         {
-            Components = [.. Enumerable.Range(1, 60).Select(reference => new ComponentV1(reference, "", "", 0, TimeSpan.Zero, null))],
+            Components = [.. Enumerable.Range(1, 60).Select(reference => new TransferComponent(reference, "", "", 0, TimeSpan.Zero, null))],
             Blueprints = [],
             Favorites = []
         };

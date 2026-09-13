@@ -1,4 +1,4 @@
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
+using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 using CraftingCalculator.Domain.Models.Transfer;
 
 namespace CraftingCalculator.Application.Common.Interfaces;
@@ -11,7 +11,7 @@ public interface IExportFileStore
     /// deletes the oldest export files beyond the newest five. An interrupted save never leaves a partial
     /// file among the exports.
     /// </summary>
-    Task<ExportFileInfo> SaveAsync(TransferDocumentV1 document);
+    Task<ExportFileInfo> SaveAsync(TransferDocument document);
 
     /// <summary>
     /// The most recently saved export file still in the folder, or null when there is none. Reads the folder

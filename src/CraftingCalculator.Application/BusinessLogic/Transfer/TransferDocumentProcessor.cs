@@ -1,5 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
+using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models.Transfer;
 
@@ -15,7 +15,7 @@ public static class TransferDocumentProcessor
     /// <exception cref="InvalidOperationException">
     /// <paramref name="selected"/> leaves out a record that a selected record depends on.
     /// </exception>
-    public static TransferDocumentV1 ToDocument(
+    public static TransferDocument ToDocument(
         DatasetSnapshot snapshot, IReadOnlySet<RecordKey> selected, DateTimeOffset now, string appVersion)
     {
         // The file has to be importable on its own, which a link to a record left out of it would prevent.
@@ -29,7 +29,7 @@ public static class TransferDocumentProcessor
         Dictionary<int, int> blueprintRefs = RefsFor(RecordKind.Blueprint, snapshot.Blueprints.Select(blueprint => blueprint.Id), selected);
         Dictionary<int, int> favoriteRefs = RefsFor(RecordKind.Favorite, snapshot.Favorites.Select(favorite => favorite.Id), selected);
 
-        return new TransferDocumentV1(
+        return new TransferDocument(
             TransferFormat.Name,
             TransferFormat.CurrentVersion,
             now.ToUniversalTime(),
@@ -38,19 +38,19 @@ public static class TransferDocumentProcessor
             [
                 .. snapshot.Categories
                     .Where(category => categoryRefs.ContainsKey(category.Id))
-                    .Select(category => new CategoryV1(categoryRefs[category.Id], category.Name, category.Description))
+                    .Select(category => new TransferCategory(categoryRefs[category.Id], category.Name, category.Description))
             ],
             [
                 .. snapshot.Components
                     .Where(component => componentRefs.ContainsKey(component.Id))
-                    .Select(component => new ComponentV1(
+                    .Select(component => new TransferComponent(
                         componentRefs[component.Id], component.Name, component.Description, component.Cost,
                         component.ProductionTime, RefOf(categoryRefs, component.CategoryId)))
             ],
             [
                 .. snapshot.Blueprints
                     .Where(blueprint => blueprintRefs.ContainsKey(blueprint.Id))
-                    .Select(blueprint => new BlueprintV1(
+                    .Select(blueprint => new TransferBlueprint(
                         blueprintRefs[blueprint.Id], blueprint.Name, blueprint.Description, blueprint.Value,
                         blueprint.Yield, blueprint.ProductionTime, RefOf(categoryRefs, blueprint.CategoryId),
                         Links(componentRefs, blueprint.Components), Links(blueprintRefs, blueprint.Blueprints)))
@@ -58,7 +58,7 @@ public static class TransferDocumentProcessor
             [
                 .. snapshot.Favorites
                     .Where(favorite => favoriteRefs.ContainsKey(favorite.Id))
-                    .Select(favorite => new FavoriteV1(
+                    .Select(favorite => new TransferFavorite(
                         favoriteRefs[favorite.Id], favorite.Name, Links(blueprintRefs, favorite.Blueprints)))
             ]);
     }
@@ -71,6 +71,6 @@ public static class TransferDocumentProcessor
 
     private static int? RefOf(Dictionary<int, int> refs, int? id) => id is { } value ? refs[value] : null;
 
-    private static List<QuantityRefV1> Links(Dictionary<int, int> refs, IEnumerable<QuantityLink> links) =>
-        [.. links.Select(link => new QuantityRefV1(refs[link.TargetId], link.Quantity))];
+    private static List<QuantityRef> Links(Dictionary<int, int> refs, IEnumerable<QuantityLink> links) =>
+        [.. links.Select(link => new QuantityRef(refs[link.TargetId], link.Quantity))];
 }

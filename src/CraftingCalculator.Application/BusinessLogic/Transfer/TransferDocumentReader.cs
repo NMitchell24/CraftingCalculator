@@ -1,7 +1,6 @@
 using System.Text.Json;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
-using CraftingCalculator.Application.BusinessLogic.Transfer.Format.V1;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models.Transfer;
 
@@ -31,7 +30,7 @@ public static class TransferDocumentReader
 
     private const string NotAnExport = "This isn't a Crafting Calculator export file.";
 
-    // A version 1 file nests five deep: document, list, record, link list, link. The margin allows for a file
+    // An export nests five deep: document, list, record, link list, link. The margin allows for a file
     // someone reformatted by hand, and the cap stops one built to exhaust the parser.
     private static readonly JsonDocumentOptions ParseOptions = new()
     {
@@ -52,7 +51,7 @@ public static class TransferDocumentReader
             return Invalid($"This file is bigger than {MaxFileBytes / (1024 * 1024)} MB, which is far bigger than any export.");
         }
 
-        TransferDocumentV1 document;
+        TransferDocument document;
 
         try
         {
@@ -63,11 +62,12 @@ public static class TransferDocumentReader
                 return Invalid(formatError);
             }
 
-            // Version 1 is the only version so far. When there is a version 2, an older file is upgraded here, one
-            // version at a time, before it is deserialized as the current version.
+            // An older file deserializes through the current types: every member added since its version has a
+            // default. Only a version whose change was not additive needs an upgrade step here, applied to the
+            // parsed JSON one version at a time before deserialization (docs/transfer-format-maintenance.md).
             try
             {
-                document = json.Deserialize(TransferJsonContext.Default.TransferDocumentV1)
+                document = json.Deserialize(TransferJsonContext.Default.TransferDocument)
                            ?? throw new JsonException();
             }
             catch (JsonException exception)
@@ -103,10 +103,10 @@ public static class TransferDocumentReader
     private static string? CheckFormat(JsonElement root)
     {
         if (root.ValueKind != JsonValueKind.Object
-            || !root.TryGetProperty(JsonName(nameof(TransferDocumentV1.Format)), out JsonElement format)
+            || !root.TryGetProperty(JsonName(nameof(TransferDocument.Format)), out JsonElement format)
             || format.ValueKind != JsonValueKind.String
             || format.GetString() != TransferFormat.Name
-            || !root.TryGetProperty(JsonName(nameof(TransferDocumentV1.FormatVersion)), out JsonElement version)
+            || !root.TryGetProperty(JsonName(nameof(TransferDocument.FormatVersion)), out JsonElement version)
             || version.ValueKind != JsonValueKind.Number
             || !version.TryGetInt32(out int number)
             || number < 1)
@@ -203,7 +203,7 @@ public static class TransferDocumentReader
             .MaxBy(pair => pair.Depth);
     }
 
-    private static DatasetSnapshot ToSnapshot(TransferDocumentV1 document) => new(
+    private static DatasetSnapshot ToSnapshot(TransferDocument document) => new(
         document.DatasetName,
         [.. document.Categories.Select(category => new SnapshotCategory(category.Ref, category.Name, category.Description))],
         [
@@ -218,7 +218,7 @@ public static class TransferDocumentReader
         ],
         [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))]);
 
-    private static List<QuantityLink> Links(IEnumerable<QuantityRefV1> links) =>
+    private static List<QuantityLink> Links(IEnumerable<QuantityRef> links) =>
         [.. links.Select(link => new QuantityLink(link.Ref, link.Quantity))];
 
     private static string Quoted(string name)
@@ -232,7 +232,7 @@ public static class TransferDocumentReader
     /// first, list the first <see cref="MaxListedErrors"/> and count the rest. One instance serves one
     /// <see cref="Run"/>.
     /// </summary>
-    private sealed class DocumentChecker(TransferDocumentV1 document)
+    private sealed class DocumentChecker(TransferDocument document)
     {
         private const string Category = "category";
         private const string Component = "component";
@@ -259,13 +259,13 @@ public static class TransferDocumentReader
             HashSet<int> blueprints = CheckRefs(Blueprint, "blueprints", document.Blueprints, blueprint => blueprint.Ref, blueprint => blueprint.Name);
             CheckRefs(Favorite, "favorites", document.Favorites, favorite => favorite.Ref, favorite => favorite.Name);
 
-            foreach (CategoryV1 category in document.Categories)
+            foreach (TransferCategory category in document.Categories)
             {
                 CheckName(Category, category.Ref, category.Name);
                 CheckText(Named(Category, category.Name), category.Name, category.Description);
             }
 
-            foreach (ComponentV1 component in document.Components)
+            foreach (TransferComponent component in document.Components)
             {
                 string subject = Named(Component, component.Name);
 
@@ -275,7 +275,7 @@ public static class TransferDocumentReader
                 CheckCategory(subject, component.Category, categories);
             }
 
-            foreach (BlueprintV1 blueprint in document.Blueprints)
+            foreach (TransferBlueprint blueprint in document.Blueprints)
             {
                 string subject = Named(Blueprint, blueprint.Name);
 
@@ -293,7 +293,7 @@ public static class TransferDocumentReader
                 CheckLinks(subject, Blueprint, blueprint.Blueprints, blueprints);
             }
 
-            foreach (FavoriteV1 favorite in document.Favorites)
+            foreach (TransferFavorite favorite in document.Favorites)
             {
                 string subject = Named(Favorite, favorite.Name);
 
@@ -394,9 +394,9 @@ public static class TransferDocumentReader
             }
         }
 
-        private void CheckLinks(string subject, string targetNoun, IEnumerable<QuantityRefV1> links, HashSet<int> targets)
+        private void CheckLinks(string subject, string targetNoun, IEnumerable<QuantityRef> links, HashSet<int> targets)
         {
-            foreach (QuantityRefV1 link in links)
+            foreach (QuantityRef link in links)
             {
                 if (!targets.Contains(link.Ref))
                 {
