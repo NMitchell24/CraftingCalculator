@@ -407,19 +407,34 @@ html.keyboard-open .page-content-with-bottom-nav {
 
 .summary-grid {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px 16px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
     margin: 0;
     font-variant-numeric: tabular-nums;
 }
 
+/* minmax(0, 1fr) lets the column shrink below its content size so overflow-wrap can act; without it
+   a bare 1fr's default min-width:auto keeps the column as wide as the label's longest word, and a
+   long value can push the grid wider than the dialog that hosts it. */
 .summary-grid dt {
     color: var(--mud-palette-text-secondary);
+    overflow-wrap: anywhere;
+    padding: 6px 0;
+    border-top: 1px solid var(--mud-palette-lines-default);
 }
 
+/* The column gap lives here as padding-left rather than on the grid, so the hairline border below
+   can run the full row width instead of stopping short of the value column. */
 .summary-grid dd {
     margin: 0;
+    padding: 6px 0 6px 16px;
     text-align: right;
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.summary-grid dt:first-of-type,
+.summary-grid dd:first-of-type {
+    border-top: none;
 }
 
 .summary-profit {
@@ -1436,7 +1451,12 @@ html.keyboard-open .mud-dialog-container {
     font-variant-numeric: tabular-nums;
 }
 
+/* min-width: 0 overrides a flex item's default min-width: auto, which otherwise keeps this label at
+   its content width and pushes the dialog into a horizontal scrollbar at large text sizes - the same
+   fix as minmax(0, 1fr) on .summary-grid above, for a flex row instead of a grid column. */
 .info-dialog-parts-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
     color: var(--mud-palette-text-secondary);
 }
 
