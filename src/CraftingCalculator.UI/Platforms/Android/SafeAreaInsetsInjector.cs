@@ -50,27 +50,37 @@ internal sealed class SafeAreaInsetsInjector(Android.Webkit.WebView webView)
         // which carries every position:fixed bar - the app bar above all - off the top of what the user
         // can see. Padding the content view by the IME height shrinks the WebView for real, so the
         // layout viewport matches what is visible and fixed positioning lands where it should.
-        // Subtracting the bottom system-bar inset avoids double-counting it: the IME inset already
-        // includes the nav bar, and --safe-area-inset-bottom reserves that separately in CSS.
-        Insets? ime = insets.GetInsets(WindowInsetsCompat.Type.Ime());
-        int imePadding = Math.Max((ime?.Bottom ?? 0) - bars.Bottom, 0);
+        // The padding is the whole IME inset, nav bar included, because the nav bar is under the keyboard:
+        // padding by less leaves that strip of the WebView behind the IME, and WebView M139+ shrinks the
+        // visual viewport by any overlap, which pans the page (visualViewport.offsetTop) on every open.
+        // For the same reason --safe-area-inset-bottom drops to 0 while the keyboard is up.
+        int imeBottom = insets.GetInsets(WindowInsetsCompat.Type.Ime())?.Bottom ?? 0;
+        bool imeOpen = imeBottom > 0;
 
-        v.SetPadding(0, 0, 0, imePadding);
+        v.SetPadding(0, 0, 0, imeBottom);
 
         // Insets are device px; convert to CSS px in-page via the WebView's own devicePixelRatio
         // rather than guessing the display density (the two differ on some hardware).
+        // data-native-ime tells the keyboard script in index.html that the WebView already resizes around the
+        // keyboard here, so it leaves --keyboard-inset at 0 and .keyboard-open to this listener.
         string js =
+            "document.documentElement.setAttribute('data-native-ime','');" +
+            $"document.documentElement.classList.toggle('keyboard-open',{(imeOpen ? "true" : "false")});" +
             $"document.documentElement.style.setProperty('--safe-area-inset-top',({bars.Top}/window.devicePixelRatio)+'px');" +
-            $"document.documentElement.style.setProperty('--safe-area-inset-bottom',({bars.Bottom}/window.devicePixelRatio)+'px');" +
+            $"document.documentElement.style.setProperty('--safe-area-inset-bottom',({(imeOpen ? 0 : bars.Bottom)}/window.devicePixelRatio)+'px');" +
             $"document.documentElement.style.setProperty('--safe-area-inset-left',({sides.Left}/window.devicePixelRatio)+'px');" +
             $"document.documentElement.style.setProperty('--safe-area-inset-right',({sides.Right}/window.devicePixelRatio)+'px');";
         webView.EvaluateJavascript(js, null);
 
-        // Consume only the system bars so no descendant re-applies them as padding; keep every other
-        // inset type (notably IME, so keyboard resizing still works, and display cutout) flowing.
+        // Consume the system bars so no descendant re-applies them as padding, and the IME because the padding
+        // above already resized the WebView for it. WebView M139+ shrinks its visual viewport by any IME inset
+        // it receives, so letting it through shrank the page twice for the moment between the inset arriving
+        // and the padded layout landing; a focused field scrolled into view in that moment was centered in a
+        // viewport half the real height and left the page scrolled up. The display cutout keeps flowing.
         // SetInsets is under-annotated as returning a nullable Builder; it always returns the builder.
         return new WindowInsetsCompat.Builder(insets)
             .SetInsets(WindowInsetsCompat.Type.SystemBars(), Insets.Of(0, 0, 0, 0))!
+            .SetInsets(WindowInsetsCompat.Type.Ime(), Insets.Of(0, 0, 0, 0))!
             .Build();
     }
 }

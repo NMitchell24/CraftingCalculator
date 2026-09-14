@@ -11,7 +11,7 @@ cetera. Sometimes, it's even the thing you *have* to craft so that you can make 
 example, you can't craft Ammo without Gunpowder. Gunpowder is another thing you have to craft. So, both Ammo and 
 Gunpowder are Blueprints. How much Ammo you can make just **depends** on how much Gunpowder you can make first.
 
-Every blueprint is a name plus a list of parts. Each part is either a [component](components.md) or **another 
+Every blueprint is a name plus a list of requirements. Each requirement is either a [component](components.md) or **another 
 blueprint**. This last part is how you would link together the Ammo and Gunpowder blueprints from the example above. 
 Gunpowder is a blueprint by itself that requires raw components of Sulfur and Charcoal. Ammo then requires 
 Gunpowder and Metal. So the app now knows that to craft Ammo, you will need to collect Sulfur, Charcoal, and Metal. 
@@ -87,19 +87,29 @@ blueprints down when they display in lists. See [Categories](categories.md) for 
 Free text. Notes to yourself: which workbench it needs, which tier it unlocks at, how to unlock it, whatever you want.
 This shows up on the detail card when you tap the blueprint anywhere in the app.
 
-## Adding parts
+## Adding requirements
 
-If you tap or click on the **Add component** panel it will expand with three controls:
+Tap ![Add](assets/add.svg) **Add requirements**. You get one list of everything this blueprint can use, components and
+blueprints together, sorted by name. The small line under each name tells you which one it is.
 
-1. **A Component / Blueprint toggle.** This defines which type of record you want to add.
-2. **A search box.** Start typing; it filters as you go.
-3. **A quantity and the ![Add](assets/add.svg) Add button.**
+1. **Search:** start typing in ![Search](assets/search.svg) the search box and the list filters as you go.
+   ![Filter](assets/filter-list.svg) narrows it down to a [category](categories.md) or two.
+2. **Add:** tap ![Add](assets/add.svg) **Add** on a row to put one of it in the blueprint.
+3. **Adjust:** once a requirement is in, its row swaps **Add** for ![Minus](assets/remove.svg), a number you can edit,
+   and ![Plus](assets/add.svg). Tap ![Minus](assets/remove.svg) when it's down to 1 and it's out again.
+4. **Done:** tap **Done** in the top corner when you're finished.
 
-If you add the same part twice the quantities merge rather than creating a duplicate row.
+Every tap counts the moment you make it. There's no separate confirm step. The keyboard stays up while you tap
+the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus](assets/add.svg) once, type `tin`, tap
+**Add**, and never have to chase the keyboard away. Scroll the list when you want it gone.
 
-Underneath, each part you've added gets a row with ![Minus](assets/remove.svg), an editable number,
-![Plus](assets/add.svg), and ![Delete](assets/delete.svg). Setting a quantity to 0 removes the part
-completely.
+> **Note:** Nothing is saved until you tap ![Save](assets/save.svg) **Save** back on the blueprint. **Cancel**
+> still throws all of it away.
+
+Back on the blueprint, each requirement you've added gets a row with ![Minus](assets/remove.svg), an editable number,
+![Plus](assets/add.svg), and ![Delete](assets/delete.svg). Tapping ![Minus](assets/remove.svg) when it's down to 1
+removes the requirement completely. Typing 0 doesn't. The row stays put at 0, so a fat-fingered edit can't quietly
+delete the Copper out of your Bronze.
 
 ### Nesting blueprints
 
@@ -122,16 +132,18 @@ A blueprint can't contain **itself**, and it can't contain anything that already
 Gunpowder, so Gunpowder can't turn around and use Ammo. That's a loop with no bottom: you'd need
 Gunpowder before you could make Ammo, and Ammo before you could make Gunpowder, forever.
 
-You don't have to watch for it. When you switch **Add component** over to **Blueprint**, the list
-already leaves out this blueprint and every blueprint that uses it, however deep. So if you're editing
-Gunpowder and Ammo isn't in the list, that's why.
+You don't have to watch for it. The **Add requirements** list already leaves out this blueprint and every
+blueprint that uses it, however deep. So if you're editing Gunpowder and Ammo isn't in the list, that's why.
 
 ## What to do when you're done
 
 - ![Save](assets/save.svg) **Save** commits your changes. It stays grayed out until the blueprint has a
-  name.
+  name. If a requirement is sitting at 0, it asks first: **Save anyway** keeps it, **Go back** lets you fix it.
 - **Cancel** or the back arrow abandons them. If you have unsaved edits, you get asked first.
 - ![Delete](assets/delete.svg) **Delete**, at the bottom left, removes the blueprint after a confirmation.
+
+> **Note:** On a phone these buttons duck out of the way while the keyboard is up. Tap the keyboard's Enter key
+> and they're right back.
 
 > **Tip:** Armor sets and tool tiers are usually 90% identical. To make a near-copy easily, you can use
 > ![Duplicate](assets/content-copy.svg) **Duplicate** on the Blueprints list. 

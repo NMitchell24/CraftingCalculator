@@ -73,10 +73,10 @@ Now we get into the real reason you're here. It's time to create your first **Bl
 4. **Yield per craft**: how many the recipe produces in one go. A Valheim forge hands you **1** Bronze per craft, 
    so leave it at 1.
 5. **Production time per craft**: how long one craft takes at the bench in hours, minutes, and/or seconds. Optional. 
-6. Tap or click on the **Add component** panel to open it.
-7. Leave the toggle on **Component**, search for `Copper`, set the quantity to `2`, tap **Add**.
-8. Search for `Tin`, quantity `1`, tap **Add**.
-9. **Save**.
+6. Tap ![Add](assets/add.svg) **Add requirements**.
+7. Search for `Copper`, tap **Add**, then tap ![Plus](assets/add.svg) once so it reads `2`.
+8. Search for `Tin` and tap **Add**. One is all you need.
+9. Tap **Done**, then **Save**.
 10. That's it. Your first **Blueprint** is locked in. But hold on tight, we're not quite finished yet.
 
 More detail: [Blueprints](blueprints.md).
@@ -98,10 +98,10 @@ palm of your hand.
 
 1. ![Dataset](assets/menu-book.svg) **Dataset** → ![Blueprints](assets/handyman.svg) **Blueprints** → ![New](assets/add.svg) **Add**
 2. **Name**: `Bronze Axe`
-3. Open **Add component**, add `Wood` × 4 and `Leather Scraps` × 2.
-4. Now flip the toggle from **Component** to **Blueprint**, search for `Bronze`,
-   quantity `8`, tap **Add**.
-5. **Save**.
+3. Tap ![Add](assets/add.svg) **Add requirements**, add `Wood` × 4 and `Leather Scraps` × 2.
+4. Now search for `Bronze`. It's a blueprint, but it lives in the same list. Tap **Add**, then type `8` over
+   the `1`.
+5. Tap **Done**, then **Save**.
 
 You have now told the app that a Bronze Axe needs 8 Bronze, 4 Wood, and 2 Leather Scraps. The **Blueprint** for a 
 Bronze Axe. Now, because the app already knows how to make Bronze, it therefore knows that you need 16 Copper and 

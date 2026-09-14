@@ -1,0 +1,54 @@
+@* No DialogActions: Done sits in the title, the one edge of a full-screen dialog the on-screen keyboard never
+   covers. The search bar is sticky inside the dialog content, the same hook BlueprintPickerDialog uses (app.css). *@
+<MudDialog ContentClass="picker-dialog-content">
+    <TitleContent>
+        <div class="add-parts-title">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Done" aria-label="Close" />
+            <MudText Typo="Typo.h6" Class="list-row-name add-parts-title-text">@Title</MudText>
+            <MudButton Color="Color.Primary" OnClick="Done">Done</MudButton>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <RecordSearchBar Records="_candidates" Placeholder="Search requirements" FilterChanged="OnFilterChanged" />
+
+        @if (FilteredCandidates.Count == 0)
+        {
+            <MudText Class="pa-4" Align="Align.Center">No requirements match.</MudText>
+        }
+        else
+        {
+            <MudList T="IBaseDataRecord">
+                @foreach (IBaseDataRecord candidate in FilteredCandidates)
+                {
+                    <MudListItem T="IBaseDataRecord" Ripple="false">
+                        <div class="list-row">
+                            <div class="list-row-info">
+                                <MudText Class="list-row-name">@candidate.Name</MudText>
+                                <MudText Typo="Typo.caption" Class="list-row-name">@candidate.Type.GetDescription()</MudText>
+                            </div>
+                            <CategoryChip Record="@candidate" Class="card-row-category" />
+                            @* index.html stops a tap on these buttons from taking focus off the search field, so
+                               the keyboard stays up between searches. *@
+                            <div class="list-row-stepper">
+                                @if (BlueprintPartProcessor.FindPart(Blueprint, candidate) is { } part)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" aria-label="Less"
+                                                   OnClick="@(() => StepAsync(part, -1))" />
+                                    <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
+                                                     Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" aria-label="More"
+                                                   OnClick="@(() => StepAsync(part, 1))" />
+                                }
+                                else
+                                {
+                                    <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                                               OnClick="@(() => AddAsync(candidate))">Add</MudButton>
+                                }
+                            </div>
+                        </div>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </DialogContent>
+</MudDialog>

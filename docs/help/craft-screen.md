@@ -28,7 +28,7 @@ everything you selected drops into your batch with a quantity of 1.
 |-----------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | ![Minus](assets/remove.svg) ![Plus](assets/add.svg) | Step the quantity up or down by one, or by ten. See [Stepping by ten](craft-screen.md#stepping-by-ten). |
 | **The number**                                      | Tap it and type a quantity directly. Handy when you need 240 of something.                              |
-| ![Info](assets/info.svg)                            | Opens a detail card showing the value, yield, production time, and the recipe's own parts.              |
+| ![Info](assets/info.svg)                            | Opens a detail card showing the value, yield, production time, and the recipe's own requirements.       |
 | ![Delete](assets/delete.svg)                        | Removes that blueprint from the batch.                                                                  |
 
 Stepping the quantity **below zero removes the row**. Zero itself is a perfectly valid quantity. It
@@ -94,8 +94,8 @@ standing in a mine or purchasing ore from a trader.
 ### Steps
 
 The full breakdown, as a tree. It traces down from the item you requested to the raw materials required for every step 
-along the way. The top row is a blueprint from your batch. Expand that row and you can see the parts it 
-needs. Expand those rows to see the parts **they** need, and so on, all the way down to raw components.
+along the way. The top row is a blueprint from your batch. Expand that row and you can see the requirements it 
+needs. Expand those rows to see the requirements **they** need, and so on, all the way down to raw components.
 
 - The **arrow** on the left expands and collapses a branch.
 - **Tapping the row itself** opens its detail card. This shows a breakdown of the quantity, crafts, yield, surplus 

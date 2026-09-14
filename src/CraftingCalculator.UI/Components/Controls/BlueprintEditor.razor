@@ -2,11 +2,11 @@
               FullWidth="true" Required="true" RequiredError="Name is required" Immediate="true" Class="mb-4" />
 
 <MudNumericField @bind-Value="Model.Value" @bind-Value:after="NotifyChangedAsync" Label="Value per item"
-                 Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" onfocus="this.select()" />
+                 Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" />
 
 @* Min is the user-facing guard; Blueprint.Yield clamps as well, for anything reaching the model another way. *@
 <MudNumericField T="long" @bind-Value="Model.Yield" @bind-Value:after="NotifyChangedAsync" Label="Yield per craft"
-                 Variant="Variant.Outlined" FullWidth="true" Min="1" Class="mb-4" onfocus="this.select()" />
+                 Variant="Variant.Outlined" FullWidth="true" Min="1" Class="mb-4" />
 
 <ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
                      Label="Production time per craft" />
@@ -16,40 +16,14 @@
 <MudTextField @bind-Value="Model.Description" @bind-Value:after="NotifyChangedAsync" Label="Description"
               Variant="Variant.Outlined" FullWidth="true" Lines="3" Sizing="InputSizing.Auto" MaxLines="10" Class="mb-4" />
 
-<MudExpansionPanels Elevation="1" Class="mb-2">
-    <MudExpansionPanel Text="Add component">
-        <MudToggleGroup T="DataType" Value="_partType" ValueChanged="OnPartTypeChanged"
-                        Delimiters="false" Class="mb-3">
-            <MudToggleItem Value="DataType.Component">Component</MudToggleItem>
-            <MudToggleItem Value="DataType.Blueprint">Blueprint</MudToggleItem>
-        </MudToggleGroup>
-
-        @* Opens upward. This is a type-ahead, so focusing it raises the on-screen keyboard, and the
-           default downward popover lands squarely behind it - scrolling to see the list then counts as
-           a click outside and closes it. Modal is the other half: without it a scroll gesture anywhere
-           outside the list dismisses it before it can be read. MaxHeight is below MudBlazor's 300
-           default so that opening upward from a field near the top of the form cannot reach the app
-           bar. *@
-        <MudAutocomplete T="IBaseDataRecord" @bind-Value="_selectedPart" SearchFunc="SearchAsync"
-                         ToStringFunc="@(record => record?.Name ?? "")" Label="@($"{_partType.GetDescription()} to add")"
-                         Variant="Variant.Outlined" FullWidth="true" Clearable="true" ResetValueOnEmptyText="true"
-                         AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.BottomLeft" MaxHeight="220"
-                         Class="mb-3" />
-
-        <div class="blueprint-add-row">
-            <MudNumericField T="long" @bind-Value="_quantityToAdd" Label="Quantity" Min="1"
-                             Variant="Variant.Outlined" Class="blueprint-add-qty" onfocus="this.select()" />
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
-                       Disabled="@(_selectedPart is null)" OnClick="AddComponentAsync">Add</MudButton>
-        </div>
-    </MudExpansionPanel>
-</MudExpansionPanels>
+<MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" StartIcon="@Icons.Material.Filled.Add"
+           Class="mb-2" OnClick="OpenAddPartsAsync">Add requirements</MudButton>
 
 @if (Parts.Count == 0)
 {
     <div class="pane-empty-state">
-        <MudText Typo="Typo.body1">No components yet</MudText>
-        <MudText Typo="Typo.caption">Open "Add component" above to add a component or another blueprint.</MudText>
+        <MudText Typo="Typo.body1">No requirements yet</MudText>
+        <MudText Typo="Typo.caption">Tap "Add requirements" above to add a component or another blueprint.</MudText>
     </div>
 }
 else
@@ -65,12 +39,11 @@ else
                     </div>
                     <div class="list-row-stepper">
                         <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
-                                       OnClick="@(() => SetQuantityAsync(part, part.Quantity - 1))" />
+                                       OnClick="@(() => StepAsync(part, -1))" />
                         <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
-                                         Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field"
-                                         onfocus="this.select()" />
+                                         Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
                         <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
-                                       OnClick="@(() => SetQuantityAsync(part, part.Quantity + 1))" />
+                                       OnClick="@(() => StepAsync(part, 1))" />
                     </div>
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(part))" />
                 </div>

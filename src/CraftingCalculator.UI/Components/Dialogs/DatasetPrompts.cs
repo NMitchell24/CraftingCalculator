@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
@@ -7,8 +8,8 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
 /// The prompts the Dataset screen runs: the delete confirmations for one record or several - shared by
-/// the Dataset list's row actions, its Delete Mode, and the editor's action bar - and the naming and
-/// delete sequences for the datasets themselves.
+/// the Dataset list's row actions, its Delete Mode, and the editor's action bar - the editor's check before
+/// saving, and the naming and delete sequences for the datasets themselves.
 /// </summary>
 public static class DatasetPrompts
 {
@@ -78,6 +79,28 @@ public static class DatasetPrompts
             $"Delete {record.Type.GetDescription()}?",
             $"'{record.Name}' will be deleted forever and removed from any blueprints {alsoFavorites}where it is used.",
             yesText: "Delete", cancelText: "Cancel");
+
+        return confirmed == true;
+    }
+
+    /// <summary>
+    /// Returns true if <paramref name="record"/> is ready to save, or if the user chose to save it anyway after being
+    /// told which of its requirements have a quantity of 0.
+    /// </summary>
+    public static async Task<bool> ConfirmSaveAsync(IDialogService dialogs, IBaseDataRecord record)
+    {
+        if (record is not BlueprintModel blueprint || BlueprintPartProcessor.GetPartsAtZero(blueprint) is not { Count: > 0 } atZero)
+        {
+            return true;
+        }
+
+        string names = string.Join(", ", atZero.Select(part => $"'{part.Name}'"));
+        string verb = atZero.Count == 1 ? "has" : "have";
+
+        bool? confirmed = await dialogs.ShowMessageBoxAsync(
+            "Requirements at 0",
+            $"{names} {verb} a quantity of 0, so the blueprint won't need any. Save anyway, or go back and fix it?",
+            yesText: "Save anyway", cancelText: "Go back");
 
         return confirmed == true;
     }

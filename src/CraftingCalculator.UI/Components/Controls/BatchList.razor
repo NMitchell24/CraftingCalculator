@@ -31,8 +31,7 @@
                                                title="@DecrementLabel" aria-label="@DecrementLabel"
                                                OnClick="@(() => State.Step(selected, -StepSize))" />
                                 <MudNumericField T="long" Value="selected.Quantity" ValueChanged="@(v => State.SetQuantity(selected, v))"
-                                                 Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field"
-                                                 onfocus="this.select()" />
+                                                 Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
                                 <MudIconButton Icon="@IncrementIcon" Color="@StepColor" Size="Size.Medium"
                                                title="@IncrementLabel" aria-label="@IncrementLabel"
                                                OnClick="@(() => State.Step(selected, StepSize))" />

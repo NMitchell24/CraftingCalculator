@@ -22,6 +22,14 @@ public static class BlueprintPartProcessor
     }
 
     /// <summary>
+    /// The part on the blueprint that <paramref name="record"/> represents, or <c>null</c> when the blueprint
+    /// does not use it.
+    /// </summary>
+    public static IBaseQuantityRecord? FindPart(BlueprintModel blueprint, IBaseDataRecord record) =>
+        // Type and name, because name is what ComponentMap and BlueprintMap merge a repeated Add on.
+        GetParts(blueprint).FirstOrDefault(part => part.Type == record.Type && part.Name == record.Name);
+
+    /// <summary>
     /// Adds the part to the blueprint, or raises the quantity of the matching part already on it by
     /// <paramref name="quantity"/>.
     /// </summary>
@@ -39,10 +47,13 @@ public static class BlueprintPartProcessor
     }
 
     /// <summary>
-    /// Sets the part's quantity on the blueprint. A quantity of 0 or less removes the part entirely.
+    /// Moves the part's quantity by <paramref name="step"/>, which is negative to step down. Stepping below 1 removes
+    /// the part from the blueprint.
     /// </summary>
-    public static void SetQuantity(BlueprintModel blueprint, IBaseQuantityRecord part, long quantity)
+    public static void Step(BlueprintModel blueprint, IBaseQuantityRecord part, long step)
     {
+        long quantity = part.Quantity + step;
+
         if (quantity <= 0)
         {
             Remove(blueprint, part);
@@ -51,6 +62,10 @@ public static class BlueprintPartProcessor
 
         part.Quantity = quantity;
     }
+
+    /// <summary>The blueprint's parts that have a quantity of 0, in <see cref="GetParts"/> order.</summary>
+    public static List<IBaseQuantityRecord> GetPartsAtZero(BlueprintModel blueprint) =>
+        [.. GetParts(blueprint).Where(part => part.Quantity == 0)];
 
     /// <summary>Removes the part from the blueprint.</summary>
     public static void Remove(BlueprintModel blueprint, IBaseQuantityRecord part)

@@ -87,7 +87,7 @@ Same as everywhere else: ![Save](assets/save.svg) **Save** is grayed out until t
 **Cancel** and the back arrow warn you about unsaved edits, and ![Delete](assets/delete.svg) **Delete**
 asks before it acts.
 
-Deleting a component that a blueprint uses removes it from that blueprint's part list. The blueprint
+Deleting a component that a blueprint uses removes it from that blueprint's requirements list. The blueprint
 itself survives. It just needs one less thing.
 
 To create a copy of one, use ![Duplicate](assets/content-copy.svg) **Duplicate** on the Components list.

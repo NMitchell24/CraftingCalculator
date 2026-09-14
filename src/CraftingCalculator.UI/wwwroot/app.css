@@ -131,6 +131,9 @@ html, body {
        three quarters of --mud-appbar-height, and MainLayout pads it by the status-bar inset on top.
        Anything that pins itself directly under the bar offsets by this. */
     --app-bar-bottom: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    /* How far the on-screen keyboard reaches up over the layout viewport, written by the keyboard script in
+       index.html. Only ever non-zero on iOS: Android's SafeAreaInsetsInjector shrinks the WebView instead. */
+    --keyboard-inset: 0px;
 }
 
 /* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
@@ -217,6 +220,20 @@ html, body {
    property are decided by source order, and this one has to come after the rule above. */
 .page-content-with-actions-bar {
     padding-bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+/* While the on-screen keyboard is up (.keyboard-open, see index.html) it covers the bottom bars rather than
+   lifting them: with the keyboard open a phone has about 685px of viewport, and three docked bars took a third
+   of it away from the field being typed into. They come back when the keyboard closes. */
+html.keyboard-open .bottom-nav,
+html.keyboard-open .actions-bar,
+html.keyboard-open .editor-action-bar {
+    display: none;
+}
+
+/* Out-specifies both offsets above, which are always applied together. */
+html.keyboard-open .page-content-with-bottom-nav {
+    padding-bottom: 16px;
 }
 
 /* MainLayout.razor's bottom navigation bar (xs breakpoint only). Not CSS-isolated (see MainLayout.razor
@@ -601,6 +618,11 @@ html, body {
 .list-row-stepper {
     display: flex;
     align-items: center;
+}
+
+/* AddPartsDialog's Add button, which takes the stepper's place on a part the blueprint does not use yet. */
+.list-row-stepper .mud-button-root {
+    min-height: 44px;
 }
 
 .list-row-qty-field {
@@ -1062,16 +1084,6 @@ html, body {
     padding-bottom: 72px;
 }
 
-.blueprint-add-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.blueprint-add-qty {
-    width: 96px;
-}
-
 /* Thumb-reachable Cancel/Save - above the bottom nav on xs and clear of the gesture-nav area
    everywhere. The only fixed bar left in the app now that the totals bar is a card. */
 .editor-action-bar {
@@ -1218,6 +1230,11 @@ html, body {
     }
 }
 
+/* Every bar the two positions above clear is hidden while the keyboard is up, so the toast docks on the keyboard. */
+html.keyboard-open .mud-snackbar-location-bottom-center {
+    bottom: calc(8px + var(--keyboard-inset));
+}
+
 /* #mud-snackbar-container is pointer-events:none, but each .mud-snackbar re-enables it for
    click-to-close - so a tap aimed at a control beneath a toast hits the toast instead. Dismissal is by
    timeout only now, which is also why ShowCloseIcon is off (MauiProgram.cs). */
@@ -1238,6 +1255,13 @@ html, body {
 .mud-dialog:not(.mud-dialog-fullscreen) {
     margin: 16px;
     max-height: calc(100dvh - 32px);
+}
+
+/* The container is sized to the layout viewport, which on iOS stays full height under the keyboard, so a
+   full-screen dialog's bottom would sit behind it. --keyboard-inset is 0 on Android, where the WebView shrinks. */
+html.keyboard-open .mud-dialog-container {
+    height: auto;
+    bottom: var(--keyboard-inset);
 }
 
 /* Applied to every dialog title from one place rather than repeated at each call site, alongside the
@@ -1266,6 +1290,19 @@ html, body {
    flush against the gesture nav bar's swipe area. */
 .mud-dialog-fullscreen .mud-dialog-actions {
     padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+}
+
+/* Components/Dialogs/AddPartsDialog.razor. Close, the title and Done share the title row; the title takes the
+   slack and ellipsizes (.list-row-name) so a long blueprint name never pushes Done off the edge. */
+.add-parts-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.add-parts-title-text {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 /* Components/Dialogs/InfoDialog.razor. The name takes the row and the category chip trails it, so a
