@@ -5,6 +5,7 @@ using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
@@ -25,6 +26,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
+    [Inject] private IJSRuntime Js { get; set; } = null!;
 
     private IBaseDataRecord? _record;
     private DataType _type;
@@ -60,7 +62,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
         PageShellState.Configure(this, new PageShellConfig(Title())
         {
-            BackHref = ListHref,
+            ShowBack = true,
             TitleIsUserContent = Id > 0
         });
     }
@@ -69,7 +71,10 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
     private void MarkDirty() => _isDirty = true;
 
-    private void Cancel() => Navigation.NavigateTo(ListHref);
+    // The editor is only ever opened from its list, so stepping back returns there and takes the editor out
+    // of history. A NavigateTo would push the list on top instead, leaving the editor behind it for the
+    // system back gesture to reopen.
+    private async Task ReturnToListAsync() => await Js.InvokeVoidAsync("history.back");
 
     private async Task SaveAsync()
     {
@@ -82,7 +87,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
         _isDirty = false;
         Snackbar.Add($"Saved '{_record.Name}'", Severity.Success);
-        Navigation.NavigateTo(ListHref);
+        await ReturnToListAsync();
     }
 
     private async Task DeleteAsync()
@@ -96,12 +101,12 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
         _isDirty = false;
         Snackbar.Add($"Deleted '{_record.Name}'", Severity.Success);
-        Navigation.NavigateTo(ListHref);
+        await ReturnToListAsync();
     }
 
     /// <summary>
-    /// Guards the back arrow, Cancel, and the bottom nav / side rail alike. The WPF app discarded
-    /// in-progress edits silently whenever the selection changed.
+    /// Guards every way off the page: Cancel, the back arrow and the system back gesture, and the bottom
+    /// nav / side rail. The WPF app discarded in-progress edits silently whenever the selection changed.
     /// </summary>
     private async ValueTask ConfirmDiscardAsync(LocationChangingContext context)
     {
@@ -122,7 +127,19 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         if (discard == true)
         {
             _isDirty = false;
-            Navigation.NavigateTo(context.TargetLocation);
+
+            // The list is the entry beneath this one, so only a step back targets it. Every other destination
+            // replaces the editor's entry, or back from there would reopen the edits just discarded.
+            // TargetLocation stays relative when the navigation came from a NavigateTo call.
+            if (Navigation.ToAbsoluteUri(context.TargetLocation).AbsolutePath
+                .Equals(ListHref, StringComparison.OrdinalIgnoreCase))
+            {
+                await ReturnToListAsync();
+            }
+            else
+            {
+                Navigation.NavigateTo(context.TargetLocation, replace: true);
+            }
         }
     }
 

@@ -86,7 +86,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
         PageShellState.Configure(this, new PageShellConfig(TitleFor(_type))
         {
-            BackHref = "/dataset",
+            ShowBack = true,
             Actions =
             [
                 new PageAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync),

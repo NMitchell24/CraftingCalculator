@@ -47,7 +47,7 @@ public partial class Import : ComponentBase, IDisposable
     private void ConfigureShell() =>
         PageShellState.Configure(this, new PageShellConfig("Import Data")
         {
-            BackHref = "/dataset/import-export",
+            ShowBack = true,
             Actions = ImportState.Step switch
             {
                 ImportStep.Review =>

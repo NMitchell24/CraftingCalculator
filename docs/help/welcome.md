@@ -51,3 +51,6 @@ answer.
 
 Help is always one tap away. The ![Help](assets/help-outline.svg) icon in the top bar opens the help page for whatever screen you are 
 looking at.
+
+Read as many help pages as you like. Tap ![Help](assets/help-outline.svg) again, or use your phone's back gesture, and
+you're straight back on the screen you came from. The back arrow on a help page takes you to the contents instead.

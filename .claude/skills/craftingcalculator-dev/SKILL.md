@@ -162,7 +162,7 @@ touching them. The short version:
 
 ## Built-in help (`docs/help`)
 
-The app ships a manual. The **?** in the app bar (`MainLayout.ToggleHelp`) opens the help page for the
+The app ships a manual. The **?** in the app bar (`MainLayout.ToggleHelpAsync`) opens the help page for the
 route the user is on; `/help` is the contents list and `/help/{TopicId}` one page.
 
 **Any change to what the user sees updates the matching page under `docs/help/`, in the same commit.**

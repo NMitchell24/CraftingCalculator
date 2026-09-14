@@ -48,13 +48,6 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
 
-    // Settings and Help are both app-bar overlays: they open over whatever page is showing, and their
-    // own icon closes them back to it rather than to a fixed route. One shared stack rather than a
-    // return address each, because the overlays open over each other: opening Help from Settings has to
-    // close back to Settings, and closing that has to reach the page Settings was opened from. Two
-    // slots would point at each other there, and the pair would never unwind.
-    private readonly Stack<string> _overlayOrigins = new();
-
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
     // rather than committing to a nav it may have to take back.
@@ -186,17 +179,17 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 
     private bool IsSettingsOpen => IsOpen(SettingsRoute);
 
-    private bool IsHelpOpen => IsOpen(HelpTopics.HelpRoot);
+    private bool IsHelpOpen => HelpProcessor.IsHelpRoute(CurrentRoute);
 
     private string SettingsActionLabel => IsSettingsOpen ? "Close settings" : "Settings";
 
     private string HelpActionLabel => IsHelpOpen ? "Close help" : "Help for this screen";
 
-    private void ToggleSettings() => ToggleOverlay(IsSettingsOpen, $"/{SettingsRoute}");
+    private Task ToggleSettingsAsync() => ToggleOverlayAsync(IsSettingsOpen, $"/{SettingsRoute}");
 
     // The target is resolved from the route the user is on now, which is why it is computed here rather
     // than by the Help page itself: once the navigation has happened that route is gone.
-    private void ToggleHelp() => ToggleOverlay(IsHelpOpen,
+    private Task ToggleHelpAsync() => ToggleOverlayAsync(IsHelpOpen,
         $"/{HelpTopics.HelpRoot}/{HelpProcessor.ResolveTopic(CurrentRoute).Id}");
 
     /// <summary>Whether the current route is <paramref name="route"/> or a page beneath it.</summary>
@@ -205,30 +198,38 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         || CurrentRoute.StartsWith($"{route}/", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Opens <paramref name="target"/> over the current page, or closes it by navigating back to
-    /// wherever the topmost open overlay was opened from.
+    /// Opens <paramref name="target"/> over the current page, or closes the open overlay back to the screen
+    /// it was opened from.
     /// </summary>
-    private void ToggleOverlay(bool isOpen, string target)
+    private async Task ToggleOverlayAsync(bool isOpen, string target)
     {
+        // Settings has no navigation of its own and Help swaps its pages in place, so an open overlay is
+        // always exactly one history entry above the screen it was opened from.
         if (isOpen)
         {
-            // Empty on a deep link straight into an overlay, or once the user has left one by the nav
-            // rail rather than by its own icon.
-            Navigation.NavigateTo(_overlayOrigins.Count > 0 ? _overlayOrigins.Pop() : "/");
+            await StepBackAsync();
             return;
         }
 
-        // Opening an overlay from an ordinary page starts a new chain. Anything still on the stack was
-        // left by an overlay the user walked away from with the nav rail instead of closing, and popping
-        // it later would send them back to a page they had already moved on from.
-        if (!IsSettingsOpen && !IsHelpOpen)
-        {
-            _overlayOrigins.Clear();
-        }
-
-        _overlayOrigins.Push(Navigation.Uri);
         Navigation.NavigateTo(target);
     }
+
+    // Help swaps its pages in place, so the arrow on a topic reaches the contents by navigating there;
+    // stepping back would leave Help altogether.
+    private async Task GoBackAsync()
+    {
+        if (IsHelpOpen)
+        {
+            Navigation.NavigateTo($"/{HelpTopics.HelpRoot}");
+            return;
+        }
+
+        await StepBackAsync();
+    }
+
+    // history.back() rather than a NavigateTo to the page underneath, which would push a second copy of
+    // that page and leave the one being closed behind it for the system back gesture to reopen.
+    private ValueTask StepBackAsync() => Js.InvokeVoidAsync("history.back");
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
 
