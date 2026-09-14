@@ -4,7 +4,7 @@
     <TitleContent>
         <div class="add-parts-title">
             <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Done" aria-label="Close" />
-            <MudText Typo="Typo.h6" Class="list-row-name add-parts-title-text">@Title</MudText>
+            <MudText Typo="Typo.h6" Class="add-parts-title-text">@Title</MudText>
             <MudButton Color="Color.Primary" OnClick="Done">Done</MudButton>
         </div>
     </TitleContent>
@@ -21,21 +21,21 @@
                 @foreach (IBaseDataRecord candidate in FilteredCandidates)
                 {
                     <MudListItem T="IBaseDataRecord" Ripple="false">
-                        <div class="list-row">
-                            <div class="list-row-info">
-                                <MudText Class="list-row-name">@candidate.Name</MudText>
-                                <MudText Typo="Typo.caption" Class="list-row-name">@candidate.Type.GetDescription()</MudText>
+                        <div class="record-row">
+                            <div class="record-row-name">
+                                <MudText>@candidate.Name</MudText>
+                                <MudText Typo="Typo.caption" Class="record-row-caption">@candidate.Type.GetDescription()</MudText>
                             </div>
-                            <CategoryChip Record="@candidate" Class="card-row-category" />
+                            <div class="record-row-meta"><CategoryChip Record="@candidate" Class="record-row-category" /></div>
                             @* index.html stops a tap on these buttons from taking focus off the search field, so
                                the keyboard stays up between searches. *@
-                            <div class="list-row-stepper">
+                            <div class="record-row-end record-row-stepper">
                                 @if (BlueprintPartProcessor.FindPart(Blueprint, candidate) is { } part)
                                 {
                                     <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" aria-label="Less"
                                                    OnClick="@(() => StepAsync(part, -1))" />
                                     <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
-                                                     Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
+                                                     Min="0" DebounceInterval="300" HideSpinButtons="true" Class="record-row-qty-field" />
                                     <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" aria-label="More"
                                                    OnClick="@(() => StepAsync(part, 1))" />
                                 }

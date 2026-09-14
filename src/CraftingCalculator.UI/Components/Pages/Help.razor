@@ -35,9 +35,9 @@
                 @foreach (HelpTopic topic in HelpTopics.All)
                 {
                     <MudListItem T="HelpTopic" Href="@HrefFor(topic)">
-                        <div class="list-row">
-                            <div class="list-row-info">
-                                <MudText Class="list-row-name">@topic.Title</MudText>
+                        <div class="help-topic-row">
+                            <div class="help-topic-info">
+                                <MudText>@topic.Title</MudText>
                                 <MudText Typo="Typo.caption" Class="help-topic-summary">@topic.Summary</MudText>
                             </div>
                             <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Primary" />

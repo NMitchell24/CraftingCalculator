@@ -32,20 +32,22 @@ else
         @foreach (IBaseQuantityRecord part in Parts)
         {
             <MudListItem T="IBaseQuantityRecord">
-                <div class="list-row">
-                    <div class="list-row-info">
-                        <MudText Class="list-row-name">@part.Name</MudText>
-                        <MudText Typo="Typo.caption" Class="list-row-name">@part.Type.GetDescription()</MudText>
+                <div class="record-row">
+                    <div class="record-row-name">
+                        <MudText>@part.Name</MudText>
+                        <MudText Typo="Typo.caption" Class="record-row-caption">@part.Type.GetDescription()</MudText>
                     </div>
-                    <div class="list-row-stepper">
-                        <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
-                                       OnClick="@(() => StepAsync(part, -1))" />
-                        <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
-                                         Min="0" DebounceInterval="300" HideSpinButtons="true" Class="list-row-qty-field" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
-                                       OnClick="@(() => StepAsync(part, 1))" />
+                    <div class="record-row-end">
+                        <div class="record-row-stepper">
+                            <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                           OnClick="@(() => StepAsync(part, -1))" />
+                            <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
+                                             Min="0" DebounceInterval="300" HideSpinButtons="true" Class="record-row-qty-field" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                           OnClick="@(() => StepAsync(part, 1))" />
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(part))" />
                     </div>
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(part))" />
                 </div>
             </MudListItem>
         }

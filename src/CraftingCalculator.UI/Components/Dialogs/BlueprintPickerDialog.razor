@@ -13,11 +13,9 @@
                 @foreach (BlueprintModel blueprint in FilteredBlueprints)
                 {
                     <MudListItem T="BlueprintModel" Value="@blueprint">
-                        <div class="list-row">
-                            <div class="list-row-info">
-                                <MudText Class="list-row-name">@blueprint.Name</MudText>
-                            </div>
-                            <CategoryChip Record="@blueprint" Class="card-row-category" />
+                        <div class="record-row">
+                            <MudText Class="record-row-name">@blueprint.Name</MudText>
+                            <div class="record-row-meta"><CategoryChip Record="@blueprint" Class="record-row-category" /></div>
                         </div>
                     </MudListItem>
                 }

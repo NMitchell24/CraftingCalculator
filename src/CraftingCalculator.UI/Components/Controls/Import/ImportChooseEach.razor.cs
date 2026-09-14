@@ -12,7 +12,7 @@ namespace CraftingCalculator.UI.Components.Controls.Import;
 public partial class ImportChooseEach : BaseImportControl
 {
     // Matches .transfer-row's height in app.css, which is fixed so Virtualize can position rows exactly.
-    private const float RowHeight = 48;
+    private const float RowHeight = 56;
 
     /// <summary>Raised when the user taps Import Selected.</summary>
     [Parameter] public EventCallback OnImport { get; set; }

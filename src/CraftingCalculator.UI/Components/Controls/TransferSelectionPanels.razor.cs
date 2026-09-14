@@ -19,7 +19,7 @@ public partial class TransferSelectionPanels : ComponentBase
     private sealed record Row(RecordKey Key, string Name);
 
     // Matches .transfer-row's height in app.css, which is fixed so Virtualize can position rows exactly.
-    private const float RowHeight = 48;
+    private const float RowHeight = 56;
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
