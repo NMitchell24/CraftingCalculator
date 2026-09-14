@@ -28,12 +28,14 @@
                            before it bubbles. @onclick:stopPropagation can only be applied to an
                            element, never a component tag, hence the wrapper div. *@
                         <div class="record-row-end" @onclick="() => { }" @onclick:stopPropagation="true">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                                           title="@($"Rename {favorite.Name}")" aria-label="@($"Rename {favorite.Name}")"
-                                           OnClick="@(() => RenameAsync(favorite))" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
-                                           title="@($"Delete {favorite.Name}")" aria-label="@($"Delete {favorite.Name}")"
-                                           OnClick="@(() => DeleteAsync(favorite))" />
+                            <div class="record-row-icons">
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                               title="@($"Rename {favorite.Name}")" aria-label="@($"Rename {favorite.Name}")"
+                                               OnClick="@(() => RenameAsync(favorite))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                                               title="@($"Delete {favorite.Name}")" aria-label="@($"Delete {favorite.Name}")"
+                                               OnClick="@(() => DeleteAsync(favorite))" />
+                            </div>
                         </div>
                     </div>
                 </MudListItem>

@@ -39,12 +39,14 @@
                            buttons have to stop the event before it bubbles, and
                            @onclick:stopPropagation only applies to an element - hence the wrapper. *@
                         <div class="record-row-end" @onclick="() => { }" @onclick:stopPropagation="true">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                                           title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
-                                           OnClick="@(() => Edit(record))" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
-                                           title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
-                                           OnClick="@(() => DeleteAsync(record))" />
+                            <div class="record-row-icons">
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                               title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
+                                               OnClick="@(() => Edit(record))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                                               title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
+                                               OnClick="@(() => DeleteAsync(record))" />
+                            </div>
                         </div>
                     </div>
                 </MudListItem>

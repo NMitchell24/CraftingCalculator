@@ -626,12 +626,30 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* margin-left: auto keeps the buttons at the trailing edge whether they share the meta's line or have
-   one of their own. */
+   one of their own. flex: 0 1 auto plus min-width: 0 let the cell itself shrink below its content's
+   natural width instead of forcing the row wider than the card; flex-wrap plus justify-content:
+   flex-end then wrap content that still does not fit (.record-row-stepper alongside BatchList's
+   .record-row-icons, at the largest Android text size) onto a second line, right-aligned under the
+   first, rather than clipping it at the card edge. Wrapping happens between .record-row-stepper and
+   .record-row-icons, never inside either: each is one flex item here, so its own buttons move to the
+   next line together instead of splitting mid-group. */
 .record-row-end {
     display: flex;
-    flex: 0 0 auto;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-end;
+    gap: 4px 8px;
+    min-width: 0;
     margin-left: auto;
+}
+
+/* Groups icon-only row actions (BatchList's Info/Delete, Favorites' and DatasetList's Edit/Delete) into
+   one flex item so .record-row-end wraps them together - see the comment above. */
+.record-row-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 @media (min-width: 600px) {
