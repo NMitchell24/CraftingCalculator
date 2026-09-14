@@ -438,12 +438,23 @@ html.keyboard-open .page-content-with-bottom-nav {
     color: var(--mud-palette-error);
 }
 
-/* The tab row's own row, holding nothing else. Sharing it with the pane actions sized the tab bar by
-   whatever they left over, so it changed width whenever the active pane's action count changed. */
-.pane-toolbar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
+/* Inline-size container so the query below can ask "do three one-line labels fit here" in a unit that
+   tracks the group's own font - see the query's comment for why that unit is ch, not px. */
+.pane-tabs {
+    container-type: inline-size;
+}
+
+/* Below this width the three labels can't each fit their pill on one line, so the group stacks into
+   three full-width pills instead - a label breaking mid-word is the bug this avoids. ch rather than a
+   media query's px: the Android WebView's text-zoom setting scales ch (it's measured from the zoomed
+   glyphs) but not the container's px width, so only ch tracks whether the *text* fits at every zoom
+   level. 30ch sits between a calibrated failing width (~27ch, labels didn't fit on one line) and a
+   calibrated fitting one (~36ch). MudToggleGroup sets grid-template-columns inline on the element that
+   also carries .segmented, hence the !important. */
+@container (max-width: 30ch) {
+    .segmented {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 /* Segmented control, replacing MudToggleGroup's default bordered box: a recessed track holding one
@@ -467,8 +478,7 @@ html.keyboard-open .page-content-with-bottom-nav {
    by .segmented rather than left as the bare SelectedClass MudToggleGroup applies. */
 .segmented .mud-toggle-item {
     border-radius: 8px;
-    /* The touch floor, kept explicit because the label below is allowed to wrap: a one-line pill is
-       44px on its own, and a two-line one must not shrink the others. */
+    /* The touch target floor. */
     min-height: 44px;
     /* MudBlazor's .mud-toggle-item sets `border-style: none !important`, so a plain border on the
        selected pill below would never paint. Re-declaring the style here with the same weight is what
@@ -478,16 +488,10 @@ html.keyboard-open .page-content-with-bottom-nav {
     border-color: transparent;
 }
 
-/* At a large OS text size three equal segments cannot each hold a one-line label on a phone. The label
-   wraps rather than ellipsizing: a two-line tab is still the whole word. Craft.razor puts a soft hyphen
-   in "Components" so the break lands as "Compo-nents"; overflow-wrap: anywhere is the fallback for a
-   segment too narrow even for that. .mud-button-label is a flex child that will not shrink below its
-   content on its own, hence display: block and min-width. */
+/* A label never breaks mid-word: when a segment is too narrow to hold one on a single line, the
+   .pane-tabs container query above stacks the whole group into full-width pills instead. */
 .segmented .mud-toggle-item .mud-button-label {
-    display: block;
-    min-width: 0;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
 }
 
 .segmented .mud-toggle-item:not(.segmented-selected) {
