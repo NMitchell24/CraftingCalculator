@@ -11,9 +11,10 @@ namespace CraftingCalculator.UI.Theme;
 /// </summary>
 public static class AppTheme
 {
-    // Single source of truth for every Forge color. Names are by meaning, not palette slot: a value
+    // Every Forge color, in one place. Names are by meaning, not palette slot: a value
     // that fills several slots (LightMuted, LightLines, ...) is one constant, with the slots it serves
-    // noted inline.
+    // noted inline. LightSlate, DarkSurface and LightPrimary are duplicated in
+    // Platforms/Android/Resources/values/colors.xml, which cannot reference a C# constant: change both.
     private static class ForgeColors
     {
         public const string White = "#FFFFFF"; // Primary/Secondary/TertiaryContrastText + AppbarText, light only

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The Forge palette as Android sees it. These are the native-chrome colours only - the app's
+    <!-- The Forge palette as Android sees it. These are the native-chrome colors only - the app's
          own UI is MudBlazor and gets its palette from Theme/AppTheme.cs. The values are duplicated
          here because an Android resource cannot reference a C# constant; change one and change the
          other. Names are Android's, so the mapping is spelled out:
@@ -14,5 +14,5 @@
     -->
     <color name="colorPrimary">#2E3440</color>
     <color name="colorPrimaryDark">#1B1E24</color>
-    <color name="colorAccent">#B7601F</color>
+    <color name="colorAccent">#9A4A14</color>
 </resources>
