@@ -98,9 +98,9 @@ to a bench, at every level of the tree. A four-row component list can easily be 
 lets you queue multiple crafts of an item, the steps will tell you how many to queue to get the result you're 
 looking for.
 
-### "A blueprint isn't in the list when I add a part"
+### "A blueprint isn't in the list when I add a requirement"
 
-The blueprint you're editing can't nest something that already nests it, so the **Add component** list
+The blueprint you're editing can't nest something that already nests it, so the **Add requirements** list
 leaves those out. If Ammo uses Gunpowder, then Gunpowder can't use Ammo. See [Blueprints](blueprints.md).
 
 ### "A blueprint lost one of its components"

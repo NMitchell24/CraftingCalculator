@@ -54,6 +54,16 @@ below describes where you will find these bars for the different layouts.
 | A phone in landscape mode | On the left side of the screen |
 | A tablet or PC            | On the left side of the screen |
 
+## While you're typing
+
+On a phone, the keyboard covers the bottom bars while it's up instead of shoving them up, which would take the whole 
+screen with 'em. That leaves you room to see what you're typing. Tap the keyboard's Enter key, and it locks in 
+what you typed, closes the keyboard, and the bars come right back.
+
+> **Fun Fact:** The Enter key used to be called `Carriage Return` not because people drove around with horses and 
+> buggies, but because it derived its name from the lever you pulled to return the carriage to its starting 
+> position on a typewriter. That's why some people still call it a return key.
+
 ## Collapsing the side menu
 
 On larger tablets and desktop windows (at least 960px wide and 600px high), the left side menu expands to show labels

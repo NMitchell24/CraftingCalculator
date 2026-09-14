@@ -73,10 +73,15 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
     private async Task SaveAsync()
     {
+        if (_record is null || !await DatasetPrompts.ConfirmSaveAsync(DialogService, _record))
+        {
+            return;
+        }
+
         await RecordService.SaveRecordAsync(_record);
 
         _isDirty = false;
-        Snackbar.Add($"Saved '{_record?.Name}'", Severity.Success);
+        Snackbar.Add($"Saved '{_record.Name}'", Severity.Success);
         Navigation.NavigateTo(ListHref);
     }
 

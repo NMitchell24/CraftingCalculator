@@ -1,8 +1,8 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
-using CraftingCalculator.Application.Common.Interfaces;
-using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
@@ -13,58 +13,43 @@ public partial class BlueprintEditor : ComponentBase
     /// <summary>Raised on every edit, so the hosting page can track unsaved changes.</summary>
     [Parameter] public EventCallback OnChanged { get; set; }
 
-    [Inject] private IRecordService RecordService { get; set; } = null!;
+    [CascadingParameter] private Breakpoint Breakpoint { get; set; }
 
-    private List<IBaseDataRecord> _components = [];
-    private List<IBaseDataRecord> _childBlueprintCandidates = [];
-
-    private DataType _partType = DataType.Component;
-    private IBaseDataRecord? _selectedPart;
-    private long _quantityToAdd = 1;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private List<IBaseQuantityRecord> Parts => BlueprintPartProcessor.GetParts(Model);
 
-    protected override async Task OnInitializedAsync()
+    private Task OpenAddPartsAsync()
     {
-        _components = await RecordService.GetRecordsAsync(DataType.Component);
+        DialogOptions options = new()
+        {
+            FullScreen = Breakpoint == Breakpoint.Xs,
+            MaxWidth = MaxWidth.Small,
+            CloseOnEscapeKey = true
+        };
 
-        // Leaving out this blueprint and every blueprint that already nests it is the whole cycle
-        // guard: a loop the crafting tree has no bottom to can only be written by picking one of
-        // those, so the list never offers one.
-        _childBlueprintCandidates =
-            [.. (await RecordService.GetRecordsAsync(DataType.Blueprint))
-                .OfType<BlueprintModel>()
-                .Where(candidate => !BlueprintProcessor.WouldCreateCycle(Model, candidate))];
+        // The dialog edits Model directly and reports each change as it happens, so there is no result to
+        // await: the parts list behind it is already current whichever way the dialog is closed.
+        DialogParameters<AddPartsDialog> parameters = new()
+        {
+            { dialog => dialog.Blueprint, Model },
+            { dialog => dialog.OnChanged, EventCallback.Factory.Create(this, NotifyChangedAsync) }
+        };
+
+        return DialogService.ShowAsync<AddPartsDialog>("Add requirements", parameters, options);
     }
 
-    private Task<IEnumerable<IBaseDataRecord>> SearchAsync(string? search, CancellationToken cancellationToken)
+    private async Task StepAsync(IBaseQuantityRecord part, long step)
     {
-        List<IBaseDataRecord> source = _partType == DataType.Blueprint ? _childBlueprintCandidates : _components;
-
-        return Task.FromResult<IEnumerable<IBaseDataRecord>>(source.Where(record =>
-            string.IsNullOrWhiteSpace(search) || (record.Name?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false)));
-    }
-
-    private void OnPartTypeChanged(DataType type)
-    {
-        _partType = type;
-        _selectedPart = null;
-        _quantityToAdd = 1;
-    }
-
-    private async Task AddComponentAsync()
-    {
-        BlueprintPartProcessor.Add(Model, _selectedPart, _quantityToAdd);
-
-        _selectedPart = null;
-        _quantityToAdd = 1;
-
+        BlueprintPartProcessor.Step(Model, part, step);
         await NotifyChangedAsync();
     }
 
     private async Task SetQuantityAsync(IBaseQuantityRecord part, long quantity)
     {
-        BlueprintPartProcessor.SetQuantity(Model, part, quantity);
+        // Typing 0, or clearing the field and leaving it, keeps the part: removing it would pull the row out from
+        // under the field being edited. Stepping below 1 and Delete remove it, and Save warns about any left at 0.
+        part.Quantity = quantity;
         await NotifyChangedAsync();
     }
 

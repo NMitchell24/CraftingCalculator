@@ -5,7 +5,7 @@
         <MudTextField T="string" Value="@_filter.Search" ValueChanged="OnSearchChangedAsync"
                       Placeholder="@Placeholder" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true"
-                      Class="record-search-field" />
+                      Class="record-search-field" enterkeyhint="search" />
 
         @if (_showFilter)
         {
