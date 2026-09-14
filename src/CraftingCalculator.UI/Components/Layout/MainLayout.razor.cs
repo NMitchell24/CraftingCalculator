@@ -2,8 +2,8 @@ using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.UI.State;
-using CraftingCalculator.UI.Theme;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
 using MudBlazor.Services;
@@ -19,6 +19,18 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     [Inject] private IJSRuntime Js { get; set; } = null!;
     [Inject] private IBrowserViewportService ViewportService { get; set; } = null!;
 
+    /// <summary>One of the app's top-level destinations in the side rail and the bottom nav.</summary>
+    private sealed record Destination(string Label, string Route, string Icon, NavLinkMatch Match);
+
+    private const string RootRoute = "/";
+
+    private static readonly Destination[] Destinations =
+    [
+        new("Craft", RootRoute, Icons.Material.Filled.Calculate, NavLinkMatch.All),
+        new("Favorites", "/favorites", Icons.Material.Filled.Star, NavLinkMatch.Prefix),
+        new("Dataset", "/dataset", Icons.Material.Filled.MenuBook, NavLinkMatch.Prefix)
+    ];
+
     private const string SettingsRoute = "settings";
 
     private const string DrawerCollapsedKey = "drawer_collapsed";
@@ -31,7 +43,6 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // getBoundingClientRect in the Android WebView (Pixel 9 emulator, landscape Mini rail, MudBlazor
     // 9.7.0): the Dense app bar without its status-bar padding, one MudNavLink row, and
     // .actions-bar-divider's 1px rule plus its 8px margins. Re-measure after a MudBlazor upgrade.
-    private const int DestinationCount = 3;
     private const double AppBarHeight = 48;
     private const double NavLinkHeight = 40;
     private const double ActionsDividerHeight = 17;
@@ -47,6 +58,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // until the first viewport notification arrives.
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
+    private bool _unwinding;
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
@@ -103,7 +115,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
             // Every other idiom is a tablet in practice. The status-bar inset above the app bar is not known
             // here (Android injects it into CSS only), so this can overcount by one slot on a tall inset;
             // the drawer's own scroll absorbs that.
-            double free = (_windowSize?.Height ?? 0) - AppBarHeight - DestinationCount * NavLinkHeight
+            double free = (_windowSize?.Height ?? 0) - AppBarHeight - Destinations.Length * NavLinkHeight
                           - ActionsDividerHeight;
 
             return Math.Max(PhoneActionsMaxVisible, (int)Math.Floor(free / NavLinkHeight));
@@ -230,6 +242,76 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // history.back() rather than a NavigateTo to the page underneath, which would push a second copy of
     // that page and leave the one being closed behind it for the system back gesture to reopen.
     private ValueTask StepBackAsync() => Js.InvokeVoidAsync("history.back");
+
+    /// <summary>
+    /// Opens <paramref name="destination"/> with history reset beneath it: Craft is the first entry, and every
+    /// other destination sits directly above it, so back from any destination reaches Craft and then leaves
+    /// the app.
+    /// </summary>
+    private async Task OpenDestinationAsync(Destination destination)
+    {
+        if (PageShellState.Config.ConfirmLeaveAsync is { } confirmLeave && !await confirmLeave())
+        {
+            return;
+        }
+
+        // The app starts on Craft, and nothing replaces that first entry, so index 0 is always Craft.
+        int index = await Js.InvokeAsync<int>("appHistory.index");
+        int target = destination.Route == RootRoute ? 0 : 1;
+        string route = destination.Route.TrimStart('/');
+
+        if (index <= target)
+        {
+            // Directly above Craft already, or on Craft itself opening a destination above it.
+            if (CurrentRoute != route)
+            {
+                Navigation.NavigateTo(destination.Route, replace: index == target);
+            }
+
+            return;
+        }
+
+        _unwinding = true;
+        StateHasChanged();
+
+        try
+        {
+            await WhenLocationChangedAsync(() => Js.InvokeVoidAsync("history.go", target - index));
+
+            if (CurrentRoute != route)
+            {
+                await WhenLocationChangedAsync(() =>
+                {
+                    Navigation.NavigateTo(destination.Route, replace: true);
+                    return ValueTask.CompletedTask;
+                });
+            }
+        }
+        finally
+        {
+            _unwinding = false;
+        }
+    }
+
+    // Only called while the page body is left out, so no page's location-changing handler is registered to
+    // stop the navigation and leave this waiting.
+    private async Task WhenLocationChangedAsync(Func<ValueTask> navigate)
+    {
+        TaskCompletionSource arrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        EventHandler<LocationChangedEventArgs> onLocationChanged = (_, _) => arrived.TrySetResult();
+
+        Navigation.LocationChanged += onLocationChanged;
+
+        try
+        {
+            await navigate();
+            await arrived.Task;
+        }
+        finally
+        {
+            Navigation.LocationChanged -= onLocationChanged;
+        }
+    }
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
 

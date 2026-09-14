@@ -32,6 +32,12 @@ public sealed record PageShellConfig(string Title)
     public bool ShowBack { get; init; }
 
     /// <summary>
+    /// Asks whether the user may leave the page, resolving to true when they may; null on a page that can
+    /// always be left. The shell awaits it before opening a destination from the bottom nav or side rail.
+    /// </summary>
+    public Func<Task<bool>>? ConfirmLeaveAsync { get; init; }
+
+    /// <summary>
     /// True when <see cref="Title"/> is user-entered data - a saved record's own name - rather than one
     /// of the app's own screen names. The layout renders its own titles in the display face and user
     /// content in the body face.

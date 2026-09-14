@@ -63,7 +63,8 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         PageShellState.Configure(this, new PageShellConfig(Title())
         {
             ShowBack = true,
-            TitleIsUserContent = Id > 0
+            TitleIsUserContent = Id > 0,
+            ConfirmLeaveAsync = ConfirmLeaveAsync
         });
     }
 
@@ -105,8 +106,9 @@ public partial class DatasetEditor : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Guards every way off the page: Cancel, the back arrow and the system back gesture, and the bottom
-    /// nav / side rail. The WPF app discarded in-progress edits silently whenever the selection changed.
+    /// Guards Cancel, the back arrow, the system back gesture, and opening Help or Settings over the page. The
+    /// bottom nav / side rail ask through <see cref="ConfirmLeaveAsync"/> instead. The WPF app discarded
+    /// in-progress edits silently whenever the selection changed.
     /// </summary>
     private async ValueTask ConfirmDiscardAsync(LocationChangingContext context)
     {
@@ -119,28 +121,41 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         // navigation.
         context.PreventNavigation();
 
+        if (!await ConfirmLeaveAsync())
+        {
+            return;
+        }
+
+        // The list is the entry beneath this one, so only a step back targets it. Opening Help or Settings
+        // replaces the editor's entry instead, or back from there would reopen the edits just discarded.
+        // TargetLocation stays relative when the navigation came from a NavigateTo call.
+        if (Navigation.ToAbsoluteUri(context.TargetLocation).AbsolutePath
+            .Equals(ListHref, StringComparison.OrdinalIgnoreCase))
+        {
+            await ReturnToListAsync();
+        }
+        else
+        {
+            Navigation.NavigateTo(context.TargetLocation, replace: true);
+        }
+    }
+
+    /// <summary>True when there are no unsaved edits, or the user chose to discard them.</summary>
+    private async Task<bool> ConfirmLeaveAsync()
+    {
+        if (!_isDirty)
+        {
+            return true;
+        }
+
         bool? discard = await DialogService.ShowMessageBoxAsync(
             "Discard changes?",
             "Your edits have not been saved.",
             yesText: "Discard", cancelText: "Keep editing");
 
-        if (discard == true)
-        {
-            _isDirty = false;
+        _isDirty = discard != true;
 
-            // The list is the entry beneath this one, so only a step back targets it. Every other destination
-            // replaces the editor's entry, or back from there would reopen the edits just discarded.
-            // TargetLocation stays relative when the navigation came from a NavigateTo call.
-            if (Navigation.ToAbsoluteUri(context.TargetLocation).AbsolutePath
-                .Equals(ListHref, StringComparison.OrdinalIgnoreCase))
-            {
-                await ReturnToListAsync();
-            }
-            else
-            {
-                Navigation.NavigateTo(context.TargetLocation, replace: true);
-            }
-        }
+        return !_isDirty;
     }
 
     public void Dispose()

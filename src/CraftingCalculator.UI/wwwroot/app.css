@@ -236,6 +236,12 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-bottom: 16px;
 }
 
+/* MainLayout.razor wraps each destination link in the side rail and the bottom nav to take over its click.
+   display: contents keeps the wrapper out of the box tree, so both lay their links out exactly as they would unwrapped. */
+.nav-destination {
+    display: contents;
+}
+
 /* MainLayout.razor's bottom navigation bar (xs breakpoint only). Not CSS-isolated (see MainLayout.razor
    for why) - .razor.css scoped-bundle output never gets produced for this project's TFMs, so isolated
    rules silently never load. Global rules here are the same fix Schmeg.UI settled on for the same gap. */

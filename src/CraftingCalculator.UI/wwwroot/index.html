@@ -91,6 +91,18 @@
         };
     </script>
 
+    <!-- Read by MainLayout.OpenDestinationAsync. Blazor's NavigationManager stamps every history entry it creates with
+         _index, the entry's position in the session history; the entry the app starts on carries no state, so it is 0.
+         Read from here rather than counted in .NET, where LocationChanged cannot tell a step back from a new entry, and
+         rather than history.length, which also counts the entries ahead of the current one. -->
+    <script>
+        window.appHistory = {
+            index: function () {
+                return (history.state && history.state._index) || 0;
+            }
+        };
+    </script>
+
     <!-- The on-screen keyboard policy, for every field in the app at once: Enter commits and closes the
          keyboard, a field the keyboard would cover scrolls into view, a picker keeps the keyboard up while its
          buttons are tapped and drops it when its list is scrolled, and while the keyboard is up <html> carries
