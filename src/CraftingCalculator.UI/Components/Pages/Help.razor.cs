@@ -1,8 +1,10 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 
 namespace CraftingCalculator.UI.Components.Pages;
@@ -22,13 +24,20 @@ public partial class Help : ComponentBase, IDisposable
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
 
+    // Tags the replacement SwapInPlace issues, so the handler lets its own navigation through.
+    private const string SwappedInPlace = "help-swapped-in-place";
+
     private HelpArticle? _article;
     private bool _loaded;
     private bool _scrollPending;
+    private IDisposable? _navigationGuard;
 
     private static string ContentsHref => $"/{HelpTopics.HelpRoot}";
 
     private static string HrefFor(HelpTopic topic) => $"/{HelpTopics.HelpRoot}/{topic.Id}";
+
+    protected override void OnInitialized() =>
+        _navigationGuard = Navigation.RegisterLocationChangingHandler(SwapInPlace);
 
     protected override async Task OnParametersSetAsync()
     {
@@ -44,7 +53,7 @@ public partial class Help : ComponentBase, IDisposable
         // this is, the way Settings does. TitleIsUserContent stays false: these are the app's own words.
         PageShellState.Configure(this, new PageShellConfig("Help")
         {
-            BackHref = TopicId is null ? null : ContentsHref
+            ShowBack = TopicId is not null
         });
     }
 
@@ -63,5 +72,31 @@ public partial class Help : ComponentBase, IDisposable
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    public void Dispose() => PageShellState.Reset(this);
+    /// <summary>
+    /// Keeps Help to one history entry however many pages the reader opens, so back and Close help both
+    /// return straight to the screen Help was opened from.
+    /// </summary>
+    private ValueTask SwapInPlace(LocationChangingContext context)
+    {
+        // Article links, the contents list and the footer button all push. Each is stopped and re-issued as a
+        // replace, which comes back through here tagged. The entry beneath Help is never a help page, so a step
+        // back is never caught. TargetLocation stays relative when the navigation came from a NavigateTo call.
+        if (context.HistoryEntryState == SwappedInPlace
+            || !HelpProcessor.IsHelpRoute(Navigation.ToAbsoluteUri(context.TargetLocation).AbsolutePath))
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        context.PreventNavigation();
+        Navigation.NavigateTo(context.TargetLocation,
+            new NavigationOptions { ReplaceHistoryEntry = true, HistoryEntryState = SwappedInPlace });
+
+        return ValueTask.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _navigationGuard?.Dispose();
+        PageShellState.Reset(this);
+    }
 }

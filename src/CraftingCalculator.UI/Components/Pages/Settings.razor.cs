@@ -10,8 +10,7 @@ public partial class Settings : ComponentBase, IDisposable
 
     private static string Version => $"{AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
 
-    // No BackHref: Settings is reached from the app bar rather than from one particular page, so the
-    // always-present bottom nav / side rail is the way back rather than a fixed return route.
+    // No back arrow: Settings is an app-bar overlay, and the Settings icon that opened it is what closes it.
     protected override void OnInitialized() => PageShellState.Configure(this, new PageShellConfig("Settings"));
 
     public void Dispose() => PageShellState.Reset(this);

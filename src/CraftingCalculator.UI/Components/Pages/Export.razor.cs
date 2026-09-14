@@ -105,7 +105,7 @@ public partial class Export : ComponentBase, IDisposable
     private void ConfigureShell() =>
         PageShellState.Configure(this, new PageShellConfig("Export Data")
         {
-            BackHref = "/dataset/import-export",
+            ShowBack = true,
             Actions =
             [
                 new PageAction("Export Data", Icons.Material.Filled.Output, ExportAsync, Disabled: !CanExport),

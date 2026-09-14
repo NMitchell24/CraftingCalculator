@@ -23,6 +23,10 @@ app. See the table below for an overview of these options.
 | ![Favorites](assets/star.svg) **Favorites**  | Takes you to the [Favorites Screen](favorites.md) |
 | ![Dataset](assets/menu-book.svg) **Dataset** | Takes you to the [Dataset Screen](dataset.md)     |
 
+Tapping one of these starts you fresh on that screen. From there, your phone's back gesture takes you to **Craft**, and
+from **Craft** it leaves the app. It won't drag you back through every blueprint you opened on the way. Inside a
+screen, back works the way you'd expect: from the blueprint list, it takes you back to **Dataset**.
+
 ## The Actions Bar
 
 The actions bar options will change depending on which screen you are looking at. Some pages offer Add and Delete 

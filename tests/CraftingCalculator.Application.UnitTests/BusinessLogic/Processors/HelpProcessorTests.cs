@@ -55,6 +55,15 @@ public class HelpProcessorTests
         HelpProcessor.ResolveTopic(route).Id.Should().Be(HelpTopics.DefaultTopicId);
     }
 
+    [TestCase("help", ExpectedResult = true)]
+    [TestCase("/help/calculations", ExpectedResult = true)]
+    [TestCase("Help/Calculations#surplus", ExpectedResult = true)]
+    [TestCase("helpful", ExpectedResult = false)]
+    [TestCase("dataset/Blueprint/3", ExpectedResult = false)]
+    [TestCase("", ExpectedResult = false)]
+    public bool IsHelpRoute_ARoute_IsTrueOnlyForTheContentsAndHelpPages(string route) =>
+        HelpProcessor.IsHelpRoute(route);
+
     [Test]
     public void Find_AnUnknownId_IsNull()
     {

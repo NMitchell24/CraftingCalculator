@@ -25,8 +25,17 @@ public sealed record PageShellConfig(string Title)
     /// <summary>The page's actions, in the order the shell should show them.</summary>
     public IReadOnlyList<PageAction> Actions { get; init; } = [];
 
-    /// <summary>Where the app bar's back arrow navigates, or null on a page that should not show one.</summary>
-    public string? BackHref { get; init; }
+    /// <summary>
+    /// True to show the app bar's back arrow. It takes the same step back through history as the system back
+    /// gesture, except on a help topic, where it opens the help contents.
+    /// </summary>
+    public bool ShowBack { get; init; }
+
+    /// <summary>
+    /// Asks whether the user may leave the page, resolving to true when they may; null on a page that can
+    /// always be left. The shell awaits it before opening a destination from the bottom nav or side rail.
+    /// </summary>
+    public Func<Task<bool>>? ConfirmLeaveAsync { get; init; }
 
     /// <summary>
     /// True when <see cref="Title"/> is user-entered data - a saved record's own name - rather than one

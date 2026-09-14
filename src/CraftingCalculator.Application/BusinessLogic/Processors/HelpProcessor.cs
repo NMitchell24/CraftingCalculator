@@ -72,6 +72,12 @@ public static class HelpProcessor
         HelpTopics.All.FirstOrDefault(topic =>
             string.Equals(topic.Id, topicId, StringComparison.OrdinalIgnoreCase));
 
+    /// <summary>Whether <paramref name="route"/> is the help contents or one of the help pages.</summary>
+    /// <param name="route">
+    /// An app route, with or without a leading slash and with or without a query string or fragment.
+    /// </param>
+    public static bool IsHelpRoute(string? route) => CoversRoute(HelpTopics.HelpRoot, NormalizeRoute(route));
+
     /// <summary>
     /// Renders help Markdown to an HTML fragment: cross-page <c>.md</c> links become the in-app help
     /// routes they correspond to, and each icon image becomes the icon's own markup inline.

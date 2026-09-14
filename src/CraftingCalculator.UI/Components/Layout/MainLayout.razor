@@ -31,9 +31,9 @@
                     <MudIconButton Icon="@DrawerToggleIcon" Color="Color.Inherit" OnClick="ToggleDrawer" Edge="Edge.Start"
                                    title="@DrawerToggleLabel" aria-label="@DrawerToggleLabel" />
                 }
-                @if (PageShellState.Config.BackHref is string backHref)
+                @if (PageShellState.Config.ShowBack)
                 {
-                    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Inherit" Href="@backHref"
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Inherit" OnClick="GoBackAsync"
                                    aria-label="Back" />
                 }
             </div>
@@ -44,9 +44,9 @@
                 @* Context sensitive: on any page but Help this opens the help page for the route the
                    user is on (HelpProcessor.ResolveTopic), so the button answers "what is this screen"
                    rather than dropping everyone on the contents list. *@
-                <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" Color="Color.Inherit" OnClick="ToggleHelp"
+                <MudIconButton Icon="@Icons.Material.Filled.HelpOutline" Color="Color.Inherit" OnClick="ToggleHelpAsync"
                                title="@HelpActionLabel" aria-label="@HelpActionLabel" />
-                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" OnClick="ToggleSettings"
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" OnClick="ToggleSettingsAsync"
                                title="@SettingsActionLabel" aria-label="@SettingsActionLabel" />
             </div>
         </MudAppBar>
@@ -61,9 +61,15 @@
                DrawerExpanded, so a collapsed drawer is a closed Mini rail and never an open one. *@
             <MudDrawer Open="@DrawerExpanded" Fixed="true" Variant="@(DrawerExpanded ? DrawerVariant.Persistent : DrawerVariant.Mini)" ClipMode="DrawerClipMode.Always" Elevation="1">
                 <MudNavMenu Color="Color.Primary" Rounded="true">
-                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Calculate">Craft</MudNavLink>
-                    <MudNavLink Href="/favorites" Icon="@Icons.Material.Filled.Star">Favorites</MudNavLink>
-                    <MudNavLink Href="/dataset" Icon="@Icons.Material.Filled.MenuBook">Dataset</MudNavLink>
+                    @* Still links, so NavLink keeps highlighting the current destination, but the click is taken
+                       over: preventDefault stops Blazor's own link navigation and OpenDestinationAsync navigates
+                       instead. *@
+                    @foreach (Destination destination in Destinations)
+                    {
+                        <div class="nav-destination" @onclick="() => OpenDestinationAsync(destination)" @onclick:preventDefault>
+                            <MudNavLink Href="@destination.Route" Match="@destination.Match" Icon="@destination.Icon">@destination.Label</MudNavLink>
+                        </div>
+                    }
                     <ActionsBar Actions="@PageShellState.Config.Actions" Mode="ActionsBarMode.Drawer"
                                 MaxVisible="@ActionsMaxVisible" />
                 </MudNavMenu>
@@ -71,7 +77,12 @@
         }
 
         <MudMainContent Class="@MainContentClass">
-            @Body
+            @* Left out while OpenDestinationAsync steps back through history, so the pages it passes are never
+               created and the page being left is disposed before the first step. *@
+            @if (!_unwinding)
+            {
+                @Body
+            }
         </MudMainContent>
 
         @if (ShowActionsBar)
@@ -84,9 +95,13 @@
         {
             <MudPaper Class="bottom-nav" Elevation="3" Square="true">
                 <MudNavMenu Class="bottom-nav-menu" Color="Color.Primary">
-                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Calculate">Craft</MudNavLink>
-                    <MudNavLink Href="/favorites" Icon="@Icons.Material.Filled.Star">Favorites</MudNavLink>
-                    <MudNavLink Href="/dataset" Icon="@Icons.Material.Filled.MenuBook">Dataset</MudNavLink>
+                    @* Taken over the same way as the side rail's. *@
+                    @foreach (Destination destination in Destinations)
+                    {
+                        <div class="nav-destination" @onclick="() => OpenDestinationAsync(destination)" @onclick:preventDefault>
+                            <MudNavLink Href="@destination.Route" Match="@destination.Match" Icon="@destination.Icon">@destination.Label</MudNavLink>
+                        </div>
+                    }
                 </MudNavMenu>
             </MudPaper>
         }

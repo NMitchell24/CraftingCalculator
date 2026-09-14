@@ -2,8 +2,8 @@ using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.UI.State;
-using CraftingCalculator.UI.Theme;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
 using MudBlazor.Services;
@@ -19,6 +19,18 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     [Inject] private IJSRuntime Js { get; set; } = null!;
     [Inject] private IBrowserViewportService ViewportService { get; set; } = null!;
 
+    /// <summary>One of the app's top-level destinations in the side rail and the bottom nav.</summary>
+    private sealed record Destination(string Label, string Route, string Icon, NavLinkMatch Match);
+
+    private const string RootRoute = "/";
+
+    private static readonly Destination[] Destinations =
+    [
+        new("Craft", RootRoute, Icons.Material.Filled.Calculate, NavLinkMatch.All),
+        new("Favorites", "/favorites", Icons.Material.Filled.Star, NavLinkMatch.Prefix),
+        new("Dataset", "/dataset", Icons.Material.Filled.MenuBook, NavLinkMatch.Prefix)
+    ];
+
     private const string SettingsRoute = "settings";
 
     private const string DrawerCollapsedKey = "drawer_collapsed";
@@ -31,7 +43,6 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // getBoundingClientRect in the Android WebView (Pixel 9 emulator, landscape Mini rail, MudBlazor
     // 9.7.0): the Dense app bar without its status-bar padding, one MudNavLink row, and
     // .actions-bar-divider's 1px rule plus its 8px margins. Re-measure after a MudBlazor upgrade.
-    private const int DestinationCount = 3;
     private const double AppBarHeight = 48;
     private const double NavLinkHeight = 40;
     private const double ActionsDividerHeight = 17;
@@ -47,13 +58,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // until the first viewport notification arrives.
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
-
-    // Settings and Help are both app-bar overlays: they open over whatever page is showing, and their
-    // own icon closes them back to it rather than to a fixed route. One shared stack rather than a
-    // return address each, because the overlays open over each other: opening Help from Settings has to
-    // close back to Settings, and closing that has to reach the page Settings was opened from. Two
-    // slots would point at each other there, and the pair would never unwind.
-    private readonly Stack<string> _overlayOrigins = new();
+    private bool _unwinding;
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
@@ -110,7 +115,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
             // Every other idiom is a tablet in practice. The status-bar inset above the app bar is not known
             // here (Android injects it into CSS only), so this can overcount by one slot on a tall inset;
             // the drawer's own scroll absorbs that.
-            double free = (_windowSize?.Height ?? 0) - AppBarHeight - DestinationCount * NavLinkHeight
+            double free = (_windowSize?.Height ?? 0) - AppBarHeight - Destinations.Length * NavLinkHeight
                           - ActionsDividerHeight;
 
             return Math.Max(PhoneActionsMaxVisible, (int)Math.Floor(free / NavLinkHeight));
@@ -186,17 +191,17 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 
     private bool IsSettingsOpen => IsOpen(SettingsRoute);
 
-    private bool IsHelpOpen => IsOpen(HelpTopics.HelpRoot);
+    private bool IsHelpOpen => HelpProcessor.IsHelpRoute(CurrentRoute);
 
     private string SettingsActionLabel => IsSettingsOpen ? "Close settings" : "Settings";
 
     private string HelpActionLabel => IsHelpOpen ? "Close help" : "Help for this screen";
 
-    private void ToggleSettings() => ToggleOverlay(IsSettingsOpen, $"/{SettingsRoute}");
+    private Task ToggleSettingsAsync() => ToggleOverlayAsync(IsSettingsOpen, $"/{SettingsRoute}");
 
     // The target is resolved from the route the user is on now, which is why it is computed here rather
     // than by the Help page itself: once the navigation has happened that route is gone.
-    private void ToggleHelp() => ToggleOverlay(IsHelpOpen,
+    private Task ToggleHelpAsync() => ToggleOverlayAsync(IsHelpOpen,
         $"/{HelpTopics.HelpRoot}/{HelpProcessor.ResolveTopic(CurrentRoute).Id}");
 
     /// <summary>Whether the current route is <paramref name="route"/> or a page beneath it.</summary>
@@ -205,29 +210,107 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         || CurrentRoute.StartsWith($"{route}/", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Opens <paramref name="target"/> over the current page, or closes it by navigating back to
-    /// wherever the topmost open overlay was opened from.
+    /// Opens <paramref name="target"/> over the current page, or closes the open overlay back to the screen
+    /// it was opened from.
     /// </summary>
-    private void ToggleOverlay(bool isOpen, string target)
+    private async Task ToggleOverlayAsync(bool isOpen, string target)
     {
+        // Settings has no navigation of its own and Help swaps its pages in place, so an open overlay is
+        // always exactly one history entry above the screen it was opened from.
         if (isOpen)
         {
-            // Empty on a deep link straight into an overlay, or once the user has left one by the nav
-            // rail rather than by its own icon.
-            Navigation.NavigateTo(_overlayOrigins.Count > 0 ? _overlayOrigins.Pop() : "/");
+            await StepBackAsync();
             return;
         }
 
-        // Opening an overlay from an ordinary page starts a new chain. Anything still on the stack was
-        // left by an overlay the user walked away from with the nav rail instead of closing, and popping
-        // it later would send them back to a page they had already moved on from.
-        if (!IsSettingsOpen && !IsHelpOpen)
+        Navigation.NavigateTo(target);
+    }
+
+    // Help swaps its pages in place, so the arrow on a topic reaches the contents by navigating there;
+    // stepping back would leave Help altogether.
+    private async Task GoBackAsync()
+    {
+        if (IsHelpOpen)
         {
-            _overlayOrigins.Clear();
+            Navigation.NavigateTo($"/{HelpTopics.HelpRoot}");
+            return;
         }
 
-        _overlayOrigins.Push(Navigation.Uri);
-        Navigation.NavigateTo(target);
+        await StepBackAsync();
+    }
+
+    // history.back() rather than a NavigateTo to the page underneath, which would push a second copy of
+    // that page and leave the one being closed behind it for the system back gesture to reopen.
+    private ValueTask StepBackAsync() => Js.InvokeVoidAsync("history.back");
+
+    /// <summary>
+    /// Opens <paramref name="destination"/> with history reset beneath it: Craft is the first entry, and every
+    /// other destination sits directly above it, so back from any destination reaches Craft and then leaves
+    /// the app.
+    /// </summary>
+    private async Task OpenDestinationAsync(Destination destination)
+    {
+        if (PageShellState.Config.ConfirmLeaveAsync is { } confirmLeave && !await confirmLeave())
+        {
+            return;
+        }
+
+        // The app starts on Craft, and nothing replaces that first entry, so index 0 is always Craft.
+        int index = await Js.InvokeAsync<int>("appHistory.index");
+        int target = destination.Route == RootRoute ? 0 : 1;
+        string route = destination.Route.TrimStart('/');
+
+        if (index <= target)
+        {
+            // Directly above Craft already, or on Craft itself opening a destination above it.
+            if (CurrentRoute != route)
+            {
+                Navigation.NavigateTo(destination.Route, replace: index == target);
+            }
+
+            return;
+        }
+
+        _unwinding = true;
+        StateHasChanged();
+
+        try
+        {
+            await WhenLocationChangedAsync(() => Js.InvokeVoidAsync("history.go", target - index));
+
+            if (CurrentRoute != route)
+            {
+                await WhenLocationChangedAsync(() =>
+                {
+                    Navigation.NavigateTo(destination.Route, replace: true);
+                    return ValueTask.CompletedTask;
+                });
+            }
+        }
+        finally
+        {
+            _unwinding = false;
+        }
+    }
+
+    // Only called while the page body is left out, so no page's location-changing handler is registered to
+    // stop the navigation and leave this waiting.
+    private async Task WhenLocationChangedAsync(Func<ValueTask> navigate)
+    {
+        TaskCompletionSource arrived = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        EventHandler<LocationChangedEventArgs> onLocationChanged = (_, _) => arrived.TrySetResult();
+
+        Navigation.LocationChanged += onLocationChanged;
+
+        try
+        {
+            await navigate();
+            await arrived.Task;
+        }
+        finally
+        {
+            Navigation.LocationChanged -= onLocationChanged;
+        }
     }
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
