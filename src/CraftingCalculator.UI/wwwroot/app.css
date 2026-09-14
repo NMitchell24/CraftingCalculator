@@ -1475,6 +1475,29 @@ html.keyboard-open .mud-dialog-container {
     overflow: hidden;
 }
 
+/* Floated (shrunk) label overlapping the value at large Android OS text sizes, every Variant.Outlined
+   field - "Load Favorite" printing over "Bronze Gear Up", and the same for every other outlined field in
+   the app. MudBlazor shrinks the label with a fixed transform (label font-size 1rem, line-height 1.15rem -
+   both zoomed by Android's WebView) while the field's own padding-top that makes room for it (18.5px
+   normal, 10.5px dense) is a px length and is not. Measured on the Pixel 9 AVD at Android's maximum "Font
+   size" (font_scale 2.0): the shrunk label box grows to 27.6px tall, and MudBlazor's fixed -6px offset
+   lands it from -6px to 21.6px - well inside the value's own text area. At 100% zoom it ends at 7.8px,
+   clear of the padding, which is why the overlap is invisible off-device and only shows up at Android's
+   own top text size.
+
+   The fix is the Y offset. A percentage in translate() resolves against the label's own unscaled box, so
+   -37.5% - half of MudBlazor's own 0.75 scale factor (0.5 * 0.75) - centers the scaled label on the border
+   line at every zoom level instead of one term (the label) scaling with zoomed text and the other (the px
+   offset) not. At 100% zoom this lands at -6.9px against the design's -6px, close enough that the resting
+   look is unchanged. The selector list is MudBlazor's own three shrink triggers - shrunk state, focus, and
+   Chromium autofill - repeated verbatim (MudBlazor.min.css) so this wins on specificity rather than
+   source order. */
+.mud-shrink~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined,
+.mud-input:focus-within~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined,
+.mud-input:has(:-webkit-autofill)~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined {
+    transform: translate(14px, -37.5%) scale(0.75);
+}
+
 /* Production time editor: three fields on one line so hours/minutes/seconds read as one value rather
    than three unrelated settings. Equal columns keep each one a comfortable tap target on a phone. */
 .production-time-label {
