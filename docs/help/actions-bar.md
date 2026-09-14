@@ -57,7 +57,7 @@ below describes where you will find these bars for the different layouts.
 ## While you're typing
 
 On a phone, the keyboard covers the bottom bars while it's up instead of shoving them up, which would take the whole 
-the screen with 'em. That leaves you room to see what you're typing. Tap the keyboard's Enter key, and it locks in 
+screen with 'em. That leaves you room to see what you're typing. Tap the keyboard's Enter key, and it locks in 
 what you typed, closes the keyboard, and the bars come right back.
 
 > **Fun Fact:** The Enter key used to be called `Carriage Return` not because people drove around with horses and 

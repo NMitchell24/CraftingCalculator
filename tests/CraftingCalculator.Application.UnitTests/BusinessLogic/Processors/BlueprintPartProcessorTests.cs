@@ -37,7 +37,7 @@ public class BlueprintPartProcessorTests
     }
 
     [Test]
-    public void FindPart_ChildBlueprintSharingAComponentsName_ReturnsTheChildBlueprint()
+    public void FindPart_ChildBlueprintSharingAComponentName_ReturnsTheChildBlueprint()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Axe");
         blueprint.Components.Add(NewComponent(2, "Bronze"), 1);
