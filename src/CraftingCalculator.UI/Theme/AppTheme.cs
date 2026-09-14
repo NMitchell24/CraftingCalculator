@@ -11,16 +11,16 @@ namespace CraftingCalculator.UI.Theme;
 /// </summary>
 public static class AppTheme
 {
-    // Single source of truth for every Forge colour. Names are by meaning, not palette slot: a value
+    // Single source of truth for every Forge color. Names are by meaning, not palette slot: a value
     // that fills several slots (LightMuted, LightLines, ...) is one constant, with the slots it serves
     // noted inline.
     private static class ForgeColors
     {
         public const string White = "#FFFFFF"; // Primary/Secondary/TertiaryContrastText + AppbarText, light only
 
-        // Light - white surfaces on a cool grey ground, copper primary, slate app bar
-        public const string LightPrimary = "#B7601F";
-        public const string LightVerdigris = "#1D6F7C"; // Tertiary - oxidised copper, the primary's counterpart
+        // Light - white surfaces on a cool gray ground, copper primary, slate app bar
+        public const string LightPrimary = "#9A4A14";
+        public const string LightVerdigris = "#1D6F7C"; // Tertiary - oxidized copper, the primary's counterpart
         public const string LightSlate = "#2E3440"; // Secondary + AppbarBackground
         public const string LightSurface = "#FFFFFF"; // Surface + DrawerBackground
         public const string LightBackground = "#F5F6F8";
@@ -34,7 +34,7 @@ public static class AppTheme
         // Dark - near-black ground, lifted slate surfaces, warmed copper primary
         public const string DarkPrimary = "#E39A5C";
         public const string DarkOnAccent = "#1B1E24"; // PrimaryContrastText + TertiaryContrastText
-        public const string DarkVerdigris = "#5FB8C6"; // Tertiary - oxidised copper, the primary's counterpart
+        public const string DarkVerdigris = "#5FB8C6"; // Tertiary - oxidized copper, the primary's counterpart
         public const string DarkSlate = "#2C313B"; // Secondary + Divider + LinesDefault + TableLines
         public const string DarkSurface = "#1B1E24"; // Surface + AppbarBackground
         public const string DarkDrawer = "#171A20";
