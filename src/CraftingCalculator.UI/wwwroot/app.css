@@ -1456,6 +1456,21 @@ html.keyboard-open .mud-dialog-container {
     top: 0.5rem;
 }
 
+/* The notch an outlined field cuts in its border for the floated label. MudBlazor sizes it from a hidden
+   <legend> copy of the label text with no cap, while the visible label itself is capped and ellipsized at
+   the field's width. At a large OS text size a label wider than its field ("Seconds" in the production
+   time row) therefore left a run of hidden text past the field's right edge. That is not cosmetic: text
+   past the viewport's right edge is scrollable overflow, and Chromium on Android widens the layout
+   viewport to contain it - here to 336px on a 320px screen - after which every position: fixed bar spans
+   the wider layout viewport and slides as the page is scrolled. The bottom nav shifted off the right edge,
+   and the app bar climbed under the status bar on the editor screens. 22px is the legend's own
+   margin-left + margin-right (11px each, MudBlazor). overflow: hidden stops the text inside the capped
+   legend counting as overflow of its own. */
+.mud-input.mud-input-outlined > .mud-input-outlined-border legend {
+    max-width: calc(100% - 22px);
+    overflow: hidden;
+}
+
 /* Production time editor: three fields on one line so hours/minutes/seconds read as one value rather
    than three unrelated settings. Equal columns keep each one a comfortable tap target on a phone. */
 .production-time-label {
