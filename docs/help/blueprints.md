@@ -94,9 +94,10 @@ blueprints together, sorted by name. The small line under each name tells you wh
 
 1. **Search:** start typing in ![Search](assets/search.svg) the search box and the list filters as you go.
    ![Filter](assets/filter-list.svg) narrows it down to a [category](categories.md) or two.
-2. **Add:** tap ![Add](assets/add.svg) **Add** on a row to put one of it in the blueprint.
+2. **Add:** tap ![Add](assets/add.svg) **Add** on a row to put one in the blueprint.
 3. **Adjust:** once a requirement is in, its row swaps **Add** for ![Minus](assets/remove.svg), a number you can edit,
-   and ![Plus](assets/add.svg). Tap ![Minus](assets/remove.svg) when it's down to 1 and it's out again.
+   and ![Plus](assets/add.svg). Tap ![Minus](assets/remove.svg) when it's down to 1 and it'll get dropped from the 
+   requirements.
 4. **Done:** tap **Done** in the top corner when you're finished.
 
 Every tap counts the moment you make it. There's no separate confirm step. The keyboard stays up while you tap
