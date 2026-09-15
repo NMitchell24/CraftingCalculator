@@ -102,7 +102,8 @@ material. How you start one depends on your screen:
 - **On a tablet or PC:** tap the ![Duplicate](assets/content-copy.svg) button on the row, between Edit and Delete.
 - **On a phone:** there's no room on the row for a third button, so it's a mode. Tap the
   ![Duplicate](assets/content-copy.svg) **Duplicate** action, then tap any row. Tap the action again to leave the
-  mode without doing anything.
+  mode without doing anything. In landscape orientation there's plenty of room to add this button in on a phone. So 
+  if you don't want to mess with turning the mode on, rotate your phone and just tap the button on the row.
 
 ### Delete mode (deleting several at once)
 
