@@ -804,6 +804,13 @@ html.keyboard-open .page-content-with-bottom-nav {
     text-align: right;
 }
 
+/* Sizes queries below against this element's own box, which follows Android's text zoom (font_scale)
+   the way a media query - keyed to the unzoomed viewport - does not. Verified on-device: at font_scale
+   2.0 the same CSS px width reports far fewer ch than at 1.0, because ch is relative to the zoomed font. */
+.steps-tree {
+    container-type: inline-size;
+}
+
 /* Tree on a narrow screen: cap MudBlazor's fixed 17px-per-level indent (Styles/components/_treeview.scss)
    and let long names wrap instead of truncating or forcing horizontal scroll of the whole page. */
 .steps-tree-view {
@@ -1563,6 +1570,19 @@ html.keyboard-open .mud-dialog-container {
 .steps-tree-time {
     opacity: 0.7;
     font-variant-numeric: tabular-nums;
+}
+
+/* Below this width the time crowds out the step name, forcing it to wrap on every row - the time is
+   still available in the step's Info dialog and the Crafting Summary total, so drop it here instead.
+   Calibrated on-device (emulator-5554) against .steps-tree's own ch, which tracks font_scale:
+     320px / font_scale 2.0 (200%) -> ~17.6ch, time needed to stay hidden
+     395px / font_scale 1.3 (130%) -> ~27ch,   "Bronze Helmet x1  4s" still fit on one line
+     448px / font_scale 1.0 (100%) -> ~41ch
+   24ch sits between those two kept-cases, so it only fires at the extreme end. */
+@container (max-width: 24ch) {
+    .steps-tree-time {
+        display: none;
+    }
 }
 
 /* A Crafting Steps row whose count is crafts rather than items (BlueprintTreeNode.Label). Dotted
