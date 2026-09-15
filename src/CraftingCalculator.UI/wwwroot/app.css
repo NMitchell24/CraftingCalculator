@@ -1383,6 +1383,17 @@ html.keyboard-open .mud-snackbar-location-bottom-center {
     max-height: calc(100dvh - 32px);
 }
 
+/* A button label never wraps inside its button; when the row cannot fit every button on one line, the
+   buttons stack instead, Material's stacked-buttons layout. MudBlazor's row is already flex-end with an
+   8px gap, and every dialog lists the dismissive button first (MudMessageBox renders Cancel, No, Yes),
+   so wrap-reverse leaves that first line at the bottom and moves each button that does not fit up a
+   line, every line still right-aligned. A three-button row can end up partly stacked, one on top and
+   two below. This covers MudMessageBox and the app's own dialogs alike, and needs no text-size check. */
+.mud-dialog-actions {
+    flex-wrap: wrap-reverse;
+    white-space: nowrap;
+}
+
 /* The container is sized to the layout viewport, which on iOS stays full height under the keyboard, so a
    full-screen dialog's bottom would sit behind it. --keyboard-inset is 0 on Android, where the WebView shrinks. */
 html.keyboard-open .mud-dialog-container {

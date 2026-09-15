@@ -187,8 +187,8 @@ The app asks how you want to bring it in:
 - **As New Dataset:** makes a brand new dataset out of what you picked. The name comes prefilled with whatever the
   dataset was called in the file, and the usual [unique-name rule](managing-datasets.md#adding-one) applies. You stay in
   the dataset you're in, so switch over when you're ready.
-- **Into 'your dataset':** adds what you picked to the dataset you're in right now. The button says its name, so
-  there's no guessing where it's going.
+- **Into Current:** adds what you picked to the dataset you're in right now. The question above the buttons names
+  it, so there's no guessing where it's going.
 
 As New is the safe bet. Nothing you already have changes, and if you don't like how it turned out you can
 [delete it](managing-datasets.md#deleting-one) and pretend it never happened.
