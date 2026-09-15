@@ -17,10 +17,13 @@
    value this component already has. *@
 <CascadingValue Value="_breakpoint ?? Breakpoint.Xs" IsFixed="false">
     <MudLayout>
-        @* Three tracks with equal-width sides (app.css) so the title is centred on the viewport rather
-           than on the space the icons leave - a MudSpacer would push it off-centre on every page
-           without a back arrow. The page's own actions live on the ActionsBar below, not up here. *@
-        <MudAppBar Dense="true" Elevation="1" Style="padding-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));">
+        @* Three tracks with equal-width sides while the title fits (app.css) so it is centered on the
+           viewport rather than on the space the icons leave - a MudSpacer would push it off-center on
+           every page without a back arrow. The page's own actions live on the ActionsBar below, not up here.
+           data-height-var is read by the height-measuring script in index.html: the bar grows when its
+           title wraps, and everything that parks under it offsets by --app-bar-height (app.css). *@
+        <MudAppBar Dense="true" Elevation="1" Style="padding-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));"
+                   data-height-var="--app-bar-height">
             <div class="app-bar-start">
                 @* Only where the labelled drawer could show: the Mini rail is the only face a smaller
                    viewport has, so there is nothing for the toggle to switch between. Edge.Start takes
@@ -38,7 +41,7 @@
                 }
             </div>
 
-            <MudText Typo="Typo.h6" Class="@AppBarTitleClass">@PageShellState.Config.Title</MudText>
+            <MudText Typo="Typo.h6" Class="app-bar-title display-title">@PageShellState.Config.Title</MudText>
 
             <div class="app-bar-end">
                 @* Context sensitive: on any page but Help this opens the help page for the route the

@@ -63,12 +63,13 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         PageShellState.Configure(this, new PageShellConfig(Title())
         {
             ShowBack = true,
-            TitleIsUserContent = Id > 0,
             ConfirmLeaveAsync = ConfirmLeaveAsync
         });
     }
 
-    private string Title() => Id > 0 ? _record?.Name ?? "" : $"New {_type.GetDescription()}";
+    // Never the record's own name: the app bar carries only the app's own words, and the Name field below
+    // already shows the record's.
+    private string Title() => $"{(Id > 0 ? "Edit" : "New")} {_type.GetDescription()}";
 
     private void MarkDirty() => _isDirty = true;
 

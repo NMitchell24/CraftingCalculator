@@ -122,68 +122,84 @@ html, body {
        same reason --bottom-nav-height is: the page content and the snackbars offset by it. Shorter
        than the nav on purpose - it carries a page's actions, not a second set of destinations. */
     --actions-bar-height: 48px;
-    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Two 44px
-       icon buttons is the most either side holds - help and settings on the right, and the left track
-       matches so the centring stays exact even though it only ever carries the back arrow. A page's
-       own actions moved off the bar to .actions-bar and the drawer. */
-    --app-bar-side-width: 88px;
-    /* The app bar's bottom edge in viewport coordinates. The bar is Dense (MainLayout.razor), which is
-       three quarters of --mud-appbar-height, and MainLayout pads it by the status-bar inset on top.
-       Anything that pins itself directly under the bar offsets by this. */
-    --app-bar-bottom: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    /* The app bar's bottom edge in viewport coordinates. --app-bar-height is the bar's measured border-box
+       height, written onto <html> by the height-measuring script in index.html (MainLayout.razor tags the
+       MudAppBar with data-height-var), because a title that wraps makes the bar taller than its nominal
+       Dense height. The fallback is that nominal height - three quarters of --mud-appbar-height, plus the
+       status-bar inset MainLayout pads the bar by on top - and only stands until the first measurement
+       lands. Anything that pins itself directly under the bar offsets by this. */
+    --app-bar-bottom: var(--app-bar-height, calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top))));
     /* How far the on-screen keyboard reaches up over the layout viewport, written by the keyboard script in
        index.html. Only ever non-zero on iOS: Android's SafeAreaInsetsInjector shrinks the WebView instead. */
     --keyboard-inset: 0px;
 }
 
-/* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
-   screen and not merely on whatever space the icons leave. Equal fixed side tracks are what makes it
-   exact - 1fr sides would each floor at their own min-content width, and the heavier action side
-   would win. */
+/* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centered on the
+   screen and not merely on whatever space the icons leave. While the title fits, the auto middle track
+   takes exactly its width and the two fr sides split the rest equally, which centers it on the viewport
+   rather than in the gap between the icons. When it does not fit - a large OS text size on a narrow
+   phone - the sides shrink to their icons (48px for the back arrow, 96px for help + settings) and the
+   title takes the rest, wrapping at word boundaries; fixed 88px sides squeezed single words like
+   "Categories" into an ellipsis there. */
 .mud-appbar .mud-toolbar {
     display: grid;
-    grid-template-columns: var(--app-bar-side-width) minmax(0, 1fr) var(--app-bar-side-width);
+    grid-template-columns: minmax(auto, 1fr) auto minmax(auto, 1fr);
     align-items: center;
     padding-left: calc(16px + var(--edge-inset-symmetric));
     padding-right: calc(16px + var(--edge-inset-symmetric));
 }
 
+/* MudBlazor fixes the Dense toolbar at this height (three quarters of --mud-appbar-height), which is
+   what forced a long title into an ellipsis. Same selector as its rule, so this wins on source order:
+   the bar keeps that height for a one-line title and grows to hold a wrapped one. The height-measuring
+   script in index.html is what tells the rest of the layout how tall it ended up (--app-bar-height). */
+.mud-appbar.mud-appbar-dense .mud-toolbar-appbar {
+    height: auto;
+    min-height: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4);
+}
+
+/* align-self: start keeps the icons on the title's first line when it wraps and the bar grows; centered,
+   they would float between the two lines. On a one-line bar the 48px buttons fill the row either way. */
 .app-bar-start {
     justify-self: start;
+    align-self: start;
     display: flex;
     align-items: center;
 }
 
 .app-bar-end {
     justify-self: end;
+    align-self: start;
     display: flex;
     align-items: center;
 }
 
-/* minmax(0, 1fr) above lets this track shrink below its content; without these rules a long title
-   would instead widen the track and push the action icons off the bar. The ellipsis is deliberate and
-   one of two exceptions to record names wrapping (the other is .transfer-row-name): the bar is a fixed
-   height, and the page beneath restates its title in full - the editor's is its own Name field. */
+/* A title is never ellipsized: a truncated "Categ..." is the only place that word appears on the
+   screen, and a screen reader reads it literally. It wraps at word boundaries instead (overflow-wrap:
+   normal keeps a word whole even when it is wider than the track) and the toolbar above grows to hold
+   it. Declared after .display-title so this line-height wins: 1 is right for one line and too tight
+   for two. The vertical padding is a wrapped title's breathing room; it sits here rather than on the
+   toolbar, where it would push a one-line bar past its 48px. */
 .app-bar-title {
     text-align: center;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    /* Guarantees clear air between the title and the action icons at any text zoom. Android's WebView
-       scales px text by the OS "Font size" setting, so at its maximum a title that merely fits the
-       track ends up butting straight against the +. Reserving the gutter here makes the ellipsis kick
-       in a little sooner instead. */
-    padding: 0 8px;
+    white-space: normal;
+    overflow-wrap: normal;
+    line-height: 1.1;
+    /* No horizontal padding: at the largest Android text size on a 320px viewport "Components" is 143px
+       wide and the track beside a back arrow is 144px, so even a few px here pushes the icons out past
+       the bar's gutter. The icon buttons' own 12px inner padding is the visible air between the last
+       letter and the glyph. */
+    padding: 4px 0;
 }
 
-/* Two jobs. First, compensate MudMainContent's own top offset (which only accounts for the app bar's
-   nominal toolbar height) for the extra padding-top MainLayout.razor puts on the app bar to clear the
-   status bar. Second, supply the 16px gap under the bar: MudBlazor offsets the bar with `padding-top`
-   on .mud-main-content at two classes of specificity (_main.scss), so .page-content's one-class
-   `padding: 16px` shorthand never won the top edge and page content sat flush against the bar. The gap
-   goes here, on the rule that does win, rather than by out-specifying MudBlazor's. */
+/* The content's offset under the bar, restated from the measured bar plus 16px of clear air. MudBlazor
+   offsets the content by the bar's nominal height with `padding-top` on .mud-main-content at two
+   classes of specificity (_main.scss), which knows nothing of the status-bar inset MainLayout.razor
+   pads the bar by or of a wrapped title; --app-bar-bottom is the real bottom edge. Same specificity as
+   MudBlazor's rule and later in the cascade, so it wins, which .page-content's one-class `padding:
+   16px` shorthand never could - without this the content sat flush against the bar. */
 .mud-layout .mud-main-content {
-    margin-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    padding-top: calc(var(--app-bar-bottom) + 16px);
 }
 
 /* Same compensation as .mud-main-content above, for the side rail (sm+: MudDrawer Mini/Persistent,
@@ -1089,9 +1105,9 @@ html.keyboard-open .page-content-with-bottom-nav {
     cursor: pointer;
 }
 
-/* One of the two places a record name may ellipsize (the other is .app-bar-title): Virtualize positions
-   these rows at a fixed height, so the line cannot grow. The selection panels' Info button shows the
-   full name; the import conflict list has no such button, and lives with the ellipsis. */
+/* The one place a record name may ellipsize: Virtualize positions these rows at a fixed height, so the
+   line cannot grow. The selection panels' Info button shows the full name; the import conflict list
+   has no such button, and lives with the ellipsis. */
 .transfer-row-name {
     flex: 1 1 auto;
     min-width: 0;
