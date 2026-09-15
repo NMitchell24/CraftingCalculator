@@ -20,18 +20,20 @@
                 <BlueprintEditor @key="_record" Model="blueprint" OnChanged="MarkDirty" />
                 break;
         }
-    </div>
 
-    @* This page declares no PageActions, so it gets no ActionsBar - which would dock exactly where
-       this bar already is. Delete lives here instead, opposite the Cancel/Save pair. *@
-    <MudPaper Class="editor-action-bar" Elevation="8" Square="true">
-        @if (Id > 0)
-        {
-            <MudIconButton Class="editor-action-bar-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
-                           OnClick="DeleteAsync" title="Delete" aria-label="Delete" />
-        }
-        <MudButton OnClick="ReturnToListAsync">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save"
-                   Disabled="@string.IsNullOrWhiteSpace(_record.Name)" OnClick="SaveAsync">Save</MudButton>
-    </MudPaper>
+        @* This page declares no PageActions, so it gets no ActionsBar - which would dock exactly where
+           this bar already is. Delete lives here instead, opposite the Cancel/Save pair. Inside the column
+           rather than after it: fixed to the viewport the bar ignores its parent, and at expanded widths it
+           sticks to the bottom of this column (app.css). *@
+        <MudPaper Class="editor-action-bar" Elevation="8" Square="true">
+            @if (Id > 0)
+            {
+                <MudIconButton Class="editor-action-bar-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                               OnClick="DeleteAsync" title="Delete" aria-label="Delete" />
+            }
+            <MudButton OnClick="ReturnToListAsync">Cancel</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save"
+                       Disabled="@string.IsNullOrWhiteSpace(_record.Name)" OnClick="SaveAsync">Save</MudButton>
+        </MudPaper>
+    </div>
 }

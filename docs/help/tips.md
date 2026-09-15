@@ -60,7 +60,7 @@ invent names to tell them apart.
 
 Armor sets, tool tiers and ammunition types are usually the same basic recipe with one or two materials swapped.
 Build the first one properly, then use ![Duplicate](assets/content-copy.svg) **Duplicate** on the
-Blueprints list for the rest. See [The Dataset Screen](dataset.md).
+Blueprints list for the rest. See [Duplicating a record](dataset.md#duplicating-a-record).
 
 ### Model a whole build as one blueprint
 
@@ -131,9 +131,10 @@ temporary and won't impact any saved favorites. Saved favorites reference the bl
 
 - **The number in a quantity stepper is editable.** Tap it and type. Much faster than tapping **+** two
   hundred times.
-- **Or make the stepper move in tens.** ![Step by 10](assets/x10.svg) **Step by 10** on the
-  [Craft screen](craft-screen.md#stepping-by-ten) switches every row over at once, for when you want 40
-  arrows and don't feel like typing.
+- **Or step in tens.** On a tablet or PC, every row on the [Craft screen](craft-screen.md#stepping-by-ten) has
+  ![Step down by ten](assets/keyboard-double-arrow-down.svg) and ![Step up by ten](assets/keyboard-double-arrow-up.svg)
+  buttons. On a phone, ![Step by 10](assets/x10.svg) **Step by 10** switches every row over at once. Both are for
+  when you want 40 arrows and don't feel like typing.
 - **A quantity of zero keeps the row.** Handy for asking "what does this batch look like without the
   armor?" without losing your selection.
 - **Press and hold ![Delete](assets/delete.svg)** in Delete mode to back out with nothing deleted.

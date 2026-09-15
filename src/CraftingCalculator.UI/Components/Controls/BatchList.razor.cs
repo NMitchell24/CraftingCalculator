@@ -17,6 +17,18 @@ public partial class BatchList : ComponentBase, IDisposable
     /// <summary>How far one tap of a row's + or - moves that blueprint's quantity.</summary>
     [Parameter] public long StepSize { get; set; } = 1;
 
+    /// <summary>
+    /// When set, every row also carries a pair of buttons, either side of its stepper, that move the quantity by
+    /// this much. Null for rows with the stepper alone.
+    /// </summary>
+    [Parameter] public long? BulkStep { get; set; }
+
+    private string ListClass => BulkStep is null ? "batch-list" : "batch-list batch-list-bulk-step";
+
+    private string BulkDecrementLabel => $"Subtract {BulkStep}";
+
+    private string BulkIncrementLabel => $"Add {BulkStep}";
+
     private bool IsBulkStep => StepSize > 1;
 
     private string DecrementIcon => IsBulkStep ? Icons.Material.Filled.KeyboardDoubleArrowDown : Icons.Material.Filled.Remove;

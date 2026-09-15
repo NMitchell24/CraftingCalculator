@@ -57,7 +57,9 @@ The caption changes with the type.
 - **Blueprints:** list how many components they have. 
 
 Tap ![Edit](assets/edit.svg) to edit a row. You don't have to tap the icon directly. Tapping anywhere on the card 
-does the same thing. ![Delete](assets/delete.svg) deletes that one record after a confirmation.
+does the same thing. ![Delete](assets/delete.svg) deletes that one record after a confirmation. On a tablet or PC
+there's a ![Duplicate](assets/content-copy.svg) between them, too. See
+[Duplicating a record](dataset.md#duplicating-a-record).
 
 > **Note:** On the Blueprints list the caption says something like `3 components`. This is not the quantity of 
 > components in the blueprint, but the number of individual components and other blueprints that have been linked 
@@ -83,20 +85,25 @@ These [actions](actions-bar.md) show up whenever you go to one of the lists for 
 | Action                                                  | What it does                                |
 |---------------------------------------------------------|---------------------------------------------|
 | ![New](assets/add.svg) **New**                          | Opens an empty editor for this record type. |
-| ![Duplicate](assets/content-copy.svg) **Duplicate**     | Turns on Duplicate mode.                    |
+| ![Duplicate](assets/content-copy.svg) **Duplicate**     | On a phone, turns on Duplicate mode.        |
 | ![Delete](assets/delete.svg) **Delete**                 | Turns on Delete mode.                       |
 | ![Delete all](assets/delete-forever.svg) **Delete all** | Wipes this list after a confirmation.       |
 
-The last three gray out when the list is empty, since there would be nothing to act on.
+Everything but New grays out when the list is empty, since there would be nothing to act on.
 
-### Duplicate mode
+### Duplicating a record
 
-Tap ![Duplicate](assets/content-copy.svg) **Duplicate**, then tap any row. The editor opens on a
-**copy** of that record, named `Whatever - Copy`, with nothing saved yet. Change what you need, fix the
-name, tap **Save**.
+Duplicating opens the editor on a **copy** of a record, named `Whatever - Copy`, with nothing saved yet. Change what
+you need, fix the name, tap **Save**.
 
 This is the fast way to build out an armor set or a tool tier, where five recipes differ by one
-material. Tap ![Duplicate](assets/content-copy.svg) again to leave the mode without doing anything.
+material. How you start one depends on your screen:
+
+- **On a tablet or PC:** tap the ![Duplicate](assets/content-copy.svg) button on the row, between Edit and Delete.
+- **On a phone:** there's no room on the row for a third button, so it's a mode. Tap the
+  ![Duplicate](assets/content-copy.svg) **Duplicate** action, then tap any row. Tap the action again to leave the
+  mode without doing anything. In landscape orientation there's plenty of room to add this button in on a phone. So 
+  if you don't want to mess with turning the mode on, rotate your phone and just tap the button on the row.
 
 ### Delete mode (deleting several at once)
 

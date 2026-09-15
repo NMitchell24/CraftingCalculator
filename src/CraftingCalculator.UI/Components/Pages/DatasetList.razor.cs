@@ -23,7 +23,10 @@ public partial class DatasetList : ComponentBase, IDisposable
         /// <summary>A row tap opens the editor.</summary>
         Normal,
 
-        /// <summary>The next row tap opens the editor on a copy of that record.</summary>
+        /// <summary>
+        /// The next row tap opens the editor on a copy of that record. Compact viewports only; wider rows carry a
+        /// Duplicate button of their own.
+        /// </summary>
         Duplicate,
 
         /// <summary>Row taps toggle selection; the Delete action then deletes the selection.</summary>
@@ -32,6 +35,8 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     /// <summary>The <see cref="DataType"/> being listed, as its enum name.</summary>
     [Parameter] public string Type { get; set; } = "";
+
+    [CascadingParameter] private Breakpoint Breakpoint { get; set; }
 
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
@@ -48,15 +53,34 @@ public partial class DatasetList : ComponentBase, IDisposable
     // value equality, so a selection held as records would not survive a reload.
     private readonly HashSet<int> _selected = [];
 
+    // The Type the list was last loaded for. A resized window or a turned phone changes only the
+    // Breakpoint, and reloading for it would discard a Delete Mode selection and clear the filter out from
+    // under a search bar still showing it.
+    private string? _listedType;
+
+    // The IsCompact the shell's actions were last declared for; null until the first ConfigureShell.
+    private bool? _shellCompact;
+
     private List<IBaseDataRecord> FilteredRecords => RecordFilterProcessor.Apply(_records, _filter);
+
+    // Compact keeps Duplicate as a mode on the shell; wider viewports have room for it on every row.
+    private bool IsCompact => Breakpoint == Breakpoint.Xs;
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Type == _listedType)
+        {
+            ApplyBreakpoint();
+            return;
+        }
+
         if (!Enum.TryParse(Type, ignoreCase: true, out _type))
         {
             Navigation.NavigateTo("/dataset");
             return;
         }
+
+        _listedType = Type;
 
         // The router reuses this instance when only {Type} changes, so the previous type's rows,
         // selection and mode would stay on screen for the length of the load below. SetMode clears
@@ -80,27 +104,52 @@ public partial class DatasetList : ComponentBase, IDisposable
     /// <summary>The type's noun agreeing with <paramref name="count"/>, for text that counts records.</summary>
     private static string NounFor(DataType type, int count) => count == 1 ? type.GetDescription() : TitleFor(type);
 
+    private void ApplyBreakpoint()
+    {
+        // Configure re-renders MainLayout, which cascades the Breakpoint again, so the shell is re-declared only
+        // when the viewport crosses the compact boundary.
+        if (_shellCompact == IsCompact)
+        {
+            return;
+        }
+
+        // Duplicate Mode exists only on compact, so this is the viewport leaving it: the action is about to leave
+        // the shell, and the next row tap would otherwise make a copy with nothing on screen to turn the mode off.
+        if (_mode == ListMode.Duplicate)
+        {
+            SetMode(ListMode.Normal);
+            return;
+        }
+
+        ConfigureShell();
+    }
+
     private void ConfigureShell()
     {
         bool empty = _records.Count == 0;
+        _shellCompact = IsCompact;
+
+        List<PageAction> actions = [new($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync)];
+
+        if (IsCompact)
+        {
+            actions.Add(new PageAction("Duplicate", Icons.Material.Filled.ContentCopy, ToggleDuplicateModeAsync,
+                Disabled: empty, Active: _mode == ListMode.Duplicate));
+        }
+
+        // Wired only while the mode is on, the one state the gesture means anything in. A hold
+        // outside it is inert either way - the WebView delivers no click after a long press, so
+        // that tap is lost whether or not a handler is attached.
+        actions.Add(new PageAction("Delete", Icons.Material.Filled.Delete, ToggleDeleteModeAsync,
+            Disabled: empty, Active: _mode == ListMode.Delete,
+            OnLongPress: _mode == ListMode.Delete ? ExitDeleteModeAsync : null));
+        actions.Add(new PageAction($"Delete all {TitleFor(_type)}", Icons.Material.Filled.DeleteForever,
+            DeleteAllAsync, Disabled: empty));
 
         PageShellState.Configure(this, new PageShellConfig(TitleFor(_type))
         {
             ShowBack = true,
-            Actions =
-            [
-                new PageAction($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync),
-                new PageAction("Duplicate", Icons.Material.Filled.ContentCopy, ToggleDuplicateModeAsync,
-                    Disabled: empty, Active: _mode == ListMode.Duplicate),
-                // Wired only while the mode is on, the one state the gesture means anything in. A hold
-                // outside it is inert either way - the WebView delivers no click after a long press, so
-                // that tap is lost whether or not a handler is attached.
-                new PageAction("Delete", Icons.Material.Filled.Delete, ToggleDeleteModeAsync,
-                    Disabled: empty, Active: _mode == ListMode.Delete,
-                    OnLongPress: _mode == ListMode.Delete ? ExitDeleteModeAsync : null),
-                new PageAction($"Delete all {TitleFor(_type)}", Icons.Material.Filled.DeleteForever,
-                    DeleteAllAsync, Disabled: empty)
-            ]
+            Actions = actions
         });
     }
 

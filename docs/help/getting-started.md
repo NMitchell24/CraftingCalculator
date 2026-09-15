@@ -31,10 +31,10 @@ look like this.
 For this example you'll need the following categories: `Metal`, `Materials`, `Wood`, `Gear`. 
 
 > **Tip:** Adding multiple items with near-identical values? Duplicate 'em!  
-> **Duplicate** mode (![Duplicate](assets/content-copy.svg)) opens the editor pre-filled from the row you tap with 
+> ![Duplicate](assets/content-copy.svg) **Duplicate** opens the editor pre-filled from the row you pick, with 
 > '- Copy' added to the name. So, duplicate, change the name, save, and do it again. It's that easy!
 >
-> You can duplicate Categories, Components, or Blueprints. See [Duplicate mode](dataset.md#duplicate-mode) for more 
+> You can duplicate Categories, Components, or Blueprints. See [Duplicating a record](dataset.md#duplicating-a-record) for more 
 > info.
 
 More detail: [Categories](categories.md).
