@@ -1206,8 +1206,9 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-bottom: 72px;
 }
 
-/* Thumb-reachable Cancel/Save - above the bottom nav on xs and clear of the gesture-nav area
-   everywhere. The only fixed bar left in the app now that the totals bar is a card. */
+/* Thumb-reachable Cancel/Save, with an icon-only Delete at the far end - above the bottom nav on xs and
+   clear of the gesture-nav area everywhere. Always a single line: see .editor-action-bar-delete for why
+   Delete has no label. The only fixed bar left in the app now that the totals bar is a card. */
 .editor-action-bar {
     position: fixed;
     border-top: 1px solid var(--mud-palette-lines-default);
@@ -1224,9 +1225,12 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-right: calc(16px + var(--edge-inset-right));
 }
 
-/* Pushed to the opposite end of the bar from Cancel/Save, so a destructive action is nowhere near the
-   button the thumb is aiming for. auto margin rather than justify-content: space-between on the bar,
-   which would spread Cancel and Save apart on a new record, where there is no Delete. */
+/* The icon-only Delete (a MudIconButton, 48px at every text size). Three labeled buttons do not fit a
+   320px bar at the largest Android text size, and letting the bar wrap would put Delete on a line of its
+   own, where it reads as the primary action. Pushed to the opposite end of the bar from Cancel/Save, so a
+   destructive action is nowhere near the button the thumb is aiming for. auto margin rather than
+   justify-content: space-between on the bar, which would spread Cancel and Save apart on a new record,
+   where there is no Delete. */
 .editor-action-bar-delete {
     margin-right: auto;
 }

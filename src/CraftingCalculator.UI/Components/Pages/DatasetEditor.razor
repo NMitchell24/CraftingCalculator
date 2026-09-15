@@ -27,8 +27,8 @@
     <MudPaper Class="editor-action-bar" Elevation="8" Square="true">
         @if (Id > 0)
         {
-            <MudButton Class="editor-action-bar-delete" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete"
-                       OnClick="DeleteAsync">Delete</MudButton>
+            <MudIconButton Class="editor-action-bar-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                           OnClick="DeleteAsync" title="Delete" aria-label="Delete" />
         }
         <MudButton OnClick="ReturnToListAsync">Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save"
