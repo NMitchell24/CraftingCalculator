@@ -138,7 +138,7 @@
             // up: search, tap +, search again. Only while the search field has focus, because a quantity field
             // being typed into has to blur and commit before its own + applies.
             document.addEventListener('mousedown', function (e) {
-                if (e.target.closest('.list-row-stepper button') && isSearchFocused()) {
+                if (e.target.closest('.record-row-stepper button') && isSearchFocused()) {
                     e.preventDefault();
                 }
             }, true);

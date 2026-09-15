@@ -635,8 +635,8 @@ html.keyboard-open .page-content-with-bottom-nav {
    buttons for it; the chip and the trailing cell share the second line while the chip's basis fits
    beside the buttons, and otherwise the buttons move down to a third. A wider list puts all three cells
    on one line, which is the row the Dataset list always had. Nothing in a row is truncated: names and
-   category names are user data, and overflow-wrap: anywhere breaks even a 40-character word rather
-   than widening the row. Android scales px text by the OS Font size setting, so at its top a phone
+   category names are user data, and overflow-wrap: break-word breaks a 40-character word that could not
+   fit a line by itself rather than widening the row. Android scales px text by the OS Font size setting, so at its top a phone
    shows about half again as much text per line as the design width, and a landscape phone has the
    text budget of a narrow one; every shape here is checked there, not only at the default. */
 .record-row {
@@ -650,7 +650,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 .record-row-name {
     flex: 1 0 100%;
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 /* MudText renders a caption as an inline span; under the name it is a line of its own. */
@@ -674,7 +674,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     align-items: center;
     gap: 4px 8px;
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 /* An uncategorized record renders no chip. The empty cell has to go, or its 8em basis would still push
@@ -829,7 +829,7 @@ html.keyboard-open .page-content-with-bottom-nav {
    size (12px x 1.3 x 1.25 + 4 = 23.5). */
 .category-chip .mud-chip-content {
     display: block;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     line-height: 1.25;
     padding: 2px 0;
     text-align: center;
@@ -993,8 +993,8 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* Both cards fit on screen without scrolling in either orientation: each is the largest square the free
    height and its column allow. The free height is the viewport minus the chrome MainLayout draws around
    .page-content - the app bar and its 16px gap above, and below it the page's bottom padding (16px) or,
-   at xs, the bottom nav. This page has no actions, so no actions bar. A square that small cannot grow to fit
-   large OS text, so the card's description is clamped (.transfer-hub-description) instead. */
+   at xs, the bottom nav. This page has no actions, so no actions bar. At large OS text sizes the square is
+   too small for its text, and the card grows taller instead (.transfer-hub-card), so the page scrolls. */
 .transfer-hub {
     --transfer-hub-viewport: 100vh;
     --transfer-hub-gap: 16px;
@@ -1022,9 +1022,9 @@ html.keyboard-open .page-content-with-bottom-nav {
     }
 }
 
-/* The card is a native <button> (ImportExport.razor), so it resets the button's own font and color. Its
-   contents are centered in a column, so anything taller than the card would spill out of the top as well as
-   the bottom; the icon and title do not shrink, and the description is the only item that does. */
+/* The card is a native <button> (ImportExport.razor), so it resets the button's own font and color. No
+   overflow other than visible: a scroll container loses aspect-ratio's automatic minimum height, and that
+   minimum is what lets the card grow past a square when its text does not fit. */
 .transfer-hub-card {
     width: min(100%, calc((var(--transfer-hub-height) - var(--transfer-hub-gap)) / 2));
     aspect-ratio: 1;
@@ -1036,7 +1036,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    overflow: hidden;
     font: inherit;
     color: inherit;
     text-align: center;
@@ -1058,26 +1057,15 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 .transfer-hub-icon {
-    flex-shrink: 0;
     font-size: 3rem;
 }
 
-.transfer-hub-title {
+.transfer-hub-title,
+.transfer-hub-description {
     display: block;
-    flex-shrink: 0;
 }
 
-/* The description is what gives way when the card is too short for everything. The clamp is a fixed count
-   because the WebView supports only the prefixed -webkit-line-clamp, not line-clamp: auto; 3 lines is what
-   fits under the icon and title at 200% portrait and is the whole description at every smaller text size.
-   min-height: 0 lets it shrink below the clamp too, so a card with room for fewer lines cuts the description
-   rather than pushing the title out of the top. */
 .transfer-hub-description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    min-height: 0;
-    overflow: hidden;
     color: var(--mud-palette-text-secondary);
 }
 
@@ -1215,12 +1203,12 @@ html.keyboard-open .page-content-with-bottom-nav {
     cursor: pointer;
 }
 
-/* Wraps like every other record name in the app; a name with no spaces to break at breaks anywhere rather
-   than run under the Info button. */
+/* Wraps like every other record name in the app; a word too long for a line by itself breaks inside the word
+   rather than run under the Info button. */
 .transfer-row-name {
     flex: 1 1 auto;
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 /* The Info button (MudIconButton, 48px at every text size) is centered on a one-line row, not on the row: the
