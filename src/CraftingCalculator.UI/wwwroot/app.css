@@ -1589,18 +1589,33 @@ html.keyboard-open .mud-dialog-container {
     transform: translate(14px, -37.5%) scale(0.75);
 }
 
-/* Production time editor: three fields on one line so hours/minutes/seconds read as one value rather
-   than three unrelated settings. Equal columns keep each one a comfortable tap target on a phone. */
 .production-time-label {
     display: block;
     opacity: 0.7;
     margin-bottom: 4px;
 }
 
+/* Production time editor: hours, minutes and seconds share one line so they read as one value rather
+   than three unrelated settings, but only while every field can show its whole label. When they can't,
+   all three stack at full width together; a partial wrap (two fields over one) would read as two values.
+   The flex basis does the switch with no script: (24ch - 100%) * 999 is a huge width when the row is
+   narrower than 24ch, so each field wraps onto a line of its own, and a negative one when the row is
+   wider, which clamps to 0 so the three grow into equal shares. ch rather than px for the same reason as
+   .pane-tabs: Android's WebView text zoom scales ch but not the row's px width (nor em/rem), so only ch
+   tracks whether the labels fit. Measured in the fields' own font, the row is about 19ch at Android's
+   maximum Font size and Display size (320px viewport, 200% text, where "Minutes" and "Seconds" were
+   ellipsized), about 28.8ch at 395px / 130% (where "Minutes" still fits its third) and about 44ch at
+   448px / 100%. 24ch stacks the first and keeps the other two on one line. min-width: 0 lets a field
+   shrink below its input's intrinsic width, which would otherwise push a one-line row past the screen. */
 .production-time-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
+}
+
+.production-time-row > .mud-input-control {
+    flex: 1 1 calc((24ch - 100%) * 999);
+    min-width: 0;
 }
 
 /* Echoes the entered value back in the same format the Crafting Summary uses, so the user can see that
