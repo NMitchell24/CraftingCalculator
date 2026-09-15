@@ -9,8 +9,8 @@ public partial class SummaryCard : ComponentBase, IDisposable
 
     private string ProfitClass => State.Profit switch
     {
-        > 0 => "summary-profit summary-profit-positive",
-        < 0 => "summary-profit summary-profit-negative",
+        > 0 => "summary-profit-positive",
+        < 0 => "summary-profit-negative",
         _ => "summary-profit"
     };
 
