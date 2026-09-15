@@ -751,8 +751,11 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* The Craft batch wherever its rows carry +10 / -10 beside the stepper (BatchList.razor): two 48px buttons more
    than the rows the query above was calibrated on, so that list keeps the wrapped shape for another 12ch and the
    name keeps the room every other list gets at 55ch. 12ch is those 96px and their gap at 100%, where a ch of
-   the list's face is about 9.5px (the batch list measured 567px = 60ch in a 1906px Windows window, still
-   wrapped); at a larger text size the same 12ch is more pixels, which only errs toward wrapping. */
+   the list's face is about 9.5px; at a larger text size the same 12ch is more pixels, which only errs toward
+   wrapping. Never on a portrait phone: below 600px the batch has no +10 / -10 (Craft.razor.cs). Calibration,
+   measured on the batch list: about 53ch on a 997px landscape phone at 130%, 59ch on an 880px one at 130% and
+   60ch in a 1906px Windows window (all wrap); about 68ch on a 997px landscape phone at 100%, where the name keeps
+   209px on one line, and 76ch on an 880px one at 100% (both one line). */
 @container (55ch <= width < 67ch) {
     .batch-list-bulk-step .record-row {
         flex-wrap: wrap;
