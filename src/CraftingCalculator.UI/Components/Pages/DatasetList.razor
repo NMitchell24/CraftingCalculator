@@ -43,6 +43,13 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
                                                title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
                                                OnClick="@(() => Edit(record))" />
+                                @* Compact viewports have Duplicate Mode on the shell instead (DatasetList.razor.cs). *@
+                                @if (!IsCompact)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary"
+                                                   title="@($"Duplicate {record.Name}")" aria-label="@($"Duplicate {record.Name}")"
+                                                   OnClick="@(() => Duplicate(record))" />
+                                }
                                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
                                                title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
                                                OnClick="@(() => DeleteAsync(record))" />

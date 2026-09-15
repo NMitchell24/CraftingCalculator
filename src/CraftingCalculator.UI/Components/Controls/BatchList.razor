@@ -1,6 +1,6 @@
 @implements IDisposable
 
-<div class="batch-list">
+<div class="@ListClass">
     @if (State.BlueprintQuantities.Count == 0)
     {
         <div class="pane-empty-state">
@@ -19,10 +19,18 @@
                         <MudText Class="record-row-name">@selected.Name</MudText>
                         <div class="record-row-meta"><CategoryChip Record="@selected.Blueprint" /></div>
                         <div class="record-row-end">
-                            @* The two buttons carry the x10 mode rather than a toggle of their own: a third
-                               button in this row costs 44px it does not have on a 360px phone, so the
-                               mode changes the glyph and color of the buttons it already affects. *@
+                            @* On a compact viewport the two buttons carry the x10 mode rather than a toggle of
+                               their own: a third button in this row costs 44px it does not have on a 360px
+                               phone, so the mode changes the glyph and color of the buttons it already affects.
+                               Wider viewports have the room, and the owner passes BulkStep for a dedicated
+                               pair instead. *@
                             <div class="record-row-stepper">
+                                @if (BulkStep is { } bulkDown)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardDoubleArrowDown" Size="Size.Medium"
+                                                   title="@BulkDecrementLabel" aria-label="@BulkDecrementLabel"
+                                                   OnClick="@(() => State.Step(selected, -bulkDown))" />
+                                }
                                 <MudIconButton Icon="@DecrementIcon" Color="@StepColor" Size="Size.Medium"
                                                title="@DecrementLabel" aria-label="@DecrementLabel"
                                                OnClick="@(() => State.Step(selected, -StepSize))" />
@@ -31,6 +39,12 @@
                                 <MudIconButton Icon="@IncrementIcon" Color="@StepColor" Size="Size.Medium"
                                                title="@IncrementLabel" aria-label="@IncrementLabel"
                                                OnClick="@(() => State.Step(selected, StepSize))" />
+                                @if (BulkStep is { } bulkUp)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardDoubleArrowUp" Size="Size.Medium"
+                                                   title="@BulkIncrementLabel" aria-label="@BulkIncrementLabel"
+                                                   OnClick="@(() => State.Step(selected, bulkUp))" />
+                                }
                             </div>
                             <div class="record-row-icons">
                                 <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="@(() => ShowInfoAsync(selected))" />

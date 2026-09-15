@@ -28,7 +28,7 @@ public partial class Craft : ComponentBase, IDisposable
     /// <summary>One tap of a batch row's + or - in the normal mode.</summary>
     private const long SingleStep = 1;
 
-    /// <summary>One tap of a batch row's + or - while the x10 mode is on.</summary>
+    /// <summary>One tap of a batch row's + or - while the x10 mode is on, or of its own +10 / -10 buttons.</summary>
     private const long BulkStep = 10;
 
     // Hand-rolled: Material's numbered icons stop at LooksTwo, and _10k draws "10K". A multiplication
@@ -46,10 +46,16 @@ public partial class Craft : ComponentBase, IDisposable
 
     private int _favoriteSelectNonce;
 
-    // Only drives the Add Blueprints dialog's FullScreen vs. side-drawer choice now - the pane layout
-    // itself (single active pane vs. all three side by side) is a pure CSS media query (app.css),
-    // since it needs both width and height to tell a landscape phone apart from a real tablet.
-    private bool IsXs => Breakpoint == Breakpoint.Xs;
+    // The IsCompact the shell's actions were last declared for; null until the first ConfigureShell.
+    private bool? _shellCompact;
+
+    // Drives the x10 mode (compact keeps it on the shell; wider viewports put +10 / -10 on every row
+    // instead) and the Add Blueprints dialog's FullScreen choice. The pane layout itself is a pure CSS
+    // media query (app.css), since it needs both width and height to tell a landscape phone apart from a
+    // real tablet.
+    private bool IsCompact => Breakpoint == Breakpoint.Xs;
+
+    private long? RowBulkStep => IsCompact ? null : BulkStep;
 
     // Reflects CraftState rather than holding a selection of its own, so clearing the batch or loading a
     // favorite from anywhere else moves the select with it.
@@ -73,21 +79,41 @@ public partial class Craft : ComponentBase, IDisposable
         await ReloadFavoritesAsync();
     }
 
+    protected override void OnParametersSet()
+    {
+        // The cascaded Breakpoint is this page's only parameter. Configure re-renders MainLayout, which cascades
+        // the Breakpoint again, so the shell is re-declared only when the viewport crosses the compact boundary.
+        if (_shellCompact == IsCompact)
+        {
+            return;
+        }
+
+        // Leaving compact takes the x10 action off the shell, so the mode goes with it: the stepper would
+        // otherwise keep moving by ten beside the rows' own +10 / -10 buttons, with nothing on screen to turn it off.
+        _stepSize = SingleStep;
+        ConfigureShell();
+    }
+
     // Re-declared rather than configured once, because the x10 action carries both the mode it is in and
-    // whether the batch has anything to step.
+    // whether the batch has anything to step, and exists only on a compact viewport.
     private void ConfigureShell()
     {
-        PageShellState.Configure(this, new PageShellConfig("Craft")
+        _shellCompact = IsCompact;
+
+        List<PageAction> actions =
+        [
+            new("Add blueprints", Icons.Material.Filled.Add, OpenPickerAsync),
+            new("Clear selection", Icons.Material.Filled.Clear, ClearBatchAsync),
+            new("Save as favorite", Icons.Material.Filled.Save, SaveAsFavoriteAsync)
+        ];
+
+        if (IsCompact)
         {
-            Actions =
-            [
-                new PageAction("Add blueprints", Icons.Material.Filled.Add, OpenPickerAsync),
-                new PageAction("Clear selection", Icons.Material.Filled.Clear, ClearBatchAsync),
-                new PageAction("Save as favorite", Icons.Material.Filled.Save, SaveAsFavoriteAsync),
-                new PageAction("Step by 10", TimesTenIcon, ToggleStepSizeAsync,
-                    Disabled: State.BlueprintQuantities.Count == 0, Active: _stepSize == BulkStep)
-            ]
-        });
+            actions.Add(new PageAction("Step by 10", TimesTenIcon, ToggleStepSizeAsync,
+                Disabled: State.BlueprintQuantities.Count == 0, Active: _stepSize == BulkStep));
+        }
+
+        PageShellState.Configure(this, new PageShellConfig("Craft") { Actions = actions });
     }
 
     private void OnStateChanged()
@@ -145,7 +171,7 @@ public partial class Craft : ComponentBase, IDisposable
     {
         DialogOptions options = new()
         {
-            FullScreen = IsXs,
+            FullScreen = IsCompact,
             MaxWidth = MaxWidth.Small,
             CloseOnEscapeKey = true
         };

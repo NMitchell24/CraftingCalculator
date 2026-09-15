@@ -593,6 +593,13 @@ html.keyboard-open .page-content-with-bottom-nav {
     display: block;
 }
 
+/* Wider than the 720px single-column screens because it has two columns at expanded sizes; past 1200px a
+   row's name and its figures sit so far apart they stop reading as one line. */
+.craft-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 /* Large tablets and up only - both dimensions ample, which a landscape phone never satisfies at the
    same time as a genuine tablet does. The batch and summary move beside the content card rather than
    above it, so the whole screen fits without scrolling. */
@@ -738,6 +745,26 @@ html.keyboard-open .page-content-with-bottom-nav {
     .record-row-meta {
         flex: 0 0 auto;
         max-width: 40%;
+    }
+}
+
+/* The Craft batch wherever its rows carry +10 / -10 beside the stepper (BatchList.razor): two 48px buttons more
+   than the rows the query above was calibrated on, so that list keeps the wrapped shape for another 12ch and the
+   name keeps the room every other list gets at 55ch. 12ch is those 96px and their gap at 100%, where a ch of
+   the list's face is about 9.5px (the batch list measured 567px = 60ch in a 1906px Windows window, still
+   wrapped); at a larger text size the same 12ch is more pixels, which only errs toward wrapping. */
+@container (55ch <= width < 67ch) {
+    .batch-list-bulk-step .record-row {
+        flex-wrap: wrap;
+    }
+
+    .batch-list-bulk-step .record-row-name {
+        flex: 1 0 100%;
+    }
+
+    .batch-list-bulk-step .record-row-meta {
+        flex: 1 1 12ch;
+        max-width: none;
     }
 }
 
@@ -896,7 +923,8 @@ html.keyboard-open .page-content-with-bottom-nav {
 
 /* Capped for the same reason as .dataset-editor: a single column of cards stretched across a desktop
    window is far harder to scan than the same column at phone width. */
-.dataset-page {
+.dataset-page,
+.favorites-page {
     max-width: 720px;
     margin: 0 auto;
 }
@@ -1309,7 +1337,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 
 /* Thumb-reachable Cancel/Save, with an icon-only Delete at the far end - above the bottom nav on xs and
    clear of the gesture-nav area everywhere. Always a single line: see .editor-action-bar-delete for why
-   Delete has no label. The only fixed bar left in the app now that the totals bar is a card. */
+   Delete has no label. Fixed to the viewport below 960px; the expanded rule below docks it to the form. */
 .editor-action-bar {
     position: fixed;
     border-top: 1px solid var(--mud-palette-lines-default);
@@ -1340,6 +1368,28 @@ html.keyboard-open .page-content-with-bottom-nav {
     .editor-action-bar {
         bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
         padding-bottom: 8px;
+    }
+}
+
+/* Expanded widths, where a bar spanning the window put Save a monitor's width away from the 720px form. The bar
+   is the column's last child (DatasetEditor.razor) and sticks to the bottom of the viewport: it stays in reach
+   while a long blueprint scrolls, and rests directly under the last field when the form is short. A sticky box
+   never leaves its containing block, so the column's clearance for the fixed bar goes, or the bar would come to
+   rest 72px above the end of the page. The side padding drops the edge insets, since the bar reaches no edge. */
+@media (min-width: 960px) {
+    .dataset-editor {
+        padding-bottom: 0;
+    }
+
+    .editor-action-bar {
+        position: sticky;
+        left: auto;
+        right: auto;
+        margin-top: 16px;
+        padding-left: 16px;
+        padding-right: 16px;
+        border: 1px solid var(--mud-palette-lines-default);
+        border-radius: var(--mud-default-borderradius);
     }
 }
 
@@ -1482,6 +1532,16 @@ html.keyboard-open .mud-snackbar-location-bottom-center {
 .mud-dialog:not(.mud-dialog-fullscreen) {
     margin: 16px;
     max-height: calc(100dvh - 32px);
+}
+
+/* BlueprintPickerDialog and AddPartsDialog wherever they are a centered card rather than full-screen. Sized by
+   its content, a picker changed height, and MudBlazor re-centered it, on every keystroke in its search field. A
+   fixed height holds it still: .mud-dialog is a flex column, so the content takes what the title and buttons
+   leave at any text size and scrolls the list, or its "No ... match" line, inside that. Matched through the
+   ContentClass both pickers carry. 720px keeps a picker from becoming a wall of rows on a desktop monitor; below
+   that it takes all the height the rule above allows, which on a landscape phone is all there is. */
+.mud-dialog:not(.mud-dialog-fullscreen):has(.picker-dialog-content) {
+    height: min(720px, calc(100dvh - 32px));
 }
 
 /* A button label never wraps inside its button; when the row cannot fit every button on one line, the

@@ -75,7 +75,7 @@ Copy it, call the copy `Rust - Modded`, and change the things that actually diff
 retyping two hundred components.
 
 The name comes prefilled as the original with `- Copy` on the end, the same way
-[duplicating a record](dataset.md#duplicate-mode) does, which also parks the copy right next to the
+[duplicating a record](dataset.md#duplicating-a-record) does, which also parks the copy right next to the
 original in the droplist. Type over it with whatever you want. The unique-name rule still applies.
 
 From there the two are completely separate. Changing the `Beancan Grenade` recipe in the copy does nothing to 
