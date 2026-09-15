@@ -869,22 +869,26 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: 16px;
 }
 
-/* Takes the row's slack so the four buttons keep their full tap targets. The basis is the least the
-   select can show a dataset name in, in ch for the reason .craft-favorite-select gives: on a screen too
-   narrow for that beside the buttons it wraps onto a line of its own and takes the full width, the
-   same shape as that select. min-width overrides MudSelect's own intrinsic width, which would
-   otherwise refuse to shrink below it. */
+/* Takes the row's slack so the four buttons keep their full tap targets. flex-grow of 999 rather than 1
+   for the reason .craft-batch-title-row .app-card-title gives: sharing a line with the buttons, the
+   select absorbs all but a thousandth of the slack, so the buttons stay compact at the trailing edge.
+   The basis is the least the select can show a dataset name in, in ch for the reason
+   .craft-favorite-select gives: on a screen too narrow for that beside the buttons it wraps onto a line
+   of its own and takes the full width, the same shape as that select. min-width overrides MudSelect's
+   own intrinsic width, which would otherwise refuse to shrink below it. */
 .dataset-switcher-select {
-    flex: 1 1 20ch;
+    flex: 999 1 20ch;
     min-width: 0;
 }
 
-/* margin-left: auto keeps the buttons at the trailing edge once they have wrapped under the select. */
+/* Grows so that, once wrapped onto a line of its own, the group is the only item there and fills the
+   row, and space-evenly spreads the four buttons across it. Beside the select it gets a thousandth of
+   the slack, which leaves the buttons visually unchanged at the trailing edge. */
 .dataset-switcher-actions {
     display: flex;
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     align-items: center;
-    margin-left: auto;
+    justify-content: space-evenly;
 }
 
 .dataset-switcher-actions .mud-icon-button {
@@ -907,23 +911,34 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* Pairs the card with its Actions Bar action, which carries the same icon. Sized against the title
    rather than the default 24px so it reads as part of the heading and not as a second control. */
 .dataset-summary-icon {
-    flex: 0 0 auto;
     font-size: 1.5rem;
 }
 
+/* A grid so the icon centers on the title's line alone rather than on the title and count together:
+   the icon and title share the first row track, and the count sits under the title in the second
+   column. The pencil stays outside the grid - spanning both rows, its 44px minimum would stretch the
+   title's track wherever the two text lines are shorter than it, and pull the icon off the title. */
 .dataset-summary-info {
     flex: 1 1 auto;
     min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 2px;
 }
 
 /* The count is the point of the card, so it carries the weight its heading does not. */
 .dataset-summary-count {
+    grid-column: 2;
     color: var(--mud-palette-text-secondary);
 }
 
-/* The card itself is the target, so its own title needs no bottom gap above the count. */
+/* The card itself is the target, so its own title needs no bottom gap above the count. The grid's
+   row-gap spaces the two instead of a margin, which would sit inside the title's track and put the
+   icon's center below the title's. */
 .dataset-summary-card .app-card-title {
-    margin-bottom: 2px;
+    margin-bottom: 0;
 }
 
 .dataset-summary-card .mud-icon-button {
