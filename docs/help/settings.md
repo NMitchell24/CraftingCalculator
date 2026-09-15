@@ -24,10 +24,16 @@ The change is instant. There's nothing to save and nothing to restart.
 
 ## About
 
-The app's name, its version and build number, the copyright, and the license.
+The app's name, its version and build number, the copyright, the promise, and the license.
 
-Crafting Calculator is 100% free software under the **GPL 2.0**. You can use it, share it and modify it; the
-full terms are summarized on the screen.
+Crafting Calculator is 100% free, and it's staying that way. That's the **privacy and free software commitment**:
+no price tag, no ads, no telemetry, no tracking and no data collection. Not in this version, not in the next one,
+not ever.
+
+The source code is public under a **personal-use license**. Fork it, build it, tinker with it, make it your own.
+You can even post your builds on GitHub. Just don't sell it, and don't put your copy up on an app store or
+marketplace. Only Sterling Turd Productions, LLC gets to put the app in the stores. The short version of the terms
+is on the screen.
 
 The **fonts** note is there because both typefaces ship inside the app rather than being downloaded:
 **Inter** for body text and **Jersey 20** for headings, both under the SIL Open Font License. That's
@@ -40,8 +46,8 @@ Everything you create — every component, blueprint, category and favorite — 
 
 - **No account.** There's nothing to sign up for and nothing to log into.
 - **No internet.** The app makes no network calls at all. It works in a tent, on a plane, in a basement, or on the moon.
-- **No telemetry.** Nothing about you or your dataset is collected or sent anywhere. When I said 100% free, I meant 
-  it. Your data is **not** some hidden cost.
+- **No telemetry.** The app doesn't collect anything about you or your dataset, and it doesn't send anything
+  anywhere. When I said 100% free, I meant it. Your data is **not** some hidden cost.
 
 All of your [datasets](managing-datasets.md) share that one database file, so this applies to every one of
 them at once.
