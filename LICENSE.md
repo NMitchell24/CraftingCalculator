@@ -6,7 +6,7 @@ Copyright (c) 2026 Sterling Turd Productions, LLC. All rights reserved.
 
 Permission is hereby granted to any person obtaining a copy of this software and
 associated source code files to download, view, fork, modify, and compile the software
-strictly for PERSONAL, NON-COMMERCIAL, AND PRIVATE USE.
+strictly for PERSONAL, NON-COMMERCIAL USE.
 
 You may keep a fork or modified copy of the source code in a public or private source
 code repository (such as GitHub), and share that source code with others, provided
@@ -37,8 +37,11 @@ in Section 2 are met.
 ## 3. Preservation of Privacy and Free Status
 
 Any authorized distribution of this software by the copyright holder will remain 100%
-free of charge, free of advertisements, and free of tracking/telemetry. This clause
-reflects the immutable intent of the original author.
+free of charge, free of advertisements, free of tracking/telemetry, and free of data
+collection. It will not collect, sell, or transmit user data, except where the user
+chooses to export or share it, and will read or write files outside its own storage only
+when the user selects them. This clause reflects the immutable intent of the original
+author.
 
 ## 4. Contributions
 

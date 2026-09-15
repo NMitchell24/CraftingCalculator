@@ -53,8 +53,10 @@ All of your [datasets](managing-datasets.md) share that one database file, so th
 them at once.
 
 It also means that the app comes with an honest caveat: **your dataset lives and dies with the app's storage.** 
-There's no cloud copy, so uninstalling the app, or clearing its data from your device's settings, takes your recipes
-with it. Worth knowing before you spend an evening entering a modpack.
+I don't keep a cloud copy, so uninstalling the app, or clearing its data from your device's settings, takes your
+recipes with it. Your phone's own backup, Google's or Apple's, might have a copy if you've got backups switched on,
+but that's between you and your phone. Don't count on it. Worth knowing before you spend an evening entering a
+modpack.
 
 The way around that is an export. ![Dataset](assets/menu-book.svg) **Dataset** →
 ![Import/Export](assets/import-export.svg) **Import/Export** → ![Export Data](assets/output.svg) **Export Data**

@@ -19,13 +19,15 @@ promises. Not just this release, and not until the next business plan comes alon
 
 1. **Free, forever.** The app costs nothing to download and nothing to use. No price tag, no subscription, no
    premium tier, no in-app purchases, and no features held back behind a paywall.
-2. **No advertisements. Ever.** No banners, no pop-ups, no sponsored content, no "watch a video to unlock." Not
-   of any kind.
+2. **No advertisements. Ever.** Not of any kind: no banners, no pop-ups, no sponsored content, no "watch a video to
+   unlock."
 3. **No telemetry. Ever.** The app contains no analytics, no usage tracking and no crash reporting, and it will
    never include a third-party SDK that does any of those.
 4. **No data collection. Ever.** Your datasets, favorites and settings stay in the database on your device.
    Nothing about you or your data is collected, sold, shared or sent anywhere without your explicit permission. The 
-   only way your data leaves the device is an export file you create and share yourself.
+   only ways your data leaves the device are an export file you create and share yourself, and your device's own
+   backup (Google or iCloud), if you've turned it on. That backup lives in your account. Sterling Turd Productions,
+   LLC never sees it.
 5. **Your files, your choice.** The app only reads or writes a file outside its own storage when you pick that file
    yourself in your device's file or share dialog.
 
@@ -158,7 +160,7 @@ same source the app reads, is [docs/pages-rewrite-plan.md](docs/pages-rewrite-pl
 Custom Source-Available and Personal Use License — see [LICENSE.md](LICENSE.md). Copyright © 2026 Sterling Turd
 Productions, LLC.
 
-Fork it, modify it, compile it and make it your own, for **personal, non-commercial, private use**. Forks can live
+Fork it, modify it, compile it and make it your own, for **personal, non-commercial use**. Forks can live
 in public repositories, as long as they keep the license and copyright notice, and you can publish your builds of the
 app or your fork on GitHub, as build artifacts or GitHub Releases. What you can't do is sell the software or any fork
 of it, or publish the app or a modified build of it to an app store, marketplace or any distribution platform other
