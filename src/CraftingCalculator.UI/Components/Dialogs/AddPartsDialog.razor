@@ -26,7 +26,7 @@
                                 <MudText>@candidate.Name</MudText>
                                 <MudText Typo="Typo.caption" Class="record-row-caption">@candidate.Type.GetDescription()</MudText>
                             </div>
-                            <div class="record-row-meta"><CategoryChip Record="@candidate" Class="record-row-category" /></div>
+                            <div class="record-row-meta"><CategoryChip Record="@candidate" /></div>
                             @* index.html stops a tap on these buttons from taking focus off the search field, so
                                the keyboard stays up between searches. *@
                             <div class="record-row-end record-row-stepper">

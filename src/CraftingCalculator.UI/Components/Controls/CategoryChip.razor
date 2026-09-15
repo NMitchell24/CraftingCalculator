@@ -3,5 +3,5 @@
     @* Outlined primary rather than the default grey, which disappeared against the light card.
        Color.Primary is themed for both palettes, so it follows dark mode too. *@
     <MudChip T="string" Text="@name" Size="Size.Small" Variant="Variant.Outlined"
-             Color="Color.Primary" Ripple="false" Class="@Class" />
+             Color="Color.Primary" Ripple="false" Class="@($"category-chip {Class}")" />
 }

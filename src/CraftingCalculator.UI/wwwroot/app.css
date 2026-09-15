@@ -619,7 +619,7 @@ html.keyboard-open .page-content-with-bottom-nav {
    The basis is fixed rather than the chip's own width on purpose: the decision then turns only on the
    buttons' width and the row's, which are the same for every row of a list, so a list stacks as a
    whole or not at all - never one stacked row among rows that are not. A chip wider than the meta
-   wraps inside it (.record-row-category). ch rather than em: Android's text zoom scales the glyphs,
+   wraps inside it (.category-chip). ch rather than em: Android's text zoom scales the glyphs,
    and so a ch, but leaves em and rem lengths at their unzoomed size (measured on the Pixel 9 AVD at
    130%: 10em = 154px, 10ch = 126px, against a computed font size of 20px), and this basis has to grow
    with the chip's text or the chip wraps at exactly the zoom where it needs the room most. */
@@ -750,12 +750,13 @@ html.keyboard-open .page-content-with-bottom-nav {
     font-variant-numeric: tabular-nums;
 }
 
-/* The category chip in a row's meta cell. A category name is user data like the record's, so it wraps
-   inside the pill rather than ellipsizing: MudChip fixes its height (24px at Size.Small, set at two
-   classes, which is why this selector carries .mud-chip too) and sets white-space: nowrap, and both
-   are undone here. The floor keeps a one-line chip exactly as MudBlazor draws it; the cap keeps a long
-   name inside the cell rather than widening the row. */
-.mud-chip.record-row-category {
+/* CategoryChip.razor applies this to every chip it renders, in a row's meta cell or the Info dialog's
+   title. A category name is user data like the record's, so it wraps inside the pill rather than
+   ellipsizing: MudChip fixes its height (24px at Size.Small, set at two classes, which is why this
+   selector carries .mud-chip too) and sets white-space: nowrap, and both are undone here. The floor
+   keeps a one-line chip exactly as MudBlazor draws it; the cap keeps a long name inside its container
+   (the row's meta cell, or the dialog's title row) rather than widening it. */
+.mud-chip.category-chip {
     margin: 0;
     max-width: 100%;
     min-width: 0;
@@ -764,14 +765,16 @@ html.keyboard-open .page-content-with-bottom-nav {
     white-space: normal;
 }
 
-/* MudChip lays its content out as a flex row; block lets the text wrap as lines. The padding gives a
-   wrapped chip's outer lines air against the border, and at 1.25 a single line still fits the 24px floor
-   at the largest Android text size (12px x 1.3 x 1.25 + 4 = 23.5). */
-.record-row-category .mud-chip-content {
+/* MudChip lays its content out as a flex row; block lets the text wrap as lines and centers it, since a
+   pill reads oddly with left-aligned wrapped lines. The padding gives a wrapped chip's outer lines air
+   against the border, and at 1.25 a single line still fits the 24px floor at the largest Android text
+   size (12px x 1.3 x 1.25 + 4 = 23.5). */
+.category-chip .mud-chip-content {
     display: block;
     overflow-wrap: anywhere;
     line-height: 1.25;
     padding: 2px 0;
+    text-align: center;
 }
 
 .materials-list .mud-list {
@@ -1409,10 +1412,14 @@ html.keyboard-open .mud-dialog-container {
     overflow-wrap: anywhere;
 }
 
-/* Components/Dialogs/InfoDialog.razor. The name takes the row and the category chip trails it, so a
-   long name wraps within the space the chip leaves rather than pushing it off the title. */
+/* Components/Dialogs/InfoDialog.razor. The name takes the row and the category chip trails it when both
+   fit on one line. flex-wrap lets the chip drop to a line of its own when it doesn't: without it, a
+   long category name (e.g. "Refined Materials") forced the name down to one letter per line instead,
+   and the chip itself ran past the dialog's edge. .category-chip's own max-width keeps a chip wider
+   than the dialog wrapping its own text rather than widening the row. */
 .info-dialog-title {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
 }
@@ -1424,7 +1431,6 @@ html.keyboard-open .mud-dialog-container {
 
 .info-dialog-category {
     flex: 0 0 auto;
-    margin: 0;
 }
 
 /* The description reads as prose above the figures, so it gets body spacing rather than a grid row. */
