@@ -3,31 +3,47 @@
 <MudPaper Class="app-card" Elevation="0">
     <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Crafting Summary</MudText>
 
-    <dl class="summary-grid">
-        <dt>Components Needed</dt>
-        <dd>@State.TotalComponentCount total</dd>
+    <dl class="summary-list">
+        <div class="summary-row">
+            <dt>Components Needed</dt>
+            <dd>@State.TotalComponentCount total</dd>
+        </div>
 
-        <dt>Crafting Steps</dt>
-        <dd>@State.CraftingStepCount</dd>
+        <div class="summary-row">
+            <dt>Crafting Steps</dt>
+            <dd>@State.CraftingStepCount</dd>
+        </div>
 
-        <dt>Crafting Time</dt>
-        <dd>@DurationProcessor.Format(State.TotalProductionTime)</dd>
+        <div class="summary-row">
+            <dt>Crafting Time</dt>
+            <dd>@DurationProcessor.Format(State.TotalProductionTime)</dd>
+        </div>
 
-        <dt>Cost</dt>
-        <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
+        <div class="summary-row">
+            <dt>Cost</dt>
+            <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
+        </div>
 
-        <dt>Value</dt>
-        <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
+        <div class="summary-row">
+            <dt>Value</dt>
+            <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
+        </div>
 
         @* Listed rather than folded into Profit: surplus is stock on hand, not a sale. *@
-        <dt>Surplus Stock</dt>
-        <dd>@State.SurplusCount total</dd>
+        <div class="summary-row">
+            <dt>Surplus Stock</dt>
+            <dd>@State.SurplusCount total</dd>
+        </div>
 
-        <dt>Surplus Value</dt>
-        <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
+        <div class="summary-row">
+            <dt>Surplus Value</dt>
+            <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
+        </div>
 
         @* The one line a user is actually here for, so it is the only one that carries emphasis. *@
-        <dt class="summary-profit">Profit</dt>
-        <dd class="@ProfitClass">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>
+        <div class="summary-row">
+            <dt class="summary-profit">Profit</dt>
+            <dd class="@ProfitClass">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>
+        </div>
     </dl>
 </MudPaper>

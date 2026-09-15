@@ -18,27 +18,37 @@
 
         @if (Blueprint is not null || Component is not null)
         {
-            @* Same label/value grid as the Crafting Summary card - this is the same kind of read-only
+            @* Same label/value list as the Crafting Summary card - this is the same kind of read-only
                figure list, so it reuses those classes rather than cloning them under a dialog- prefix. *@
-            <dl class="summary-grid">
+            <dl class="summary-list">
                 @if (Blueprint is { } blueprint)
                 {
-                    <dt>Value per Item</dt>
-                    <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
+                    <div class="summary-row">
+                        <dt>Value per Item</dt>
+                        <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
+                    </div>
 
-                    <dt>Yield per Craft</dt>
-                    <dd>@blueprint.Yield</dd>
+                    <div class="summary-row">
+                        <dt>Yield per Craft</dt>
+                        <dd>@blueprint.Yield</dd>
+                    </div>
 
-                    <dt>Production Time per Craft</dt>
-                    <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
+                    <div class="summary-row">
+                        <dt>Production Time per Craft</dt>
+                        <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
+                    </div>
                 }
                 else if (Component is { } component)
                 {
-                    <dt>Cost per Item</dt>
-                    <dd>@string.Format(FormatConstants.CurrencyFormat, component.Cost)</dd>
+                    <div class="summary-row">
+                        <dt>Cost per Item</dt>
+                        <dd>@string.Format(FormatConstants.CurrencyFormat, component.Cost)</dd>
+                    </div>
 
-                    <dt>Production Time per Item</dt>
-                    <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
+                    <div class="summary-row">
+                        <dt>Production Time per Item</dt>
+                        <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
+                    </div>
                 }
             </dl>
         }
@@ -47,21 +57,32 @@
         {
             @* Direct requirements only, collapsed by default: the dialog then opens at the same height
                whatever the blueprint's size, and the full nested breakdown is what the Crafting Steps
-               view is for. *@
+               view is for. The caret is drawn beside the count (HideIcon) rather than by MudExpansionPanel:
+               MudBlazor's own is a sibling of the title content, centered against it, so once the count
+               dropped under the label at large text sizes the caret floated between the two lines. *@
             <MudExpansionPanels Elevation="0" Outlined="false" Gutters="false" Class="info-dialog-parts">
-                <MudExpansionPanel Gutters="false" Dense="true" Disabled="@(_parts.Count == 0)">
+                <MudExpansionPanel Gutters="false" Dense="true" HideIcon="true" Disabled="@(_parts.Count == 0)"
+                                   @bind-Expanded="_partsExpanded">
                     <TitleContent>
                         <div class="info-dialog-parts-summary">
                             <span class="info-dialog-parts-label">@PartsLabel</span>
-                            <span>@_parts.Count</span>
+                            <span class="info-dialog-parts-count">
+                                @_parts.Count
+                                @if (_parts.Count > 0)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.ExpandMore" Class="@PartsCaretClass" />
+                                }
+                            </span>
                         </div>
                     </TitleContent>
                     <ChildContent>
-                        <dl class="summary-grid">
+                        <dl class="summary-list">
                             @foreach (IBaseQuantityRecord part in _parts)
                             {
-                                <dt>@part.Name</dt>
-                                <dd>x@(part.Quantity)</dd>
+                                <div class="summary-row">
+                                    <dt>@part.Name</dt>
+                                    <dd>x@(part.Quantity)</dd>
+                                </div>
                             }
                         </dl>
                     </ChildContent>
@@ -75,9 +96,11 @@
 
             <MudText Typo="Typo.subtitle2" Class="info-dialog-step-title">Crafting Step Details</MudText>
 
-            <dl class="summary-grid">
-                <dt>Quantity</dt>
-                <dd>@step.Quantity</dd>
+            <dl class="summary-list">
+                <div class="summary-row">
+                    <dt>Quantity</dt>
+                    <dd>@step.Quantity</dd>
+                </div>
 
                 @if (!step.IsComponent)
                 {
@@ -85,15 +108,21 @@
                        so it has no craft count and cannot be overproduced. The surplus is only ever the
                        remainder of rounding the quantity up to a whole number of crafts of the size the
                        Yield per Craft row above gives. *@
-                    <dt>Crafts</dt>
-                    <dd>@step.Crafts</dd>
+                    <div class="summary-row">
+                        <dt>Crafts</dt>
+                        <dd>@step.Crafts</dd>
+                    </div>
 
-                    <dt>Surplus</dt>
-                    <dd>@step.Surplus</dd>
+                    <div class="summary-row">
+                        <dt>Surplus</dt>
+                        <dd>@step.Surplus</dd>
+                    </div>
                 }
 
-                <dt>Total Production Time</dt>
-                <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
+                <div class="summary-row">
+                    <dt>Total Production Time</dt>
+                    <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
+                </div>
             </dl>
 
             <MudText Typo="Typo.caption" Class="info-dialog-step-note">Crafting Step Details apply to this step only.</MudText>

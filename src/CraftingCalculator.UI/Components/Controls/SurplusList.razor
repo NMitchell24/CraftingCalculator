@@ -9,7 +9,7 @@
     }
     else
     {
-        <MudList T="BlueprintQuantity">
+        <MudList T="BlueprintQuantity" Class="record-list">
             @foreach (BlueprintQuantity blueprintQuantity in State.SurplusStock)
             {
                 <MudListItem T="BlueprintQuantity" OnClick="@(() => ShowInfoAsync(blueprintQuantity))">

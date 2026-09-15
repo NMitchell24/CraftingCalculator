@@ -9,7 +9,7 @@
         }
         else
         {
-            <MudList T="BlueprintModel" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
+            <MudList T="BlueprintModel" Class="record-list" @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
                 @foreach (BlueprintModel blueprint in FilteredBlueprints)
                 {
                     <MudListItem T="BlueprintModel" Value="@blueprint">

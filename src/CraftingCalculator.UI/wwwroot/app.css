@@ -421,41 +421,68 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-width: 0;
 }
 
-.summary-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
+/* The label/value list under the Crafting Summary and in the Info dialog. Each pair is one
+   .summary-row, a wrapping flex line: the label and its value share the line while both fit at their
+   natural widths, and otherwise the value drops to a line of its own, right-aligned, under a label
+   that now has the full width and wraps between words. The two-column grid this replaces gave the
+   label column whatever the value left over, which at large text sizes was narrower than the word
+   "Components", so the label broke inside the word. */
+.summary-list {
+    container-type: inline-size;
     margin: 0;
     font-variant-numeric: tabular-nums;
 }
 
-/* minmax(0, 1fr) lets the column shrink below its content size so overflow-wrap can act; without it
-   a bare 1fr's default min-width:auto keeps the column as wide as the label's longest word, and a
-   long value can push the grid wider than the dialog that hosts it. */
-.summary-grid dt {
-    color: var(--mud-palette-text-secondary);
-    overflow-wrap: anywhere;
+.summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 16px;
     padding: 6px 0;
+}
+
+.summary-row + .summary-row {
     border-top: 1px solid var(--mud-palette-lines-default);
 }
 
-/* The column gap lives here as padding-left rather than on the grid, so the hairline border below
-   can run the full row width instead of stopping short of the value column. */
-.summary-grid dd {
-    margin: 0;
-    padding: 6px 0 6px 16px;
+/* min-width: 0 lets a label alone on its line shrink to the row, so a single word wider than the row
+   (a part name is user content) breaks inside the word instead of overflowing the dialog; break-word
+   rather than anywhere, because anywhere also breaks inside a word that would fit on the next line. */
+.summary-row dt {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+    color: var(--mud-palette-text-secondary);
+}
+
+/* margin-left: auto keeps the value at the right edge on a line of its own. */
+.summary-row dd {
+    flex: 0 0 auto;
+    margin: 0 0 0 auto;
     text-align: right;
-    border-top: 1px solid var(--mud-palette-lines-default);
 }
 
-.summary-grid dt:first-of-type,
-.summary-grid dd:first-of-type {
-    border-top: none;
-}
-
-.summary-profit {
+/* Scoped under .summary-row so it outranks the dt rule above; a bare .summary-profit lost to it and the
+   Profit label rendered in the secondary color. */
+.summary-row .summary-profit {
     font-weight: 600;
     color: var(--mud-palette-text-primary);
+}
+
+/* A list stacks as a whole or not at all: one row with its value beneath the label between rows that
+   keep theirs beside it reads as an accident, so below this width every label takes its line and every
+   value drops under it (the per-row wrap above still catches a single row that does not fit on a wider
+   list). The condition is in ch so it follows Android's text zoom, which em and rem do not (a container
+   query resolves ch against the container's own font; a media query only knows the viewport).
+   Calibration: the Crafting Summary's list is about 19ch at 320px / 200% and the Info dialog's lists and
+   .info-dialog-parts about 17ch, where every row has to stack; about 30ch and 27ch at 395px / 130%,
+   where "Components Needed  234 total" still fits the card but "Production Time per Craft  4s" does not
+   fit the dialog; about 43ch and 40ch at 448px / 100%, where everything fits. */
+@container (max-width: 28ch) {
+    .summary-row dt,
+    .info-dialog-parts-label {
+        flex-basis: 100%;
+    }
 }
 
 /* Success/Error rather than fixed hex values: MudThemeProvider re-emits both palette variables for
@@ -603,14 +630,15 @@ html.keyboard-open .page-content-with-bottom-nav {
    cells - the name, with its caption beneath when the row has one; the meta, which is the category
    chip; and the trailing cell, which holds the row's buttons or, on a read-only row, its figures.
 
-   Compact (under 600px, MudBlazor's Xs): the name owns the first line, so a long one has the whole
-   card width and wraps rather than fighting the chip and buttons for it; the chip and the trailing
-   cell share the second line while the chip's basis fits beside the buttons, and otherwise the buttons
-   move down to a third. Medium and up puts all three cells on one line, which is the row the Dataset
-   list always had. Nothing in a row is truncated: names and category names are user data, and
-   overflow-wrap: anywhere breaks even a 40-character word rather than widening the row. Android
-   scales px text by the OS Font size setting, so at its top a phone shows about half again as much
-   text per line as the design width; every shape here is checked there, not only at the default. */
+   In a narrow list (under 55ch of the list's own text, the .record-list query below): the name owns
+   the first line, so a long one has the whole card width and wraps rather than fighting the chip and
+   buttons for it; the chip and the trailing cell share the second line while the chip's basis fits
+   beside the buttons, and otherwise the buttons move down to a third. A wider list puts all three cells
+   on one line, which is the row the Dataset list always had. Nothing in a row is truncated: names and
+   category names are user data, and overflow-wrap: anywhere breaks even a 40-character word rather
+   than widening the row. Android scales px text by the OS Font size setting, so at its top a phone
+   shows about half again as much text per line as the design width, and a landscape phone has the
+   text budget of a narrow one; every shape here is checked there, not only at the default. */
 .record-row {
     display: flex;
     flex-wrap: wrap;
@@ -683,7 +711,21 @@ html.keyboard-open .page-content-with-bottom-nav {
     gap: 4px;
 }
 
-@media (min-width: 600px) {
+/* Every MudList that holds .record-rows (the batch, Components and Surplus lists, the Dataset and Favorites
+   lists, the blueprint editor's requirements, the picker and Add requirements dialogs). It is the container
+   the one-line query below measures, so a list goes to one line as a whole or not at all. */
+.record-list {
+    container-type: inline-size;
+}
+
+/* One line per row once the list is wide enough, measured in the list's own ch so the decision follows
+   Android's text zoom. The viewport-width media query this replaces (min-width: 600px) put a 712px
+   landscape phone at 200% on one line, where it has the text budget of a 356px phone: the name column
+   starved and "Wood" broke mid-word while the chip ran into the figures. Calibration: about 47ch on a
+   448px phone at 100% and about 52ch on a 997px landscape phone at 200% (both wrap); about 58ch at a
+   600px viewport at 100%, where the side rail has appeared, and about 72ch on an 880px landscape phone
+   at 130% (both one line). */
+@container (min-width: 55ch) {
     .record-row {
         flex-wrap: nowrap;
     }
@@ -1103,19 +1145,24 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-height: 44px;
 }
 
-/* The expand caret (TransferPanelHeader.razor, in place of MudBlazor's, which HideIcon removes), turned and eased
-   exactly as MudBlazor turns its own. Its margin plus the tools row's 8px gap keep 16px between the select-all
-   button and the caret: the caret has no tap handler of its own; the header does, but Chromium's touch adjustment
-   prefers a tappable descendant (the button) over its tappable ancestor (the header) whenever the finger's contact
-   area overlaps both, so with the two flush, taps on the caret landed on select-all. The gap keeps the button out
-   of a fingertip centered on the caret. */
-.transfer-panel-caret {
-    flex: 0 0 auto;
+/* The caret's margin plus the tools row's 8px gap keep 16px between the select-all button and the caret: the
+   caret has no tap handler of its own; the header does, but Chromium's touch adjustment prefers a tappable
+   descendant (the button) over its tappable ancestor (the header) whenever the finger's contact area overlaps
+   both, so with the two flush, taps on the caret landed on select-all. The gap keeps the button out of a
+   fingertip centered on the caret. */
+.transfer-panel-tools .panel-caret {
     margin-inline-start: 8px;
+}
+
+/* An expand caret a component draws itself (TransferPanelHeader, InfoDialog's parts expander) where
+   MudExpansionPanel's own, a sibling of the title content, could not sit where the header needs it;
+   HideIcon on the panel removes MudBlazor's. The transition matches MudBlazor's. */
+.panel-caret {
+    flex: 0 0 auto;
     transition: transform .3s cubic-bezier(0.25, 0.8, 0.5, 1);
 }
 
-.transfer-panel-caret-expanded {
+.panel-caret-expanded {
     transform: rotate(180deg);
 }
 
@@ -1561,6 +1608,7 @@ html.keyboard-open .mud-dialog-container {
    read as a second card inside the dialog; only the header's label/count row and the divider above it
    are wanted here. */
 .info-dialog-parts {
+    container-type: inline-size;
     margin-top: 8px;
     background-color: transparent;
 }
@@ -1569,25 +1617,33 @@ html.keyboard-open .mud-dialog-container {
     background-color: transparent;
 }
 
-/* MudExpansionPanel lays its title out beside the expand icon, so the count is pushed to the icon
-   rather than to the dialog edge - close enough to the summary grid's right-aligned values to read as
-   the same kind of row. */
+/* The expander's header is the same shape as a .summary-row: label and count share the line while
+   both fit, and otherwise the count drops beneath the label, right-aligned, with the caret beside it
+   (the panel hides MudBlazor's own caret; see the markup). */
 .info-dialog-parts-summary {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
+    column-gap: 16px;
     width: 100%;
     font-variant-numeric: tabular-nums;
 }
 
 /* min-width: 0 overrides a flex item's default min-width: auto, which otherwise keeps this label at
-   its content width and pushes the dialog into a horizontal scrollbar at large text sizes - the same
-   fix as minmax(0, 1fr) on .summary-grid above, for a flex row instead of a grid column. */
+   its content width and pushes the dialog into a horizontal scrollbar at large text sizes; break-word
+   rather than anywhere for the reason .summary-row dt gives. */
 .info-dialog-parts-label {
+    flex: 1 1 auto;
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     color: var(--mud-palette-text-secondary);
+}
+
+.info-dialog-parts-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
 }
 
 /* Separates the figures that describe the record itself from the ones that apply only to the tapped

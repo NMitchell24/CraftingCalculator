@@ -169,6 +169,11 @@ dotnet ef migrations add <Name>
   component APIs before editing rather than relying on recalled knowledge. If it isn't available, ask
   the user whether they'd like to install and set it up (setup steps are in the
   `craftingcalculator-dev` skill).
+- **Large text sizes are a requirement, not an edge case.** Android scales the WebView's text up to 2x inside a
+  320 CSS px viewport. Nothing is ever ellipsized or broken inside a word; what does not fit stacks, and a
+  list stacks as a whole; a length that has to follow the text is in `ch`, never `em`/`rem`. The full rules,
+  the MudBlazor workarounds and the device test matrix are in the `craftingcalculator-dev` skill ("Large text
+  sizes"). Check every UI change on the emulator at `font_scale` 2.0 / `wm density` 672 before calling it done.
 - **CI is three workflows.** `unit-tests.yml` (format + build + test via
   `CraftingCalculator.Tests.slnf` on Linux, no MAUI workloads) is the gate — it runs on every PR into
   `main`. `build.yml` (one Release build per platform head) is **`workflow_dispatch` only** for now;

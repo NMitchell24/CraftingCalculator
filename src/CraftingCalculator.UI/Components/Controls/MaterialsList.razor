@@ -9,7 +9,7 @@
     }
     else
     {
-        <MudList T="ComponentQuantity">
+        <MudList T="ComponentQuantity" Class="record-list">
             @foreach (ComponentQuantity componentQuantity in State.TotalComponents)
             {
                 <MudListItem T="ComponentQuantity" OnClick="@(() => ShowInfoAsync(componentQuantity))">

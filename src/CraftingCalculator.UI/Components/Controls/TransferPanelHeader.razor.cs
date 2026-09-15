@@ -32,5 +32,5 @@ public partial class TransferPanelHeader : ComponentBase
     /// <summary>Raised when the toggle is tapped; see <see cref="SelectAllToggle.OnToggle"/>.</summary>
     [Parameter] public EventCallback OnToggle { get; set; }
 
-    private string CaretClass => Expanded ? "transfer-panel-caret transfer-panel-caret-expanded" : "transfer-panel-caret";
+    private string CaretClass => Expanded ? "panel-caret panel-caret-expanded" : "panel-caret";
 }

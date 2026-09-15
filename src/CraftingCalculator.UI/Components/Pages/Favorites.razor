@@ -13,7 +13,7 @@
     }
     else
     {
-        <MudList T="BlueprintFavorite">
+        <MudList T="BlueprintFavorite" Class="record-list">
             @foreach (BlueprintFavorite favorite in _favorites)
             {
                 <MudListItem T="BlueprintFavorite" Class="@RowClass(favorite)" OnClick="@(() => OnRowClick(favorite))">
