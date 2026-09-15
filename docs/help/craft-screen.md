@@ -52,7 +52,9 @@ supposed to save you from. There's a faster way, and where it lives depends on h
 ![Step by 10](assets/x10.svg) **Step by 10** and every row's stepper starts moving in tens. The buttons swap over to
 the double arrows so you can tell at a glance that it's on. It stays on until you tap the action again, so you can
 set up a whole batch in one go. Turn your phone sideways and you'll usually get the tablet buttons instead, which
-switches the action off.
+switches the action off. You can also just rotate your phone over to landscape mode if you don't want to muck about 
+with modes. In landscape orientation there's plenty of room for those extra buttons. So, the mode gets dropped and 
+the buttons get added.
 
 Either way, nothing else about the row changes. You can still tap the number and type a quantity straight in.
 
