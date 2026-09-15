@@ -178,7 +178,7 @@ When you're happy with it, tap **Import Data**, either the big button under the 
 **Import Data** or the ![Choose Another File](assets/file-open.svg) action, starts over with a different one. Not
 importing anything today? **Cancel**, at the very bottom, drops the file and takes you back to Step 1.
 
-More detail on the panels: [Picking what goes in](import-export.md#picking-what-goes-in).
+More detail on the panels: [Picking what goes out](import-export.md#picking-what-goes-out).
 
 ### As a new dataset, or into this one
 
@@ -214,7 +214,7 @@ records.
 ### Choosing each one
 
 Step 4 has a panel for each kind of record that clashes, laid out like the ones in
-[Picking what goes in](import-export.md#picking-what-goes-in). Open a panel and tap the ones you want replaced. Picked
+[Picking what goes out](import-export.md#picking-what-goes-out). Open a panel and tap the ones you want replaced. Picked
 rows are highlighted, and each header counts your picks. Everything you don't pick stays as it is.
 
 The button at the right of each header picks or unpicks the whole panel, and its icon works the same way it does there:

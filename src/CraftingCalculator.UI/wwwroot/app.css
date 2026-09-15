@@ -1040,11 +1040,13 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* Export and Import (Components/Pages/Export.razor, Import.razor) and the selection panels they share
-   (Components/Controls/TransferSelectionPanels.razor). */
+   (Components/Controls/TransferSelectionPanels.razor, Import/ImportChooseEach.razor, with the panel header in
+   TransferPanelHeader.razor). */
 
 .transfer-page {
-    /* TransferSelectionPanels.RowHeight and ImportChooseEach.RowHeight hold the same number: Virtualize positions rows by it.
-       Room for a line of text at the largest OS text size, with air; the row's own height is fixed (.transfer-row). */
+    /* TransferSelectionPanels.RowHeight and ImportChooseEach.RowHeight hold the same number: Virtualize estimates its
+       scroll range by it. Room for one line of text at the largest OS text size, with air; it is the row's minimum
+       (.transfer-row), and a row whose name wraps grows past it, which Virtualize tolerates. */
     --transfer-row-height: 56px;
 }
 
@@ -1052,12 +1054,34 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: 16px;
 }
 
+/* Two groups, the icon and title and then the count, select-all and caret, on one line where both fit at their
+   natural widths. Where they don't (320px at the largest Android text size) the tools wrap onto a line of their
+   own, pushed to the end by the auto margin; nothing overflows the header. Overflow here is not cosmetic: content
+   past the right edge widens Chromium's layout viewport on Android, and every position: fixed bar spans the wider
+   viewport and slides as the page scrolls. */
 .transfer-panel-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    column-gap: 8px;
     width: 100%;
     min-width: 0;
+}
+
+.transfer-panel-heading {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    gap: 8px;
+    min-width: 0;
+}
+
+.transfer-panel-tools {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 8px;
+    margin-inline-start: auto;
 }
 
 .transfer-panel-icon {
@@ -1065,7 +1089,6 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 .transfer-panel-title {
-    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -1080,13 +1103,20 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-height: 44px;
 }
 
-/* MudBlazor puts the expand arrow flush against the title content, so it touched the select-all button. The
-   arrow has no tap handler of its own; the header does, but Chromium's touch adjustment prefers a tappable
-   descendant (the button) over its tappable ancestor (the header) whenever the finger's contact area overlaps
-   both, so taps on the arrow landed on select-all. The gap keeps the button out of a fingertip centered on the
-   arrow. */
-.transfer-panels .mud-expand-panel-header .mud-expand-panel-icon {
-    margin-inline-start: 16px;
+/* The expand caret (TransferPanelHeader.razor, in place of MudBlazor's, which HideIcon removes), turned and eased
+   exactly as MudBlazor turns its own. Its margin plus the tools row's 8px gap keep 16px between the select-all
+   button and the caret: the caret has no tap handler of its own; the header does, but Chromium's touch adjustment
+   prefers a tappable descendant (the button) over its tappable ancestor (the header) whenever the finger's contact
+   area overlaps both, so with the two flush, taps on the caret landed on select-all. The gap keeps the button out
+   of a fingertip centered on the caret. */
+.transfer-panel-caret {
+    flex: 0 0 auto;
+    margin-inline-start: 8px;
+    transition: transform .3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+
+.transfer-panel-caret-expanded {
+    transform: rotate(180deg);
 }
 
 /* Selected panels and rows. primary-hover alone is a 6% tint, which Delete Mode gets away with because its
@@ -1108,24 +1138,28 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* A compact row rather than the card-style MudListItem other lists use: cards nested inside the panel's own
-   card would double every border. Fixed height, because Virtualize places rows by it. */
+   card would double every border. A minimum height rather than a fixed one: Virtualize only estimates by
+   --transfer-row-height, so a row whose name wraps may grow. Top-aligned so the Info button stays on the name's
+   first line when it does. */
 .transfer-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 4px;
     box-sizing: border-box;
-    height: var(--transfer-row-height);
+    min-height: var(--transfer-row-height);
     border-bottom: 1px solid var(--mud-palette-lines-default);
 }
 
-/* Fills the row up to the Info button, so a tap anywhere else on the row selects it. */
+/* Fills the row up to the Info button, so a tap anywhere else on the row selects it. Stretched to the row's
+   full height, so a one-line name centers in the row's minimum; the vertical padding is a wrapped name's air
+   above and below, and only a wrapped name is tall enough for it to matter. */
 .transfer-row-select {
     display: flex;
     align-items: center;
+    align-self: stretch;
     flex: 1 1 auto;
     min-width: 0;
-    height: 100%;
-    padding: 0 0 0 12px;
+    padding: 8px 0 8px 12px;
     border: 0;
     background: none;
     color: inherit;
@@ -1134,15 +1168,18 @@ html.keyboard-open .page-content-with-bottom-nav {
     cursor: pointer;
 }
 
-/* The one place a record name may ellipsize: Virtualize positions these rows at a fixed height, so the
-   line cannot grow. The selection panels' Info button shows the full name; the import conflict list
-   has no such button, and lives with the ellipsis. */
+/* Wraps like every other record name in the app; a name with no spaces to break at breaks anywhere rather
+   than run under the Info button. */
 .transfer-row-name {
     flex: 1 1 auto;
     min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+}
+
+/* The Info button (MudIconButton, 48px at every text size) is centered on a one-line row, not on the row: the
+   row is top-aligned so the button stays on the first line of a wrapped name. */
+.transfer-row .mud-icon-button {
+    margin-top: calc((var(--transfer-row-height) - 48px) / 2);
 }
 
 .transfer-action,

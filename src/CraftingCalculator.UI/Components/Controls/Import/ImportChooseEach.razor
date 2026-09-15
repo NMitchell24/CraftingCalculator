@@ -15,17 +15,15 @@
         int picked = rows.Count(IsPicked);
         SelectionState state = TransferSelectionProcessor.StateOf(picked, rows.Count);
 
-        @* KeepContentAlive off for the reason TransferSelectionPanels gives: a collapsed panel's rows would stay in the
-           DOM at zero height, where Virtualize renders far more than a screenful. *@
-        <MudExpansionPanel @key="panel.Kind" KeepContentAlive="false"
+        @* KeepContentAlive off and HideIcon on for the reasons TransferSelectionPanels gives: a collapsed panel's rows
+           would stay in the DOM at zero height, where Virtualize renders far more than a screenful, and
+           TransferPanelHeader draws the caret itself. *@
+        <MudExpansionPanel @key="panel.Kind" KeepContentAlive="false" HideIcon="true"
+                           @bind-Expanded="_expanded[panel.Kind]"
                            HeaderClass="@(picked == 0 ? "" : "transfer-panel-selected")">
             <TitleContent>
-                <div class="transfer-panel-header">
-                    <MudIcon Icon="@panel.Icon" Class="transfer-panel-icon" />
-                    <MudText Typo="Typo.subtitle1" Class="transfer-panel-title">@panel.Title</MudText>
-                    <MudText Typo="Typo.body2" Class="transfer-panel-count">@picked</MudText>
-                    <SelectAllToggle State="state" Title="@panel.Title" OnToggle="@(() => ToggleAll(rows, state))" />
-                </div>
+                <TransferPanelHeader Icon="@panel.Icon" Title="@panel.Title" Count="picked" State="state"
+                                     Expanded="@_expanded[panel.Kind]" OnToggle="@(() => ToggleAll(rows, state))" />
             </TitleContent>
             <ChildContent>
                 <div class="transfer-rows">
