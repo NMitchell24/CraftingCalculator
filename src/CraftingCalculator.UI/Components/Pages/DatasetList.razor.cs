@@ -193,7 +193,7 @@ public partial class DatasetList : ComponentBase, IDisposable
     }
 
     private string RowClass(IBaseDataRecord record) =>
-        _mode == ListMode.Delete && _selected.Contains(record.Id) ? "list-row-selected" : "";
+        _mode == ListMode.Delete && _selected.Contains(record.Id) ? "list-item-selected" : "";
 
     private void Edit(IBaseDataRecord record) => Navigation.NavigateTo($"/dataset/{record.Type}/{record.Id}");
 

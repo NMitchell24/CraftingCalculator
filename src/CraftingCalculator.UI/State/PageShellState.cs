@@ -20,6 +20,10 @@ public sealed record PageAction(
 /// <summary>
 /// Everything a page puts on the shared shell. Only <see cref="Title"/> is required.
 /// </summary>
+/// <param name="Title">
+/// The screen's name in the app's own words, never user-entered data such as a record's name: the app bar
+/// wraps it rather than truncating it, and renders it in the display face.
+/// </param>
 public sealed record PageShellConfig(string Title)
 {
     /// <summary>The page's actions, in the order the shell should show them.</summary>
@@ -36,13 +40,6 @@ public sealed record PageShellConfig(string Title)
     /// always be left. The shell awaits it before opening a destination from the bottom nav or side rail.
     /// </summary>
     public Func<Task<bool>>? ConfirmLeaveAsync { get; init; }
-
-    /// <summary>
-    /// True when <see cref="Title"/> is user-entered data - a saved record's own name - rather than one
-    /// of the app's own screen names. The layout renders its own titles in the display face and user
-    /// content in the body face.
-    /// </summary>
-    public bool TitleIsUserContent { get; init; }
 }
 
 /// <summary>

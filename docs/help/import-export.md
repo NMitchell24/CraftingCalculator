@@ -178,7 +178,7 @@ When you're happy with it, tap **Import Data**, either the big button under the 
 **Import Data** or the ![Choose Another File](assets/file-open.svg) action, starts over with a different one. Not
 importing anything today? **Cancel**, at the very bottom, drops the file and takes you back to Step 1.
 
-More detail on the panels: [Picking what goes in](import-export.md#picking-what-goes-in).
+More detail on the panels: [Picking what goes out](import-export.md#picking-what-goes-out).
 
 ### As a new dataset, or into this one
 
@@ -187,8 +187,8 @@ The app asks how you want to bring it in:
 - **As New Dataset:** makes a brand new dataset out of what you picked. The name comes prefilled with whatever the
   dataset was called in the file, and the usual [unique-name rule](managing-datasets.md#adding-one) applies. You stay in
   the dataset you're in, so switch over when you're ready.
-- **Into 'your dataset':** adds what you picked to the dataset you're in right now. The button says its name, so
-  there's no guessing where it's going.
+- **Into Current:** adds what you picked to the dataset you're in right now. The question above the buttons names
+  it, so there's no guessing where it's going.
 
 As New is the safe bet. Nothing you already have changes, and if you don't like how it turned out you can
 [delete it](managing-datasets.md#deleting-one) and pretend it never happened.
@@ -214,7 +214,7 @@ records.
 ### Choosing each one
 
 Step 4 has a panel for each kind of record that clashes, laid out like the ones in
-[Picking what goes in](import-export.md#picking-what-goes-in). Open a panel and tap the ones you want replaced. Picked
+[Picking what goes out](import-export.md#picking-what-goes-out). Open a panel and tap the ones you want replaced. Picked
 rows are highlighted, and each header counts your picks. Everything you don't pick stays as it is.
 
 The button at the right of each header picks or unpicks the whole panel, and its icon works the same way it does there:

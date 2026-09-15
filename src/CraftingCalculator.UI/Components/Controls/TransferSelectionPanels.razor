@@ -5,19 +5,17 @@
         List<Row> rows = _rows[panel.Kind];
 
         @* KeepContentAlive off: a collapsed panel's rows would otherwise stay in the DOM at zero height, where
-           Virtualize cannot tell how many fit and renders far more than a screenful. *@
-        <MudExpansionPanel @key="panel.Kind" KeepContentAlive="false" Disabled="@(rows.Count == 0)"
+           Virtualize cannot tell how many fit and renders far more than a screenful. HideIcon because
+           TransferPanelHeader draws the caret itself; the header tap still toggles the panel, and Expanded is
+           bound so the caret follows it. *@
+        <MudExpansionPanel @key="panel.Kind" KeepContentAlive="false" HideIcon="true" Disabled="@(rows.Count == 0)"
+                           @bind-Expanded="_expanded[panel.Kind]"
                            HeaderClass="@(state == SelectionState.None ? "" : "transfer-panel-selected")">
             <TitleContent>
-                <div class="transfer-panel-header">
-                    <MudIcon Icon="@panel.Icon" Class="transfer-panel-icon" />
-                    <MudText Typo="Typo.subtitle1" Class="transfer-panel-title">@panel.Title</MudText>
-                    <MudText Typo="Typo.body2" Class="transfer-panel-count">
-                        @TransferSelectionProcessor.CountSelected(Graph, Selected, panel.Kind)
-                    </MudText>
-                    <SelectAllToggle State="state" Title="@panel.Title" Disabled="@(rows.Count == 0)"
+                <TransferPanelHeader Icon="@panel.Icon" Title="@panel.Title"
+                                     Count="@TransferSelectionProcessor.CountSelected(Graph, Selected, panel.Kind)"
+                                     State="state" Disabled="@(rows.Count == 0)" Expanded="@_expanded[panel.Kind]"
                                      OnToggle="@(() => ToggleAllAsync(panel, state))" />
-                </div>
             </TitleContent>
             <ChildContent>
                 <div class="transfer-rows">

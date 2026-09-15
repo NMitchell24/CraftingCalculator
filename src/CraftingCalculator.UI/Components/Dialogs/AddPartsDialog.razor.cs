@@ -27,8 +27,6 @@ public partial class AddPartsDialog : ComponentBase
 
     private List<IBaseDataRecord> FilteredCandidates => RecordFilterProcessor.Apply(_candidates, _filter);
 
-    private string Title => string.IsNullOrWhiteSpace(Blueprint.Name) ? "Add requirements" : $"Add to {Blueprint.Name}";
-
     protected override async Task OnInitializedAsync()
     {
         List<IBaseDataRecord> components = await RecordService.GetRecordsAsync(DataType.Component);

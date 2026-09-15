@@ -27,7 +27,7 @@ public partial class ImportExport : ComponentBase, IDisposable
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     protected override void OnInitialized() =>
-        PageShellState.Configure(this, new PageShellConfig("Import/Export Data") { ShowBack = true });
+        PageShellState.Configure(this, new PageShellConfig("Import and Export") { ShowBack = true });
 
     private void Open(TransferCard card) => Navigation.NavigateTo(card.Route);
 

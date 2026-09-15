@@ -37,15 +37,19 @@
                 @* Tabs and actions are separate rows on purpose. Sharing one row sized the tab bar by
                    whatever the actions left over, so it changed width on every switch - Materials has one
                    action and Steps has two. Every tab has an action, so no row ever empties. *@
-                <MudToggleGroup T="CraftView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
-                                SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
-                    @* "Steps" rather than "Crafting Steps": the group is an equal-column grid, so a third
-                       segment leaves each one about a third of a phone's width. The Crafting Summary card
-                       still spells it out. *@
-                    <MudToggleItem Value="CraftView.Materials">Components</MudToggleItem>
-                    <MudToggleItem Value="CraftView.Steps">Steps</MudToggleItem>
-                    <MudToggleItem Value="CraftView.Surplus">Surplus</MudToggleItem>
-                </MudToggleGroup>
+                <div class="pane-tabs">
+                    <MudToggleGroup T="CraftView" Value="_view" ValueChanged="OnViewChanged" Class="segmented"
+                                    SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+                        @* "Steps" rather than "Crafting Steps": the group is an equal-column grid, so a third
+                           segment leaves each one about a third of a phone's width. The Crafting Summary card
+                           still spells it out. Below a width too narrow for all three labels on one line each,
+                           the .pane-tabs container query in app.css (keyed on the zoom-aware ch unit) stacks
+                           the group into three full-width pills instead of letting a label wrap mid-word. *@
+                        <MudToggleItem Value="CraftView.Materials">Components</MudToggleItem>
+                        <MudToggleItem Value="CraftView.Steps">Steps</MudToggleItem>
+                        <MudToggleItem Value="CraftView.Surplus">Surplus</MudToggleItem>
+                    </MudToggleGroup>
+                </div>
 
                 @* Labelled rather than icon-only: PR 8b shrank these to bare icons only because they were
                    sharing the tab row. On their own row there is space to say what they do. *@

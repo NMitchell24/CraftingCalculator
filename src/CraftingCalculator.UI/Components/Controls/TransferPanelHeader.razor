@@ -1,0 +1,13 @@
+@* The caret is drawn here rather than by MudExpansionPanel (HideIcon on the owner): MudBlazor renders its own as a
+   sibling of the title content, so it could never wrap onto the header's second row with the count and the toggle. *@
+<div class="transfer-panel-header">
+    <div class="transfer-panel-heading">
+        <MudIcon Icon="@Icon" Class="transfer-panel-icon" />
+        <MudText Typo="Typo.subtitle1" Class="transfer-panel-title display-title">@Title</MudText>
+    </div>
+    <div class="transfer-panel-tools">
+        <MudText Typo="Typo.body2" Class="transfer-panel-count">@Count</MudText>
+        <SelectAllToggle State="State" Title="@Title" Disabled="Disabled" OnToggle="OnToggle" />
+        <MudIcon Icon="@Icons.Material.Filled.ExpandMore" Class="@CaretClass" />
+    </div>
+</div>

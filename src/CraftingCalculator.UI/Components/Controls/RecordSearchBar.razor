@@ -3,7 +3,7 @@
         @* Adornment is one enum in MudBlazor 9.7.0 (None/Start/End), so the search icon and the filter
            button cannot both be adornments of this field - the menu is a sibling in the flex row. *@
         <MudTextField T="string" Value="@_filter.Search" ValueChanged="OnSearchChangedAsync"
-                      Placeholder="@Placeholder" Adornment="Adornment.Start"
+                      Placeholder="Search" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Clearable="true"
                       Class="record-search-field" enterkeyhint="search" />
 

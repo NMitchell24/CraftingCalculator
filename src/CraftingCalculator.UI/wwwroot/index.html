@@ -138,7 +138,7 @@
             // up: search, tap +, search again. Only while the search field has focus, because a quantity field
             // being typed into has to blur and commit before its own + applies.
             document.addEventListener('mousedown', function (e) {
-                if (e.target.closest('.list-row-stepper button') && isSearchFocused()) {
+                if (e.target.closest('.record-row-stepper button') && isSearchFocused()) {
                     e.preventDefault();
                 }
             }, true);
@@ -190,6 +190,53 @@
                 viewport.addEventListener('resize', onViewportChange);
                 viewport.addEventListener('scroll', onViewportChange);
             }
+        })();
+    </script>
+
+    <!-- Publishes the measured border-box height of every element that carries a data-height-var attribute
+         as a custom property on the root element, named by that attribute's value, so the stylesheet can
+         offset by a bar whose height depends on its content: the app bar grows when its title wraps
+         (MainLayout tags it, and the app-bar-bottom variable in app.css reads the result). The property is
+         removed when the element leaves the DOM, which lets the stylesheet's fallback value stand in until
+         the next one renders. -->
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var tracked = new Map();
+
+            var resizeObserver = new ResizeObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var name = tracked.get(entry.target);
+
+                    if (name) {
+                        root.style.setProperty(name, entry.target.getBoundingClientRect().height + 'px');
+                    }
+                });
+            });
+
+            // Blazor renders and removes elements as pages change, so the set is re-read on every DOM
+            // mutation rather than once; the attribute selector keeps that cheap.
+            function sync() {
+                var current = new Set(document.querySelectorAll('[data-height-var]'));
+
+                tracked.forEach(function (name, element) {
+                    if (!current.has(element)) {
+                        resizeObserver.unobserve(element);
+                        tracked.delete(element);
+                        root.style.removeProperty(name);
+                    }
+                });
+
+                current.forEach(function (element) {
+                    if (!tracked.has(element)) {
+                        tracked.set(element, element.dataset.heightVar);
+                        resizeObserver.observe(element);
+                    }
+                });
+            }
+
+            new MutationObserver(sync).observe(document.body, { childList: true, subtree: true });
+            sync();
         })();
     </script>
 

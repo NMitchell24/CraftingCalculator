@@ -122,66 +122,84 @@ html, body {
        same reason --bottom-nav-height is: the page content and the snackbars offset by it. Shorter
        than the nav on purpose - it carries a page's actions, not a second set of destinations. */
     --actions-bar-height: 48px;
-    /* Both app-bar side tracks are this wide so the title track is centred on the viewport. Two 44px
-       icon buttons is the most either side holds - help and settings on the right, and the left track
-       matches so the centring stays exact even though it only ever carries the back arrow. A page's
-       own actions moved off the bar to .actions-bar and the drawer. */
-    --app-bar-side-width: 88px;
-    /* The app bar's bottom edge in viewport coordinates. The bar is Dense (MainLayout.razor), which is
-       three quarters of --mud-appbar-height, and MainLayout pads it by the status-bar inset on top.
-       Anything that pins itself directly under the bar offsets by this. */
-    --app-bar-bottom: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    /* The app bar's bottom edge in viewport coordinates. --app-bar-height is the bar's measured border-box
+       height, written onto <html> by the height-measuring script in index.html (MainLayout.razor tags the
+       MudAppBar with data-height-var), because a title that wraps makes the bar taller than its nominal
+       Dense height. The fallback is that nominal height - three quarters of --mud-appbar-height, plus the
+       status-bar inset MainLayout pads the bar by on top - and only stands until the first measurement
+       lands. Anything that pins itself directly under the bar offsets by this. */
+    --app-bar-bottom: var(--app-bar-height, calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top))));
     /* How far the on-screen keyboard reaches up over the layout viewport, written by the keyboard script in
        index.html. Only ever non-zero on iOS: Android's SafeAreaInsetsInjector shrinks the WebView instead. */
     --keyboard-inset: 0px;
 }
 
-/* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centred on the
-   screen and not merely on whatever space the icons leave. Equal fixed side tracks are what makes it
-   exact - 1fr sides would each floor at their own min-content width, and the heavier action side
-   would win. */
+/* Three tracks rather than MudBlazor's flex row (MainLayout.razor), so the title is centered on the
+   screen and not merely on whatever space the icons leave. While the title fits, the auto middle track
+   takes exactly its width and the two fr sides split the rest equally, which centers it on the viewport
+   rather than in the gap between the icons. When it does not fit - a large OS text size on a narrow
+   phone - the sides shrink to their icons (48px for the back arrow, 96px for help + settings) and the
+   title takes the rest, wrapping at word boundaries; fixed 88px sides squeezed single words like
+   "Categories" into an ellipsis there. */
 .mud-appbar .mud-toolbar {
     display: grid;
-    grid-template-columns: var(--app-bar-side-width) minmax(0, 1fr) var(--app-bar-side-width);
+    grid-template-columns: minmax(auto, 1fr) auto minmax(auto, 1fr);
     align-items: center;
     padding-left: calc(16px + var(--edge-inset-symmetric));
     padding-right: calc(16px + var(--edge-inset-symmetric));
 }
 
+/* MudBlazor fixes the Dense toolbar at this height (three quarters of --mud-appbar-height), which is
+   what forced a long title into an ellipsis. Same selector as its rule, so this wins on source order:
+   the bar keeps that height for a one-line title and grows to hold a wrapped one. The height-measuring
+   script in index.html is what tells the rest of the layout how tall it ended up (--app-bar-height). */
+.mud-appbar.mud-appbar-dense .mud-toolbar-appbar {
+    height: auto;
+    min-height: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4);
+}
+
+/* align-self: start keeps the icons on the title's first line when it wraps and the bar grows; centered,
+   they would float between the two lines. On a one-line bar the 48px buttons fill the row either way. */
 .app-bar-start {
     justify-self: start;
+    align-self: start;
     display: flex;
     align-items: center;
 }
 
 .app-bar-end {
     justify-self: end;
+    align-self: start;
     display: flex;
     align-items: center;
 }
 
-/* minmax(0, 1fr) above lets this track shrink below its content; without these rules a long title
-   would instead widen the track and push the action icons off the bar. */
+/* A title is never ellipsized: a truncated "Categ..." is the only place that word appears on the
+   screen, and a screen reader reads it literally. It wraps at word boundaries instead (overflow-wrap:
+   normal keeps a word whole even when it is wider than the track) and the toolbar above grows to hold
+   it. Declared after .display-title so this line-height wins: 1 is right for one line and too tight
+   for two. The vertical padding is a wrapped title's breathing room; it sits here rather than on the
+   toolbar, where it would push a one-line bar past its 48px. */
 .app-bar-title {
     text-align: center;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    /* Guarantees clear air between the title and the action icons at any text zoom. Android's WebView
-       scales px text by the OS "Font size" setting, so at its maximum a title that merely fits the
-       track ends up butting straight against the +. Reserving the gutter here makes the ellipsis kick
-       in a little sooner instead. */
-    padding: 0 8px;
+    white-space: normal;
+    overflow-wrap: normal;
+    line-height: 1.1;
+    /* No horizontal padding: at the largest Android text size on a 320px viewport "Components" is 143px
+       wide and the track beside a back arrow is 144px, so even a few px here pushes the icons out past
+       the bar's gutter. The icon buttons' own 12px inner padding is the visible air between the last
+       letter and the glyph. */
+    padding: 4px 0;
 }
 
-/* Two jobs. First, compensate MudMainContent's own top offset (which only accounts for the app bar's
-   nominal toolbar height) for the extra padding-top MainLayout.razor puts on the app bar to clear the
-   status bar. Second, supply the 16px gap under the bar: MudBlazor offsets the bar with `padding-top`
-   on .mud-main-content at two classes of specificity (_main.scss), so .page-content's one-class
-   `padding: 16px` shorthand never won the top edge and page content sat flush against the bar. The gap
-   goes here, on the rule that does win, rather than by out-specifying MudBlazor's. */
+/* The content's offset under the bar, restated from the measured bar plus 16px of clear air. MudBlazor
+   offsets the content by the bar's nominal height with `padding-top` on .mud-main-content at two
+   classes of specificity (_main.scss), which knows nothing of the status-bar inset MainLayout.razor
+   pads the bar by or of a wrapped title; --app-bar-bottom is the real bottom edge. Same specificity as
+   MudBlazor's rule and later in the cascade, so it wins, which .page-content's one-class `padding:
+   16px` shorthand never could - without this the content sat flush against the bar. */
 .mud-layout .mud-main-content {
-    margin-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
+    padding-top: calc(var(--app-bar-bottom) + 16px);
 }
 
 /* Same compensation as .mud-main-content above, for the side rail (sm+: MudDrawer Mini/Persistent,
@@ -373,48 +391,98 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* The batch card's heading shares its row with the Load Favorite select - same shape as
-   .dataset-summary-row, which pairs a heading with a control the same way. */
+   .dataset-switcher, which pairs a select with a control group the same way. The row wraps rather than
+   squeezing its items: at a large OS text size the heading was breaking onto two lines and the select
+   was too narrow for its own label, both because a one-line row was refusing to become two. */
 .craft-batch-title-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
 }
 
 /* The heading takes the slack and gives up its own bottom margin to the row, which now carries the
-   gap to the batch list below. */
+   gap to the batch list below. flex-grow of 999 rather than 1 so the heading, not the select, absorbs
+   the slack when both share the line - the select stays at its 168px basis there and only fills the
+   row once it has wrapped onto a line of its own. */
 .craft-batch-title-row .app-card-title {
-    flex: 1 1 auto;
+    flex: 999 1 auto;
     min-width: 0;
     margin-bottom: 0;
 }
 
-/* Shrinks before the heading does, and never grows past a width that would crowd it off a phone row. */
+/* Shares the line with the heading when both fit at their natural widths; otherwise drops beneath it
+   and takes the full width, so its label never runs under the dropdown arrow. The basis is what its
+   "Load Favorite" label and a short favorite name need, in ch so it grows with Android's text zoom the
+   way the text does (see .record-row-meta for why not em). */
 .craft-favorite-select {
-    flex: 0 1 168px;
+    flex: 1 1 17ch;
     min-width: 0;
 }
 
-.summary-grid {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px 16px;
+/* The label/value list under the Crafting Summary and in the Info dialog. Each pair is one
+   .summary-row, a wrapping flex line: the label and its value share the line while both fit at their
+   natural widths, and otherwise the value drops to a line of its own, right-aligned, under a label
+   that now has the full width and wraps between words. The two-column grid this replaces gave the
+   label column whatever the value left over, which at large text sizes was narrower than the word
+   "Components", so the label broke inside the word. */
+.summary-list {
+    container-type: inline-size;
     margin: 0;
     font-variant-numeric: tabular-nums;
 }
 
-.summary-grid dt {
+.summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 16px;
+    padding: 6px 0;
+}
+
+.summary-row + .summary-row {
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+/* min-width: 0 lets a label alone on its line shrink to the row, so a single word wider than the row
+   (a part name is user content) breaks inside the word instead of overflowing the dialog; break-word
+   rather than anywhere, because anywhere also breaks inside a word that would fit on the next line. */
+.summary-row dt {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
     color: var(--mud-palette-text-secondary);
 }
 
-.summary-grid dd {
-    margin: 0;
+/* margin-left: auto keeps the value at the right edge on a line of its own. */
+.summary-row dd {
+    flex: 0 0 auto;
+    margin: 0 0 0 auto;
     text-align: right;
 }
 
-.summary-profit {
+/* Scoped under .summary-row so it outranks the dt rule above; a bare .summary-profit lost to it and the
+   Profit label rendered in the secondary color. */
+.summary-row .summary-profit {
     font-weight: 600;
     color: var(--mud-palette-text-primary);
+}
+
+/* A list stacks as a whole or not at all: one row with its value beneath the label between rows that
+   keep theirs beside it reads as an accident, so below this width every label takes its line and every
+   value drops under it (the per-row wrap above still catches a single row that does not fit on a wider
+   list). The condition is in ch so it follows Android's text zoom, which em and rem do not (a container
+   query resolves ch against the container's own font; a media query only knows the viewport).
+   Calibration: the Crafting Summary's list is about 19ch at 320px / 200% and the Info dialog's lists and
+   .info-dialog-parts about 17ch, where every row has to stack; about 30ch and 27ch at 395px / 130%,
+   where "Components Needed  234 total" still fits the card but "Production Time per Craft  4s" does not
+   fit the dialog; about 43ch and 40ch at 448px / 100%, where everything fits. */
+@container (max-width: 28ch) {
+    .summary-row dt,
+    .info-dialog-parts-label {
+        flex-basis: 100%;
+    }
 }
 
 /* Success/Error rather than fixed hex values: MudThemeProvider re-emits both palette variables for
@@ -428,12 +496,23 @@ html.keyboard-open .page-content-with-bottom-nav {
     color: var(--mud-palette-error);
 }
 
-/* The tab row's own row, holding nothing else. Sharing it with the pane actions sized the tab bar by
-   whatever they left over, so it changed width whenever the active pane's action count changed. */
-.pane-toolbar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
+/* Inline-size container so the query below can ask "do three one-line labels fit here" in a unit that
+   tracks the group's own font - see the query's comment for why that unit is ch, not px. */
+.pane-tabs {
+    container-type: inline-size;
+}
+
+/* Below this width the three labels can't each fit their pill on one line, so the group stacks into
+   three full-width pills instead - a label breaking mid-word is the bug this avoids. ch rather than a
+   media query's px: the Android WebView's text-zoom setting scales ch (it's measured from the zoomed
+   glyphs) but not the container's px width, so only ch tracks whether the *text* fits at every zoom
+   level. 30ch sits between a calibrated failing width (~27ch, labels didn't fit on one line) and a
+   calibrated fitting one (~36ch). MudToggleGroup sets grid-template-columns inline on the element that
+   also carries .segmented, hence the !important. */
+@container (max-width: 30ch) {
+    .segmented {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 /* Segmented control, replacing MudToggleGroup's default bordered box: a recessed track holding one
@@ -457,9 +536,8 @@ html.keyboard-open .page-content-with-bottom-nav {
    by .segmented rather than left as the bare SelectedClass MudToggleGroup applies. */
 .segmented .mud-toggle-item {
     border-radius: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* The touch target floor. */
+    min-height: 44px;
     /* MudBlazor's .mud-toggle-item sets `border-style: none !important`, so a plain border on the
        selected pill below would never paint. Re-declaring the style here with the same weight is what
        lets that rule's border-color and width take effect. */
@@ -468,15 +546,10 @@ html.keyboard-open .page-content-with-bottom-nav {
     border-color: transparent;
 }
 
-/* The truncation has to live on the label, not just the item: .mud-button-label is a flex child that
-   will not shrink below its content, so at large text zoom it overflows the button and gets clipped at
-   both edges mid-glyph rather than ellipsised at the end. */
+/* A label never breaks mid-word: when a segment is too narrow to hold one on a single line, the
+   .pane-tabs container query above stacks the whole group into full-width pills instead. */
 .segmented .mud-toggle-item .mud-button-label {
-    display: block;
-    min-width: 0;
-    overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .segmented .mud-toggle-item:not(.segmented-selected) {
@@ -535,15 +608,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     }
 }
 
-/* Without this, a name too long for the available width overflows its container (flexbox and grid
-   don't clip by default) and visually bleeds onto whatever follows it in the row. */
-.list-row-name {
-    display: block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 .pane-empty-state {
     display: flex;
     flex-direction: column;
@@ -561,27 +625,133 @@ html.keyboard-open .page-content-with-bottom-nav {
     opacity: 0.7;
 }
 
+/* One row shape for every record list in the app: the Craft batch, the Components and Surplus lists,
+   Favorites, the Dataset list, the blueprint editor's requirements, and both picker dialogs. Three
+   cells - the name, with its caption beneath when the row has one; the meta, which is the category
+   chip; and the trailing cell, which holds the row's buttons or, on a read-only row, its figures.
+
+   In a narrow list (under 55ch of the list's own text, the .record-list query below): the name owns
+   the first line, so a long one has the whole card width and wraps rather than fighting the chip and
+   buttons for it; the chip and the trailing cell share the second line while the chip's basis fits
+   beside the buttons, and otherwise the buttons move down to a third. A wider list puts all three cells
+   on one line, which is the row the Dataset list always had. Nothing in a row is truncated: names and
+   category names are user data, and overflow-wrap: break-word breaks a 40-character word that could not
+   fit a line by itself rather than widening the row. Android scales px text by the OS Font size setting, so at its top a phone
+   shows about half again as much text per line as the design width, and a landscape phone has the
+   text budget of a narrow one; every shape here is checked there, not only at the default. */
+.record-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    width: 100%;
+}
+
+.record-row-name {
+    flex: 1 0 100%;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+/* MudText renders a caption as an inline span; under the name it is a line of its own. */
+.record-row-caption {
+    display: block;
+}
+
+/* 12ch is about the width of a two-word category chip. The meta asks for that much beside the buttons
+   and, when they leave less, takes the line for itself and the buttons drop to a line of their own.
+   The basis is fixed rather than the chip's own width on purpose: the decision then turns only on the
+   buttons' width and the row's, which are the same for every row of a list, so a list stacks as a
+   whole or not at all - never one stacked row among rows that are not. A chip wider than the meta
+   wraps inside it (.category-chip). ch rather than em: Android's text zoom scales the glyphs,
+   and so a ch, but leaves em and rem lengths at their unzoomed size (measured on the Pixel 9 AVD at
+   130%: 10em = 154px, 10ch = 126px, against a computed font size of 20px), and this basis has to grow
+   with the chip's text or the chip wraps at exactly the zoom where it needs the room most. */
+.record-row-meta {
+    display: flex;
+    flex: 1 1 12ch;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+/* An uncategorized record renders no chip. The empty cell has to go, or its 8em basis would still push
+   the buttons down a line and leave a blank one behind. The markup keeps the div on one line so Blazor
+   emits no whitespace text node inside it; comment nodes do not stop :empty from matching. */
+.record-row-meta:empty {
+    display: none;
+}
+
+/* margin-left: auto keeps the buttons at the trailing edge whether they share the meta's line or have
+   one of their own. flex: 0 1 auto plus min-width: 0 let the cell itself shrink below its content's
+   natural width instead of forcing the row wider than the card; flex-wrap plus justify-content:
+   flex-end then wrap content that still does not fit (.record-row-stepper alongside BatchList's
+   .record-row-icons, at the largest Android text size) onto a second line, right-aligned under the
+   first, rather than clipping it at the card edge. Wrapping happens between .record-row-stepper and
+   .record-row-icons, never inside either: each is one flex item here, so its own buttons move to the
+   next line together instead of splitting mid-group. */
+.record-row-end {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px 8px;
+    min-width: 0;
+    margin-left: auto;
+}
+
+/* Groups icon-only row actions (BatchList's Info/Delete, Favorites' and DatasetList's Edit/Delete) into
+   one flex item so .record-row-end wraps them together - see the comment above. */
+.record-row-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Every MudList that holds .record-rows (the batch, Components and Surplus lists, the Dataset and Favorites
+   lists, the blueprint editor's requirements, the picker and Add requirements dialogs). It is the container
+   the one-line query below measures, so a list goes to one line as a whole or not at all. */
+.record-list {
+    container-type: inline-size;
+}
+
+/* One line per row once the list is wide enough, measured in the list's own ch so the decision follows
+   Android's text zoom. The viewport-width media query this replaces (min-width: 600px) put a 712px
+   landscape phone at 200% on one line, where it has the text budget of a 356px phone: the name column
+   starved and "Wood" broke mid-word while the chip ran into the figures. Calibration: about 47ch on a
+   448px phone at 100% and about 52ch on a 997px landscape phone at 200% (both wrap); about 58ch at a
+   600px viewport at 100%, where the side rail has appeared, and about 72ch on an 880px landscape phone
+   at 130% (both one line). */
+@container (min-width: 55ch) {
+    .record-row {
+        flex-wrap: nowrap;
+    }
+
+    /* The name gives way first: it shrinks and wraps its text while the chip holds its width up to the cap. */
+    .record-row-name {
+        flex: 1 1 auto;
+    }
+
+    .record-row-meta {
+        flex: 0 0 auto;
+        max-width: 40%;
+    }
+}
+
 /* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
    regardless of the icon button's own visual (smaller) padding. */
-.list-row .mud-icon-button,
-.batch-row .mud-icon-button {
+.record-row .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
 }
 
-/* One shared row shape for every name-plus-actions list in the app: the Calculate batch, Favorites,
-   the Dataset list, and the blueprint editor's components. Same dedupe as .list-row-name. */
-.list-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    width: 100%;
-}
-
-/* Surface separation for every list in the app, applied to MudListItem rather than to .list-row so
-   that MaterialsList (.materials-row) gets it from the same rule. Rows read as discrete cards instead
-   of undifferentiated text on one flat sheet. MudListItem carries its own padding, so only the fill,
-   border and rhythm are set here. */
+/* Surface separation for every list in the app, applied to MudListItem rather than to .record-row so
+   that the help contents list (.help-topic-row) gets it from the same rule. Rows read as discrete
+   cards instead of undifferentiated text on one flat sheet. MudListItem carries its own padding, so
+   only the fill, border and rhythm are set here. */
 .mud-list > .mud-list-item {
     background-color: var(--mud-palette-surface);
     border: 1px solid var(--mud-palette-lines-default);
@@ -592,7 +762,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* Delete Mode on the Dataset and Favorites lists. Scoped the same way as the card rule above rather
    than by class alone, because that rule sets a background on every row and would otherwise win on
    specificity. */
-.mud-list > .mud-list-item.list-row-selected {
+.mud-list > .mud-list-item.list-item-selected {
     background-color: var(--mud-palette-primary-hover);
     border-color: var(--mud-palette-primary);
 }
@@ -608,111 +778,83 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: 0;
 }
 
-.list-row-info {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-/* The row's two action buttons have to hold their width whatever the name and caption beside them are:
-   left to the default flex-shrink they squeeze to one button's width and stack vertically, which is
-   what a long category description did. .list-row-info is the item that gives way instead. */
-.list-row-actions {
-    display: flex;
-    flex: 0 0 auto;
-}
-
-.list-row-stepper {
+/* The floor is the stepper's own width - two Size.Medium icon buttons (48px each) around the quantity
+   input (4.5ch of its subtitle1 face, about 5ch of the row's body face) - so that AddPartsDialog's Add
+   button, which stands in for the stepper on a part the blueprint does not use yet, holds the same
+   width. The .record-row-meta stacking rule turns on the trailing cell's width, and a list where some
+   rows show Add and others the stepper would otherwise stack the one and not the other. */
+.record-row-stepper {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+    min-width: calc(2 * 48px + 5ch);
 }
 
-/* AddPartsDialog's Add button, which takes the stepper's place on a part the blueprint does not use yet. */
-.list-row-stepper .mud-button-root {
+.record-row-stepper .mud-button-root {
     min-height: 44px;
 }
 
-.list-row-qty-field {
-    width: 56px;
+/* Sized on the input in its own ch rather than a px width on the control: the WebView's text zoom
+   scales the digits but not a px box, and 56px held three digits at 130%. Four digits plus a little
+   air, at any zoom. The selector repeats MudBlazor's own (.mud-input > input.mud-input-root, which
+   sets width: 100%) so it outranks it; the control is width: auto and shrink-wraps the input. */
+.record-row-qty-field {
+    width: auto;
 }
 
-.list-row-qty-field input {
+.record-row-qty-field .mud-input > input.mud-input-root {
+    width: 4.5ch;
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
 
-/* The header every card row shares: a name, then its category chip. Used by the Craft batch
-   (.batch-row) and by the Components and Surplus lists (.materials-row), which is why it is not part
-   of either family. The border sits here rather than on the name so the header's own padding-bottom
-   and the row's gap leave equal space on both sides of the line. */
-.card-row-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--mud-palette-lines-default);
-}
-
-.card-row-name {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-weight: 500;
-}
-
-/* Intrinsic width, so the name is what gives way when the two cannot both fit. Used from the
-   one-line .list-row shape too (the Dataset list), where the chip sits between the name/caption block
-   and the row actions rather than in a .card-row-header. */
-.card-row-category {
-    flex: 0 0 auto;
+/* CategoryChip.razor applies this to every chip it renders, in a row's meta cell or the Info dialog's
+   title. A category name is user data like the record's, so it wraps inside the pill rather than
+   ellipsizing: MudChip fixes its height (24px at Size.Small, set at two classes, which is why this
+   selector carries .mud-chip too) and sets white-space: nowrap, and both are undone here. The floor
+   keeps a one-line chip exactly as MudBlazor draws it; the cap keeps a long name inside its container
+   (the row's meta cell, or the dialog's title row) rather than widening it. */
+.mud-chip.category-chip {
     margin: 0;
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 24px;
+    white-space: normal;
 }
 
-/* The Craft screen's batch row is two lines rather than the one-line .list-row shape: the name gets a
-   full line to itself, so a long blueprint name has the whole card width before it ellipsizes, which
-   it was doing constantly in phone portrait. Deliberately its own family rather than a change to
-   .list-row, which Favorites, the Dataset list and the blueprint editor also use. Mirrors
-   .materials-row so the two cards on the Craft screen read as the same kind of object. */
-.batch-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-}
-
-.batch-row-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.batch-row-icons {
-    display: flex;
-    align-items: center;
+/* MudChip lays its content out as a flex row; block lets the text wrap as lines and centers it, since a
+   pill reads oddly with left-aligned wrapped lines. The padding gives a wrapped chip's outer lines air
+   against the border, and at 1.25 a single line still fits the 24px floor at the largest Android text
+   size (12px x 1.3 x 1.25 + 4 = 23.5). */
+.category-chip .mud-chip-content {
+    display: block;
+    overflow-wrap: break-word;
+    line-height: 1.25;
+    padding: 2px 0;
+    text-align: center;
 }
 
 .materials-list .mud-list {
     padding-top: 0;
 }
 
-/* The name gets its own line above a labelled quantity/cost table. Keeping the name in the same row as
-   the stats centred it against the taller two-line cost cell, so it sat off the baseline of the value
-   it was read against. tabular-nums keeps the digits from shifting the column alignment as quantities
-   and costs change. */
-.materials-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    font-variant-numeric: tabular-nums;
-}
-
-/* One grid for all four cells (both labels, then both values) so each value sits directly under its
-   own label and the two values share a row. */
+/* The Components and Surplus lists' figures, in the row's trailing cell: one grid for all four cells
+   (both labels, then both values) so each value sits directly under its own label and the two values
+   share a row. tabular-nums keeps the digits from shifting the column alignment as quantities and
+   costs change. */
 .materials-row-stats {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto auto;
     align-items: baseline;
-    column-gap: 8px;
+    column-gap: 16px;
     row-gap: 2px;
+    font-variant-numeric: tabular-nums;
+    /* Room for "Quantity" and a four-digit currency value. A floor for the same reason .record-row-stepper
+       has one: the .record-row-meta stacking rule turns on this cell's width, and left to its figures a
+       row saying x30 / $150.00 would stack while its neighbor saying x5 / $10.00 did not. Wider figures
+       still widen the cell; the floor covers the values a real batch produces. */
+    min-width: 14ch;
 }
 
 .materials-row-label {
@@ -721,6 +863,13 @@ html.keyboard-open .page-content-with-bottom-nav {
 
 .materials-row-end {
     text-align: right;
+}
+
+/* Sizes queries below against this element's own box, which follows Android's text zoom (font_scale)
+   the way a media query - keyed to the unzoomed viewport - does not. Verified on-device: at font_scale
+   2.0 the same CSS px width reports far fewer ch than at 1.0, because ch is relative to the zoomed font. */
+.steps-tree {
+    container-type: inline-size;
 }
 
 /* Tree on a narrow screen: cap MudBlazor's fixed 17px-per-level indent (Styles/components/_treeview.scss)
@@ -756,23 +905,32 @@ html.keyboard-open .page-content-with-bottom-nav {
    actions that manage the set of them. */
 .dataset-switcher {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 4px;
     margin-bottom: 16px;
 }
 
-/* Takes the row's slack so the four buttons keep their full tap targets at phone width. min-width
-   overrides MudSelect's own intrinsic width, which would otherwise refuse to shrink below it and push
-   the buttons off the edge on a narrow screen. */
+/* Takes the row's slack so the four buttons keep their full tap targets. flex-grow of 999 rather than 1
+   for the reason .craft-batch-title-row .app-card-title gives: sharing a line with the buttons, the
+   select absorbs all but a thousandth of the slack, so the buttons stay compact at the trailing edge.
+   The basis is the least the select can show a dataset name in, in ch for the reason
+   .craft-favorite-select gives: on a screen too narrow for that beside the buttons it wraps onto a line
+   of its own and takes the full width, the same shape as that select. min-width overrides MudSelect's
+   own intrinsic width, which would otherwise refuse to shrink below it. */
 .dataset-switcher-select {
-    flex: 1 1 auto;
+    flex: 999 1 20ch;
     min-width: 0;
 }
 
+/* Grows so that, once wrapped onto a line of its own, the group is the only item there and fills the
+   row, and space-evenly spreads the four buttons across it. Beside the select it gets a thousandth of
+   the slack, which leaves the buttons visually unchanged at the trailing edge. */
 .dataset-switcher-actions {
     display: flex;
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     align-items: center;
+    justify-content: space-evenly;
 }
 
 .dataset-switcher-actions .mud-icon-button {
@@ -795,23 +953,34 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* Pairs the card with its Actions Bar action, which carries the same icon. Sized against the title
    rather than the default 24px so it reads as part of the heading and not as a second control. */
 .dataset-summary-icon {
-    flex: 0 0 auto;
     font-size: 1.5rem;
 }
 
+/* A grid so the icon centers on the title's line alone rather than on the title and count together:
+   the icon and title share the first row track, and the count sits under the title in the second
+   column. The pencil stays outside the grid - spanning both rows, its 44px minimum would stretch the
+   title's track wherever the two text lines are shorter than it, and pull the icon off the title. */
 .dataset-summary-info {
     flex: 1 1 auto;
     min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 2px;
 }
 
 /* The count is the point of the card, so it carries the weight its heading does not. */
 .dataset-summary-count {
+    grid-column: 2;
     color: var(--mud-palette-text-secondary);
 }
 
-/* The card itself is the target, so its own title needs no bottom gap above the count. */
+/* The card itself is the target, so its own title needs no bottom gap above the count. The grid's
+   row-gap spaces the two instead of a margin, which would sit inside the title's track and put the
+   icon's center below the title's. */
 .dataset-summary-card .app-card-title {
-    margin-bottom: 2px;
+    margin-bottom: 0;
 }
 
 .dataset-summary-card .mud-icon-button {
@@ -824,7 +993,8 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* Both cards fit on screen without scrolling in either orientation: each is the largest square the free
    height and its column allow. The free height is the viewport minus the chrome MainLayout draws around
    .page-content - the app bar and its 16px gap above, and below it the page's bottom padding (16px) or,
-   at xs, the bottom nav. This page has no actions, so no actions bar. */
+   at xs, the bottom nav. This page has no actions, so no actions bar. At large OS text sizes the square is
+   too small for its text, and the card grows taller instead (.transfer-hub-card), so the page scrolls. */
 .transfer-hub {
     --transfer-hub-viewport: 100vh;
     --transfer-hub-gap: 16px;
@@ -852,7 +1022,9 @@ html.keyboard-open .page-content-with-bottom-nav {
     }
 }
 
-/* The card is a native <button> (ImportExport.razor), so it resets the button's own font and color. */
+/* The card is a native <button> (ImportExport.razor), so it resets the button's own font and color. No
+   overflow other than visible: a scroll container loses aspect-ratio's automatic minimum height, and that
+   minimum is what lets the card grow past a square when its text does not fit. */
 .transfer-hub-card {
     width: min(100%, calc((var(--transfer-hub-height) - var(--transfer-hub-gap)) / 2));
     aspect-ratio: 1;
@@ -864,7 +1036,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    overflow: hidden;
     font: inherit;
     color: inherit;
     text-align: center;
@@ -899,23 +1070,48 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* Export and Import (Components/Pages/Export.razor, Import.razor) and the selection panels they share
-   (Components/Controls/TransferSelectionPanels.razor). */
+   (Components/Controls/TransferSelectionPanels.razor, Import/ImportChooseEach.razor, with the panel header in
+   TransferPanelHeader.razor). */
 
 .transfer-page {
-    /* TransferSelectionPanels.RowHeight and ImportChooseEach.RowHeight hold the same number: Virtualize positions rows by it. */
-    --transfer-row-height: 48px;
+    /* TransferSelectionPanels.RowHeight and ImportChooseEach.RowHeight hold the same number: Virtualize estimates its
+       scroll range by it. Room for one line of text at the largest OS text size, with air; it is the row's minimum
+       (.transfer-row), and a row whose name wraps grows past it, which Virtualize tolerates. */
+    --transfer-row-height: 56px;
 }
 
 .transfer-panels {
     margin-bottom: 16px;
 }
 
+/* Two groups, the icon and title and then the count, select-all and caret, on one line where both fit at their
+   natural widths. Where they don't (320px at the largest Android text size) the tools wrap onto a line of their
+   own, pushed to the end by the auto margin; nothing overflows the header. Overflow here is not cosmetic: content
+   past the right edge widens Chromium's layout viewport on Android, and every position: fixed bar spans the wider
+   viewport and slides as the page scrolls. */
 .transfer-panel-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    column-gap: 8px;
     width: 100%;
     min-width: 0;
+}
+
+.transfer-panel-heading {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    gap: 8px;
+    min-width: 0;
+}
+
+.transfer-panel-tools {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 8px;
+    margin-inline-start: auto;
 }
 
 .transfer-panel-icon {
@@ -923,7 +1119,6 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 .transfer-panel-title {
-    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -938,13 +1133,25 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-height: 44px;
 }
 
-/* MudBlazor puts the expand arrow flush against the title content, so it touched the select-all button. The
-   arrow has no tap handler of its own; the header does, but Chromium's touch adjustment prefers a tappable
+/* The caret's margin plus the tools row's 8px gap keep 16px between the select-all button and the caret: the
+   caret has no tap handler of its own; the header does, but Chromium's touch adjustment prefers a tappable
    descendant (the button) over its tappable ancestor (the header) whenever the finger's contact area overlaps
-   both, so taps on the arrow landed on select-all. The gap keeps the button out of a fingertip centered on the
-   arrow. */
-.transfer-panels .mud-expand-panel-header .mud-expand-panel-icon {
-    margin-inline-start: 16px;
+   both, so with the two flush, taps on the caret landed on select-all. The gap keeps the button out of a
+   fingertip centered on the caret. */
+.transfer-panel-tools .panel-caret {
+    margin-inline-start: 8px;
+}
+
+/* An expand caret a component draws itself (TransferPanelHeader, InfoDialog's parts expander) where
+   MudExpansionPanel's own, a sibling of the title content, could not sit where the header needs it;
+   HideIcon on the panel removes MudBlazor's. The transition matches MudBlazor's. */
+.panel-caret {
+    flex: 0 0 auto;
+    transition: transform .3s cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+
+.panel-caret-expanded {
+    transform: rotate(180deg);
 }
 
 /* Selected panels and rows. primary-hover alone is a 6% tint, which Delete Mode gets away with because its
@@ -966,24 +1173,28 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* A compact row rather than the card-style MudListItem other lists use: cards nested inside the panel's own
-   card would double every border. Fixed height, because Virtualize places rows by it. */
+   card would double every border. A minimum height rather than a fixed one: Virtualize only estimates by
+   --transfer-row-height, so a row whose name wraps may grow. Top-aligned so the Info button stays on the name's
+   first line when it does. */
 .transfer-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 4px;
     box-sizing: border-box;
-    height: var(--transfer-row-height);
+    min-height: var(--transfer-row-height);
     border-bottom: 1px solid var(--mud-palette-lines-default);
 }
 
-/* Fills the row up to the Info button, so a tap anywhere else on the row selects it. */
+/* Fills the row up to the Info button, so a tap anywhere else on the row selects it. Stretched to the row's
+   full height, so a one-line name centers in the row's minimum; the vertical padding is a wrapped name's air
+   above and below, and only a wrapped name is tall enough for it to matter. */
 .transfer-row-select {
     display: flex;
     align-items: center;
+    align-self: stretch;
     flex: 1 1 auto;
     min-width: 0;
-    height: 100%;
-    padding: 0 0 0 12px;
+    padding: 8px 0 8px 12px;
     border: 0;
     background: none;
     color: inherit;
@@ -992,12 +1203,18 @@ html.keyboard-open .page-content-with-bottom-nav {
     cursor: pointer;
 }
 
+/* Wraps like every other record name in the app; a word too long for a line by itself breaks inside the word
+   rather than run under the Info button. */
 .transfer-row-name {
     flex: 1 1 auto;
     min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    overflow-wrap: break-word;
+}
+
+/* The Info button (MudIconButton, 48px at every text size) is centered on a one-line row, not on the row: the
+   row is top-aligned so the button stays on the first line of a wrapped name. */
+.transfer-row .mud-icon-button {
+    margin-top: calc((var(--transfer-row-height) - 48px) / 2);
 }
 
 .transfer-action,
@@ -1090,8 +1307,9 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-bottom: 72px;
 }
 
-/* Thumb-reachable Cancel/Save - above the bottom nav on xs and clear of the gesture-nav area
-   everywhere. The only fixed bar left in the app now that the totals bar is a card. */
+/* Thumb-reachable Cancel/Save, with an icon-only Delete at the far end - above the bottom nav on xs and
+   clear of the gesture-nav area everywhere. Always a single line: see .editor-action-bar-delete for why
+   Delete has no label. The only fixed bar left in the app now that the totals bar is a card. */
 .editor-action-bar {
     position: fixed;
     border-top: 1px solid var(--mud-palette-lines-default);
@@ -1108,9 +1326,12 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-right: calc(16px + var(--edge-inset-right));
 }
 
-/* Pushed to the opposite end of the bar from Cancel/Save, so a destructive action is nowhere near the
-   button the thumb is aiming for. auto margin rather than justify-content: space-between on the bar,
-   which would spread Cancel and Save apart on a new record, where there is no Delete. */
+/* The icon-only Delete (a MudIconButton, 48px at every text size). Three labeled buttons do not fit a
+   320px bar at the largest Android text size, and letting the bar wrap would put Delete on a line of its
+   own, where it reads as the primary action. Pushed to the opposite end of the bar from Cancel/Save, so a
+   destructive action is nowhere near the button the thumb is aiming for. auto margin rather than
+   justify-content: space-between on the bar, which would spread Cancel and Save apart on a new record,
+   where there is no Delete. */
 .editor-action-bar-delete {
     margin-right: auto;
 }
@@ -1184,7 +1405,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     flex: 0 0 auto;
 }
 
-/* Same 44px floor as .list-row's buttons - the filter menu has no other way in. */
+/* Same 44px floor as .record-row's buttons - the filter menu has no other way in. */
 .record-search-row .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
@@ -1263,6 +1484,17 @@ html.keyboard-open .mud-snackbar-location-bottom-center {
     max-height: calc(100dvh - 32px);
 }
 
+/* A button label never wraps inside its button; when the row cannot fit every button on one line, the
+   buttons stack instead, Material's stacked-buttons layout. MudBlazor's row is already flex-end with an
+   8px gap, and every dialog lists the dismissive button first (MudMessageBox renders Cancel, No, Yes),
+   so wrap-reverse leaves that first line at the bottom and moves each button that does not fit up a
+   line, every line still right-aligned. A three-button row can end up partly stacked, one on top and
+   two below. This covers MudMessageBox and the app's own dialogs alike, and needs no text-size check. */
+.mud-dialog-actions {
+    flex-wrap: wrap-reverse;
+    white-space: nowrap;
+}
+
 /* The container is sized to the layout viewport, which on iOS stays full height under the keyboard, so a
    full-screen dialog's bottom would sit behind it. --keyboard-inset is 0 on Android, where the WebView shrinks. */
 html.keyboard-open .mud-dialog-container {
@@ -1298,23 +1530,48 @@ html.keyboard-open .mud-dialog-container {
     padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
-/* Components/Dialogs/AddPartsDialog.razor. Close, the title and Done share the title row; the title takes the
-   slack and ellipsizes (.list-row-name) so a long blueprint name never pushes Done off the edge. */
+/* Components/Dialogs/AddPartsDialog.razor. Close, the title and Done share the title row, and the title takes the
+   slack. At the largest text sizes the title wraps to two lines. The title spans a second 1fr row: an item that
+   crosses a flexible track grows only that track, so the first row stays as tall as the taller button and Close
+   and Done center in it. A grid column also keeps Done at its full width; in a flex row .mud-button-root's 64px
+   min-width let Done shrink until its label broke. No column gap: both buttons already pad themselves. */
 .add-parts-title {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    align-items: center;
+}
+
+.add-parts-title > .mud-button-root {
+    grid-row: 1;
+}
+
+/* The end-edge counterpart of Close's Edge.Start, which MudButton has no parameter for: the label lines up with the
+   title's padding instead of sitting 8px inside it. At font_scale 2.0 on a 320px viewport "requirements" needs
+   those 8px to stay on one line. */
+.add-parts-title > .mud-button-root:last-child {
+    margin-inline-end: -8px;
+}
+
+/* Stretched over both rows with its text centered, so a one-line title still lines up with the buttons.
+   overflow-wrap is the guard for a word wider than the column: horizontal overflow on Android widens the layout
+   viewport and slides the fixed bars. */
+.add-parts-title-text {
+    grid-row: 1 / span 2;
+    align-self: stretch;
     display: flex;
     align-items: center;
-    gap: 4px;
+    overflow-wrap: anywhere;
 }
 
-.add-parts-title-text {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-/* Components/Dialogs/InfoDialog.razor. The name takes the row and the category chip trails it, so a
-   long name wraps within the space the chip leaves rather than pushing it off the title. */
+/* Components/Dialogs/InfoDialog.razor. The name takes the row and the category chip trails it when both
+   fit on one line. flex-wrap lets the chip drop to a line of its own when it doesn't: without it, a
+   long category name (e.g. "Refined Materials") forced the name down to one letter per line instead,
+   and the chip itself ran past the dialog's edge. .category-chip's own max-width keeps a chip wider
+   than the dialog wrapping its own text rather than widening the row. */
 .info-dialog-title {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
 }
@@ -1326,7 +1583,6 @@ html.keyboard-open .mud-dialog-container {
 
 .info-dialog-category {
     flex: 0 0 auto;
-    margin: 0;
 }
 
 /* The description reads as prose above the figures, so it gets body spacing rather than a grid row. */
@@ -1340,6 +1596,7 @@ html.keyboard-open .mud-dialog-container {
    read as a second card inside the dialog; only the header's label/count row and the divider above it
    are wanted here. */
 .info-dialog-parts {
+    container-type: inline-size;
     margin-top: 8px;
     background-color: transparent;
 }
@@ -1348,20 +1605,33 @@ html.keyboard-open .mud-dialog-container {
     background-color: transparent;
 }
 
-/* MudExpansionPanel lays its title out beside the expand icon, so the count is pushed to the icon
-   rather than to the dialog edge - close enough to the summary grid's right-aligned values to read as
-   the same kind of row. */
+/* The expander's header is the same shape as a .summary-row: label and count share the line while
+   both fit, and otherwise the count drops beneath the label, right-aligned, with the caret beside it
+   (the panel hides MudBlazor's own caret; see the markup). */
 .info-dialog-parts-summary {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
+    column-gap: 16px;
     width: 100%;
     font-variant-numeric: tabular-nums;
 }
 
+/* min-width: 0 overrides a flex item's default min-width: auto, which otherwise keeps this label at
+   its content width and pushes the dialog into a horizontal scrollbar at large text sizes; break-word
+   rather than anywhere for the reason .summary-row dt gives. */
 .info-dialog-parts-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
     color: var(--mud-palette-text-secondary);
+}
+
+.info-dialog-parts-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
 }
 
 /* Separates the figures that describe the record itself from the ones that apply only to the tapped
@@ -1402,18 +1672,71 @@ html.keyboard-open .mud-dialog-container {
     top: 0.5rem;
 }
 
-/* Production time editor: three fields on one line so hours/minutes/seconds read as one value rather
-   than three unrelated settings. Equal columns keep each one a comfortable tap target on a phone. */
+/* The notch an outlined field cuts in its border for the floated label. MudBlazor sizes it from a hidden
+   <legend> copy of the label text with no cap, while the visible label itself is capped and ellipsized at
+   the field's width. At a large OS text size a label wider than its field ("Seconds" in the production
+   time row) therefore left a run of hidden text past the field's right edge. That is not cosmetic: text
+   past the viewport's right edge is scrollable overflow, and Chromium on Android widens the layout
+   viewport to contain it - here to 336px on a 320px screen - after which every position: fixed bar spans
+   the wider layout viewport and slides as the page is scrolled. The bottom nav shifted off the right edge,
+   and the app bar climbed under the status bar on the editor screens. 22px is the legend's own
+   margin-left + margin-right (11px each, MudBlazor). overflow: hidden stops the text inside the capped
+   legend counting as overflow of its own. */
+.mud-input.mud-input-outlined > .mud-input-outlined-border legend {
+    max-width: calc(100% - 22px);
+    overflow: hidden;
+}
+
+/* Floated (shrunk) label overlapping the value at large Android OS text sizes, every Variant.Outlined
+   field - "Load Favorite" printing over "Bronze Gear Up", and the same for every other outlined field in
+   the app. MudBlazor shrinks the label with a fixed transform (label font-size 1rem, line-height 1.15rem -
+   both zoomed by Android's WebView) while the field's own padding-top that makes room for it (18.5px
+   normal, 10.5px dense) is a px length and is not. Measured on the Pixel 9 AVD at Android's maximum "Font
+   size" (font_scale 2.0): the shrunk label box grows to 27.6px tall, and MudBlazor's fixed -6px offset
+   lands it from -6px to 21.6px - well inside the value's own text area. At 100% zoom it ends at 7.8px,
+   clear of the padding, which is why the overlap is invisible off-device and only shows up at Android's
+   own top text size.
+
+   The fix is the Y offset. A percentage in translate() resolves against the label's own unscaled box, so
+   -37.5% - half of MudBlazor's own 0.75 scale factor (0.5 * 0.75) - centers the scaled label on the border
+   line at every zoom level instead of one term (the label) scaling with zoomed text and the other (the px
+   offset) not. At 100% zoom this lands at -6.9px against the design's -6px, close enough that the resting
+   look is unchanged. The selector list is MudBlazor's own three shrink triggers - shrunk state, focus, and
+   Chromium autofill - repeated verbatim (MudBlazor.min.css) so this wins on specificity rather than
+   source order. */
+.mud-shrink~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined,
+.mud-input:focus-within~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined,
+.mud-input:has(:-webkit-autofill)~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined {
+    transform: translate(14px, -37.5%) scale(0.75);
+}
+
 .production-time-label {
     display: block;
     opacity: 0.7;
     margin-bottom: 4px;
 }
 
+/* Production time editor: hours, minutes and seconds share one line so they read as one value rather
+   than three unrelated settings, but only while every field can show its whole label. When they can't,
+   all three stack at full width together; a partial wrap (two fields over one) would read as two values.
+   The flex basis does the switch with no script: (24ch - 100%) * 999 is a huge width when the row is
+   narrower than 24ch, so each field wraps onto a line of its own, and a negative one when the row is
+   wider, which clamps to 0 so the three grow into equal shares. ch rather than px for the same reason as
+   .pane-tabs: Android's WebView text zoom scales ch but not the row's px width (nor em/rem), so only ch
+   tracks whether the labels fit. Measured in the fields' own font, the row is about 19ch at Android's
+   maximum Font size and Display size (320px viewport, 200% text, where "Minutes" and "Seconds" were
+   ellipsized), about 28.8ch at 395px / 130% (where "Minutes" still fits its third) and about 44ch at
+   448px / 100%. 24ch stacks the first and keeps the other two on one line. min-width: 0 lets a field
+   shrink below its input's intrinsic width, which would otherwise push a one-line row past the screen. */
 .production-time-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
+}
+
+.production-time-row > .mud-input-control {
+    flex: 1 1 calc((24ch - 100%) * 999);
+    min-width: 0;
 }
 
 /* Echoes the entered value back in the same format the Crafting Summary uses, so the user can see that
@@ -1429,6 +1752,19 @@ html.keyboard-open .mud-dialog-container {
 .steps-tree-time {
     opacity: 0.7;
     font-variant-numeric: tabular-nums;
+}
+
+/* Below this width the time crowds out the step name, forcing it to wrap on every row - the time is
+   still available in the step's Info dialog and the Crafting Summary total, so drop it here instead.
+   Calibrated on-device (emulator-5554) against .steps-tree's own ch, which tracks font_scale:
+     320px / font_scale 2.0 (200%) -> ~17.6ch, time needed to stay hidden
+     395px / font_scale 1.3 (130%) -> ~27ch,   "Bronze Helmet x1  4s" still fit on one line
+     448px / font_scale 1.0 (100%) -> ~41ch
+   24ch sits between those two kept-cases, so it only fires at the extreme end. */
+@container (max-width: 24ch) {
+    .steps-tree-time {
+        display: none;
+    }
 }
 
 /* A Crafting Steps row whose count is crafts rather than items (BlueprintTreeNode.Label). Dotted
@@ -1451,12 +1787,22 @@ html.keyboard-open .mud-dialog-container {
    rest of the app these are bare HTML tags with no MudBlazor classes on them - every rule below is
    scoped to .help-article for that reason, and none of it leaks into the component markup elsewhere.
    Colours come from the palette so the pages follow light/dark with everything else. */
+/* The contents list's row (Help.razor): a topic's title and summary, and a chevron saying the row opens
+   it. Not a .record-row - there is no meta cell and the chevron belongs beside the title, not under it. */
+.help-topic-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.help-topic-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .help-topic-summary {
     display: block;
     color: var(--mud-palette-text-secondary);
-    /* The contents list is the one place a caption is a full sentence, so it wraps rather than
-       ellipsizing the way .list-row-name does. */
-    white-space: normal;
 }
 
 /* Wider than the app's other body copy is allowed to get. Long-form prose set the full width of a

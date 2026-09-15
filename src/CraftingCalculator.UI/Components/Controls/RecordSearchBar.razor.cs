@@ -8,8 +8,8 @@ using Color = MudBlazor.Color;
 namespace CraftingCalculator.UI.Components.Controls;
 
 /// <summary>
-/// The search field and category filter shared by <see cref="Pages.DatasetList" /> and
-/// <see cref="Dialogs.BlueprintPickerDialog" />. It owns the filter and raises
+/// The search field and category filter shared by <see cref="Pages.DatasetList" />,
+/// <see cref="Dialogs.BlueprintPickerDialog" /> and <see cref="Dialogs.AddPartsDialog" />. It owns the filter and raises
 /// <see cref="FilterChanged" />; the host applies it to its own records with
 /// <see cref="RecordFilterProcessor.Apply{T}" />.
 /// </summary>
@@ -23,9 +23,6 @@ public partial class RecordSearchBar : ComponentBase
     /// these, so passing the filtered list instead would collapse the menu to the current selection.
     /// </summary>
     [Parameter, EditorRequired] public IReadOnlyList<IBaseDataRecord> Records { get; set; } = [];
-
-    /// <summary>Placeholder text for the search field.</summary>
-    [Parameter] public string Placeholder { get; set; } = "Search";
 
     /// <summary>Raised whenever the search text or the selected categories change.</summary>
     [Parameter] public EventCallback<RecordFilter> FilterChanged { get; set; }
@@ -57,7 +54,7 @@ public partial class RecordSearchBar : ComponentBase
         _showFilter = categoriesInUse.Count > 0;
 
         // Records change as the user edits, so a selected category can stop being offered - the last
-        // record in it is recategorised, or the category itself is deleted. The stale id would go on
+        // record in it is recategorized, or the category itself is deleted. The stale id would go on
         // filtering with no chip left to explain why, so it is dropped and the host re-notified.
         RecordFilter pruned = RecordFilterProcessor.Prune(_filter, Records);
 

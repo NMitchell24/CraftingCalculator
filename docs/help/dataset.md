@@ -113,8 +113,8 @@ Tapping a row opens its editor. The fields differ by type. See [Blueprints](blue
 [Components](components.md) and [Categories](categories.md) for details about each type. The bar at the bottom is 
 always the same:
 
-- ![Delete](assets/delete.svg) **Delete:** (on the left, and only on a record that already exists) removes it, after 
-  asking.
+- ![Delete](assets/delete.svg) **Delete:** the red trash can on the left, only on a record that already exists.
+  Removes it, after asking.
 - **Cancel:** goes back without saving.
 - ![Save](assets/save.svg) **Save:** commits. It stays grayed out until the record has a name, because
   a name is required for each record.

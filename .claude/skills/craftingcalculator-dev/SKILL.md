@@ -159,6 +159,86 @@ touching them. The short version:
   breakpoints. Every interactive target is ≥ 44×44 px; no action is reachable only by hover or
   right-click. See the three-destination bottom-nav/side-rail shell (`Craft` `/`, `Favorites`
   `/favorites`, `Dataset` `/dataset`) before adding new navigation.
+- **All CSS goes in `wwwroot/app.css`.** `.razor.css` isolation never loads for this project's TFMs.
+
+### Large text sizes: legibility over layout
+
+Android multiplies every `px` font size by the OS **Font size** setting (up to 2.0) after CSS resolves, and
+the OS **Display size** setting shrinks the viewport to 320 CSS px at the same time. The whole UI was reworked
+in September 2026 (branch `UI-Refinement-TextReflow`) to survive that, and every one of those fixes was a
+layout that had assumed text of a known width. The rule that settled every case: **a legible, working reflow
+beats exact alignment.** A new or changed component has to hold to these, or it reintroduces the same bugs:
+
+- **Nothing is ever ellipsized or broken inside a word.** Not a record name, not a label, not a title, not a
+  button. The one exception is the value inside a `MudSelect`, which a select cannot wrap. So: no
+  `text-overflow: ellipsis`, no `overflow-wrap: anywhere` on a label (it breaks "Componen / ts" as soon as the
+  column is narrow), no `&shy;`. User content that can be one enormous word gets `min-width: 0` plus
+  `overflow-wrap: break-word`, which only breaks a word that would not fit a whole line by itself.
+- **When things do not fit on one line, they stack; they do not shrink.** A label/value row puts the value
+  under the label, right-aligned; a segmented control becomes full-width pills; a dialog's buttons stack with
+  the confirming action on top (`flex-wrap: wrap-reverse` + `white-space: nowrap`); three fields become three
+  full-width fields; the app bar grows taller. A flex item that may shrink needs `min-width: 0`, a grid column
+  `minmax(0, 1fr)`, or the row pushes the page wider instead.
+- **A list reflows as a whole or not at all.** One row stacked between rows that still share a line reads as an
+  accident. Make the decision at the list, not the row: a `container-type: inline-size` wrapper with an
+  `@container (max-width: Nch)` query (`.summary-list`, `.pane-tabs`, `.steps-tree`), a fixed `ch` basis that is
+  the same on every row (`.record-row-meta`), or the "Holy Albatross" `flex: 1 1 calc((Nch - 100%) * 999)`
+  (`.production-time-row`). Keep the per-row wrap as the fallback for a single row that still does not fit.
+- **Lengths that have to follow the text are in `ch` (or `lh`), never `em`/`rem`.** Android's text zoom scales
+  `px` and `ch` but not `em`/`rem` (measured: 10em = 154px, 10ch = 126px at 130%). A **media query cannot see the
+  zoom**; only the viewport. A **container query can**: its `ch` resolves against the container's own font.
+- **Every threshold carries its calibration.** A rule with `Nch` in it has a comment giving the container's
+  width in ch at 320px / 200%, 395px / 130% and 448px / 100%, and which of those it separates. Without the
+  numbers the next person cannot tell whether 24ch or 30ch is right.
+- **Nothing may overflow the viewport to the right.** Chromium on Android widens the layout viewport to contain
+  scrollable overflow, and then every `position: fixed` bar (bottom nav, actions bar, editor bar) spans the
+  wider viewport and slides as the page scrolls. `overflow-x: hidden` on `html` does not stop it; fix the
+  source (the hidden `<legend>` of an outlined field was one).
+- **Chrome that can grow is measured, not assumed.** The app bar wraps its title, so its height is read by the
+  `data-height-var` script in `index.html` into `--app-bar-height`, and everything that offsets by the bar
+  reads `--app-bar-bottom`. A bar whose height depends on text takes the same attribute; a bar sized in `px`
+  is checked at 200% (the editor action bar holds one line only because Delete is icon-only).
+- **No user content in a title or a button label**: the app bar, dialog titles, `MudMessageBox` buttons.
+  Titles are the app's own words in the display face; the record's name is on the screen already. The one
+  exception is `InfoDialog`, whose title is the record's name and always was; it wraps, it is never cut. A
+  button that would not fit with a label becomes an icon-only `MudIconButton` with `title`/`aria-label`.
+- **MudBlazor draws some things where a wrapped header cannot use them.** `MudExpansionPanel`'s caret is a
+  sibling of the title content: use `HideIcon="true"` and draw `.panel-caret` beside the count
+  (`TransferPanelHeader`, `InfoDialog`). `MudToggleGroup` sets its grid columns inline, so stacking needs
+  `!important`. The outlined field's shrunk label is positioned in `px`; the override translates in percent.
+
+**Verify on a device, not by reasoning.** The everyday check for a component you changed is one look at that
+screen on an Android emulator or phone with both accessibility sliders at their top, which on a Pixel-class
+device is a 320 × 712 CSS px viewport with 24px body text:
+
+```
+adb shell settings put system font_scale 2.0
+adb shell wm density 672
+```
+
+Put them back afterwards (`font_scale 1.0`, `wm density reset`). A code change needs a build with fast
+deployment off, or the device keeps running the old assemblies:
+
+```
+dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-android -t:SignAndroidPackage -p:EmbedAssembliesIntoApk=true
+adb install -r src/CraftingCalculator.UI/bin/Debug/net10.0-android/com.sterlingturd.craftingcalculator-Signed.apk
+MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingturd.craftingcalculator rm -rf files/.__override__
+```
+
+Debug builds expose the WebView over the Chrome DevTools Protocol (`adb forward tcp:9222
+localabstract:webview_devtools_remote_<pid>`, pid from `adb shell pidof com.sterlingturd.craftingcalculator`;
+on Windows, launch with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=<port>`), so a short
+script can evaluate JS in the page instead of guessing from screenshots: `scrollWidth > clientWidth` on an
+element with `text-overflow: ellipsis` is a cut-off, a `Range` over one word whose `getClientRects()` spans two
+lines is a mid-word break, and `document.documentElement.scrollWidth > innerWidth` is horizontal overflow.
+
+The **full matrix** (`font_scale` 0.85 / 1.0 / 1.3 / 2.0 × `wm density` 480 / 544 / 672, portrait and
+landscape, every screen, plus the Windows head at a few widths) is the pre-merge check for a branch that
+touches shared layout: the `.record-row` family, the app bar, dialogs, a list or a card every screen uses.
+It is expensive: about twenty minutes of emulator time, hundreds of screenshots and measurements, and a lot
+of tokens if the output is read back. **Do not run it on your own initiative. Ask first,** and only when the
+change warrants it; a single-component change gets the one-screen check above. Any scripts that automate the
+walk are machine-local and not part of the repo; do not go looking for them.
 
 ## Built-in help (`docs/help`)
 
@@ -366,6 +446,8 @@ semantic search).
    `Infrastructure/DependencyInjection.cs`. 5. Service interface + impl in
    `Application/Common/Services` → register in `Application/DependencyInjection.cs`. 6. Transformation
    logic in a `Processor`. 7. Razor page/component in `UI/Components` injecting the service, mobile-
-   first per the design rules above. 8. Unit tests mirroring the source path. 9. **Update the help
-   pages under `docs/help/` for anything the change makes visible to the user**, and add a
-   `HelpTopics` entry if the feature introduces a new screen — see "Built-in help" above.
+   first per the design rules above, **checked on the emulator at `font_scale` 2.0 / density 672** (see
+   "Large text sizes": nothing ellipsized, nothing broken mid-word, nothing past the right edge).
+   8. Unit tests mirroring the source path. 9. **Update the help pages under `docs/help/` for anything
+   the change makes visible to the user**, and add a `HelpTopics` entry if the feature introduces a new
+   screen — see "Built-in help" above.

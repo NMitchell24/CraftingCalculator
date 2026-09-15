@@ -25,26 +25,28 @@
     }
     else
     {
-        <MudList T="IBaseDataRecord">
+        <MudList T="IBaseDataRecord" Class="record-list">
             @foreach (IBaseDataRecord record in FilteredRecords)
             {
                 <MudListItem T="IBaseDataRecord" Class="@RowClass(record)" OnClick="@(() => OnRowClick(record))">
-                    <div class="list-row">
-                        <div class="list-row-info">
-                            <MudText Class="list-row-name">@record.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="list-row-name">@CaptionFor(record)</MudText>
+                    <div class="record-row">
+                        <div class="record-row-name">
+                            <MudText>@record.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="record-row-caption">@CaptionFor(record)</MudText>
                         </div>
-                        <CategoryChip Record="@record" Class="card-row-category" />
+                        <div class="record-row-meta"><CategoryChip Record="@record" /></div>
                         @* Same shape as Favorites.razor: the row itself has a tap action, so the row
                            buttons have to stop the event before it bubbles, and
                            @onclick:stopPropagation only applies to an element - hence the wrapper. *@
-                        <div class="list-row-actions" @onclick="() => { }" @onclick:stopPropagation="true">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                                           title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
-                                           OnClick="@(() => Edit(record))" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
-                                           title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
-                                           OnClick="@(() => DeleteAsync(record))" />
+                        <div class="record-row-end" @onclick="() => { }" @onclick:stopPropagation="true">
+                            <div class="record-row-icons">
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                               title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
+                                               OnClick="@(() => Edit(record))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                                               title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
+                                               OnClick="@(() => DeleteAsync(record))" />
+                            </div>
                         </div>
                     </div>
                 </MudListItem>

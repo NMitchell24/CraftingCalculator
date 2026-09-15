@@ -9,22 +9,22 @@
     }
     else
     {
-        <MudList T="BlueprintQuantity">
+        <MudList T="BlueprintQuantity" Class="record-list">
             @foreach (BlueprintQuantity blueprintQuantity in State.SurplusStock)
             {
                 <MudListItem T="BlueprintQuantity" OnClick="@(() => ShowInfoAsync(blueprintQuantity))">
-                    @* Same row shape as MaterialsList - name, then a paired label/value grid - so it
+                    @* Same figures as MaterialsList - a paired label/value grid in the trailing cell - so it
                        reuses those classes rather than cloning them under a surplus- prefix. *@
-                    <div class="materials-row">
-                        <div class="card-row-header">
-                            <MudText Class="list-row-name card-row-name">@blueprintQuantity.Name</MudText>
-                            <CategoryChip Record="@blueprintQuantity.Blueprint" Class="card-row-category" />
-                        </div>
-                        <div class="materials-row-stats">
-                            <MudText Typo="Typo.caption" Class="materials-row-label">Quantity</MudText>
-                            <MudText Typo="Typo.caption" Class="materials-row-label materials-row-end">Value</MudText>
-                            <MudText>x@(blueprintQuantity.Quantity)</MudText>
-                            <MudText Class="materials-row-end">@string.Format(FormatConstants.CurrencyFormat, blueprintQuantity.TotalValue)</MudText>
+                    <div class="record-row">
+                        <MudText Class="record-row-name">@blueprintQuantity.Name</MudText>
+                        <div class="record-row-meta"><CategoryChip Record="@blueprintQuantity.Blueprint" /></div>
+                        <div class="record-row-end">
+                            <div class="materials-row-stats">
+                                <MudText Typo="Typo.caption" Class="materials-row-label">Quantity</MudText>
+                                <MudText Typo="Typo.caption" Class="materials-row-label materials-row-end">Value</MudText>
+                                <MudText>x@(blueprintQuantity.Quantity)</MudText>
+                                <MudText Class="materials-row-end">@string.Format(FormatConstants.CurrencyFormat, blueprintQuantity.TotalValue)</MudText>
+                            </div>
                         </div>
                     </div>
                 </MudListItem>

@@ -85,8 +85,8 @@ public partial class Import : ComponentBase, IDisposable
             .FirstOrDefault(dataset => dataset.Id == datasetId)?.Name ?? "";
 
         bool? choice = await DialogService.ShowMessageBoxAsync(
-            "Import Data", "How would you like to import this data?",
-            yesText: "As New Dataset", noText: $"Into '{datasetName}'", cancelText: "Cancel");
+            "Import Data", $"Add it to '{datasetName}', or make a new dataset?",
+            yesText: "As New Dataset", noText: "Into Current", cancelText: "Cancel");
 
         if (choice == true)
         {

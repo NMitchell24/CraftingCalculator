@@ -13,27 +13,29 @@
     }
     else
     {
-        <MudList T="BlueprintFavorite">
+        <MudList T="BlueprintFavorite" Class="record-list">
             @foreach (BlueprintFavorite favorite in _favorites)
             {
                 <MudListItem T="BlueprintFavorite" Class="@RowClass(favorite)" OnClick="@(() => OnRowClick(favorite))">
-                    <div class="list-row">
-                        <div class="list-row-info">
-                            <MudText Class="list-row-name">@favorite.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="list-row-name">
+                    <div class="record-row">
+                        <div class="record-row-name">
+                            <MudText>@favorite.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="record-row-caption">
                                 @favorite.BlueprintCount blueprint@(favorite.BlueprintCount == 1 ? "" : "s")
                             </MudText>
                         </div>
                         @* The row itself has a tap action, so the row actions have to stop the event
                            before it bubbles. @onclick:stopPropagation can only be applied to an
                            element, never a component tag, hence the wrapper div. *@
-                        <div class="list-row-actions" @onclick="() => { }" @onclick:stopPropagation="true">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                                           title="@($"Rename {favorite.Name}")" aria-label="@($"Rename {favorite.Name}")"
-                                           OnClick="@(() => RenameAsync(favorite))" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
-                                           title="@($"Delete {favorite.Name}")" aria-label="@($"Delete {favorite.Name}")"
-                                           OnClick="@(() => DeleteAsync(favorite))" />
+                        <div class="record-row-end" @onclick="() => { }" @onclick:stopPropagation="true">
+                            <div class="record-row-icons">
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                               title="@($"Rename {favorite.Name}")" aria-label="@($"Rename {favorite.Name}")"
+                                               OnClick="@(() => RenameAsync(favorite))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                                               title="@($"Delete {favorite.Name}")" aria-label="@($"Delete {favorite.Name}")"
+                                               OnClick="@(() => DeleteAsync(favorite))" />
+                            </div>
                         </div>
                     </div>
                 </MudListItem>

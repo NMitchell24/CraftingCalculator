@@ -50,7 +50,7 @@ public partial class Help : ComponentBase, IDisposable
         _scrollPending = true;
 
         // The topic's own name is the H1 the Markdown opens with; the bar says which part of the app
-        // this is, the way Settings does. TitleIsUserContent stays false: these are the app's own words.
+        // this is, the way Settings does.
         PageShellState.Configure(this, new PageShellConfig("Help")
         {
             ShowBack = TopicId is not null

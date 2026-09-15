@@ -126,11 +126,6 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // callbacks, so the first frame this is true is also the first frame the layout is fully resolved.
     private bool IsReady => _themeResolved && _breakpoint is not null;
 
-    // The display face is reserved for the app's own screen names; a record's own name renders in the
-    // body face, which is both the honest signal and the legible choice for text the app never wrote.
-    private string AppBarTitleClass =>
-        PageShellState.Config.TitleIsUserContent ? "app-bar-title" : "app-bar-title display-title";
-
     protected override void OnInitialized()
     {
         PageShellState.Changed += StateHasChanged;

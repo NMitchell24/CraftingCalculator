@@ -13,6 +13,7 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 public partial class InfoDialog
 {
     private List<IBaseQuantityRecord> _parts = [];
+    private bool _partsExpanded;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
@@ -38,6 +39,8 @@ public partial class InfoDialog
     private string? Name => Record is not null ? Record.Name : Favorite?.Name;
 
     private string PartsLabel => Favorite is null ? "Components" : "Blueprints";
+
+    private string PartsCaretClass => _partsExpanded ? "panel-caret panel-caret-expanded" : "panel-caret";
 
     /// <summary>Opens the dialog for a category, component or blueprint picked from a list.</summary>
     public static Task<IDialogReference> ShowAsync(IDialogService dialogs, IBaseDataRecord record) =>

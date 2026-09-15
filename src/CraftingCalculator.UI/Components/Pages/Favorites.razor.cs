@@ -127,7 +127,7 @@ public partial class Favorites : ComponentBase, IDisposable
     }
 
     private string RowClass(BlueprintFavorite favorite) =>
-        _mode == ListMode.Delete && _selected.Contains(favorite.Id) ? "list-row-selected" : "";
+        _mode == ListMode.Delete && _selected.Contains(favorite.Id) ? "list-item-selected" : "";
 
     private async Task RenameAsync(BlueprintFavorite favorite)
     {

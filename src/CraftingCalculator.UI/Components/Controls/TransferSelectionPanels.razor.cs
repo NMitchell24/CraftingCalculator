@@ -18,8 +18,9 @@ public partial class TransferSelectionPanels : ComponentBase
 {
     private sealed record Row(RecordKey Key, string Name);
 
-    // Matches .transfer-row's height in app.css, which is fixed so Virtualize can position rows exactly.
-    private const float RowHeight = 48;
+    // Matches --transfer-row-height in app.css: a one-line row's height, which Virtualize takes as its estimate of
+    // every row, and the row's minimum, since a long name wraps and makes its row taller.
+    private const float RowHeight = 56;
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
@@ -37,6 +38,7 @@ public partial class TransferSelectionPanels : ComponentBase
 
     private DatasetSnapshot? _rowsFor;
     private Dictionary<RecordKind, List<Row>> _rows = [];
+    private readonly Dictionary<RecordKind, bool> _expanded = TransferRecordKinds.All.ToDictionary(panel => panel.Kind, _ => false);
 
     protected override void OnParametersSet()
     {
