@@ -65,7 +65,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// </summary>
     public string? LoadedFavoriteName { get; private set; }
 
-    /// <summary>Adds one of the blueprint to the batch, or raises its quantity by one when it is already there.</summary>
+    /// <summary>Adds a blueprint to the batch, or raises its quantity by one when it is already there.</summary>
     public void Add(BlueprintModel blueprint)
     {
         _blueprintMap.Add(blueprint, 1);
