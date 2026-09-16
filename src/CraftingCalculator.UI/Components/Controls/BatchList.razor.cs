@@ -31,9 +31,9 @@ public partial class BatchList : ComponentBase, IDisposable
 
     private bool IsBulkStep => StepSize > 1;
 
-    private string DecrementIcon => IsBulkStep ? Icons.Material.Filled.KeyboardDoubleArrowDown : Icons.Material.Filled.Remove;
+    private string DecrementIcon => IsBulkStep ? StepIcons.MinusTen : Icons.Material.Filled.Remove;
 
-    private string IncrementIcon => IsBulkStep ? Icons.Material.Filled.KeyboardDoubleArrowUp : Icons.Material.Filled.Add;
+    private string IncrementIcon => IsBulkStep ? StepIcons.PlusTen : Icons.Material.Filled.Add;
 
     // The stepper is what the mode actually changes, so it is also what announces the mode is on - the
     // actions bar's own highlight is off at the other end of the screen while the user is tapping here.

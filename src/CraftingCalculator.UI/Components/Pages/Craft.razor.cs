@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.Components.Controls;
 using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
@@ -31,15 +32,6 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     /// <summary>One tap of a batch row's + or - while the x10 mode is on, or of its own +10 / -10 buttons.</summary>
     private const long BulkStep = 10;
-
-    // Hand-rolled: Material's numbered icons stop at LooksTwo, and _10k draws "10K". A multiplication
-    // sign followed by the digits 1 and 0, drawn for MudBlazor's 24x24 icon viewBox.
-    // docs/help/assets/x10.svg wraps this same markup for the help pages.
-    private const string TimesTenIcon =
-        "<path d=\"M0 0h24v24H0z\" fill=\"none\"/>" +
-        "<path d=\"M8.5 9.21L7.8 8.5 5 11.3 2.21 8.5 1.5 9.21 4.3 12 1.5 14.8 2.21 15.5 5 12.71 7.8 15.5 8.5 14.8 5.71 12z\"/>" +
-        "<path d=\"M14 6h-1.4L10 8.4v1.7l2.6-1.9V18h1.4z\"/>" +
-        "<path d=\"M19 6a3.2 6 0 1 0 0 12 3.2 6 0 1 0 0-12zm0 2.4a1.6 3.6 0 1 1 0 7.2 1.6 3.6 0 1 1 0-7.2z\"/>";
 
     private CraftView _view = CraftView.Materials;
     private List<BlueprintFavorite> _favorites = [];
@@ -110,7 +102,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
         if (IsCompact)
         {
-            actions.Add(new PageAction("Step by 10", TimesTenIcon, ToggleStepSizeAsync,
+            actions.Add(new PageAction("Step by 10", StepIcons.TimesTen, ToggleStepSizeAsync,
                 Disabled: State.BlueprintQuantities.Count == 0, Active: _stepSize == BulkStep));
         }
 

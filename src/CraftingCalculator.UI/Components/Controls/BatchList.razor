@@ -27,7 +27,7 @@
                             <div class="record-row-stepper">
                                 @if (BulkStep is { } bulkDown)
                                 {
-                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardDoubleArrowDown" Size="Size.Medium"
+                                    <MudIconButton Icon="@StepIcons.MinusTen" Size="Size.Medium"
                                                    title="@BulkDecrementLabel" aria-label="@BulkDecrementLabel"
                                                    OnClick="@(() => State.Step(selected, -bulkDown))" />
                                 }
@@ -41,7 +41,7 @@
                                                OnClick="@(() => State.Step(selected, StepSize))" />
                                 @if (BulkStep is { } bulkUp)
                                 {
-                                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardDoubleArrowUp" Size="Size.Medium"
+                                    <MudIconButton Icon="@StepIcons.PlusTen" Size="Size.Medium"
                                                    title="@BulkIncrementLabel" aria-label="@BulkIncrementLabel"
                                                    OnClick="@(() => State.Step(selected, bulkUp))" />
                                 }
