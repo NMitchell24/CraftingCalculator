@@ -51,6 +51,26 @@ Two things worth knowing:
 The filter button is hidden entirely on lists where nothing is categorized, and on the Categories list
 itself, which would be a bit redundant.
 
+### Filters stick around
+
+Every list remembers its own filter. Say you're on Components with `Ores` ticked and you tap into Copper Ore to fix its
+cost. When you come back, the list is still showing just your ores. You don't have to tick them again.
+
+Each list keeps its own, and they don't share. That goes for the Blueprints list, the Components list, the picker you
+add requirements from in the blueprint editor, and the blueprint picker on the [Craft screen](craft-screen.md).
+Filtering the Craft picker down to `Weapons` leaves the Blueprints list alone. That's on purpose: the categories you
+care about while picking a batch usually aren't the ones you care about while cleaning up your dataset. The only 
+thing that might appear to share filters is the add requirements list when editing blueprints. This list is a shared 
+control that lives on every blueprint. So a filter you applied on one blueprint automatically applies on every 
+blueprint you edit. This is helpful if you need to edit several blueprints and make similar changes to each one.
+
+The search text doesn't stick. It clears when you leave, same as always.
+
+> **Note:** Filters last until you close the app. Open it again tomorrow and every list starts unfiltered.
+
+If a category you had ticked stops being in use, its chip goes away and the list stops filtering by it. Put something
+back in that category before you change that list's filter and the filter comes back with it.
+
 ## Naming schemes that work well
 
 Pick one axis and stay on it. Mixing several is what makes a dataset confusing. It's best to stay with categories 

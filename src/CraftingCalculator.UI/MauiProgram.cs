@@ -50,6 +50,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
         builder.Services.AddSingleton<IShareService, ShareService>();
 
+        builder.Services.AddScoped<CategoryFilterState>();
         builder.Services.AddScoped<CraftState>();
         builder.Services.AddScoped<ExportState>();
         builder.Services.AddScoped<ImportState>();

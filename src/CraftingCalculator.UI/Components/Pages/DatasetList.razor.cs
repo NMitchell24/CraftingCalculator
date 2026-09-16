@@ -94,6 +94,13 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private void OnFilterChanged(RecordFilter filter) => _filter = filter;
 
+    private static FilterList FilterListFor(DataType type) => type switch
+    {
+        DataType.Blueprint => FilterList.Blueprints,
+        DataType.Component => FilterList.Components,
+        _ => FilterList.Categories
+    };
+
     private static string TitleFor(DataType type) => type switch
     {
         DataType.Blueprint => "Blueprints",

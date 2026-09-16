@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 
 // MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
@@ -11,7 +12,8 @@ namespace CraftingCalculator.UI.Components.Controls;
 /// The search field and category filter shared by <see cref="Pages.DatasetList" />
 /// and <see cref="Dialogs.RecordPickerDialog" />. It owns the filter and raises
 /// <see cref="FilterChanged" />; the host applies it to its own records with
-/// <see cref="RecordFilterProcessor.Apply{T}" />.
+/// <see cref="RecordFilterProcessor.Apply{T}" />. The selected categories are remembered per
+/// <see cref="FilterList" /> for the app session; the search text is not.
 /// </summary>
 public partial class RecordSearchBar : ComponentBase
 {
@@ -26,6 +28,11 @@ public partial class RecordSearchBar : ComponentBase
 
     /// <summary>Raised whenever the search text or the selected categories change.</summary>
     [Parameter] public EventCallback<RecordFilter> FilterChanged { get; set; }
+
+    /// <summary>The list whose category selection this bar restores and remembers.</summary>
+    [Parameter, EditorRequired] public FilterList FilterList { get; set; }
+
+    [Inject] private CategoryFilterState CategoryFilterState { get; set; } = null!;
 
     private RecordFilter _filter = RecordFilter.Empty;
 
@@ -56,9 +63,13 @@ public partial class RecordSearchBar : ComponentBase
         // Records change as the user edits, so a selected category can stop being offered - the last
         // record in it is recategorized, or the category itself is deleted. The stale id would go on
         // filtering with no chip left to explain why, so it is dropped and the host re-notified.
-        RecordFilter pruned = RecordFilterProcessor.Prune(_filter, Records);
+        // The remembered selection is pruned rather than _filter: DatasetList renders this bar with no
+        // Records while it loads, and pruning _filter against that would lose the selection before the
+        // records arrive.
+        RecordFilter pruned = RecordFilterProcessor.Prune(
+            _filter with { CategoryIds = CategoryFilterState.Get(FilterList) }, Records);
 
-        if (!ReferenceEquals(pruned, _filter))
+        if (!pruned.CategoryIds.SetEquals(_filter.CategoryIds))
         {
             _filter = pruned;
             await FilterChanged.InvokeAsync(_filter);
@@ -73,14 +84,20 @@ public partial class RecordSearchBar : ComponentBase
         SetFilterAsync(_filter with { Search = search ?? "" });
 
     private Task OnCategoriesChangedAsync(IReadOnlyCollection<int>? categoryIds) =>
-        SetFilterAsync(_filter with { CategoryIds = new HashSet<int>(categoryIds ?? []) });
+        SetCategoriesAsync(new HashSet<int>(categoryIds ?? []));
 
     private Task RemoveAsync(int categoryId)
     {
         HashSet<int> remaining = [.. _filter.CategoryIds];
         remaining.Remove(categoryId);
 
-        return SetFilterAsync(_filter with { CategoryIds = remaining });
+        return SetCategoriesAsync(remaining);
+    }
+
+    private Task SetCategoriesAsync(IReadOnlySet<int> categoryIds)
+    {
+        CategoryFilterState.Set(FilterList, categoryIds);
+        return SetFilterAsync(_filter with { CategoryIds = categoryIds });
     }
 
     private async Task SetFilterAsync(RecordFilter filter)

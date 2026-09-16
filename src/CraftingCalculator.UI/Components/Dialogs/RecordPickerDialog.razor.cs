@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -21,6 +22,9 @@ public partial class RecordPickerDialog : ComponentBase
 
     /// <summary>Where picked records go.</summary>
     [Parameter, EditorRequired] public IRecordPickerTarget Target { get; set; } = null!;
+
+    /// <summary>The list whose category filter the dialog restores and remembers.</summary>
+    [Parameter, EditorRequired] public FilterList FilterList { get; set; }
 
     private RecordFilter _filter = RecordFilter.Empty;
 

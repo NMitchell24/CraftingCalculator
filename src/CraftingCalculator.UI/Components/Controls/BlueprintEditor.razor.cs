@@ -3,6 +3,7 @@ using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
+using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -46,7 +47,8 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
         {
             { dialog => dialog.Title, "Add requirements" },
             { dialog => dialog.Records, [.. components.Concat(blueprints).OrderBy(record => record.Name, StringComparer.CurrentCultureIgnoreCase)] },
-            { dialog => dialog.Target, this }
+            { dialog => dialog.Target, this },
+            { dialog => dialog.FilterList, FilterList.RequirementsPicker }
         };
 
         await DialogService.ShowAsync<RecordPickerDialog>("Add requirements", parameters, options);

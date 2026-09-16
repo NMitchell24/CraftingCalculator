@@ -184,7 +184,8 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
         {
             { dialog => dialog.Title, "Add blueprints" },
             { dialog => dialog.Records, blueprints },
-            { dialog => dialog.Target, this }
+            { dialog => dialog.Target, this },
+            { dialog => dialog.FilterList, FilterList.CraftPicker }
         };
 
         await DialogService.ShowAsync<RecordPickerDialog>("Add blueprints", parameters, options);
