@@ -56,9 +56,9 @@ public static class FavoritePrompts
         {
             bool? update = await ConfirmDialog.ChooseAsync(
                 dialogs,
-                "Update or Create New?",
+                "Update or create new?",
                 $"Would you like to update '{loaded}' or create a new favorite?",
-                confirmText: "Update", alternativeText: "Create New");
+                confirmText: "Update", alternativeText: "Create new");
 
             if (update is null)
             {
@@ -91,7 +91,7 @@ public static class FavoritePrompts
     private static async Task<string?> PromptForNewNameAsync(IDialogService dialogs, CraftState state)
     {
         DialogParameters parameters = new() { ["Label"] = "Favorite name", ["ConfirmText"] = "Save" };
-        IDialogReference dialogRef = await dialogs.ShowAsync<TextInputDialog>("Save as Favorite", parameters);
+        IDialogReference dialogRef = await dialogs.ShowAsync<TextInputDialog>("Save as favorite", parameters);
         DialogResult? result = await dialogRef.Result;
 
         if (result is null or { Canceled: true } || result.Data is not string entered || string.IsNullOrWhiteSpace(entered))

@@ -129,7 +129,10 @@ public partial class DatasetList : ComponentBase, IDisposable
         bool empty = _records.Count == 0;
         _shellCompact = IsCompact;
 
-        List<PageAction> actions = [new($"New {_type.GetDescription()}", Icons.Material.Filled.Add, CreateNewAsync)];
+        // TitleFor and DataType's description name the screen, where they are capitalized; an action label is a
+        // sentence, where they are not.
+        List<PageAction> actions =
+            [new($"New {_type.GetDescription().ToLowerInvariant()}", Icons.Material.Filled.Add, CreateNewAsync)];
 
         if (IsCompact)
         {
@@ -143,7 +146,7 @@ public partial class DatasetList : ComponentBase, IDisposable
         actions.Add(new PageAction("Delete", Icons.Material.Filled.Delete, ToggleDeleteModeAsync,
             Disabled: empty, Active: _mode == ListMode.Delete,
             OnLongPress: _mode == ListMode.Delete ? ExitDeleteModeAsync : null));
-        actions.Add(new PageAction($"Delete all {TitleFor(_type)}", Icons.Material.Filled.DeleteForever,
+        actions.Add(new PageAction($"Delete all {TitleFor(_type).ToLowerInvariant()}", Icons.Material.Filled.DeleteForever,
             DeleteAllAsync, Disabled: empty));
 
         PageShellState.Configure(this, new PageShellConfig(TitleFor(_type))

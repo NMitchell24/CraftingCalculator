@@ -24,7 +24,7 @@ Build your batch on the [Craft screen](craft-screen.md), then tap ![Save as favo
 - If you built the batch fresh, you're asked for a name.
 - If that name is already taken, you're asked whether to overwrite it.
 - If you *loaded* a favorite and then changed it, you get a three-way choice: **Update** the one you
-  loaded, **Create New** under a different name, or **Cancel**.
+  loaded, **Create new** under a different name, or **Cancel**.
 
 > **Tip:** Do you have similar batches for different tiers of gear or different quantities for the same blueprints? 
 > Load one, bump a couple of quantities and/or add a few extra blueprints and then save as a new favorite.

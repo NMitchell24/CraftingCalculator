@@ -86,9 +86,14 @@ public static class DatasetPrompts
         // from every blueprint that used it, and a deleted blueprint from every favorite as well.
         string alsoFavorites = record.Type == DataType.Blueprint ? "or blueprint favorites " : "";
 
+        // Lowercased here rather than at the source: DataType's description and DatasetList's plurals double as
+        // page titles ("Blueprints"), where they are capitalized. Inside a sentence, which a dialog title is, they
+        // are not.
+        string noun = record.Type.GetDescription().ToLowerInvariant();
+
         return ConfirmDialog.ConfirmAsync(
             dialogs,
-            $"Delete {record.Type.GetDescription()}?",
+            $"Delete {noun}?",
             $"'{record.Name}' will be deleted forever and removed from any blueprints {alsoFavorites}where it is used.",
             "Delete", Color.Error);
     }
@@ -123,10 +128,13 @@ public static class DatasetPrompts
     {
         string alsoFavorites = type == DataType.Blueprint ? "or blueprint favorites " : "";
 
+        // See ConfirmDeleteAsync: the caller's noun is the one the shell shows as a page title.
+        string counted = $"{count} {noun.ToLowerInvariant()}";
+
         return ConfirmDialog.ConfirmAsync(
             dialogs,
-            $"Delete {count} {noun}?",
-            $"{count} {noun} will be deleted forever and removed from any blueprints {alsoFavorites}where they are used.",
+            $"Delete {counted}?",
+            $"{counted} will be deleted forever and removed from any blueprints {alsoFavorites}where they are used.",
             "Delete", Color.Error);
     }
 }

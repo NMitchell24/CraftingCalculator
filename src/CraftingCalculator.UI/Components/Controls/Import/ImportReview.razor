@@ -17,11 +17,11 @@
                              SelectionChanged="SelectionChanged" />
     <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="transfer-action"
                StartIcon="@Icons.Material.Filled.Input" Disabled="@(!ImportState.CanImport)" OnClick="OnImport">
-        Import Data
+        Import data
     </MudButton>
     <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Class="transfer-action"
                StartIcon="@Icons.Material.Filled.FileOpen" OnClick="ImportState.PickFileAsync">
-        Choose Another File
+        Choose another file
     </MudButton>
     <MudButton Variant="Variant.Text" FullWidth="true" Class="transfer-action" OnClick="ImportState.Reset">
         Cancel

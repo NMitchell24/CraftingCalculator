@@ -108,7 +108,7 @@ public partial class Export : ComponentBase, IDisposable
             ShowBack = true,
             Actions =
             [
-                new PageAction("Export Data", Icons.Material.Filled.Output, ExportAsync, Disabled: !CanExport),
+                new PageAction("Export data", Icons.Material.Filled.Output, ExportAsync, Disabled: !CanExport),
                 new PageAction("Share", Icons.Material.Filled.Share, ShareAsync,
                     Disabled: ExportState.Latest is null || ExportState.IsRunning)
             ]

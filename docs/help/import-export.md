@@ -19,7 +19,7 @@ It's two big cards and not much else. **Export Data** gets your records out, and
 This saves records from the dataset you're in to a file. Keep it as a backup, move it to your PC, or hand it to a
 friend who's starting the same game.
 
-The screen opens with **everything selected**. If a full backup is all you're after, tap **Export Data** and you're
+The screen opens with **everything selected**. If a full backup is all you're after, tap **Export data** and you're
 done.
 
 ### Picking what goes out
@@ -72,7 +72,7 @@ along with whatever they need. It's the quick way to export just your `Tools` an
 
 ### Exporting
 
-Tap **Export Data**, either the big button under the panels or the ![Export Data](assets/output.svg) action. It
+Tap **Export data**, either the big button under the panels or the ![Export data](assets/output.svg) action. It
 grays out when nothing's selected, and while an export is already running.
 
 The export runs in the background. You'll see "Building your export…" under the button, but you don't have to sit
@@ -117,7 +117,7 @@ app. Nothing lands in your data until you've seen what's in the file and said wh
 
 ### Picking a file
 
-The screen opens on **Step 1: Select a file**. Tap **Select Import File** in that card and your device's file picker
+The screen opens on **Step 1: Select a file**. Tap **Select import file** in that card and your device's file picker
 opens.
 
 - **Windows:** it only shows `.ccdata` files. Your own exports are in the folder the latest export card shows.
@@ -136,7 +136,7 @@ and "Validating file…" while it checks. You don't have to sit and wait for eit
 ### "This file can't be imported"
 
 If something about the file is off, the Step 1 card says so and lists every problem the app found, not just the first.
-Nothing was imported. Tap **Choose Another File** to try again, or **Cancel** to clear the list and put the card back
+Nothing was imported. Tap **Choose another file** to try again, or **Cancel** to clear the list and put the card back
 the way it started. Here are the usual suspects.
 
 #### "It says this isn't a Crafting Calculator export file"
@@ -173,9 +173,9 @@ Under the card, the screen looks just like [Export Data](import-export.md#export
 everything selected, and the same rules about what comes along with what. Deselect Copper and it still asks before it
 takes the Bronze Axe with it.
 
-When you're happy with it, tap **Import Data**, either the big button under the panels or the
-![Import Data](assets/input.svg) action. Wrong file after all? **Choose Another File**, either the button under
-**Import Data** or the ![Choose Another File](assets/file-open.svg) action, starts over with a different one. Not
+When you're happy with it, tap **Import data**, either the big button under the panels or the
+![Import data](assets/input.svg) action. Wrong file after all? **Choose another file**, either the button under
+**Import data** or the ![Choose another file](assets/file-open.svg) action, starts over with a different one. Not
 importing anything today? **Cancel**, at the very bottom, drops the file and takes you back to Step 1.
 
 More detail on the panels: [Picking what goes out](import-export.md#picking-what-goes-out).
@@ -202,11 +202,11 @@ while it looks. If nothing clashes, everything goes straight in.
 If something does, you land on **Step 3: Resolve conflicts**. The card tells you how many of each kind clash and gives
 you three ways to deal with them:
 
-- **Keep Mine:** your records stay exactly as they are, and anything from the file that used its own version uses
+- **Keep mine:** your records stay exactly as they are, and anything from the file that used its own version uses
   yours instead.
-- **Replace Mine:** the file's version overwrites yours: its values, its category and, for a blueprint, its recipe.
+- **Replace mine:** the file's version overwrites yours: its values, its category and, for a blueprint, its recipe.
   Everything of yours that used the old one keeps using it. It just has the new numbers now.
-- **Choose Each:** takes you to **Step 4: Select records to replace**, where you pick them one at a time.
+- **Choose each:** takes you to **Step 4: Select records to replace**, where you pick them one at a time.
 
 Records that don't clash are added whichever one you pick. Changed your mind? **Cancel** takes you back to picking
 records.
@@ -223,8 +223,8 @@ when some of it is, and ![None selected](assets/check-circle-outline.svg) when n
 every component but only a couple of its blueprints? Tap the Components button, then pick your blueprints one at a
 time. Nothing here picks anything you didn't ask for.
 
-When you're done, tap **Import Selected**, either the big button under the panels or the
-![Import Selected](assets/input.svg) action. **Cancel** under it takes you back to picking records, and your picks
+When you're done, tap **Import selected**, either the big button under the panels or the
+![Import selected](assets/input.svg) action. **Cancel** under it takes you back to picking records, and your picks
 start over the next time you choose each.
 
 **Example:**

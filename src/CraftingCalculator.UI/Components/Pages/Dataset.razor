@@ -57,7 +57,7 @@
                     </div>
                     <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
                                    OnClick="@(() => OpenList(section.Type))"
-                                   title="@($"Edit {section.Title}")" aria-label="@($"Edit {section.Title}")" />
+                                   title="@EditLabel(section)" aria-label="@EditLabel(section)" />
                 </div>
             </MudPaper>
         </div>

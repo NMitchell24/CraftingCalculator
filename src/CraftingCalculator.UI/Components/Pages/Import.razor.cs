@@ -52,10 +52,10 @@ public partial class Import : ComponentBase, IDisposable
             {
                 ImportStep.Review =>
                 [
-                    new PageAction("Import Data", Icons.Material.Filled.Input, ImportDataAsync, Disabled: !ImportState.CanImport),
-                    new PageAction("Choose Another File", Icons.Material.Filled.FileOpen, ImportState.PickFileAsync)
+                    new PageAction("Import data", Icons.Material.Filled.Input, ImportDataAsync, Disabled: !ImportState.CanImport),
+                    new PageAction("Choose another file", Icons.Material.Filled.FileOpen, ImportState.PickFileAsync)
                 ],
-                ImportStep.ResolveConflicts => [new PageAction("Import Selected", Icons.Material.Filled.Input, ImportSelectedAsync)],
+                ImportStep.ResolveConflicts => [new PageAction("Import selected", Icons.Material.Filled.Input, ImportSelectedAsync)],
                 _ => []
             }
         });
@@ -89,14 +89,14 @@ public partial class Import : ComponentBase, IDisposable
         // Neither label names the dataset; the message above them does.
         bool? choice = await ConfirmDialog.ChooseAsync(
             DialogService,
-            "Import Data",
+            "Import data",
             $"Add it to '{datasetName}', or make a new dataset?",
             confirmText: "As new dataset", alternativeText: "Into this dataset");
 
         if (choice == true)
         {
             string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-                DialogService, DatasetService, "Import as New Dataset", "Create", snapshot.DatasetName.Trim());
+                DialogService, DatasetService, "Import as new dataset", "Create", snapshot.DatasetName.Trim());
 
             if (name is not null)
             {

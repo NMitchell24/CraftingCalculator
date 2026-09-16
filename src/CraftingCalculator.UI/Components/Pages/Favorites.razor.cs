@@ -141,7 +141,7 @@ public partial class Favorites : ComponentBase, IDisposable
             ["ConfirmText"] = "Rename"
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Rename Favorite", parameters);
+        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Rename favorite", parameters);
         DialogResult? result = await dialogRef.Result;
 
         if (result is null or { Canceled: true } || result.Data is not string name
