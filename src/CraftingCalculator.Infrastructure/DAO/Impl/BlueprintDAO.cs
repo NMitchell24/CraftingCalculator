@@ -161,7 +161,7 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
         foreach (BlueprintChild blueprintChild in graph.ChildrenByParentId[entity.Id])
         {
             // Dropping a child that is already an ancestor is what keeps a cyclic row set loadable.
-            // AddPartsDialog never offers an ancestor as a child, so nothing can write one now,
+            // The Add requirements picker never offers an ancestor as a child, so nothing can write one now,
             // but a database filled in before that could - and recursing into it threw out of every
             // screen that reads a blueprint, which left the whole app unusable.
             if (graph.BlueprintsById.TryGetValue(blueprintChild.ChildBlueprintId, out Blueprint? childEntity)

@@ -7,7 +7,7 @@ using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
 
-public partial class Craft : ComponentBase, IDisposable
+public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 {
     private enum CraftView
     {
@@ -24,6 +24,7 @@ public partial class Craft : ComponentBase, IDisposable
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IClipboardService ClipboardService { get; set; } = null!;
     [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
+    [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
 
     /// <summary>One tap of a batch row's + or - in the normal mode.</summary>
     private const long SingleStep = 1;
@@ -50,7 +51,7 @@ public partial class Craft : ComponentBase, IDisposable
     private bool? _shellCompact;
 
     // Drives the x10 mode (compact keeps it on the shell; wider viewports put +10 / -10 on every row
-    // instead) and the Add Blueprints dialog's FullScreen choice. The pane layout itself is a pure CSS
+    // instead) and the blueprint picker's FullScreen choice. The pane layout itself is a pure CSS
     // media query (app.css), since it needs both width and height to tell a landscape phone apart from a
     // real tablet.
     private bool IsCompact => Breakpoint == Breakpoint.Xs;
@@ -169,6 +170,8 @@ public partial class Craft : ComponentBase, IDisposable
 
     private async Task OpenPickerAsync()
     {
+        List<BlueprintModel> blueprints = await BlueprintService.GetAllBlueprintsAsync();
+
         DialogOptions options = new()
         {
             FullScreen = IsCompact,
@@ -176,13 +179,37 @@ public partial class Craft : ComponentBase, IDisposable
             CloseOnEscapeKey = true
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<BlueprintPickerDialog>("Select blueprints to craft", options);
-        DialogResult? result = await dialogRef.Result;
-
-        if (result is { Canceled: false } && result.Data is IReadOnlyCollection<BlueprintModel> selected)
+        // Every pick goes straight into the batch through this page, so there is no result to await.
+        DialogParameters<RecordPickerDialog> parameters = new()
         {
-            State.AddBlueprints(selected);
-        }
+            { dialog => dialog.Title, "Add blueprints" },
+            { dialog => dialog.Records, blueprints },
+            { dialog => dialog.Target, this }
+        };
+
+        await DialogService.ShowAsync<RecordPickerDialog>("Add blueprints", parameters, options);
+    }
+
+    // The picker lists only blueprints and is only handed entries Find returned, so the casts below cannot fail.
+    public IBaseQuantityRecord? Find(IBaseDataRecord record) =>
+        State.BlueprintQuantities.FirstOrDefault(entry => entry.Name == record.Name);
+
+    public Task AddAsync(IBaseDataRecord record)
+    {
+        State.Add((BlueprintModel)record);
+        return Task.CompletedTask;
+    }
+
+    public Task StepAsync(IBaseQuantityRecord entry, long step)
+    {
+        State.Step((BlueprintQuantity)entry, step);
+        return Task.CompletedTask;
+    }
+
+    public Task SetQuantityAsync(IBaseQuantityRecord entry, long quantity)
+    {
+        State.SetQuantity((BlueprintQuantity)entry, quantity);
+        return Task.CompletedTask;
     }
 
     private Task ClearBatchAsync()

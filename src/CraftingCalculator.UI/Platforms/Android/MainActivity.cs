@@ -2,7 +2,9 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using AndroidX.Activity;
 using AndroidX.Core.View;
+using CraftingCalculator.UI.State;
 
 namespace CraftingCalculator.UI;
 
@@ -13,6 +15,9 @@ namespace CraftingCalculator.UI;
 [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, WindowSoftInputMode = SoftInput.AdjustResize, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 public class MainActivity : MauiAppCompatActivity
 {
+    private BackButtonState _backButtonState = null!;
+    private BackButtonCallback _backCallback = null!;
+
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -25,5 +30,37 @@ public class MainActivity : MauiAppCompatActivity
         {
             WindowCompat.SetDecorFitsSystemWindows(Window, false);
         }
+
+        _backButtonState = IPlatformApplication.Current!.Services.GetRequiredService<BackButtonState>();
+        _backCallback = new BackButtonCallback(_backButtonState);
+        _backButtonState.Changed += OnBackButtonChanged;
+        OnBackButtonChanged();
+    }
+
+    protected override void OnDestroy()
+    {
+        _backButtonState.Changed -= OnBackButtonChanged;
+        _backCallback.Remove();
+
+        base.OnDestroy();
+    }
+
+    private void OnBackButtonChanged()
+    {
+        // The dispatcher asks the most recently added enabled callback first. BlazorWebView adds its own in
+        // ConnectHandler, after OnCreate, and enables it whenever the WebView can go back, so a callback added once
+        // here would lose to it on every page but the root. Re-adding this one each time a handler is set puts it in
+        // front; removing it the rest of the time leaves back entirely to MAUI.
+        _backCallback.Remove();
+
+        if (_backButtonState.Handler is not null)
+        {
+            OnBackPressedDispatcher.AddCallback(this, _backCallback);
+        }
+    }
+
+    internal sealed class BackButtonCallback(BackButtonState state) : OnBackPressedCallback(true)
+    {
+        public override void HandleOnBackPressed() => state.Handler?.Invoke();
     }
 }

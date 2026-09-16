@@ -44,6 +44,7 @@ public static class MauiProgram
         builder.Services.AddDatabaseServices(GetDatabasePath());
         builder.Services.AddExportFileServices(GetExportsPath());
 
+        builder.Services.AddSingleton<BackButtonState>();
         builder.Services.AddSingleton<IClipboardService, ClipboardService>();
         builder.Services.AddSingleton<IImportFilePicker, ImportFilePicker>();
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();

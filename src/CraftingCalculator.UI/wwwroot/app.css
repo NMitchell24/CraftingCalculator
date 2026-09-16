@@ -809,8 +809,8 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* The floor is the stepper's own width - two Size.Medium icon buttons (48px each) around the quantity
-   input (4.5ch of its subtitle1 face, about 5ch of the row's body face) - so that AddPartsDialog's Add
-   button, which stands in for the stepper on a part the blueprint does not use yet, holds the same
+   input (4.5ch of its subtitle1 face, about 5ch of the row's body face) - so that RecordPickerDialog's Add
+   button, which stands in for the stepper on a record its target does not hold yet, holds the same
    width. The .record-row-meta stacking rule turns on the trailing cell's width, and a list where some
    rows show Add and others the stepper would otherwise stack the one and not the other. */
 .record-row-stepper {
@@ -1407,7 +1407,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 
 /* The bar parks at the top of whichever scrollport it is in and the rows scroll underneath - which is
    why it needs an opaque background of its own. Both hosts are listed because neither selector covers
-   the other: the Dataset list scrolls the document, BlueprintPickerDialog scrolls its own dialog
+   the other: the Dataset list scrolls the document, RecordPickerDialog scrolls its own dialog
    content, and the offset and surface colour differ with it. */
 .dataset-page .record-search,
 .picker-dialog-content .record-search {
@@ -1424,7 +1424,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     background-color: var(--mud-palette-background);
 }
 
-/* Components/Dialogs/BlueprintPickerDialog.razor, whose scrollport is its own .mud-dialog-content.
+/* Components/Dialogs/RecordPickerDialog.razor, whose scrollport is its own .mud-dialog-content.
    Sticky offsets are measured from the scroll container's content box, so MudBlazor's 8px padding-top
    on that element would hold the bar 8px clear of the top edge and let the rows scroll through the
    gap. Moving that padding onto the bar itself parks it flush against the edge and keeps the same
@@ -1537,11 +1537,10 @@ html.keyboard-open .mud-snackbar-location-bottom-center {
     max-height: calc(100dvh - 32px);
 }
 
-/* BlueprintPickerDialog and AddPartsDialog wherever they are a centered card rather than full-screen. Sized by
-   its content, a picker changed height, and MudBlazor re-centered it, on every keystroke in its search field. A
-   fixed height holds it still: .mud-dialog is a flex column, so the content takes what the title and buttons
-   leave at any text size and scrolls the list, or its "No ... match" line, inside that. Matched through the
-   ContentClass both pickers carry. 720px keeps a picker from becoming a wall of rows on a desktop monitor; below
+/* RecordPickerDialog wherever it is a centered card rather than full-screen. Sized by its content, the picker
+   changed height, and MudBlazor re-centered it, on every keystroke in its search field. A fixed height holds it
+   still: .mud-dialog is a flex column, so the content takes what the title leaves at any text size and scrolls
+   the list, or its "Nothing matches" line, inside that. Matched through the picker's ContentClass. 720px keeps a picker from becoming a wall of rows on a desktop monitor; below
    that it takes all the height the rule above allows, which on a landscape phone is all there is. */
 .mud-dialog:not(.mud-dialog-fullscreen):has(.picker-dialog-content) {
     height: min(720px, calc(100dvh - 32px));
@@ -1575,7 +1574,7 @@ html.keyboard-open .mud-dialog-container {
     letter-spacing: 0.02em;
 }
 
-/* A FullScreen MudDialog (BlueprintPickerDialog on xs - Components/Dialogs/BlueprintPickerDialog.razor)
+/* A FullScreen MudDialog (RecordPickerDialog on xs - Components/Dialogs/RecordPickerDialog.razor)
    draws from y=0 same as the app bar, so its title needs the same safe-area clearance. A normal
    (non-fullscreen) dialog is centered with margin and never reaches the real top of the screen, so
    this is scoped to .mud-dialog-fullscreen only. */
@@ -1583,35 +1582,25 @@ html.keyboard-open .mud-dialog-container {
     padding-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
 }
 
-.mud-dialog-fullscreen .mud-dialog-title .mud-button-close {
-    top: calc(8px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
-}
-
-/* Same reasoning as the title above, for the bottom action bar (Cancel/Confirm) - it otherwise sits
-   flush against the gesture nav bar's swipe area. */
-.mud-dialog-fullscreen .mud-dialog-actions {
-    padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
-}
-
-/* Components/Dialogs/AddPartsDialog.razor. Close and the title share the title row, and the title takes the
+/* Components/Dialogs/RecordPickerDialog.razor. Close and the title share the title row, and the title takes the
    slack. At the largest text sizes the title wraps to two lines. The title spans a second 1fr row: an item that
    crosses a flexible track grows only that track, so the first row stays as tall as Close and Close centers in
    it. No column gap: the button already pads itself. */
-.add-parts-title {
+.picker-dialog-title {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     align-items: center;
 }
 
-.add-parts-title > .mud-button-root {
+.picker-dialog-title > .mud-button-root {
     grid-row: 1;
 }
 
 /* Stretched over both rows with its text centered, so a one-line title still lines up with the buttons.
    overflow-wrap is the guard for a word wider than the column: horizontal overflow on Android widens the layout
    viewport and slides the fixed bars. */
-.add-parts-title-text {
+.picker-dialog-title-text {
     grid-row: 1 / span 2;
     align-self: stretch;
     display: flex;

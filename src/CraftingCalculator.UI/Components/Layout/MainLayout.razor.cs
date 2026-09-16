@@ -18,6 +18,8 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
     [Inject] private IBrowserViewportService ViewportService { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private BackButtonState BackButtonState { get; set; } = null!;
 
     /// <summary>One of the app's top-level destinations in the side rail and the bottom nav.</summary>
     private sealed record Destination(string Label, string Route, string Icon, NavLinkMatch Match);
@@ -59,6 +61,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
     private bool _unwinding;
+
+    // Every dialog on screen, the top one last.
+    private readonly List<IDialogReference> _openDialogs = [];
 
     // Below Sm, a fixed side rail costs too much horizontal space - the bottom nav takes over.
     // Neither renders while _breakpoint is null; the layout stays chrome-free for that one frame
@@ -130,6 +135,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     {
         PageShellState.Changed += StateHasChanged;
         ThemeState.Changed += OnThemeChanged;
+        DialogService.DialogInstanceAddedAsync += OnDialogOpenedAsync;
 
         // An absent or unrecognized stored value leaves the drawer expanded.
         bool.TryParse(PreferenceStore.Get(DrawerCollapsedKey), out _drawerCollapsed);
@@ -163,6 +169,34 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         await ApplyThemeAsync();
         StateHasChanged();
     });
+
+    private Task OnDialogOpenedAsync(IDialogReference dialog)
+    {
+        _openDialogs.Add(dialog);
+        BackButtonState.SetHandler(CloseTopDialog);
+
+        // Not awaited: ShowAsync awaits this handler, so waiting here for the dialog to close would hold ShowAsync open.
+        _ = ForgetWhenClosedAsync(dialog);
+        return Task.CompletedTask;
+    }
+
+    // Result completes however the dialog closes. OnDialogCloseRequested would miss MudDialogProvider dismissing a
+    // dialog on navigation, which completes Result without raising it, and back would then close nothing.
+    private async Task ForgetWhenClosedAsync(IDialogReference dialog)
+    {
+        await dialog.Result;
+        _openDialogs.Remove(dialog);
+
+        if (_openDialogs.Count == 0)
+        {
+            BackButtonState.SetHandler(null);
+        }
+    }
+
+    // Back cancels the top dialog, which is what Escape does to every dialog in the app (CloseOnEscapeKey on the
+    // MudDialogProvider in MainLayout.razor). Back arrives from platform code rather than a Blazor event handler, and closing re-renders
+    // MudDialogProvider, so the close goes through InvokeAsync.
+    private void CloseTopDialog() => _ = InvokeAsync(() => DialogService.Close(_openDialogs[^1], DialogResult.Cancel()));
 
     private async Task ApplyThemeAsync()
     {
@@ -327,6 +361,8 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     {
         PageShellState.Changed -= StateHasChanged;
         ThemeState.Changed -= OnThemeChanged;
+        DialogService.DialogInstanceAddedAsync -= OnDialogOpenedAsync;
+        BackButtonState.SetHandler(null);
 
         // Fire and forget: IDisposable cannot await, and the subscription only holds a JS listener -
         // nothing downstream depends on the unsubscribe having completed.

@@ -112,7 +112,7 @@ steps at the forge for Bronze, and then a final step for the Axe itself.
 
 1. Tap ![Craft](assets/calculate.svg) **Craft** in the navigation bar.
 2. Tap **Craft blueprint**, or the ![Add](assets/add.svg) action.
-3. Tick `Bronze Axe` and confirm.
+3. Tap ![Add](assets/add.svg) **Add** on `Bronze Axe`, then ![Close](assets/close.svg) **Close**.
 4. Use the ![Plus](assets/add.svg) stepper to set the quantity to 3.
 
 Look at the **Components** list. There is your farming trip (or shopping list if you can't be bothered to actually 

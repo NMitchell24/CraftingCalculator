@@ -19,8 +19,11 @@ Your batch. AKA, the list of things you want to craft in your game.
 
 **To add something**, tap **Craft blueprint** in the middle of the empty card, or the ![Add](assets/add.svg) action. 
 A picker opens with every blueprint in your Dataset. Search it, 
-[filter it by category](categories.md#filtering-by-category), tick as many as you like, then confirm. Once finished,
-everything you selected drops into your batch with a quantity of 1.
+[filter it by category](categories.md#filtering-by-category), and tap ![Add](assets/add.svg) **Add** on anything you
+want to build. It drops straight into your batch with a quantity of 1, and its row swaps **Add** for
+![Minus](assets/remove.svg), a number you can edit, and ![Plus](assets/add.svg), so you can set the quantity without
+leaving the picker. There's no confirm step. Tap ![Close](assets/close.svg) **Close** in the top corner when you're done,
+or use your phone's back gesture.
 
 **Each row in the batch gives you:**
 

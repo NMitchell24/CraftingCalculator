@@ -1,48 +1,51 @@
-@* No DialogActions: every tap applies to the blueprint as it happens, so there is nothing to confirm and Close
-   is the only way out. It sits in the title, the one edge of a full-screen dialog the on-screen keyboard never
-   covers. The search bar is sticky inside the dialog content, the same hook BlueprintPickerDialog uses (app.css). *@
+@* No DialogActions: every tap applies to the Target as it happens, so there is nothing to confirm and Close is the
+   only way out. It sits in the title, the one edge of a full-screen dialog the on-screen keyboard never covers. The
+   search bar is sticky inside the dialog content (app.css). *@
 <MudDialog ContentClass="picker-dialog-content">
     <TitleContent>
-        <div class="add-parts-title">
+        <div class="picker-dialog-title">
             <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Close" aria-label="Close" />
-            <MudText Typo="Typo.h6" Class="add-parts-title-text">Add requirements</MudText>
+            <MudText Typo="Typo.h6" Class="picker-dialog-title-text">@Title</MudText>
         </div>
     </TitleContent>
     <DialogContent>
-        <RecordSearchBar Records="_candidates" FilterChanged="OnFilterChanged" />
+        <RecordSearchBar Records="Records" FilterChanged="OnFilterChanged" />
 
-        @if (FilteredCandidates.Count == 0)
+        @if (FilteredRecords.Count == 0)
         {
-            <MudText Class="pa-4" Align="Align.Center">No requirements match.</MudText>
+            <MudText Class="pa-4" Align="Align.Center">Nothing matches.</MudText>
         }
         else
         {
             <MudList T="IBaseDataRecord" Class="record-list">
-                @foreach (IBaseDataRecord candidate in FilteredCandidates)
+                @foreach (IBaseDataRecord record in FilteredRecords)
                 {
                     <MudListItem T="IBaseDataRecord" Ripple="false">
                         <div class="record-row">
                             <div class="record-row-name">
-                                <MudText>@candidate.Name</MudText>
-                                <MudText Typo="Typo.caption" Class="record-row-caption">@candidate.Type.GetDescription()</MudText>
+                                <MudText>@record.Name</MudText>
+                                @if (_showType)
+                                {
+                                    <MudText Typo="Typo.caption" Class="record-row-caption">@record.Type.GetDescription()</MudText>
+                                }
                             </div>
-                            <div class="record-row-meta"><CategoryChip Record="@candidate" /></div>
+                            <div class="record-row-meta"><CategoryChip Record="@record" /></div>
                             @* index.html stops a tap on these buttons from taking focus off the search field, so
                                the keyboard stays up between searches. *@
                             <div class="record-row-end record-row-stepper">
-                                @if (BlueprintPartProcessor.FindPart(Blueprint, candidate) is { } part)
+                                @if (Target.Find(record) is { } entry)
                                 {
                                     <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" aria-label="Less"
-                                                   OnClick="@(() => StepAsync(part, -1))" />
-                                    <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
+                                                   OnClick="@(() => Target.StepAsync(entry, -1))" />
+                                    <MudNumericField T="long" Value="entry.Quantity" ValueChanged="@(v => Target.SetQuantityAsync(entry, v))"
                                                      Min="0" DebounceInterval="300" HideSpinButtons="true" Class="record-row-qty-field" />
                                     <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" aria-label="More"
-                                                   OnClick="@(() => StepAsync(part, 1))" />
+                                                   OnClick="@(() => Target.StepAsync(entry, 1))" />
                                 }
                                 else
                                 {
                                     <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
-                                               OnClick="@(() => AddAsync(candidate))">Add</MudButton>
+                                               OnClick="@(() => Target.AddAsync(record))">Add</MudButton>
                                 }
                             </div>
                         </div>

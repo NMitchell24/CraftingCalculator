@@ -8,8 +8,8 @@ using Color = MudBlazor.Color;
 namespace CraftingCalculator.UI.Components.Controls;
 
 /// <summary>
-/// The search field and category filter shared by <see cref="Pages.DatasetList" />,
-/// <see cref="Dialogs.BlueprintPickerDialog" /> and <see cref="Dialogs.AddPartsDialog" />. It owns the filter and raises
+/// The search field and category filter shared by <see cref="Pages.DatasetList" />
+/// and <see cref="Dialogs.RecordPickerDialog" />. It owns the filter and raises
 /// <see cref="FilterChanged" />; the host applies it to its own records with
 /// <see cref="RecordFilterProcessor.Apply{T}" />.
 /// </summary>
