@@ -1,0 +1,30 @@
+<div class="record-card">
+    <div class="record-card-title">
+        <MudText Class="record-card-name">@Name</MudText>
+        @* In Delete mode the owner's MudListItem selects the row on tap, and a tap on a button inside the card must
+           not also toggle that selection. Every wrapper below exists for the same reason. *@
+        <span class="record-card-info" @onclick="() => { }" @onclick:stopPropagation="true">
+            <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Tertiary"
+                           title="@InfoLabel" aria-label="@InfoLabel" OnClick="OnInfo" />
+        </span>
+    </div>
+    <div class="record-card-kind">
+        <MudText Typo="Typo.caption">@Kind</MudText>
+        @if (Record is not null)
+        {
+            <CategoryChip Record="@Record" />
+        }
+    </div>
+    @foreach (string detail in Details)
+    {
+        <MudText Typo="Typo.body2" Class="record-card-detail">@detail</MudText>
+    }
+    @if (Stepper is not null)
+    {
+        <div class="record-card-zone" @onclick="() => { }" @onclick:stopPropagation="true">@Stepper</div>
+    }
+    @if (Actions is not null)
+    {
+        <div class="record-card-zone record-card-actions" @onclick="() => { }" @onclick:stopPropagation="true">@Actions</div>
+    }
+</div>

@@ -1,0 +1,12 @@
+<div class="quantity-stepper">
+    <MudIconButton Icon="@StepIcons.MinusTen" Size="Size.Medium" title="Subtract 10" aria-label="Subtract 10"
+                   OnClick="@(() => OnStep.InvokeAsync(-10))" />
+    <MudIconButton Icon="@StepIcons.MinusOne" Size="Size.Medium" title="Subtract 1" aria-label="Subtract 1"
+                   OnClick="@(() => OnStep.InvokeAsync(-1))" />
+    <MudNumericField T="long" Value="Quantity" ValueChanged="OnQuantityChanged" Min="0" DebounceInterval="300"
+                     HideSpinButtons="true" Class="quantity-stepper-field" aria-label="Quantity" />
+    <MudIconButton Icon="@StepIcons.PlusOne" Size="Size.Medium" title="Add 1" aria-label="Add 1"
+                   OnClick="@(() => OnStep.InvokeAsync(1))" />
+    <MudIconButton Icon="@StepIcons.PlusTen" Size="Size.Medium" title="Add 10" aria-label="Add 10"
+                   OnClick="@(() => OnStep.InvokeAsync(10))" />
+</div>

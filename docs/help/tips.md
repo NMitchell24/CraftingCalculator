@@ -131,10 +131,9 @@ temporary and won't impact any saved favorites. Saved favorites reference the bl
 
 - **The number in a quantity stepper is editable.** Tap it and type. Much faster than tapping **+** two
   hundred times.
-- **Or step in tens.** On a tablet or PC, every row on the [Craft screen](craft-screen.md#stepping-by-ten) has
-  ![Step down by ten](assets/minus-10.svg) and ![Step up by ten](assets/plus-10.svg) buttons. On a phone,
-  ![Step by 10](assets/x10.svg) **Step by 10** switches every row over at once. Both are for when you want 40 arrows
-  and don't feel like typing.
+- **Or step in tens.** Every card on the [Craft screen](craft-screen.md#stepping-by-ten) has
+  ![Minus ten](assets/minus-10.svg) and ![Plus ten](assets/plus-10.svg) buttons, for when you want 40 arrows and
+  don't feel like typing.
 - **A quantity of zero keeps the row.** Handy for asking "what does this batch look like without the
   armor?" without losing your selection.
 - **Press and hold ![Delete](assets/delete.svg)** in Delete mode to back out with nothing deleted.
