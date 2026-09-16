@@ -71,7 +71,7 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
     public async Task SetQuantityAsync(IBaseQuantityRecord entry, long quantity)
     {
         // Typing 0, or clearing the field and leaving it, keeps the part: removing it would pull the row out from
-        // under the field being edited. Stepping below 1 and Delete remove it, and Save warns about any left at 0.
+        // under the field being edited. Stepping down from 0 and Delete remove it, and Save warns about any left at 0.
         entry.Quantity = quantity;
         await NotifyChangedAsync();
     }

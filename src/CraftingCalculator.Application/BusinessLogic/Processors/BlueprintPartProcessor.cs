@@ -49,20 +49,19 @@ public static class BlueprintPartProcessor
     }
 
     /// <summary>
-    /// Moves the part's quantity by <paramref name="step"/>, which is negative to step down. Stepping below 1 removes
-    /// the part from the blueprint.
+    /// Moves the part's quantity by <paramref name="step"/>, which is negative to step down. Stepping down settles at
+    /// zero, and stepping down again from zero removes the part from the blueprint.
     /// </summary>
     public static void Step(BlueprintModel blueprint, IBaseQuantityRecord part, long step)
     {
-        long quantity = part.Quantity + step;
-
-        if (quantity <= 0)
+        if (QuantityStepProcessor.Step(part.Quantity, step) is { } quantity)
+        {
+            part.Quantity = quantity;
+        }
+        else
         {
             Remove(blueprint, part);
-            return;
         }
-
-        part.Quantity = quantity;
     }
 
     /// <summary>The blueprint's parts that have a quantity of 0, in <see cref="GetParts"/> order.</summary>

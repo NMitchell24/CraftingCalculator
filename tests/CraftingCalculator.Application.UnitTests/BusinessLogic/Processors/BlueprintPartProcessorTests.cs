@@ -115,10 +115,36 @@ public class BlueprintPartProcessorTests
     }
 
     [Test]
-    public void Step_DownFromOne_RemovesTheComponentAndRecordsItForTheDAO()
+    public void Step_DownFromOne_KeepsThePartAtZero()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");
         blueprint.Components.Add(NewComponent(2, "Screw"), 1, id: 11);
+
+        BlueprintPartProcessor.Step(blueprint, blueprint.Components.ComponentList[0], -1);
+
+        blueprint.Components.ComponentList.Should().ContainSingle()
+            .Which.Quantity.Should().Be(0);
+        blueprint.Components.RemovedComponents.Should().BeEmpty();
+    }
+
+    [Test]
+    public void Step_DownByTenFromFour_SettlesAtZero()
+    {
+        BlueprintModel blueprint = NewBlueprint(1, "Frame");
+        blueprint.Components.Add(NewComponent(2, "Screw"), 4);
+
+        BlueprintPartProcessor.Step(blueprint, blueprint.Components.ComponentList[0], -10);
+
+        blueprint.Components.ComponentList.Should().ContainSingle()
+            .Which.Quantity.Should().Be(0);
+    }
+
+    [Test]
+    public void Step_DownFromZero_RemovesTheComponentAndRecordsItForTheDAO()
+    {
+        BlueprintModel blueprint = NewBlueprint(1, "Frame");
+        blueprint.Components.Add(NewComponent(2, "Screw"), 3, id: 11);
+        blueprint.Components.ComponentList[0].Quantity = 0;
 
         BlueprintPartProcessor.Step(blueprint, blueprint.Components.ComponentList[0], -1);
 
@@ -127,27 +153,16 @@ public class BlueprintPartProcessorTests
     }
 
     [Test]
-    public void Step_DownFromOne_RemovesTheChildBlueprintAndRecordsItForTheDAO()
+    public void Step_DownFromZero_RemovesTheChildBlueprintAndRecordsItForTheDAO()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");
-        blueprint.ChildBlueprints.Add(NewBlueprint(4, "Bracket"), 1, id: 12);
+        blueprint.ChildBlueprints.Add(NewBlueprint(4, "Bracket"), 2, id: 12);
+        blueprint.ChildBlueprints.BlueprintList[0].Quantity = 0;
 
         BlueprintPartProcessor.Step(blueprint, blueprint.ChildBlueprints.BlueprintList[0], -1);
 
         blueprint.ChildBlueprints.BlueprintList.Should().BeEmpty();
         blueprint.ChildBlueprints.RemovedBlueprints.Should().ContainSingle().Which.Id.Should().Be(12);
-    }
-
-    [Test]
-    public void Step_DownFromZero_RemovesThePart()
-    {
-        BlueprintModel blueprint = NewBlueprint(1, "Frame");
-        blueprint.Components.Add(NewComponent(2, "Screw"), 3);
-        blueprint.Components.ComponentList[0].Quantity = 0;
-
-        BlueprintPartProcessor.Step(blueprint, blueprint.Components.ComponentList[0], -1);
-
-        blueprint.Components.ComponentList.Should().BeEmpty();
     }
 
     [Test]

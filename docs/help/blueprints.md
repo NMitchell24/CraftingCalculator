@@ -96,8 +96,8 @@ blueprints together, sorted by name. The small line under each name tells you wh
    ![Filter](assets/filter-list.svg) narrows it down to a [category](categories.md) or two.
 2. **Add:** tap ![Add](assets/add.svg) **Add** on a row to put one in the blueprint.
 3. **Adjust:** once a requirement is in, its row swaps **Add** for ![Minus](assets/remove.svg), a number you can edit,
-   and ![Plus](assets/add.svg). Tap ![Minus](assets/remove.svg) when it's down to 1 and it'll get dropped from the 
-   requirements.
+   and ![Plus](assets/add.svg). ![Minus](assets/remove.svg) stops at 0. Tap it once more at 0 and the requirement gets
+   dropped.
 4. **Close:** tap ![Close](assets/close.svg) **Close** in the top corner, or use your phone's back gesture, when you're
    finished. Back closes the list and leaves you on the blueprint.
 
@@ -109,9 +109,10 @@ the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus](asse
 > still throws all of it away.
 
 Back on the blueprint, each requirement you've added gets a row with ![Minus](assets/remove.svg), an editable number,
-![Plus](assets/add.svg), and ![Delete](assets/delete.svg). Tapping ![Minus](assets/remove.svg) when it's down to 1
-removes the requirement completely. Typing 0 doesn't. The row stays put at 0, so a fat-fingered edit can't quietly
-delete the Copper out of your Bronze.
+![Plus](assets/add.svg), and ![Delete](assets/delete.svg). ![Minus](assets/remove.svg) stops at 0, and typing 0
+doesn't remove anything either. The row stays put, so a fat-fingered edit can't quietly delete the Copper out of your
+Bronze. Tap ![Minus](assets/remove.svg) once more at 0, or tap ![Delete](assets/delete.svg), when you really do want it
+gone. If you accidentally leave one at 0, **Save** asks you about it before it saves anything.
 
 ### Nesting blueprints
 
