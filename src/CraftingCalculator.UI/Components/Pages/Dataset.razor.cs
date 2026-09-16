@@ -155,7 +155,8 @@ public partial class Dataset : ComponentBase, IDisposable
 
     private async Task AddAsync()
     {
-        string? name = await DatasetPrompts.PromptForDatasetNameAsync(DialogService, DatasetService, "New Dataset");
+        string? name = await DatasetPrompts.PromptForDatasetNameAsync(
+            DialogService, DatasetService, "New Dataset", "Create");
 
         if (name is null)
         {
@@ -183,7 +184,7 @@ public partial class Dataset : ComponentBase, IDisposable
         // copying one record in it name their copy the same way. It also sorts the copy next to the
         // dataset it came from in the switcher, which is ordered by name.
         string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-            DialogService, DatasetService, "Copy Dataset", $"{current.Name} - Copy");
+            DialogService, DatasetService, "Copy Dataset", "Copy", $"{current.Name} - Copy");
 
         if (name is null)
         {
@@ -208,7 +209,7 @@ public partial class Dataset : ComponentBase, IDisposable
         }
 
         string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-            DialogService, DatasetService, "Rename Dataset", current.Name, current.Id);
+            DialogService, DatasetService, "Rename Dataset", "Rename", current.Name, current.Id);
 
         if (name is null)
         {

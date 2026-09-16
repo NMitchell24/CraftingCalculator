@@ -46,7 +46,7 @@ other exists.
 
 ![Dataset](assets/menu-book.svg) **Dataset** → ![New](assets/add.svg) **New dataset**
 
-Type a name, tap **OK**, and you're dropped straight into it. It starts completely empty, which means
+Type a name, tap **Create**, and you're dropped straight into it. It starts completely empty, which means
 the [Dataset screen](dataset.md) will show zeroes across the board and the Craft screen will have
 nothing to offer you. That's expected. Head to [Getting Started](getting-started.md) and build it up the
 same way you built the first one.

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
 
+// MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
+using Color = MudBlazor.Color;
+
 namespace CraftingCalculator.UI.Components.Pages;
 
 public partial class DatasetEditor : ComponentBase, IDisposable
@@ -149,12 +152,13 @@ public partial class DatasetEditor : ComponentBase, IDisposable
             return true;
         }
 
-        bool? discard = await DialogService.ShowMessageBoxAsync(
+        bool discard = await ConfirmDialog.ConfirmAsync(
+            DialogService,
             "Discard changes?",
             "Your edits have not been saved.",
-            yesText: "Discard", cancelText: "Keep editing");
+            "Discard", Color.Error, cancelText: "Keep editing");
 
-        _isDirty = discard != true;
+        _isDirty = !discard;
 
         return !_isDirty;
     }

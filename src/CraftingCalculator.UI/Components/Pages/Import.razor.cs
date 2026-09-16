@@ -84,14 +84,19 @@ public partial class Import : ComponentBase, IDisposable
         string datasetName = (await Task.Run(DatasetService.GetAllAsync))
             .FirstOrDefault(dataset => dataset.Id == datasetId)?.Name ?? "";
 
-        bool? choice = await DialogService.ShowMessageBoxAsync(
-            "Import Data", $"Add it to '{datasetName}', or make a new dataset?",
-            yesText: "As New Dataset", noText: "Into Current", cancelText: "Cancel");
+        // A new dataset is the emphasized choice because it cannot change anything the user already has,
+        // which is what import-export.md recommends; merging into the open dataset is the alternative.
+        // Neither label names the dataset; the message above them does.
+        bool? choice = await ConfirmDialog.ChooseAsync(
+            DialogService,
+            "Import Data",
+            $"Add it to '{datasetName}', or make a new dataset?",
+            confirmText: "As new dataset", alternativeText: "Into this dataset");
 
         if (choice == true)
         {
             string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-                DialogService, DatasetService, "Import as New Dataset", snapshot.DatasetName.Trim());
+                DialogService, DatasetService, "Import as New Dataset", "Create", snapshot.DatasetName.Trim());
 
             if (name is not null)
             {

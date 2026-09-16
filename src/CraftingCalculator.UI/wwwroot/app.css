@@ -1593,27 +1593,19 @@ html.keyboard-open .mud-dialog-container {
     padding-bottom: calc(8px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
-/* Components/Dialogs/AddPartsDialog.razor. Close, the title and Done share the title row, and the title takes the
+/* Components/Dialogs/AddPartsDialog.razor. Close and the title share the title row, and the title takes the
    slack. At the largest text sizes the title wraps to two lines. The title spans a second 1fr row: an item that
-   crosses a flexible track grows only that track, so the first row stays as tall as the taller button and Close
-   and Done center in it. A grid column also keeps Done at its full width; in a flex row .mud-button-root's 64px
-   min-width let Done shrink until its label broke. No column gap: both buttons already pad themselves. */
+   crosses a flexible track grows only that track, so the first row stays as tall as Close and Close centers in
+   it. No column gap: the button already pads itself. */
 .add-parts-title {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     align-items: center;
 }
 
 .add-parts-title > .mud-button-root {
     grid-row: 1;
-}
-
-/* The end-edge counterpart of Close's Edge.Start, which MudButton has no parameter for: the label lines up with the
-   title's padding instead of sitting 8px inside it. At font_scale 2.0 on a 320px viewport "requirements" needs
-   those 8px to stay on one line. */
-.add-parts-title > .mud-button-root:last-child {
-    margin-inline-end: -8px;
 }
 
 /* Stretched over both rows with its text centered, so a one-line title still lines up with the buttons.

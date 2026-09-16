@@ -10,6 +10,9 @@ public partial class TextInputDialog
     [Parameter] public string Label { get; set; } = "Name";
     [Parameter] public string InitialValue { get; set; } = "";
 
+    /// <summary>The confirming button's label, naming what the name is for ("Create", "Rename", "Save").</summary>
+    [Parameter] public string ConfirmText { get; set; } = "Save";
+
     private string _value = "";
 
     protected override void OnInitialized()

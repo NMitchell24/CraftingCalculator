@@ -2,6 +2,9 @@ using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.State;
 using MudBlazor;
 
+// MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
+using Color = MudBlazor.Color;
+
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
@@ -20,12 +23,13 @@ public static class FavoritePrompts
         // one mis-tap from discarding unsaved work.
         if (state.BlueprintQuantities.Count > 0)
         {
-            bool? replace = await dialogs.ShowMessageBoxAsync(
+            bool replace = await ConfirmDialog.ConfirmAsync(
+                dialogs,
                 "Replace current selection?",
                 $"Loading '{favorite.Name}' will discard the blueprints you have selected.",
-                yesText: "Load", cancelText: "Cancel");
+                "Load");
 
-            if (replace != true)
+            if (!replace)
             {
                 return;
             }
@@ -50,10 +54,11 @@ public static class FavoritePrompts
 
         if (state.LoadedFavoriteName is { } loaded)
         {
-            bool? update = await dialogs.ShowMessageBoxAsync(
+            bool? update = await ConfirmDialog.ChooseAsync(
+                dialogs,
                 "Update or Create New?",
                 $"Would you like to update '{loaded}' or create a new favorite?",
-                yesText: "Update", noText: "Create New", cancelText: "Cancel");
+                confirmText: "Update", alternativeText: "Create New");
 
             if (update is null)
             {
@@ -85,7 +90,7 @@ public static class FavoritePrompts
     /// </summary>
     private static async Task<string?> PromptForNewNameAsync(IDialogService dialogs, CraftState state)
     {
-        DialogParameters parameters = new() { ["Label"] = "Favorite name" };
+        DialogParameters parameters = new() { ["Label"] = "Favorite name", ["ConfirmText"] = "Save" };
         IDialogReference dialogRef = await dialogs.ShowAsync<TextInputDialog>("Save as Favorite", parameters);
         DialogResult? result = await dialogRef.Result;
 
@@ -101,10 +106,12 @@ public static class FavoritePrompts
             return entered;
         }
 
-        bool? overwrite = await dialogs.ShowMessageBoxAsync(
-            "Overwrite?", $"A favorite named '{entered}' already exists. Overwrite it?",
-            yesText: "Overwrite", cancelText: "Cancel");
+        bool overwrite = await ConfirmDialog.ConfirmAsync(
+            dialogs,
+            "Overwrite?",
+            $"A favorite named '{entered}' already exists. Overwrite it?",
+            "Overwrite", Color.Error);
 
-        return overwrite == true ? entered : null;
+        return overwrite ? entered : null;
     }
 }

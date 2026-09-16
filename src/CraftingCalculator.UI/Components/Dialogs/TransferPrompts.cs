@@ -15,30 +15,23 @@ public static class TransferPrompts
     /// Asks before a deselect also deselects the <paramref name="cascaded"/> records that depend on
     /// <paramref name="subject"/>. Returns true only if the user chose to continue.
     /// </summary>
-    public static async Task<bool> ConfirmDeselectAsync(
-        IDialogService dialogs, string subject, IReadOnlyDictionary<RecordKind, int> cascaded)
-    {
-        bool? confirmed = await dialogs.ShowMessageBoxAsync(
-            "Deselect these too?", DeselectMessage(subject, cascaded), yesText: "Continue", cancelText: "Cancel");
-
-        return confirmed == true;
-    }
+    public static Task<bool> ConfirmDeselectAsync(
+        IDialogService dialogs, string subject, IReadOnlyDictionary<RecordKind, int> cascaded) =>
+        ConfirmDialog.ConfirmAsync(
+            dialogs, "Deselect these too?", DeselectMessage(subject, cascaded), "Deselect them");
 
     /// <summary>
     /// Offers to select the records linked to <paramref name="subject"/>, and what those need, which comes to
     /// the <paramref name="cascaded"/> records. Returns true only if the user said yes.
     /// </summary>
-    public static async Task<bool> ConfirmSelectUsersAsync(
-        IDialogService dialogs, string subject, IReadOnlyDictionary<RecordKind, int> cascaded)
-    {
-        bool? confirmed = await dialogs.ShowMessageBoxAsync(
+    public static Task<bool> ConfirmSelectUsersAsync(
+        IDialogService dialogs, string subject, IReadOnlyDictionary<RecordKind, int> cascaded) =>
+        ConfirmDialog.ConfirmAsync(
+            dialogs,
             "Select linked items?",
             $"Want everything linked to {subject} too? That selects {Describe(cascaded)}, counting whatever "
             + "those need to be crafted.",
-            yesText: "Yes", cancelText: "No");
-
-        return confirmed == true;
-    }
+            "Select them", cancelText: "No thanks");
 
     /// <summary>
     /// "Some of these records are already in 'Valheim': 3 components and 1 blueprint.", for imported records that share
