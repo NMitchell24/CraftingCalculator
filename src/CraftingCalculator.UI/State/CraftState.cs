@@ -97,24 +97,14 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// </summary>
     public void Step(BlueprintQuantity target, long step)
     {
-        // Zero is the landing every step down passes through, so the step that starts there is a
-        // deliberate second tap rather than an overshoot. That is what lets a step of any size clamp
-        // without losing the remove gesture: -10 against a quantity of 4 settles on zero instead of
-        // dropping the blueprint out of the batch on one tap.
-        if (step < 0 && target.Quantity == 0)
+        if (QuantityStepProcessor.Step(target.Quantity, step) is { } quantity)
+        {
+            SetQuantity(target, quantity);
+        }
+        else
         {
             Remove(target);
-            return;
         }
-
-        // The addition is what overflows, so it cannot also be the test - compare against the headroom
-        // left below MaxValue instead. Only a step up can overflow: Quantity is never negative, so a
-        // step down lands at worst a single step below zero, which Math.Max takes care of.
-        long stepped = step > 0 && target.Quantity > long.MaxValue - step
-            ? long.MaxValue
-            : target.Quantity + step;
-
-        SetQuantity(target, Math.Max(stepped, 0));
     }
 
     public void Remove(BlueprintQuantity target)
