@@ -112,7 +112,7 @@ Back on the blueprint, each requirement you've added gets a row with ![Minus](as
 ![Plus](assets/add.svg), and ![Delete](assets/delete.svg). ![Minus](assets/remove.svg) stops at 0, and typing 0
 doesn't remove anything either. The row stays put, so a fat-fingered edit can't quietly delete the Copper out of your
 Bronze. Tap ![Minus](assets/remove.svg) once more at 0, or tap ![Delete](assets/delete.svg), when you really do want it
-gone. Forget one at 0 and **Save** asks you about it before it saves anything.
+gone. If you accidentally leave one at 0, **Save** asks you about it before it saves anything.
 
 ### Nesting blueprints
 
