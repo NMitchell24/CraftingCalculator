@@ -65,13 +65,10 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// </summary>
     public string? LoadedFavoriteName { get; private set; }
 
-    public void AddBlueprints(IEnumerable<BlueprintModel> blueprints)
+    /// <summary>Adds a blueprint to the batch, or raises its quantity by one when it is already there.</summary>
+    public void Add(BlueprintModel blueprint)
     {
-        foreach (BlueprintModel blueprint in blueprints)
-        {
-            _blueprintMap.Add(blueprint, 1);
-        }
-
+        _blueprintMap.Add(blueprint, 1);
         Recalculate();
     }
 
