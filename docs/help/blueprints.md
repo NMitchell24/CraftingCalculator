@@ -98,7 +98,7 @@ blueprints together, sorted by name. The small line under each name tells you wh
 3. **Adjust:** once a requirement is in, its row swaps **Add** for ![Minus](assets/remove.svg), a number you can edit,
    and ![Plus](assets/add.svg). Tap ![Minus](assets/remove.svg) when it's down to 1 and it'll get dropped from the 
    requirements.
-4. **Done:** tap **Done** in the top corner when you're finished.
+4. **Close:** tap ![Close](assets/close.svg) **Close** in the top corner when you're finished.
 
 Every tap counts the moment you make it. There's no separate confirm step. The keyboard stays up while you tap
 the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus](assets/add.svg) once, type `tin`, tap

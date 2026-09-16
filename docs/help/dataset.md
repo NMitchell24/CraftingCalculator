@@ -144,7 +144,7 @@ wants to accidentally delete something they spent the past couple of minutes cre
 
 ## Delete all data
 
-You can Delete All Data with the ![Delete all data](assets/delete-forever.svg) action on the Dataset landing page. 
+You can delete all data with the ![Delete all data](assets/delete-forever.svg) action on the Dataset landing page. 
 This is the sledgehammer that you probably won't use very often, if even at all. But it exists to give you the 
 option to clear everything and start over. It removes **every** favorite, blueprint, category and component in the 
 dataset you're currently in. Your other [datasets](managing-datasets.md) aren't touched, and the dataset itself 

@@ -63,5 +63,5 @@ public partial class AddPartsDialog : ComponentBase
         return OnChanged.InvokeAsync();
     }
 
-    private void Done() => MudDialog.Close();
+    private void Close() => MudDialog.Close();
 }

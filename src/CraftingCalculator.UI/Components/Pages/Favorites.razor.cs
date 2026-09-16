@@ -5,6 +5,9 @@ using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
+// MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
+using Color = MudBlazor.Color;
+
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
@@ -134,10 +137,11 @@ public partial class Favorites : ComponentBase, IDisposable
         DialogParameters parameters = new()
         {
             ["Label"] = "Favorite name",
-            ["InitialValue"] = favorite.Name ?? ""
+            ["InitialValue"] = favorite.Name ?? "",
+            ["ConfirmText"] = "Rename"
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Rename Favorite", parameters);
+        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Rename favorite", parameters);
         DialogResult? result = await dialogRef.Result;
 
         if (result is null or { Canceled: true } || result.Data is not string name
@@ -162,12 +166,13 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private async Task DeleteAsync(BlueprintFavorite favorite)
     {
-        bool? confirmed = await DialogService.ShowMessageBoxAsync(
+        bool confirmed = await ConfirmDialog.ConfirmAsync(
+            DialogService,
             "Delete favorite?",
             $"This will permanently delete '{favorite.Name}'.",
-            yesText: "Delete", cancelText: "Cancel");
+            "Delete", Color.Error);
 
-        if (confirmed != true)
+        if (!confirmed)
         {
             return;
         }
@@ -223,16 +228,15 @@ public partial class Favorites : ComponentBase, IDisposable
         await ReloadAsync();
     }
 
-    private async Task<bool> ConfirmDeleteManyAsync(int count)
+    private Task<bool> ConfirmDeleteManyAsync(int count)
     {
         string noun = NounFor(count);
 
-        bool? confirmed = await DialogService.ShowMessageBoxAsync(
+        return ConfirmDialog.ConfirmAsync(
+            DialogService,
             $"Delete {count} {noun}?",
             $"{count} {noun} will be deleted forever. The blueprints they hold are not affected.",
-            yesText: "Delete", cancelText: "Cancel");
-
-        return confirmed == true;
+            "Delete", Color.Error);
     }
 
     /// <summary>The noun agreeing with <paramref name="count"/>, for text that counts favorites.</summary>

@@ -76,7 +76,7 @@ Now we get into the real reason you're here. It's time to create your first **Bl
 6. Tap ![Add](assets/add.svg) **Add requirements**.
 7. Search for `Copper`, tap **Add**, then tap ![Plus](assets/add.svg) once so it reads `2`.
 8. Search for `Tin` and tap **Add**. One is all you need.
-9. Tap **Done**, then **Save**.
+9. Tap ![Close](assets/close.svg) **Close**, then **Save**.
 10. That's it. Your first **Blueprint** is locked in. But hold on tight, we're not quite finished yet.
 
 More detail: [Blueprints](blueprints.md).
@@ -101,7 +101,7 @@ palm of your hand.
 3. Tap ![Add](assets/add.svg) **Add requirements**, add `Wood` × 4 and `Leather Scraps` × 2.
 4. Now search for `Bronze`. It's a blueprint, but it lives in the same list. Tap **Add**, then type `8` over
    the `1`.
-5. Tap **Done**, then **Save**.
+5. Tap ![Close](assets/close.svg) **Close**, then **Save**.
 
 You have now told the app that a Bronze Axe needs 8 Bronze, 4 Wood, and 2 Leather Scraps. The **Blueprint** for a 
 Bronze Axe. Now, because the app already knows how to make Bronze, it therefore knows that you need 16 Copper and 
@@ -111,7 +111,7 @@ steps at the forge for Bronze, and then a final step for the Axe itself.
 ## Step 5: Craft something
 
 1. Tap ![Craft](assets/calculate.svg) **Craft** in the navigation bar.
-2. Tap **Craft Blueprint**, or the ![Add](assets/add.svg) action.
+2. Tap **Craft blueprint**, or the ![Add](assets/add.svg) action.
 3. Tick `Bronze Axe` and confirm.
 4. Use the ![Plus](assets/add.svg) stepper to set the quantity to 3.
 

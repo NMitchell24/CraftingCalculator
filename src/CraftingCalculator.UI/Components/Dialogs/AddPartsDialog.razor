@@ -1,11 +1,11 @@
-@* No DialogActions: Done sits in the title, the one edge of a full-screen dialog the on-screen keyboard never
+@* No DialogActions: every tap applies to the blueprint as it happens, so there is nothing to confirm and Close
+   is the only way out. It sits in the title, the one edge of a full-screen dialog the on-screen keyboard never
    covers. The search bar is sticky inside the dialog content, the same hook BlueprintPickerDialog uses (app.css). *@
 <MudDialog ContentClass="picker-dialog-content">
     <TitleContent>
         <div class="add-parts-title">
-            <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Done" aria-label="Close" />
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Close" aria-label="Close" />
             <MudText Typo="Typo.h6" Class="add-parts-title-text">Add requirements</MudText>
-            <MudButton Color="Color.Primary" OnClick="Done">Done</MudButton>
         </div>
     </TitleContent>
     <DialogContent>

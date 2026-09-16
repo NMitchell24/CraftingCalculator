@@ -1,0 +1,20 @@
+@* DefaultFocus.LastChild lands on the confirming button, so Enter confirms and Escape (CloseOnEscapeKey,
+   MainLayout.razor) dismisses. There is nothing else focusable in here, so "last child" is unambiguous. *@
+<MudDialog DefaultFocus="DefaultFocus.LastChild">
+    <DialogContent>
+        <MudText>@Message</MudText>
+    </DialogContent>
+    <DialogActions>
+        @* Dismissive first, alternative in the middle, confirming last - the order .mud-dialog-actions
+           (app.css) reverses when the buttons have to stack. *@
+        <MudButton OnClick="Cancel">@CancelText</MudButton>
+        @if (!string.IsNullOrEmpty(AlternativeText))
+        {
+            <MudButton Color="Color.Primary" Variant="Variant.Outlined" OnClick="ChooseAlternative">@AlternativeText</MudButton>
+        }
+        @if (!string.IsNullOrEmpty(ConfirmText))
+        {
+            <MudButton Color="@ConfirmColor" Variant="Variant.Filled" OnClick="Confirm">@ConfirmText</MudButton>
+        }
+    </DialogActions>
+</MudDialog>

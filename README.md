@@ -12,40 +12,6 @@ calls, no personal information collected.
 [![CodeQL](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/codeql-analysis.yml)
 [![Dependencies](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/dependencies.yml/badge.svg)](https://github.com/NMitchell24/CraftingCalculator/actions/workflows/dependencies.yml)
 
-### Privacy and Free Software Commitment
-
-Crafting Calculator is published by Sterling Turd Productions, LLC, and every version it publishes keeps these
-promises. Not just this release, and not until the next business plan comes along. Forever:
-
-1. **Free, forever.** The app costs nothing to download and nothing to use. No price tag, no subscription, no
-   premium tier, no in-app purchases, and no features held back behind a paywall.
-2. **No advertisements. Ever.** Not of any kind: no banners, no pop-ups, no sponsored content, no "watch a video to
-   unlock."
-3. **No telemetry. Ever.** The app contains no analytics, no usage tracking and no crash reporting, and it will
-   never include a third-party SDK that does any of those.
-4. **No data collection. Ever.** Your datasets, favorites and settings stay in the database on your device.
-   Nothing about you or your data is collected, sold, shared or sent anywhere without your explicit permission. The 
-   only ways your data leaves the device are an export file you create and share yourself, and your device's own
-   backup (Google or iCloud), if you've turned it on. That backup lives in your account. Sterling Turd Productions,
-   LLC never sees it.
-5. **Your files, your choice.** The app only reads or writes a file outside its own storage when you pick that file
-   yourself in your device's file or share dialog.
-
-> **What the app stores can see:** Google Play, the App Store and the Microsoft Store show every developer some
-> statistics whether the app asks for them or not, like install counts, and crash reports from people who turned on
-> diagnostic sharing in their device settings. That comes from your device and the store, not from code in this
-> app, and none of it includes what's in your datasets. Sterling Turd Productions, LLC can't switch that off, but
-> it will never add anything on top of it.
-
-These promises are written into section 3 of the [license](LICENSE.md), and they bind every build Sterling Turd
-Productions, LLC publishes. The same license reserves the app stores and marketplaces to Sterling Turd Productions,
-LLC alone, so any copy you get from one of them keeps these promises. A build someone publishes from their own fork
-on GitHub is theirs, not ours. If one of our builds ever breaks a promise, that is a bug: open an issue and hold us
-to it.
-
-"Free" here means free of charge. The source is public so anyone can verify these promises are kept, but it is
-source-available under a personal-use license, not open source. See [License](#license).
-
 ### Screens
 
 - **Craft** — assemble a batch of blueprints with quantities, and see the pinned cost / value / profit
@@ -143,6 +109,38 @@ code, are in [docs/transfer-format-maintenance.md](docs/transfer-format-maintena
 requirements and the Apple toolchain setup are in [docs/dev-environment.md](docs/dev-environment.md);
 architecture and code conventions are in [CLAUDE.md](CLAUDE.md) and the `craftingcalculator-dev`
 skill under `.claude/skills/`.
+
+### Privacy and Free Software Commitment
+
+Crafting Calculator is published by Sterling Turd Productions, LLC, and every version it publishes keeps these
+promises. Not just this release, and not until the next business plan comes along. Forever:
+
+1. **Free, forever.** The app costs nothing to download and nothing to use. No price tag, no subscription, no
+   premium tier, no in-app purchases, and no features held back behind a paywall.
+2. **No advertisements. Ever.** Not of any kind: no banners, no pop-ups, no sponsored content, no "watch a video to
+   unlock."
+3. **No telemetry. Ever.** The app contains no analytics, no usage tracking and no crash reporting, and it will
+   never include a third-party SDK that does any of those.
+4. **No data collection. Ever.** Your datasets, favorites and settings stay in the database on your device.
+   Nothing about you or your data is collected, sold, shared or sent anywhere without your explicit permission. The
+   only ways your data leaves the device are an export file you create and share yourself, and your device's own
+   backup (Google or iCloud), if you've turned it on. That backup lives in your account. We cannot see it.
+5. **Your files, your choice.** The app only reads or writes a file outside its own storage when you pick that file
+   yourself in your device's file or share dialog.
+
+> **What the app stores can see:** Google Play, the App Store and the Microsoft Store show every developer some
+> statistics whether the app asks for them or not, like install counts, and crash reports from people who turned on
+> diagnostic sharing in their device settings. That comes from your device and the store, not from code in this
+> app, and none of it includes what's in your datasets. We can't switch that off, but we will never add anything on 
+> top of it.
+
+These promises are written into section 3 of the [license](LICENSE.md), and they bind every build we publish. The 
+same license reserves the app stores and marketplaces to Sterling Turd Productions, LLC alone, so any copy you get 
+from one of them keeps these promises. A build someone publishes from their own fork on GitHub is theirs, not ours. 
+If one of our builds ever breaks a promise, that is a bug: open an issue and hold us to it.
+
+"Free" here means free of charge. The source is public so anyone can verify these promises are kept, but it is
+source-available under a personal-use license, not open source. See [License](#license).
 
 ### The 1.x Windows desktop app
 

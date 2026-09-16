@@ -67,5 +67,5 @@ that make sense for the game you are playing.
 Deleting a category does **not** delete the components and blueprints filed under it. They survive; they
 simply become uncategorized, and you can recategorize them whenever you like.
 
-The ![Delete all](assets/delete-forever.svg) **Delete all Categories** action clears the lot in one go,
+The ![Delete all](assets/delete-forever.svg) **Delete all categories** action clears the lot in one go,
 after a confirmation. Same deal. Your blueprints and components are untouched.

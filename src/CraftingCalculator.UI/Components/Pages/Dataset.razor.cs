@@ -33,6 +33,10 @@ public partial class Dataset : ComponentBase, IDisposable
 
     private int SelectedDatasetId => SelectedDataset.Id;
 
+    /// <summary>The Edit button's label for <paramref name="section"/>, e.g. "Edit blueprints".</summary>
+    // Lowercased: the same word is the card's heading and the list screen's title, where it is capitalized.
+    private static string EditLabel(DatasetSection section) => $"Edit {section.Title.ToLowerInvariant()}";
+
     // The name is part of the key, not just the id: renaming the selected dataset changes neither the
     // id nor the selection, and without it the select keeps rendering the name it was built with.
     private (int Id, string? Name) DatasetSelectKey => (SelectedDatasetId, Current?.Name);
@@ -155,7 +159,8 @@ public partial class Dataset : ComponentBase, IDisposable
 
     private async Task AddAsync()
     {
-        string? name = await DatasetPrompts.PromptForDatasetNameAsync(DialogService, DatasetService, "New Dataset");
+        string? name = await DatasetPrompts.PromptForDatasetNameAsync(
+            DialogService, DatasetService, "New dataset", "Create");
 
         if (name is null)
         {
@@ -183,7 +188,7 @@ public partial class Dataset : ComponentBase, IDisposable
         // copying one record in it name their copy the same way. It also sorts the copy next to the
         // dataset it came from in the switcher, which is ordered by name.
         string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-            DialogService, DatasetService, "Copy Dataset", $"{current.Name} - Copy");
+            DialogService, DatasetService, "Copy dataset", "Copy", $"{current.Name} - Copy");
 
         if (name is null)
         {
@@ -208,7 +213,7 @@ public partial class Dataset : ComponentBase, IDisposable
         }
 
         string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-            DialogService, DatasetService, "Rename Dataset", current.Name, current.Id);
+            DialogService, DatasetService, "Rename dataset", "Rename", current.Name, current.Id);
 
         if (name is null)
         {
@@ -259,7 +264,7 @@ public partial class Dataset : ComponentBase, IDisposable
             ["ConfirmText"] = "Delete everything"
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<TypedConfirmDialog>("Delete Everything?", parameters);
+        IDialogReference dialogRef = await DialogService.ShowAsync<TypedConfirmDialog>("Delete everything?", parameters);
         DialogResult? result = await dialogRef.Result;
 
         if (result is null or { Canceled: true })

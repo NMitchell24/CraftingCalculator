@@ -4,6 +4,9 @@ using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using MudBlazor;
 
+// MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
+using Color = MudBlazor.Color;
+
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
@@ -15,17 +18,25 @@ public static class DatasetPrompts
 {
     /// <summary>
     /// Asks for a dataset name, re-asking until it is one no other dataset uses or the user backs out.
-    /// Returns the name, or null if they did. <paramref name="exceptId"/> is the dataset being renamed,
-    /// so keeping its own name is not reported as a collision.
+    /// Returns the name, or null if they did. <paramref name="confirmText"/> labels the confirming button
+    /// with what the name is for. <paramref name="exceptId"/> is the dataset being renamed, so keeping its
+    /// own name is not reported as a collision.
     /// </summary>
     public static async Task<string?> PromptForDatasetNameAsync(
-        IDialogService dialogs, IDatasetService datasets, string title, string initialValue = "", int exceptId = 0)
+        IDialogService dialogs, IDatasetService datasets, string title, string confirmText,
+        string initialValue = "", int exceptId = 0)
     {
         string entered = initialValue;
 
         while (true)
         {
-            DialogParameters parameters = new() { ["Label"] = "Dataset name", ["InitialValue"] = entered };
+            DialogParameters parameters = new()
+            {
+                ["Label"] = "Dataset name",
+                ["InitialValue"] = entered,
+                ["ConfirmText"] = confirmText
+            };
+
             IDialogReference dialogRef = await dialogs.ShowAsync<TextInputDialog>(title, parameters);
             DialogResult? result = await dialogRef.Result;
 
@@ -44,10 +55,10 @@ public static class DatasetPrompts
             // into the field so the user edits it rather than retyping it.
             entered = name;
 
-            await dialogs.ShowMessageBoxAsync(
+            await ConfirmDialog.AlertAsync(
+                dialogs,
                 "Name already in use",
-                $"A dataset named '{name}' already exists. Pick a different name.",
-                yesText: "OK");
+                $"A dataset named '{name}' already exists. Pick a different name.");
         }
     }
 
@@ -62,25 +73,29 @@ public static class DatasetPrompts
             ["ConfirmText"] = "Delete dataset"
         };
 
-        IDialogReference dialogRef = await dialogs.ShowAsync<TypedConfirmDialog>($"Delete {dataset.Name}?", parameters);
+        IDialogReference dialogRef = await dialogs.ShowAsync<TypedConfirmDialog>("Delete dataset?", parameters);
         DialogResult? result = await dialogRef.Result;
 
         return result is not (null or { Canceled: true });
     }
 
     /// <summary>Returns true only if the user confirmed the delete.</summary>
-    public static async Task<bool> ConfirmDeleteAsync(IDialogService dialogs, IBaseDataRecord record)
+    public static Task<bool> ConfirmDeleteAsync(IDialogService dialogs, IBaseDataRecord record)
     {
         // Ports the warning from ConfigureBlueprintsViewModel.DeleteItem: a deleted record disappears
         // from every blueprint that used it, and a deleted blueprint from every favorite as well.
         string alsoFavorites = record.Type == DataType.Blueprint ? "or blueprint favorites " : "";
 
-        bool? confirmed = await dialogs.ShowMessageBoxAsync(
-            $"Delete {record.Type.GetDescription()}?",
-            $"'{record.Name}' will be deleted forever and removed from any blueprints {alsoFavorites}where it is used.",
-            yesText: "Delete", cancelText: "Cancel");
+        // Lowercased here rather than at the source: DataType's description and DatasetList's plurals double as
+        // page titles ("Blueprints"), where they are capitalized. Inside a sentence, which a dialog title is, they
+        // are not.
+        string noun = record.Type.GetDescription().ToLowerInvariant();
 
-        return confirmed == true;
+        return ConfirmDialog.ConfirmAsync(
+            dialogs,
+            $"Delete {noun}?",
+            $"'{record.Name}' will be deleted forever and removed from any blueprints {alsoFavorites}where it is used.",
+            "Delete", Color.Error);
     }
 
     /// <summary>
@@ -97,12 +112,11 @@ public static class DatasetPrompts
         string names = string.Join(", ", atZero.Select(part => $"'{part.Name}'"));
         string verb = atZero.Count == 1 ? "has" : "have";
 
-        bool? confirmed = await dialogs.ShowMessageBoxAsync(
+        return await ConfirmDialog.ConfirmAsync(
+            dialogs,
             "Requirements at 0",
             $"{names} {verb} a quantity of 0, so the blueprint won't need any. Save anyway, or go back and fix it?",
-            yesText: "Save anyway", cancelText: "Go back");
-
-        return confirmed == true;
+            "Save anyway", cancelText: "Go back");
     }
 
     /// <summary>
@@ -110,15 +124,17 @@ public static class DatasetPrompts
     /// <paramref name="noun"/>, which the caller supplies already agreeing with <paramref name="count"/>.
     /// Returns true only if the user confirmed.
     /// </summary>
-    public static async Task<bool> ConfirmDeleteManyAsync(IDialogService dialogs, DataType type, string noun, int count)
+    public static Task<bool> ConfirmDeleteManyAsync(IDialogService dialogs, DataType type, string noun, int count)
     {
         string alsoFavorites = type == DataType.Blueprint ? "or blueprint favorites " : "";
 
-        bool? confirmed = await dialogs.ShowMessageBoxAsync(
-            $"Delete {count} {noun}?",
-            $"{count} {noun} will be deleted forever and removed from any blueprints {alsoFavorites}where they are used.",
-            yesText: "Delete", cancelText: "Cancel");
+        // See ConfirmDeleteAsync: the caller's noun is the one the shell shows as a page title.
+        string counted = $"{count} {noun.ToLowerInvariant()}";
 
-        return confirmed == true;
+        return ConfirmDialog.ConfirmAsync(
+            dialogs,
+            $"Delete {counted}?",
+            $"{counted} will be deleted forever and removed from any blueprints {alsoFavorites}where they are used.",
+            "Delete", Color.Error);
     }
 }

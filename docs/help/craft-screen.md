@@ -17,7 +17,7 @@ side, but they are always the same two parts:
 
 Your batch. AKA, the list of things you want to craft in your game.
 
-**To add something**, tap **Craft Blueprint** in the middle of the empty card, or the ![Add](assets/add.svg) action. 
+**To add something**, tap **Craft blueprint** in the middle of the empty card, or the ![Add](assets/add.svg) action. 
 A picker opens with every blueprint in your Dataset. Search it, 
 [filter it by category](categories.md#filtering-by-category), tick as many as you like, then confirm. Once finished,
 everything you selected drops into your batch with a quantity of 1.

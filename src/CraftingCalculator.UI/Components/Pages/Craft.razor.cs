@@ -176,7 +176,7 @@ public partial class Craft : ComponentBase, IDisposable
             CloseOnEscapeKey = true
         };
 
-        IDialogReference dialogRef = await DialogService.ShowAsync<BlueprintPickerDialog>("Select Blueprints to Craft", options);
+        IDialogReference dialogRef = await DialogService.ShowAsync<BlueprintPickerDialog>("Select blueprints to craft", options);
         DialogResult? result = await dialogRef.Result;
 
         if (result is { Canceled: false } && result.Data is IReadOnlyCollection<BlueprintModel> selected)
