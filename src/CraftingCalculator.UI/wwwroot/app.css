@@ -694,10 +694,10 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* margin-left: auto keeps the buttons at the trailing edge whether they share the meta's line or have
    one of their own. flex: 0 1 auto plus min-width: 0 let the cell itself shrink below its content's
    natural width instead of forcing the row wider than the card; flex-wrap plus justify-content:
-   flex-end then wrap content that still does not fit (.record-row-stepper alongside BatchList's
-   .record-row-icons, at the largest Android text size) onto a second line, right-aligned under the
-   first, rather than clipping it at the card edge. Wrapping happens between .record-row-stepper and
-   .record-row-icons, never inside either: each is one flex item here, so its own buttons move to the
+   flex-end then wrap content that still does not fit (the blueprint editor's .quantity-stepper alongside
+   its Delete button, at the largest Android text size) onto a second line, right-aligned under the
+   first, rather than clipping it at the card edge. Wrapping happens between the stepper and the
+   buttons beside it, never inside a group: each is one flex item here, so its own buttons move to the
    next line together instead of splitting mid-group. */
 .record-row-end {
     display: flex;
@@ -710,7 +710,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-left: auto;
 }
 
-/* Groups icon-only row actions (BatchList's Info/Delete, Favorites' and DatasetList's Edit/Delete) into
+/* Groups icon-only row actions (Favorites' and DatasetList's Edit/Delete) into
    one flex item so .record-row-end wraps them together - see the comment above. */
 .record-row-icons {
     display: flex;
@@ -745,29 +745,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     .record-row-meta {
         flex: 0 0 auto;
         max-width: 40%;
-    }
-}
-
-/* The Craft batch wherever its rows carry +10 / -10 beside the stepper (BatchList.razor): two 48px buttons more
-   than the rows the query above was calibrated on, so that list keeps the wrapped shape for another 12ch and the
-   name keeps the room every other list gets at 55ch. 12ch is those 96px and their gap at 100%, where a ch of
-   the list's face is about 9.5px; at a larger text size the same 12ch is more pixels, which only errs toward
-   wrapping. Never on a portrait phone: below 600px the batch has no +10 / -10 (Craft.razor.cs). Calibration,
-   measured on the batch list: about 53ch on a 997px landscape phone at 130%, 59ch on an 880px one at 130% and
-   60ch in a 1906px Windows window (all wrap); about 68ch on a 997px landscape phone at 100%, where the name keeps
-   209px on one line, and 76ch on an 880px one at 100% (both one line). */
-@container (55ch <= width < 67ch) {
-    .batch-list-bulk-step .record-row {
-        flex-wrap: wrap;
-    }
-
-    .batch-list-bulk-step .record-row-name {
-        flex: 1 0 100%;
-    }
-
-    .batch-list-bulk-step .record-row-meta {
-        flex: 1 1 12ch;
-        max-width: none;
     }
 }
 
@@ -808,32 +785,125 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: 0;
 }
 
-/* The floor is the stepper's own width - two Size.Medium icon buttons (48px each) around the quantity
-   input (4.5ch of its subtitle1 face, about 5ch of the row's body face) - so that RecordPickerDialog's Add
-   button, which stands in for the stepper on a record its target does not hold yet, holds the same
-   width. The .record-row-meta stacking rule turns on the trailing cell's width, and a list where some
-   rows show Add and others the stepper would otherwise stack the one and not the other. */
-.record-row-stepper {
-    display: flex;
-    align-items: center;
+/* The picker's and the blueprint editor's rows still put their +1 / -1 stepper in a .record-row's trailing cell.
+   The floor is that stepper's own width - two Size.Medium icon buttons (48px each) around the quantity input
+   (4.5ch of its subtitle1 face, about 5ch of the row's body face) - so that RecordPickerDialog's Add button, which
+   stands in for the stepper on a record its target does not hold yet, holds the same width. The .record-row-meta
+   stacking rule turns on the trailing cell's width, and a list where some rows show Add and others the stepper
+   would otherwise stack the one and not the other. These three rules keep those rows shrink-wrapped rather than
+   taking the card's full-width bar, and go when both rows move onto RecordCard. */
+.record-row .quantity-stepper {
     justify-content: flex-end;
     min-width: calc(2 * 48px + 5ch);
 }
 
-.record-row-stepper .mud-button-root {
+.record-row .quantity-stepper-field {
+    flex: none;
+}
+
+.record-row .quantity-stepper-field .mud-input > input.mud-input-root {
+    width: 4.5ch;
+}
+
+/* One record in a list (RecordCard.razor): the identity zone, then an optional stepper zone and an optional actions
+   zone, each under a hairline. The zones always stack, at every width, so every device shows the same controls. */
+.record-card {
+    width: 100%;
+}
+
+/* The Info button stays pinned to the top-right corner however many lines the name wraps to. overflow-wrap:
+   break-word breaks only a word too long to fit a line by itself; a name is never ellipsized. The negative margins
+   pull the 44px button's padding out to the card's edge and center its glyph on the name's first line. */
+.record-card-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.record-card-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.record-card-info {
+    flex: none;
+    margin: -10px -12px -6px 0;
+}
+
+/* The kind caption on the left and the category chip on the right. When a long category name does not fit beside
+   the caption it wraps onto its own line, and margin-left: auto keeps it on the right there too. */
+.record-card-kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 8px;
+}
+
+/* Repeats .mud-chip so it outranks .mud-chip.category-chip's margin: 0 below. */
+.record-card-kind .mud-chip.category-chip {
+    margin-left: auto;
+}
+
+.record-card-detail {
+    overflow-wrap: break-word;
+}
+
+.record-card-zone {
+    border-top: 1px solid var(--mud-palette-lines-default);
+    margin-top: 4px;
+    padding-top: 4px;
+}
+
+/* The negative margins pull the buttons' padding out past the card's padding, so the last glyph lines up under the
+   Info glyph and the card does not end in a band of empty padding. The right one goes on the button, not the zone,
+   which would carry its hairline out with it. */
+.record-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-bottom: -8px;
+}
+
+.record-card-actions > :last-child {
+    margin-right: -12px;
+}
+
+.record-card .mud-icon-button {
+    min-width: 44px;
     min-height: 44px;
 }
 
-/* Sized on the input in its own ch rather than a px width on the control: the WebView's text zoom
-   scales the digits but not a px box, and 56px held three digits at 130%. Four digits plus a little
-   air, at any zoom. The selector repeats MudBlazor's own (.mud-input > input.mud-input-root, which
-   sets width: 100%) so it outranks it; the control is width: auto and shrink-wraps the input. */
-.record-row-qty-field {
-    width: auto;
+/* QuantityStepper.razor: four buttons spaced evenly across the bar, and the quantity field between them taking
+   whatever is left. The cap stops a wide card from drawing a field hundreds of pixels wide around a few digits.
+   Calibration: in the Craft batch at 320px / 200% the bar has about 320 - 2 x (16 page + 12 card + 1 border
+   + 8 item) = 246px; four 48px buttons leave about 54px, three digits of the 32px face. The input scrolls rather
+   than clips, so a longer number is still editable. */
+.quantity-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.record-row-qty-field .mud-input > input.mud-input-root {
-    width: 4.5ch;
+.quantity-stepper .mud-icon-button {
+    flex: none;
+}
+
+.quantity-stepper-add {
+    min-height: 44px;
+}
+
+.quantity-stepper-field {
+    flex: 1 1 4.5ch;
+    min-width: 3ch;
+    max-width: 20ch;
+}
+
+/* The selector repeats MudBlazor's own (.mud-input > input.mud-input-root, which sets width: 100%) so it outranks
+   it. tabular-nums keeps the digits from shifting as the quantity changes. */
+.quantity-stepper-field .mud-input > input.mud-input-root {
+    width: 100%;
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
@@ -880,7 +950,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     column-gap: 16px;
     row-gap: 2px;
     font-variant-numeric: tabular-nums;
-    /* Room for "Quantity" and a four-digit currency value. A floor for the same reason .record-row-stepper
+    /* Room for "Quantity" and a four-digit currency value. A floor for the same reason .record-row .quantity-stepper
        has one: the .record-row-meta stacking rule turns on this cell's width, and left to its figures a
        row saying x30 / $150.00 would stack while its neighbor saying x5 / $10.00 did not. Wider figures
        still widen the cell; the floor covers the values a real batch produces. */

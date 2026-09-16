@@ -32,19 +32,19 @@
                             <div class="record-row-meta"><CategoryChip Record="@record" /></div>
                             @* index.html stops a tap on these buttons from taking focus off the search field, so
                                the keyboard stays up between searches. *@
-                            <div class="record-row-end record-row-stepper">
+                            <div class="record-row-end quantity-stepper">
                                 @if (Target.Find(record) is { } entry)
                                 {
                                     <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" aria-label="Less"
                                                    OnClick="@(() => Target.StepAsync(entry, -1))" />
                                     <MudNumericField T="long" Value="entry.Quantity" ValueChanged="@(v => Target.SetQuantityAsync(entry, v))"
-                                                     Min="0" DebounceInterval="300" HideSpinButtons="true" Class="record-row-qty-field" />
+                                                     Min="0" DebounceInterval="300" HideSpinButtons="true" Class="quantity-stepper-field" />
                                     <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" aria-label="More"
                                                    OnClick="@(() => Target.StepAsync(entry, 1))" />
                                 }
                                 else
                                 {
-                                    <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                                    <MudButton Class="quantity-stepper-add" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
                                                OnClick="@(() => Target.AddAsync(record))">Add</MudButton>
                                 }
                             </div>

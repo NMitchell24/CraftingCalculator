@@ -47,10 +47,9 @@ into ![More](assets/more-vert.svg) **More actions**, and tapping it opens a menu
 > **Example:** The [Dataset Screen](dataset.md) has 5 actions. On a phone you'll see Categories, Components and
 > Blueprints, and ![More](assets/more-vert.svg) holds Import/Export and Delete all data.
 
-> **Note:** a couple of actions are phone-only. A tablet or PC has room to put them right on each row, so the
-> [Craft Screen](craft-screen.md#stepping-by-ten)'s ![Step by 10](assets/x10.svg) **Step by 10** turns into buttons on
-> every batch row, and the record lists' ![Duplicate](assets/content-copy.svg) **Duplicate** turns into a button on
-> every record. One fewer action, and one fewer mode to remember.
+> **Note:** one action is phone-only. A tablet or PC has room to put it right on each row, so the record lists'
+> ![Duplicate](assets/content-copy.svg) **Duplicate** turns into a button on every record. One fewer action, and one
+> fewer mode to remember.
 
 ## How these bars behave across devices
 
