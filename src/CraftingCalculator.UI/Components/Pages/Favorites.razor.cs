@@ -11,18 +11,18 @@ using Color = MudBlazor.Color;
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
-/// The saved favorites. A row opens the rename dialog, except while the list is in the Delete Mode
-/// described by <see cref="ListMode"/>, where a row tap feeds that mode instead.
+/// The saved favorites. Each favorite is a card whose buttons show, rename or delete it; while the list is in
+/// Delete mode (<see cref="ListMode"/>), a tap on a card selects it.
 /// </summary>
 public partial class Favorites : ComponentBase, IDisposable
 {
-    /// <summary>What a row tap does, driven by the Delete action on the shell.</summary>
+    /// <summary>What a card tap does, driven by the Delete action on the shell.</summary>
     private enum ListMode
     {
-        /// <summary>A row tap opens the rename dialog.</summary>
+        /// <summary>A card tap does nothing.</summary>
         Normal,
 
-        /// <summary>Row taps toggle selection; the Delete action then deletes the selection.</summary>
+        /// <summary>Card taps toggle selection; the Delete action then deletes the selection.</summary>
         Delete
     }
 
@@ -114,11 +114,10 @@ public partial class Favorites : ComponentBase, IDisposable
         return Task.CompletedTask;
     }
 
-    private async Task OnRowClick(BlueprintFavorite favorite)
+    private void ToggleSelection(BlueprintFavorite favorite)
     {
-        if (_mode == ListMode.Normal)
+        if (_mode != ListMode.Delete)
         {
-            await RenameAsync(favorite);
             return;
         }
 
@@ -131,6 +130,13 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private string RowClass(BlueprintFavorite favorite) =>
         _mode == ListMode.Delete && _selected.Contains(favorite.Id) ? "list-item-selected" : "";
+
+    private static IReadOnlyList<string> DetailsFor(BlueprintFavorite favorite) =>
+        [$"{favorite.BlueprintCount} blueprint{(favorite.BlueprintCount == 1 ? "" : "s")}"];
+
+    private async Task ShowInfoAsync(BlueprintFavorite favorite) =>
+        await InfoDialog.ShowAsync(
+            DialogService, favorite, await FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
 
     private async Task RenameAsync(BlueprintFavorite favorite)
     {

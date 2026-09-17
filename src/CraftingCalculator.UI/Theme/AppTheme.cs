@@ -121,7 +121,7 @@ public static class AppTheme
     // FontSize uses clamp(minPx, Xvw, maxPx). Android's WebView applies the OS "Font size" setting as a
     // text zoom that multiplies every font size after it resolves, whatever unit it was written in, so
     // no unit is immune to it and none compounds it; the bounds are px because they are absolute
-    // design sizes, and the layouts reflow to absorb the zoom (app.css .record-row) rather than the
+    // design sizes, and the layouts reflow to absorb the zoom (app.css's container queries) rather than the
     // scale fighting the setting. Lengths are a different matter: the zoom scales ch (measured from
     // the zoomed glyphs) but not em or rem, which app.css relies on where a width has to follow the
     // text. Using viewport width keeps text a stable fraction of the screen and lets "Display size"

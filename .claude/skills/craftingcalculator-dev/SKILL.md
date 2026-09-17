@@ -182,7 +182,7 @@ beats exact alignment.** A new or changed component has to hold to these, or it 
 - **A list reflows as a whole or not at all.** One row stacked between rows that still share a line reads as an
   accident. Make the decision at the list, not the row: a `container-type: inline-size` wrapper with an
   `@container (max-width: Nch)` query (`.summary-list`, `.pane-tabs`, `.steps-tree`), a fixed `ch` basis that is
-  the same on every row (`.record-row-meta`), or the "Holy Albatross" `flex: 1 1 calc((Nch - 100%) * 999)`
+  the same on every row, or the "Holy Albatross" `flex: 1 1 calc((Nch - 100%) * 999)`
   (`.production-time-row`). Keep the per-row wrap as the fallback for a single row that still does not fit.
 - **Lengths that have to follow the text are in `ch` (or `lh`), never `em`/`rem`.** Android's text zoom scales
   `px` and `ch` but not `em`/`rem` (measured: 10em = 154px, 10ch = 126px at 130%). A **media query cannot see the
@@ -234,7 +234,7 @@ lines is a mid-word break, and `document.documentElement.scrollWidth > innerWidt
 
 The **full matrix** (`font_scale` 0.85 / 1.0 / 1.3 / 2.0 × `wm density` 480 / 544 / 672, portrait and
 landscape, every screen, plus the Windows head at a few widths) is the pre-merge check for a branch that
-touches shared layout: the `.record-row` family, the app bar, dialogs, a list or a card every screen uses.
+touches shared layout: `RecordCard` and `QuantityStepper`, the app bar, dialogs, a list or a card every screen uses.
 It is expensive: about twenty minutes of emulator time, hundreds of screenshots and measurements, and a lot
 of tokens if the output is read back. **Do not run it on your own initiative. Ask first,** and only when the
 change warrants it; a single-component change gets the one-screen check above. Any scripts that automate the

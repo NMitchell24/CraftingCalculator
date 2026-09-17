@@ -38,12 +38,17 @@ Build your batch on the [Craft screen](craft-screen.md), then tap ![Save as favo
 
 ## The Favorites screen
 
-A list of everything you've saved, each row showing its name and how many blueprints it holds.
+Every favorite is a card. The top shows its name, the word "Favorite", and how many blueprints it holds.
 
-| Control                                        | What it does                     |
-|------------------------------------------------|----------------------------------|
-| **Tap the row**, or ![Rename](assets/edit.svg) | Rename it.                       |
-| ![Delete](assets/delete.svg)                   | Delete it, after a confirmation. |
+Tap ![Info](assets/info.svg) in the corner to see which blueprints are in it, and how many of each, without loading
+it onto the Craft screen.
+
+Under the line at the bottom of the card are its buttons:
+
+| Control                      | What it does                     |
+|------------------------------|----------------------------------|
+| ![Rename](assets/edit.svg)   | Rename it.                       |
+| ![Delete](assets/delete.svg) | Delete it, after a confirmation. |
 
 Names need to be unique. You can't create two favorites called `Raid Kit`. If the favorite you're renaming is the 
 one currently loaded on the Craft screen, the Craft screen updates to the new name.
@@ -54,7 +59,7 @@ favorites you create.
 
 ### The actions
 
-Two [actions](actions-bar.md), for when deleting one row at a time gets old. They work exactly the way they do on
+Two [actions](actions-bar.md), for when deleting one favorite at a time gets old. They work exactly the way they do on
 the [Dataset](dataset.md) lists.
 
 | Action                                                  | What it does                               |
@@ -66,9 +71,9 @@ Both gray out until you've saved a favorite, since there would be nothing to act
 
 ### Delete mode (deleting several at once)
 
-Tap ![Delete](assets/delete.svg) **Delete**, then tap every favorite you want gone. Selected rows will highlight.
+Tap ![Delete](assets/delete.svg) **Delete**, then tap every favorite you want gone. Selected cards will highlight.
 Then tap it a second time to delete all the selected favorites. You get a confirmation naming how many are about to
-go. While the mode is on, tapping a row selects it instead of opening the rename dialog.
+go. Tapping a card only selects it while the mode is on; the rest of the time a tap on the card does nothing.
 
 > **Tip:** Changed your mind? **Press and hold the ![Delete](assets/delete.svg) action** to leave the mode with
 > nothing deleted and your selection discarded.

@@ -48,7 +48,7 @@ html, body {
 /* Startup cloak - the markup and its dismissal live in index.html; this is only its appearance. Covers
    the whole webview from the first paint until MainLayout reports the breakpoint and dark-mode values
    in. Sits above every MudBlazor layer (its highest, the tooltip, is 1600) so no part of the
-   half-resolved layout shows through. The colour is the MauiSplashScreen Color in
+   half-resolved layout shows through. The color is the MauiSplashScreen Color in
    CraftingCalculator.UI.csproj; the two have to be changed together. */
 .app-cloak {
     position: fixed;
@@ -81,7 +81,7 @@ html, body {
 
 /* Every value here is pinned rather than inherited, and each for its own reason. This block follows
    .display-title in the file, so it wins those ties.
-   - color: nothing has resolved a palette yet when this paints, so there is no theme colour to inherit.
+   - color: nothing has resolved a palette yet when this paints, so there is no theme color to inherit.
      #E4E7EC is the ink the slate app bar already uses (AppTheme.ForgeColors.DarkInk).
    - font-size: .display-title's 1.24em is relative, and against the body's 16px would land at app-bar
      size on a full-screen splash. 34px is Jersey 20's design em, the size it renders grid-crisp at (see
@@ -415,7 +415,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* Shares the line with the heading when both fit at their natural widths; otherwise drops beneath it
    and takes the full width, so its label never runs under the dropdown arrow. The basis is what its
    "Load Favorite" label and a short favorite name need, in ch so it grows with Android's text zoom the
-   way the text does (see .record-row-meta for why not em). */
+   way the text does (the zoom scales ch but leaves em and rem unzoomed). */
 .craft-favorite-select {
     flex: 1 1 17ch;
     min-width: 0;
@@ -486,8 +486,8 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* Success/Error rather than fixed hex values: MudThemeProvider re-emits both palette variables for
-   the dark theme, so the sign colours follow the theme without a second rule. A profit of exactly
-   zero gets neither class and keeps the text-primary colour above - an empty batch is not a win. */
+   the dark theme, so the sign colors follow the theme without a second rule. A profit of exactly
+   zero gets neither class and keeps the text-primary color above - an empty batch is not a win. */
 .summary-profit-positive {
     color: var(--mud-palette-success);
 }
@@ -632,129 +632,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     opacity: 0.7;
 }
 
-/* One row shape for every record list in the app: the Craft batch, the Components and Surplus lists,
-   Favorites, the Dataset list, the blueprint editor's requirements, and both picker dialogs. Three
-   cells - the name, with its caption beneath when the row has one; the meta, which is the category
-   chip; and the trailing cell, which holds the row's buttons or, on a read-only row, its figures.
-
-   In a narrow list (under 55ch of the list's own text, the .record-list query below): the name owns
-   the first line, so a long one has the whole card width and wraps rather than fighting the chip and
-   buttons for it; the chip and the trailing cell share the second line while the chip's basis fits
-   beside the buttons, and otherwise the buttons move down to a third. A wider list puts all three cells
-   on one line, which is the row the Dataset list always had. Nothing in a row is truncated: names and
-   category names are user data, and overflow-wrap: break-word breaks a 40-character word that could not
-   fit a line by itself rather than widening the row. Android scales px text by the OS Font size setting, so at its top a phone
-   shows about half again as much text per line as the design width, and a landscape phone has the
-   text budget of a narrow one; every shape here is checked there, not only at the default. */
-.record-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 8px;
-    width: 100%;
-}
-
-.record-row-name {
-    flex: 1 0 100%;
-    min-width: 0;
-    overflow-wrap: break-word;
-}
-
-/* MudText renders a caption as an inline span; under the name it is a line of its own. */
-.record-row-caption {
-    display: block;
-}
-
-/* 12ch is about the width of a two-word category chip. The meta asks for that much beside the buttons
-   and, when they leave less, takes the line for itself and the buttons drop to a line of their own.
-   The basis is fixed rather than the chip's own width on purpose: the decision then turns only on the
-   buttons' width and the row's, which are the same for every row of a list, so a list stacks as a
-   whole or not at all - never one stacked row among rows that are not. A chip wider than the meta
-   wraps inside it (.category-chip). ch rather than em: Android's text zoom scales the glyphs,
-   and so a ch, but leaves em and rem lengths at their unzoomed size (measured on the Pixel 9 AVD at
-   130%: 10em = 154px, 10ch = 126px, against a computed font size of 20px), and this basis has to grow
-   with the chip's text or the chip wraps at exactly the zoom where it needs the room most. */
-.record-row-meta {
-    display: flex;
-    flex: 1 1 12ch;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 8px;
-    min-width: 0;
-    overflow-wrap: break-word;
-}
-
-/* An uncategorized record renders no chip. The empty cell has to go, or its 8em basis would still push
-   the buttons down a line and leave a blank one behind. The markup keeps the div on one line so Blazor
-   emits no whitespace text node inside it; comment nodes do not stop :empty from matching. */
-.record-row-meta:empty {
-    display: none;
-}
-
-/* margin-left: auto keeps the buttons at the trailing edge whether they share the meta's line or have
-   one of their own. flex: 0 1 auto plus min-width: 0 let the cell itself shrink below its content's
-   natural width instead of forcing the row wider than the card; flex-wrap plus justify-content:
-   flex-end then wrap content that still does not fit (at the largest Android text size) onto a second
-   line, right-aligned under the first, rather than clipping it at the card edge. Wrapping happens
-   between groups, never inside one: each group is one flex item here, so its own buttons move to the
-   next line together instead of splitting mid-group. */
-.record-row-end {
-    display: flex;
-    flex: 0 1 auto;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 4px 8px;
-    min-width: 0;
-    margin-left: auto;
-}
-
-/* Groups icon-only row actions (Favorites' and DatasetList's Edit/Delete) into
-   one flex item so .record-row-end wraps them together - see the comment above. */
-.record-row-icons {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* Every MudList that holds .record-rows (the batch, Components and Surplus lists, the Dataset and Favorites
-   lists, the blueprint editor's requirements, the picker and Add requirements dialogs). It is the container
-   the one-line query below measures, so a list goes to one line as a whole or not at all. */
-.record-list {
-    container-type: inline-size;
-}
-
-/* One line per row once the list is wide enough, measured in the list's own ch so the decision follows
-   Android's text zoom. The viewport-width media query this replaces (min-width: 600px) put a 712px
-   landscape phone at 200% on one line, where it has the text budget of a 356px phone: the name column
-   starved and "Wood" broke mid-word while the chip ran into the figures. Calibration: about 47ch on a
-   448px phone at 100% and about 52ch on a 997px landscape phone at 200% (both wrap); about 58ch at a
-   600px viewport at 100%, where the side rail has appeared, and about 72ch on an 880px landscape phone
-   at 130% (both one line). */
-@container (min-width: 55ch) {
-    .record-row {
-        flex-wrap: nowrap;
-    }
-
-    /* The name gives way first: it shrinks and wraps its text while the chip holds its width up to the cap. */
-    .record-row-name {
-        flex: 1 1 auto;
-    }
-
-    .record-row-meta {
-        flex: 0 0 auto;
-        max-width: 40%;
-    }
-}
-
-/* Every row action here is a MudIconButton - explicit floor so the touch target meets the 44px rule
-   regardless of the icon button's own visual (smaller) padding. */
-.record-row .mud-icon-button {
-    min-width: 44px;
-    min-height: 44px;
-}
-
-/* Surface separation for every list in the app, applied to MudListItem rather than to .record-row so
+/* Surface separation for every list in the app, applied to MudListItem rather than to .record-card so
    that the help contents list (.help-topic-row) gets it from the same rule. Rows read as discrete
    cards instead of undifferentiated text on one flat sheet. MudListItem carries its own padding, so
    only the fill, border and rhythm are set here. */
@@ -1443,7 +1321,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* The bar parks at the top of whichever scrollport it is in and the rows scroll underneath - which is
    why it needs an opaque background of its own. Both hosts are listed because neither selector covers
    the other: the Dataset list scrolls the document, RecordPickerDialog scrolls its own dialog
-   content, and the offset and surface colour differ with it. */
+   content, and the offset and surface color differ with it. */
 .dataset-page .record-search,
 .picker-dialog-content .record-search {
     position: sticky;
@@ -1493,7 +1371,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     flex: 0 0 auto;
 }
 
-/* Same 44px floor as .record-row's buttons - the filter menu has no other way in. */
+/* Same 44px floor as .record-card's buttons - the filter menu has no other way in. */
 .record-search-row .mud-icon-button {
     min-width: 44px;
     min-height: 44px;
@@ -1865,9 +1743,9 @@ html.keyboard-open .mud-dialog-container {
 /* Help pages. The body is a rendered Markdown fragment (Components/Pages/Help.razor), so unlike the
    rest of the app these are bare HTML tags with no MudBlazor classes on them - every rule below is
    scoped to .help-article for that reason, and none of it leaks into the component markup elsewhere.
-   Colours come from the palette so the pages follow light/dark with everything else. */
+   Colors come from the palette so the pages follow light/dark with everything else. */
 /* The contents list's row (Help.razor): a topic's title and summary, and a chevron saying the row opens
-   it. Not a .record-row - there is no meta cell and the chevron belongs beside the title, not under it. */
+   it. Not a RecordCard - there is no kind, chip or Info button, and the chevron belongs beside the title. */
 .help-topic-row {
     display: flex;
     align-items: center;
@@ -1944,7 +1822,7 @@ html.keyboard-open .mud-dialog-container {
 /* An icon the help names, inlined into the prose by HelpProcessor from docs/help/assets. Sized in em so
    it tracks whatever it sits in - body copy, a table cell, a heading - and the width/height attributes
    on the file itself lose to these. fill is currentColor by the time it gets here, so it takes the
-   surrounding text's colour and follows the theme with it. */
+   surrounding text's color and follows the theme with it. */
 .help-article .help-icon {
     width: 1.25em;
     height: 1.25em;
