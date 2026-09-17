@@ -28,8 +28,8 @@ That's it. Tap ![Save](assets/save.svg) **Save**.
 When adding or editing any component or blueprint you have the option to select a **Category**. Pick one, or 
 clear it with the **×** to leave the record uncategorized. A record can only be in **one** category at a time.
 
-The category then shows up as a small chip on that record wherever it displays in the app. This allows you to easily 
-visually identify what group that item belongs to.
+The category then shows up as a small chip on that record's detail card, the one ![Info](assets/info.svg) opens. That way you can 
+see at a glance what group that item belongs to.
 
 ## Filtering by category
 

@@ -9,6 +9,10 @@
                 <CategoryChip Record="@Record" Class="info-dialog-category" />
             }
         </div>
+        @if (Kind is not null)
+        {
+            <MudText Typo="Typo.caption" Class="info-dialog-kind">@Kind</MudText>
+        }
     </TitleContent>
     <DialogContent>
         @if (!string.IsNullOrWhiteSpace(Record?.Description))

@@ -48,30 +48,17 @@ directly. Tapping anywhere on the card does the same thing.
 
 ## Inside a list
 
-Every record is a card. The top shows its name, what kind of record it is, its category chip, and one detail line.
-Categories don't get a chip, since the name right above it already says which category it is.
+Every record is a card. The top shows its name and its description, if you gave it one. That's it. No clutter, just
+the stuff you need to tell your records apart.
 
-The detail line changes with the type.
-
-- **Categories:** show their description, if they have one.
-- **Components:** show their cost.
-- **Blueprints:** list how many components they have. 
-
-Tap ![Info](assets/info.svg) in the corner to see everything about the record without opening the editor.
+Tap ![Info](assets/info.svg) in the corner to see everything else about a blueprint or a component without opening the
+editor: what kind of record it is, its category, its numbers, and what goes into it. Categories don't get
+![Info](assets/info.svg). A category is just a name and a description, and the card is already showing you both.
 
 Under the line at the bottom of the card are its buttons, and they're the same on a phone, a tablet or a PC.
 ![Edit](assets/edit.svg) opens the record in the editor. ![Copy](assets/content-copy.svg) opens the editor on a copy
 of it; see [Copying a record](dataset.md#copying-a-record). ![Delete](assets/delete.svg) deletes that one record after
 a confirmation.
-
-> **Note:** On the Blueprints list the detail line says something like `3 components`. This is not the quantity of 
-> components in the blueprint, but the number of individual components and other blueprints that have been linked 
-> with that specific blueprint. 
-> 
-> For example:  
-> Suppose you have a blueprint for Iron Ingot that takes 5 Iron Ore and 10 Wood. You have a second blueprint for 
-> Iron Axe that takes 2 Iron Ingot and 5 Wood. On the Blueprint list, both the Iron Axe and Iron Ingot blueprints 
-> will show `2 components`.
 
 ### Search and filter
 

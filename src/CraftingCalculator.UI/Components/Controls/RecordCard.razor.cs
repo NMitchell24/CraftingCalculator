@@ -14,20 +14,17 @@ public partial class RecordCard : ComponentBase
     /// <summary>The record's name, shown as the card's first line.</summary>
     [Parameter, EditorRequired] public string Name { get; set; } = "";
 
-    /// <summary>Caption under the name: "Blueprint", "Component", "Category" or "Favorite".</summary>
-    [Parameter, EditorRequired] public string Kind { get; set; } = "";
-
     /// <summary>
-    /// The record whose details the Info button opens, and whose category chip trails the kind when the record is filed
-    /// under a category; null for a row that is not a record (a favorite).
+    /// The record whose details the Info button opens. Null for a row that is not a record (a favorite), which
+    /// supplies <see cref="OnInfo" /> instead, or for a row with no Info button.
     /// </summary>
     [Parameter] public IBaseDataRecord? Record { get; set; }
 
     /// <summary>Extra identity lines, one per entry.</summary>
     [Parameter] public IReadOnlyList<string> Details { get; set; } = [];
 
-    /// <summary>Invoked by the Info button in place of opening <see cref="Record" />'s details. Required when
-    /// <see cref="Record" /> is null.</summary>
+    /// <summary>Invoked by the Info button in place of opening <see cref="Record" />'s details. The card has no Info
+    /// button when this and <see cref="Record" /> are both unset.</summary>
     [Parameter] public EventCallback OnInfo { get; set; }
 
     /// <summary>The stepper zone: a QuantityStepper, or a picker's Add button. Null when the row has no quantity.</summary>
@@ -37,6 +34,8 @@ public partial class RecordCard : ComponentBase
     [Parameter] public RenderFragment? Actions { get; set; }
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
+
+    private bool HasInfo => Record is not null || OnInfo.HasDelegate;
 
     private string InfoLabel => $"Info for {Name}";
 

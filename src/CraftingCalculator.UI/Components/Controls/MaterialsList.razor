@@ -13,8 +13,8 @@
             @foreach (ComponentQuantity componentQuantity in State.TotalComponents)
             {
                 <MudListItem T="ComponentQuantity">
-                    <RecordCard Name="@componentQuantity.Name" Kind="@componentQuantity.Type.GetDescription()"
-                                Record="@componentQuantity.Component" Details="@DetailsFor(componentQuantity)" />
+                    <RecordCard Name="@componentQuantity.Name" Record="@componentQuantity.Component"
+                                Details="@DetailsFor(componentQuantity)" />
                 </MudListItem>
             }
         </MudList>

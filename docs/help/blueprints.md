@@ -90,7 +90,8 @@ This shows up on the detail card when you tap the blueprint anywhere in the app.
 ## Adding requirements
 
 Tap ![Add](assets/add.svg) **Add requirements**. You get one list of everything this blueprint can use, components and
-blueprints together, sorted by name. The small line under each name tells you which one it is.
+blueprints together, sorted by name. Tap the ![Info](assets/info.svg) icon or use the Category filters if you're not 
+sure what type you're looking at.
 
 1. **Search:** start typing in ![Search](assets/search.svg) the search box and the list filters as you go.
    ![Filter](assets/filter-list.svg) narrows it down to a [category](categories.md) or two.
@@ -110,7 +111,7 @@ the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus one](
 > **Note:** Nothing is saved until you tap ![Save](assets/save.svg) **Save** back on the blueprint. **Cancel**
 > still throws all of it away.
 
-Back on the blueprint, each requirement you've added gets a card with its type, its category, ![Info](assets/info.svg),
+Back on the blueprint, each requirement you've added gets a card with its name, ![Info](assets/info.svg),
 the same stepper, and ![Delete](assets/delete.svg). Stepping down stops at 0, and typing 0 doesn't remove anything
 either. The card stays put, so a fat-fingered edit can't quietly delete the Copper out of your Bronze. Tap a minus
 once more at 0, or tap ![Delete](assets/delete.svg), when you really do want it gone. If you accidentally leave one at

@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
+using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -37,6 +38,10 @@ public partial class InfoDialog
     private ComponentModel? Component => Record as ComponentModel;
 
     private string? Name => Record is not null ? Record.Name : Favorite?.Name;
+
+    // Only a blueprint and a component name their kind. A category or a favorite is opened from a list that is
+    // already labeled with it.
+    private string? Kind => Record is BlueprintModel or ComponentModel ? Record.Type.GetDescription() : null;
 
     private string PartsLabel => Favorite is null ? "Components" : "Blueprints";
 

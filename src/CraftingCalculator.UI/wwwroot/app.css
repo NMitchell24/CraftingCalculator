@@ -688,21 +688,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin: -10px -12px -6px 0;
 }
 
-/* The kind caption on the left and the category chip on the right. When a long category name does not fit beside
-   the caption it wraps onto its own line, and margin-left: auto keeps it on the right there too. */
-.record-card-kind {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px 8px;
-}
-
-/* Repeats .mud-chip so it outranks .mud-chip.category-chip's margin: 0 below. */
-.record-card-kind .mud-chip.category-chip {
-    margin-left: auto;
-}
-
 .record-card-detail {
     overflow-wrap: break-word;
 }
@@ -1540,6 +1525,13 @@ html.keyboard-open .mud-dialog-container {
 
 .info-dialog-category {
     flex: 0 0 auto;
+}
+
+/* The kind caption sits on its own line under the name, whichever line the category chip ended up on. The margin
+   matches .info-dialog-title's gap, so a chip that wrapped under the name does not sit flush against it. */
+.info-dialog-kind {
+    display: block;
+    margin-top: 8px;
 }
 
 /* The description reads as prose above the figures, so it gets body spacing rather than a grid row. */

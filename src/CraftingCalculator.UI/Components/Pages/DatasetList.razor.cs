@@ -1,6 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
-using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
@@ -236,20 +235,8 @@ public partial class DatasetList : ComponentBase, IDisposable
         SetMode(ListMode.Normal);
     }
 
-    private static List<string> DetailsFor(IBaseDataRecord record) => record switch
-    {
-        ComponentModel component => [string.Format(FormatConstants.CurrencyFormat, component.Cost)],
-        BlueprintModel blueprint => [BlueprintCaption(blueprint)],
-        { Description: { Length: > 0 } description } => [description],
-        _ => []
-    };
-
-    private static string BlueprintCaption(BlueprintModel blueprint)
-    {
-        int components = blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count;
-
-        return $"{components} component{(components == 1 ? "" : "s")}";
-    }
+    private static List<string> DetailsFor(IBaseDataRecord record) =>
+        string.IsNullOrWhiteSpace(record.Description) ? [] : [record.Description];
 
     public void Dispose() => PageShellState.Reset(this);
 }

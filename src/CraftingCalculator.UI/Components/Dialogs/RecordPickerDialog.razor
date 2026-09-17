@@ -25,7 +25,7 @@
                            off the search field, so the keyboard stays up between searches. *@
                         @if (Target.Find(record) is { } entry)
                         {
-                            <RecordCard Name="@(record.Name ?? "")" Kind="@record.Type.GetDescription()" Record="@record">
+                            <RecordCard Name="@(record.Name ?? "")" Record="@record">
                                 <Stepper>
                                     <QuantityStepper Quantity="@entry.Quantity" OnStep="@(step => Target.StepAsync(entry, step))"
                                                      OnQuantityChanged="@(quantity => Target.SetQuantityAsync(entry, quantity))" />
@@ -39,7 +39,7 @@
                         }
                         else
                         {
-                            <RecordCard Name="@(record.Name ?? "")" Kind="@record.Type.GetDescription()" Record="@record">
+                            <RecordCard Name="@(record.Name ?? "")" Record="@record">
                                 <Stepper>
                                     <MudButton Class="quantity-stepper-add" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
                                                OnClick="@(() => Target.AddAsync(record))">Add</MudButton>

@@ -13,8 +13,8 @@
             @foreach (BlueprintQuantity blueprintQuantity in State.SurplusStock)
             {
                 <MudListItem T="BlueprintQuantity">
-                    <RecordCard Name="@blueprintQuantity.Name" Kind="@blueprintQuantity.Type.GetDescription()"
-                                Record="@blueprintQuantity.Blueprint" Details="@DetailsFor(blueprintQuantity)" />
+                    <RecordCard Name="@blueprintQuantity.Name" Record="@blueprintQuantity.Blueprint"
+                                Details="@DetailsFor(blueprintQuantity)" />
                 </MudListItem>
             }
         </MudList>
