@@ -3,7 +3,7 @@
     @if (Mode == ActionsBarMode.BottomBar)
     {
         <MudPaper Class="actions-bar" Elevation="3" Square="true">
-            @foreach (PageAction action in Visible)
+            @foreach (PageAction action in _visible)
             {
                 @* The pointer handlers cannot go on MudIconButton: @on* is an element-only directive,
                    the same constraint Dataset.razor works around. preventDefault on contextmenu stops
@@ -18,13 +18,13 @@
                                    OnClick="@(() => InvokeActionAsync(action))" title="@action.Label" aria-label="@action.Label" />
                 </span>
             }
-            @if (OverflowCount > 0)
+            @if (_overflow.Count > 0)
             {
                 @* Anchored to its own top edge so the menu opens upward: this bar is docked at the
                    bottom of the screen and a downward menu would open off it. *@
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="More actions"
                          AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.BottomRight">
-                    @foreach (PageAction action in Overflow)
+                    @foreach (PageAction action in _overflow)
                     {
                         <MudMenuItem Icon="@action.Icon" Disabled="@action.Disabled"
                                      OnClick="@(() => action.OnClick())">@action.Label</MudMenuItem>
@@ -36,10 +36,10 @@
     else
     {
         @* MudNavLink rather than a button so the actions inherit the drawer variant's own label
-           behaviour - icons alone on the Mini rail, icon + label when it is Persistent - without this
+           behavior - icons alone on the Mini rail, icon + label when it is Persistent - without this
            component knowing which variant is on screen. *@
         <MudDivider Class="actions-bar-divider" />
-        @foreach (PageAction action in Visible)
+        @foreach (PageAction action in _visible)
         {
             <div class="actions-bar-press"
                  @onpointerdown="@(() => BeginLongPress(action))"
@@ -51,11 +51,11 @@
                             OnClick="@(() => InvokeActionAsync(action))">@action.Label</MudNavLink>
             </div>
         }
-        @if (OverflowCount > 0)
+        @if (_overflow.Count > 0)
         {
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="More actions"
                      AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
-                @foreach (PageAction action in Overflow)
+                @foreach (PageAction action in _overflow)
                 {
                     <MudMenuItem Icon="@action.Icon" Disabled="@action.Disabled"
                                  OnClick="@(() => action.OnClick())">@action.Label</MudMenuItem>
