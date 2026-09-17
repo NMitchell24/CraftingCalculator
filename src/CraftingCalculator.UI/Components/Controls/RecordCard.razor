@@ -21,10 +21,14 @@
     }
     @if (Stepper is not null)
     {
-        <div class="record-card-zone" @onclick="() => { }" @onclick:stopPropagation="true">@Stepper</div>
+        <div class="record-card-zone">
+            <div class="record-card-zone-content" @onclick="() => { }" @onclick:stopPropagation="true">@Stepper</div>
+        </div>
     }
     @if (Actions is not null)
     {
-        <div class="record-card-zone record-card-actions" @onclick="() => { }" @onclick:stopPropagation="true">@Actions</div>
+        <div class="record-card-zone record-card-actions">
+            <div class="record-card-zone-content" @onclick="() => { }" @onclick:stopPropagation="true">@Actions</div>
+        </div>
     }
 </div>

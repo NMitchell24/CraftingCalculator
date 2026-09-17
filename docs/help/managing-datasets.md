@@ -66,7 +66,7 @@ empty.
 
 ![Dataset](assets/menu-book.svg) **Dataset** → ![Copy](assets/content-copy.svg) **Copy dataset**
 
-Builds a new dataset that starts out as a duplicate of the one you're in. Every category, every
+Builds a new dataset that starts out as a copy of the one you're in. Every category, every
 component, every blueprint, and every favorite, all of it copied across.
 
 This is what you want when the second dataset is *mostly* the same as the first. Say you've spent a week
