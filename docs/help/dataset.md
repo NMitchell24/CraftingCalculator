@@ -48,27 +48,30 @@ directly. Tapping anywhere on the card does the same thing.
 
 ## Inside a list
 
-Every row shows the record's name, a caption, and its category chip.
+Every record is a card. The top shows its name, what kind of record it is, its category chip, and one detail line.
+Categories don't get a chip, since the name right above it already says which category it is.
 
-The caption changes with the type.
+The detail line changes with the type.
 
-- **Categories:** show their description.
+- **Categories:** show their description, if they have one.
 - **Components:** show their cost.
 - **Blueprints:** list how many components they have. 
 
-Tap ![Edit](assets/edit.svg) to edit a row. You don't have to tap the icon directly. Tapping anywhere on the card 
-does the same thing. ![Delete](assets/delete.svg) deletes that one record after a confirmation. On a tablet or PC
-there's a ![Duplicate](assets/content-copy.svg) between them, too. See
-[Duplicating a record](dataset.md#duplicating-a-record).
+Tap ![Info](assets/info.svg) in the corner to see everything about the record without opening the editor.
 
-> **Note:** On the Blueprints list the caption says something like `3 components`. This is not the quantity of 
+Under the line at the bottom of the card are its buttons, and they're the same on a phone, a tablet or a PC.
+![Edit](assets/edit.svg) opens the record in the editor. ![Copy](assets/content-copy.svg) opens the editor on a copy
+of it; see [Copying a record](dataset.md#copying-a-record). ![Delete](assets/delete.svg) deletes that one record after
+a confirmation.
+
+> **Note:** On the Blueprints list the detail line says something like `3 components`. This is not the quantity of 
 > components in the blueprint, but the number of individual components and other blueprints that have been linked 
 > with that specific blueprint. 
 > 
 > For example:  
 > Suppose you have a blueprint for Iron Ingot that takes 5 Iron Ore and 10 Wood. You have a second blueprint for 
 > Iron Axe that takes 2 Iron Ingot and 5 Wood. On the Blueprint list, both the Iron Axe and Iron Ingot blueprints 
-> will show the caption `2 components`.
+> will show `2 components`.
 
 ### Search and filter
 
@@ -85,29 +88,22 @@ These [actions](actions-bar.md) show up whenever you go to one of the lists for 
 | Action                                                  | What it does                                |
 |---------------------------------------------------------|---------------------------------------------|
 | ![New](assets/add.svg) **New**                          | Opens an empty editor for this record type. |
-| ![Duplicate](assets/content-copy.svg) **Duplicate**     | On a phone, turns on Duplicate mode.        |
 | ![Delete](assets/delete.svg) **Delete**                 | Turns on Delete mode.                       |
 | ![Delete all](assets/delete-forever.svg) **Delete all** | Wipes this list after a confirmation.       |
 
 Everything but New grays out when the list is empty, since there would be nothing to act on.
 
-### Duplicating a record
+### Copying a record
 
-Duplicating opens the editor on a **copy** of a record, named `Whatever - Copy`, with nothing saved yet. Change what
-you need, fix the name, tap **Save**.
+![Copy](assets/content-copy.svg) **Copy** opens the editor on a **copy** of a record, named `Whatever - Copy`, with
+nothing saved yet. Change what you need, fix the name, tap **Save**.
 
 This is the fast way to build out an armor set or a tool tier, where five recipes differ by one
-material. How you start one depends on your screen:
-
-- **On a tablet or PC:** tap the ![Duplicate](assets/content-copy.svg) button on the row, between Edit and Delete.
-- **On a phone:** there's no room on the row for a third button, so it's a mode. Tap the
-  ![Duplicate](assets/content-copy.svg) **Duplicate** action, then tap any row. Tap the action again to leave the
-  mode without doing anything. In landscape orientation there's plenty of room to add this button in on a phone. So 
-  if you don't want to mess with turning the mode on, rotate your phone and just tap the button on the row.
+material. The button sits on every card, between Edit and Delete.
 
 ### Delete mode (deleting several at once)
 
-Tap ![Delete](assets/delete.svg) **Delete**, then tap every row you want gone. Selected rows will highlight. Then 
+Tap ![Delete](assets/delete.svg) **Delete**, then tap every card you want gone. Selected cards will highlight. Then 
 tap it a second time to delete all the selected records. You get a confirmation naming how many records are about 
 to go.
 
@@ -116,7 +112,7 @@ to go.
 
 ## Editing a record
 
-Tapping a row opens its editor. The fields differ by type. See [Blueprints](blueprints.md),
+Tapping ![Edit](assets/edit.svg) on a card opens its editor. The fields differ by type. See [Blueprints](blueprints.md),
 [Components](components.md) and [Categories](categories.md) for details about each type. The bar at the bottom is 
 always the same:
 

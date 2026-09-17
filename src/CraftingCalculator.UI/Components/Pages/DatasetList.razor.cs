@@ -11,32 +11,23 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
-/// One record type's list, reached from the <see cref="Dataset" /> landing page. Rows open
-/// <see cref="DatasetEditor" />, except while the list is in one of the bulk modes described by
-/// <see cref="ListMode"/>, where a row tap feeds that mode instead.
+/// One record type's list, reached from the <see cref="Dataset" /> landing page. Each record is a card whose buttons
+/// edit, copy or delete it; while the list is in Delete mode (<see cref="ListMode"/>), a tap on a card selects it.
 /// </summary>
 public partial class DatasetList : ComponentBase, IDisposable
 {
-    /// <summary>What a row tap does, driven by the Duplicate and Delete actions on the shell.</summary>
+    /// <summary>What a card tap does, driven by the Delete action on the shell.</summary>
     private enum ListMode
     {
-        /// <summary>A row tap opens the editor.</summary>
+        /// <summary>A card tap does nothing.</summary>
         Normal,
 
-        /// <summary>
-        /// The next row tap opens the editor on a copy of that record. Compact viewports only; wider rows carry a
-        /// Duplicate button of their own.
-        /// </summary>
-        Duplicate,
-
-        /// <summary>Row taps toggle selection; the Delete action then deletes the selection.</summary>
+        /// <summary>Card taps toggle selection; the Delete action then deletes the selection.</summary>
         Delete
     }
 
     /// <summary>The <see cref="DataType"/> being listed, as its enum name.</summary>
     [Parameter] public string Type { get; set; } = "";
-
-    [CascadingParameter] private Breakpoint Breakpoint { get; set; }
 
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
@@ -53,24 +44,17 @@ public partial class DatasetList : ComponentBase, IDisposable
     // value equality, so a selection held as records would not survive a reload.
     private readonly HashSet<int> _selected = [];
 
-    // The Type the list was last loaded for. A resized window or a turned phone changes only the
-    // Breakpoint, and reloading for it would discard a Delete Mode selection and clear the filter out from
-    // under a search bar still showing it.
+    // The Type the list was last loaded for. Parameters are set again whenever MainLayout re-renders, and
+    // reloading for that would discard a Delete Mode selection and clear the filter out from under a search bar
+    // still showing it.
     private string? _listedType;
 
-    // The IsCompact the shell's actions were last declared for; null until the first ConfigureShell.
-    private bool? _shellCompact;
-
     private List<IBaseDataRecord> FilteredRecords => RecordFilterProcessor.Apply(_records, _filter);
-
-    // Compact keeps Duplicate as a mode on the shell; wider viewports have room for it on every row.
-    private bool IsCompact => Breakpoint == Breakpoint.Xs;
 
     protected override async Task OnParametersSetAsync()
     {
         if (Type == _listedType)
         {
-            ApplyBreakpoint();
             return;
         }
 
@@ -111,41 +95,14 @@ public partial class DatasetList : ComponentBase, IDisposable
     /// <summary>The type's noun agreeing with <paramref name="count"/>, for text that counts records.</summary>
     private static string NounFor(DataType type, int count) => count == 1 ? type.GetDescription() : TitleFor(type);
 
-    private void ApplyBreakpoint()
-    {
-        // Configure re-renders MainLayout, which cascades the Breakpoint again, so the shell is re-declared only
-        // when the viewport crosses the compact boundary.
-        if (_shellCompact == IsCompact)
-        {
-            return;
-        }
-
-        // Duplicate Mode exists only on compact, so this is the viewport leaving it: the action is about to leave
-        // the shell, and the next row tap would otherwise make a copy with nothing on screen to turn the mode off.
-        if (_mode == ListMode.Duplicate)
-        {
-            SetMode(ListMode.Normal);
-            return;
-        }
-
-        ConfigureShell();
-    }
-
     private void ConfigureShell()
     {
         bool empty = _records.Count == 0;
-        _shellCompact = IsCompact;
 
         // TitleFor and DataType's description name the screen, where they are capitalized; an action label is a
         // sentence, where they are not.
         List<PageAction> actions =
             [new($"New {_type.GetDescription().ToLowerInvariant()}", Icons.Material.Filled.Add, CreateNewAsync)];
-
-        if (IsCompact)
-        {
-            actions.Add(new PageAction("Duplicate", Icons.Material.Filled.ContentCopy, ToggleDuplicateModeAsync,
-                Disabled: empty, Active: _mode == ListMode.Duplicate));
-        }
 
         // Wired only while the mode is on, the one state the gesture means anything in. A hold
         // outside it is inert either way - the WebView delivers no click after a long press, so
@@ -184,20 +141,6 @@ public partial class DatasetList : ComponentBase, IDisposable
         StateHasChanged();
     }
 
-    private Task ToggleDuplicateModeAsync()
-    {
-        if (_mode == ListMode.Duplicate)
-        {
-            SetMode(ListMode.Normal);
-            return Task.CompletedTask;
-        }
-
-        SetMode(ListMode.Duplicate);
-        Snackbar.Add($"Tap on a {_type.GetDescription()} to duplicate it", Severity.Info);
-
-        return Task.CompletedTask;
-    }
-
     private async Task ToggleDeleteModeAsync()
     {
         // The second tap of the Delete action is what commits the selection, so the one action both
@@ -225,29 +168,17 @@ public partial class DatasetList : ComponentBase, IDisposable
         return Task.CompletedTask;
     }
 
-    private void OnRowClick(IBaseDataRecord record)
+    private void ToggleSelection(IBaseDataRecord record)
     {
-        switch (_mode)
+        if (_mode != ListMode.Delete)
         {
-            case ListMode.Duplicate:
-                // Deliberately not reset to Normal first: this navigates away, and coming back from
-                // the editor lands on a fresh page instance whose mode is already Normal.
-                Duplicate(record);
-                break;
+            return;
+        }
 
-            case ListMode.Delete:
-                // Remove reports whether the id was selected, so the toggle costs one lookup either way.
-                if (!_selected.Remove(record.Id))
-                {
-                    _selected.Add(record.Id);
-                }
-
-                break;
-
-            case ListMode.Normal:
-            default:
-                Edit(record);
-                break;
+        // Remove reports whether the id was selected, so the toggle costs one lookup either way.
+        if (!_selected.Remove(record.Id))
+        {
+            _selected.Add(record.Id);
         }
     }
 
@@ -256,7 +187,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private void Edit(IBaseDataRecord record) => Navigation.NavigateTo($"/dataset/{record.Type}/{record.Id}");
 
-    private void Duplicate(IBaseDataRecord record) =>
+    private void Copy(IBaseDataRecord record) =>
         Navigation.NavigateTo($"/dataset/{record.Type}/0?copyFrom={record.Id}");
 
     private async Task DeleteAsync(IBaseDataRecord record)
@@ -305,11 +236,12 @@ public partial class DatasetList : ComponentBase, IDisposable
         SetMode(ListMode.Normal);
     }
 
-    private static string CaptionFor(IBaseDataRecord record) => record switch
+    private static List<string> DetailsFor(IBaseDataRecord record) => record switch
     {
-        ComponentModel component => string.Format(FormatConstants.CurrencyFormat, component.Cost),
-        BlueprintModel blueprint => BlueprintCaption(blueprint),
-        _ => record.Description ?? ""
+        ComponentModel component => [string.Format(FormatConstants.CurrencyFormat, component.Cost)],
+        BlueprintModel blueprint => [BlueprintCaption(blueprint)],
+        { Description: { Length: > 0 } description } => [description],
+        _ => []
     };
 
     private static string BlueprintCaption(BlueprintModel blueprint)

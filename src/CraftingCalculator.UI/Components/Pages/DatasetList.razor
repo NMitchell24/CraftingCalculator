@@ -28,34 +28,24 @@
         <MudList T="IBaseDataRecord" Class="record-list">
             @foreach (IBaseDataRecord record in FilteredRecords)
             {
-                <MudListItem T="IBaseDataRecord" Class="@RowClass(record)" OnClick="@(() => OnRowClick(record))">
-                    <div class="record-row">
-                        <div class="record-row-name">
-                            <MudText>@record.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="record-row-caption">@CaptionFor(record)</MudText>
-                        </div>
-                        <div class="record-row-meta"><CategoryChip Record="@record" /></div>
-                        @* Same shape as Favorites.razor: the row itself has a tap action, so the row
-                           buttons have to stop the event before it bubbles, and
-                           @onclick:stopPropagation only applies to an element - hence the wrapper. *@
-                        <div class="record-row-end" @onclick="() => { }" @onclick:stopPropagation="true">
-                            <div class="record-row-icons">
-                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                                               title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
-                                               OnClick="@(() => Edit(record))" />
-                                @* Compact viewports have Duplicate Mode on the shell instead (DatasetList.razor.cs). *@
-                                @if (!IsCompact)
-                                {
-                                    <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary"
-                                                   title="@($"Duplicate {record.Name}")" aria-label="@($"Duplicate {record.Name}")"
-                                                   OnClick="@(() => Duplicate(record))" />
-                                }
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
-                                               title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
-                                               OnClick="@(() => DeleteAsync(record))" />
-                            </div>
-                        </div>
-                    </div>
+                @* MudListItem draws as clickable whether or not OnClick is set, so the tap is always wired and
+                   ToggleSelection ignores it outside Delete mode; only the ripple follows the mode. *@
+                <MudListItem T="IBaseDataRecord" Class="@RowClass(record)" Ripple="@(_mode == ListMode.Delete)"
+                             OnClick="@(() => ToggleSelection(record))">
+                    <RecordCard Name="@(record.Name ?? "")" Kind="@record.Type.GetDescription()" Record="@record"
+                                Details="@DetailsFor(record)">
+                        <Actions>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                           title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
+                                           OnClick="@(() => Edit(record))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary"
+                                           title="@($"Copy {record.Name}")" aria-label="@($"Copy {record.Name}")"
+                                           OnClick="@(() => Copy(record))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                           title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
+                                           OnClick="@(() => DeleteAsync(record))" />
+                        </Actions>
+                    </RecordCard>
                 </MudListItem>
             }
         </MudList>

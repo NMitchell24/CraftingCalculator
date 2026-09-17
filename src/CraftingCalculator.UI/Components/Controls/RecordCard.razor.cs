@@ -18,8 +18,8 @@ public partial class RecordCard : ComponentBase
     [Parameter, EditorRequired] public string Kind { get; set; } = "";
 
     /// <summary>
-    /// The record whose category chip trails the kind and whose details the Info button opens; null for a row with no
-    /// category (a favorite).
+    /// The record whose details the Info button opens, and whose category chip trails the kind when the record is filed
+    /// under a category; null for a row that is not a record (a favorite).
     /// </summary>
     [Parameter] public IBaseDataRecord? Record { get; set; }
 
