@@ -56,11 +56,11 @@ build. See [Managing Datasets](managing-datasets.md).
 This also means two games can both have a `Wood` at completely different costs without you having to
 invent names to tell them apart.
 
-### Duplicate is your friend for tiers
+### Copy is your friend for tiers
 
 Armor sets, tool tiers and ammunition types are usually the same basic recipe with one or two materials swapped.
-Build the first one properly, then use ![Duplicate](assets/content-copy.svg) **Duplicate** on the
-Blueprints list for the rest. See [Duplicating a record](dataset.md#duplicating-a-record).
+Build the first one properly, then use ![Copy](assets/content-copy.svg) **Copy** on the
+Blueprints list for the rest. See [Copying a record](dataset.md#copying-a-record).
 
 ### Model a whole build as one blueprint
 

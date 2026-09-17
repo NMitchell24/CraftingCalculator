@@ -21,7 +21,8 @@ you can craft.
 
 ## Creating one
 
-**![Dataset](assets/menu-book.svg) Dataset → ![Components](assets/inventory-2.svg) Components → ![New](assets/add.svg) Add**, or tap an existing component's row to edit it.
+**![Dataset](assets/menu-book.svg) Dataset → ![Components](assets/inventory-2.svg) Components → 
+![New](assets/add.svg) Add**, or tap ![Edit](assets/edit.svg) on an existing component's card to edit it.
 
 ### Name
 
@@ -81,7 +82,7 @@ The one thing you gain by modeling it as a blueprint is that the app counts the 
 the production time, applies the yield rounding, and reports the surplus. If none of that matters for a
 given item, a component is less work.
 
-## Saving, duplicating and deleting
+## Saving, copying and deleting
 
 Same as everywhere else: ![Save](assets/save.svg) **Save** is grayed out until there is a name,
 **Cancel** and the back arrow warn you about unsaved edits, and ![Delete](assets/delete.svg) **Delete**
@@ -90,5 +91,5 @@ asks before it acts.
 Deleting a component that a blueprint uses removes it from that blueprint's requirements list. The blueprint
 itself survives. It just needs one less thing.
 
-To create a copy of one, use ![Duplicate](assets/content-copy.svg) **Duplicate** on the Components list.
+To create a copy of one, use ![Copy](assets/content-copy.svg) **Copy** on the Components list.
 See [The Dataset Screen](dataset.md) for more info.

@@ -21,7 +21,7 @@ Gunpowder you need to make — to craft the quantity of Ammo you want.
 ## Creating one
 
 ![Dataset](assets/menu-book.svg) **Dataset** → ![Blueprints](assets/handyman.svg) **Blueprints** → ![New](assets/add.svg) **Add**, 
-or open an existing blueprint by tapping its row.
+or open an existing blueprint by tapping ![Edit](assets/edit.svg) on its card.
 
 ### Name
 
@@ -151,7 +151,7 @@ blueprint that uses it, however deep. So if you're editing Gunpowder and Ammo is
 > and they're right back.
 
 > **Tip:** Armor sets and tool tiers are usually 90% identical. To make a near-copy easily, you can use
-> ![Duplicate](assets/content-copy.svg) **Duplicate** on the Blueprints list. 
+> ![Copy](assets/content-copy.svg) **Copy** on the Blueprints list. 
 > 
 > See [The Dataset Screen](dataset.md) for more information.
 

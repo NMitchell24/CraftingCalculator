@@ -835,6 +835,12 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-top: 4px;
 }
 
+/* The stopPropagation wrapper inside each zone (RecordCard.razor) draws no box of its own: its children lay out in
+   the zone, and a tap on the zone's empty space misses the wrapper and still selects the card in Delete mode. */
+.record-card-zone-content {
+    display: contents;
+}
+
 /* The negative margins pull the buttons' padding out past the card's padding, so the last glyph lines up under the
    Info glyph and the card does not end in a band of empty padding. The right one goes on the button, not the zone,
    which would carry its hairline out with it. */
@@ -845,7 +851,7 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: -8px;
 }
 
-.record-card-actions > :last-child {
+.record-card-actions > .record-card-zone-content > :last-child {
     margin-right: -12px;
 }
 

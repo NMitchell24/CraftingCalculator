@@ -55,7 +55,7 @@ public static class HelpTopics
             ["dataset/import-export"]),
 
         new("dataset", "The Dataset Screen",
-            "Browse, search, duplicate and delete your records.",
+            "Browse, search, copy and delete your records.",
             ["dataset"]),
 
         new("favorites", "Favorites",
