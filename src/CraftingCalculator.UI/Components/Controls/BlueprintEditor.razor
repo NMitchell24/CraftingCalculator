@@ -32,7 +32,7 @@ else
         @foreach (IBaseQuantityRecord part in Parts)
         {
             <MudListItem T="IBaseQuantityRecord" Ripple="false">
-                <RecordCard Name="@part.Name" Kind="@part.Type.GetDescription()" Record="@part.Record">
+                <RecordCard Name="@part.Name" Record="@part.Record">
                     <Stepper>
                         <QuantityStepper Quantity="@part.Quantity" OnStep="@(step => StepAsync(part, step))"
                                          OnQuantityChanged="@(quantity => SetQuantityAsync(part, quantity))" />

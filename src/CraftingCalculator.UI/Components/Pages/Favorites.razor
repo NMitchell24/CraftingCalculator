@@ -20,7 +20,7 @@
             @foreach (BlueprintFavorite favorite in _favorites)
             {
                 <MudListItem T="BlueprintFavorite" Class="@RowClass(favorite)" OnClick="@(() => ToggleSelection(favorite))">
-                    <RecordCard Name="@(favorite.Name ?? "")" Kind="Favorite" Details="@DetailsFor(favorite)"
+                    <RecordCard Name="@(favorite.Name ?? "")" Details="@DetailsFor(favorite)"
                                 OnInfo="@(() => ShowInfoAsync(favorite))">
                         <Actions>
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"

@@ -110,7 +110,7 @@ the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus one](
 > **Note:** Nothing is saved until you tap ![Save](assets/save.svg) **Save** back on the blueprint. **Cancel**
 > still throws all of it away.
 
-Back on the blueprint, each requirement you've added gets a card with its type, its category, ![Info](assets/info.svg),
+Back on the blueprint, each requirement you've added gets a card with its name, ![Info](assets/info.svg),
 the same stepper, and ![Delete](assets/delete.svg). Stepping down stops at 0, and typing 0 doesn't remove anything
 either. The card stays put, so a fat-fingered edit can't quietly delete the Copper out of your Bronze. Tap a minus
 once more at 0, or tap ![Delete](assets/delete.svg), when you really do want it gone. If you accidentally leave one at

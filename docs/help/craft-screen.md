@@ -90,7 +90,7 @@ with the quantity and total cost of each. If three different blueprints in your 
 you get **one** Iron line with the combined number. This is exactly what you want when you are
 standing in a mine or purchasing ore from a trader.
 
-Each card shows the component's name, its category, and two lines of figures: **Quantity** (`Quantity: x48`) and the
+Each card shows the component's name and two lines of figures: **Quantity** (`Quantity: x48`) and the
 **Cost** of that many.
 
 > **Tip:** Tap ![Info](assets/info.svg) on a card to show a detailed breakdown of that component with its Name,
@@ -123,7 +123,7 @@ The leftovers. The extra crap you can save for later. When a recipe yields 4 and
 twice. When you do, you end up with 2 more than you needed. This tab lists every one of those spares across the 
 whole batch along with what they are worth.
 
-Each card works like the Components tab's: the blueprint's name, its category, **Quantity** (`Quantity: x2`), and the
+Each card works like the Components tab's: the blueprint's name, **Quantity** (`Quantity: x2`), and the
 **Value** of those spares. ![Info](assets/info.svg) opens the blueprint's detail card.
 
 This isn't an error. It's just a side effect of a Blueprint that produces more than what you need. It's the app 

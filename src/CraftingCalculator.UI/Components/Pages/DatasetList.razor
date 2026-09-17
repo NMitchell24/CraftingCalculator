@@ -32,7 +32,9 @@
             @foreach (IBaseDataRecord record in FilteredRecords)
             {
                 <MudListItem T="IBaseDataRecord" Class="@RowClass(record)" OnClick="@(() => ToggleSelection(record))">
-                    <RecordCard Name="@(record.Name ?? "")" Kind="@record.Type.GetDescription()" Record="@record"
+                    @* A category has no Info button: its dialog would repeat the name and description the card
+                       already shows. *@
+                    <RecordCard Name="@(record.Name ?? "")" Record="@(_type == DataType.Category ? null : record)"
                                 Details="@DetailsFor(record)">
                         <Actions>
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"

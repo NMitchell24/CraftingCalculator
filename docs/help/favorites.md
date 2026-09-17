@@ -38,7 +38,7 @@ Build your batch on the [Craft screen](craft-screen.md), then tap ![Save as favo
 
 ## The Favorites screen
 
-Every favorite is a card. The top shows its name, the word "Favorite", and how many blueprints it holds.
+Every favorite is a card. The top shows its name and how many blueprints it holds.
 
 Tap ![Info](assets/info.svg) in the corner to see which blueprints are in it, and how many of each, without loading
 it onto the Craft screen.
