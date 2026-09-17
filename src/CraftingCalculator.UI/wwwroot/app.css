@@ -930,32 +930,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-top: 0;
 }
 
-/* The Components and Surplus lists' figures, in the row's trailing cell: one grid for all four cells
-   (both labels, then both values) so each value sits directly under its own label and the two values
-   share a row. tabular-nums keeps the digits from shifting the column alignment as quantities and
-   costs change. */
-.materials-row-stats {
-    display: grid;
-    grid-template-columns: auto auto;
-    align-items: baseline;
-    column-gap: 16px;
-    row-gap: 2px;
-    font-variant-numeric: tabular-nums;
-    /* Room for "Quantity" and a four-digit currency value. A floor because the .record-row-meta stacking
-       rule turns on this cell's width, and left to its figures a
-       row saying x30 / $150.00 would stack while its neighbor saying x5 / $10.00 did not. Wider figures
-       still widen the cell; the floor covers the values a real batch produces. */
-    min-width: 14ch;
-}
-
-.materials-row-label {
-    opacity: 0.7;
-}
-
-.materials-row-end {
-    text-align: right;
-}
-
 /* Sizes queries below against this element's own box, which follows Android's text zoom (font_scale)
    the way a media query - keyed to the unzoomed viewport - does not. Verified on-device: at font_scale
    2.0 the same CSS px width reports far fewer ch than at 1.0, because ch is relative to the zoomed font. */
