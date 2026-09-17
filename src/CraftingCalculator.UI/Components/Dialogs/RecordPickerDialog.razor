@@ -21,34 +21,31 @@
                 @foreach (IBaseDataRecord record in FilteredRecords)
                 {
                     <MudListItem T="IBaseDataRecord" Ripple="false">
-                        <div class="record-row">
-                            <div class="record-row-name">
-                                <MudText>@record.Name</MudText>
-                                @if (_showType)
-                                {
-                                    <MudText Typo="Typo.caption" Class="record-row-caption">@record.Type.GetDescription()</MudText>
-                                }
-                            </div>
-                            <div class="record-row-meta"><CategoryChip Record="@record" /></div>
-                            @* index.html stops a tap on these buttons from taking focus off the search field, so
-                               the keyboard stays up between searches. *@
-                            <div class="record-row-end quantity-stepper">
-                                @if (Target.Find(record) is { } entry)
-                                {
-                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium" aria-label="Less"
-                                                   OnClick="@(() => Target.StepAsync(entry, -1))" />
-                                    <MudNumericField T="long" Value="entry.Quantity" ValueChanged="@(v => Target.SetQuantityAsync(entry, v))"
-                                                     Min="0" DebounceInterval="300" HideSpinButtons="true" Class="quantity-stepper-field" />
-                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium" aria-label="More"
-                                                   OnClick="@(() => Target.StepAsync(entry, 1))" />
-                                }
-                                else
-                                {
+                        @* index.html stops a tap on the buttons in a card's stepper and actions zones from taking focus
+                           off the search field, so the keyboard stays up between searches. *@
+                        @if (Target.Find(record) is { } entry)
+                        {
+                            <RecordCard Name="@(record.Name ?? "")" Kind="@record.Type.GetDescription()" Record="@record">
+                                <Stepper>
+                                    <QuantityStepper Quantity="@entry.Quantity" OnStep="@(step => Target.StepAsync(entry, step))"
+                                                     OnQuantityChanged="@(quantity => Target.SetQuantityAsync(entry, quantity))" />
+                                </Stepper>
+                                <Actions>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                                   title="@RemoveLabel(record)" aria-label="@RemoveLabel(record)"
+                                                   OnClick="@(() => Target.RemoveAsync(entry))" />
+                                </Actions>
+                            </RecordCard>
+                        }
+                        else
+                        {
+                            <RecordCard Name="@(record.Name ?? "")" Kind="@record.Type.GetDescription()" Record="@record">
+                                <Stepper>
                                     <MudButton Class="quantity-stepper-add" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
                                                OnClick="@(() => Target.AddAsync(record))">Add</MudButton>
-                                }
-                            </div>
-                        </div>
+                                </Stepper>
+                            </RecordCard>
+                        }
                     </MudListItem>
                 }
             </MudList>

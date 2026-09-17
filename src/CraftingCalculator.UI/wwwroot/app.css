@@ -694,10 +694,9 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* margin-left: auto keeps the buttons at the trailing edge whether they share the meta's line or have
    one of their own. flex: 0 1 auto plus min-width: 0 let the cell itself shrink below its content's
    natural width instead of forcing the row wider than the card; flex-wrap plus justify-content:
-   flex-end then wrap content that still does not fit (the blueprint editor's .quantity-stepper alongside
-   its Delete button, at the largest Android text size) onto a second line, right-aligned under the
-   first, rather than clipping it at the card edge. Wrapping happens between the stepper and the
-   buttons beside it, never inside a group: each is one flex item here, so its own buttons move to the
+   flex-end then wrap content that still does not fit (at the largest Android text size) onto a second
+   line, right-aligned under the first, rather than clipping it at the card edge. Wrapping happens
+   between groups, never inside one: each group is one flex item here, so its own buttons move to the
    next line together instead of splitting mid-group. */
 .record-row-end {
     display: flex;
@@ -785,26 +784,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: 0;
 }
 
-/* The picker's and the blueprint editor's rows still put their +1 / -1 stepper in a .record-row's trailing cell.
-   The floor is that stepper's own width - two Size.Medium icon buttons (48px each) around the quantity input
-   (4.5ch of its subtitle1 face, about 5ch of the row's body face) - so that RecordPickerDialog's Add button, which
-   stands in for the stepper on a record its target does not hold yet, holds the same width. The .record-row-meta
-   stacking rule turns on the trailing cell's width, and a list where some rows show Add and others the stepper
-   would otherwise stack the one and not the other. These three rules keep those rows shrink-wrapped rather than
-   taking the card's full-width bar, and go when both rows move onto RecordCard. */
-.record-row .quantity-stepper {
-    justify-content: flex-end;
-    min-width: calc(2 * 48px + 5ch);
-}
-
-.record-row .quantity-stepper-field {
-    flex: none;
-}
-
-.record-row .quantity-stepper-field .mud-input > input.mud-input-root {
-    width: 4.5ch;
-}
-
 /* One record in a list (RecordCard.razor): the identity zone, then an optional stepper zone and an optional actions
    zone, each under a hairline. The zones always stack, at every width, so every device shows the same controls. */
 .record-card {
@@ -890,8 +869,14 @@ html.keyboard-open .page-content-with-bottom-nav {
     flex: none;
 }
 
+/* The picker's Add button stands in for the stepper on a record its target does not hold yet, right-aligned in the
+   zone where the stepper would be. The negative margins line its label up under the Info glyph and trim the card's
+   bottom padding, as .record-card-actions does for its buttons. */
 .quantity-stepper-add {
+    display: flex;
+    width: fit-content;
     min-height: 44px;
+    margin: 0 -8px -8px auto;
 }
 
 .quantity-stepper-field {
@@ -950,8 +935,8 @@ html.keyboard-open .page-content-with-bottom-nav {
     column-gap: 16px;
     row-gap: 2px;
     font-variant-numeric: tabular-nums;
-    /* Room for "Quantity" and a four-digit currency value. A floor for the same reason .record-row .quantity-stepper
-       has one: the .record-row-meta stacking rule turns on this cell's width, and left to its figures a
+    /* Room for "Quantity" and a four-digit currency value. A floor because the .record-row-meta stacking
+       rule turns on this cell's width, and left to its figures a
        row saying x30 / $150.00 would stack while its neighbor saying x5 / $10.00 did not. Wider figures
        still widen the cell; the floor covers the values a real batch produces. */
     min-width: 14ch;

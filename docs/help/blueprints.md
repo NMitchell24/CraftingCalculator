@@ -94,25 +94,27 @@ blueprints together, sorted by name. The small line under each name tells you wh
 
 1. **Search:** start typing in ![Search](assets/search.svg) the search box and the list filters as you go.
    ![Filter](assets/filter-list.svg) narrows it down to a [category](categories.md) or two.
-2. **Add:** tap ![Add](assets/add.svg) **Add** on a row to put one in the blueprint.
-3. **Adjust:** once a requirement is in, its row swaps **Add** for ![Minus](assets/remove.svg), a number you can edit,
-   and ![Plus](assets/add.svg). ![Minus](assets/remove.svg) stops at 0. Tap it once more at 0 and the requirement gets
-   dropped.
-4. **Close:** tap ![Close](assets/close.svg) **Close** in the top corner, or use your phone's back gesture, when you're
+2. **Add:** tap ![Add](assets/add.svg) **Add** on a card to put one in the blueprint.
+3. **Adjust:** once a requirement is in, its card swaps **Add** for ![Minus ten](assets/minus-10.svg)
+   ![Minus one](assets/minus-1.svg), a number you can edit, and ![Plus one](assets/plus-1.svg)
+   ![Plus ten](assets/plus-10.svg). Stepping down stops at 0. Tap a minus once more at 0 and the requirement gets
+   dropped. ![Delete](assets/delete.svg) drops it straight away, and the card goes back to **Add**.
+4. **Look it up:** every card has ![Info](assets/info.svg), which opens the detail card without leaving the list.
+5. **Close:** tap ![Close](assets/close.svg) **Close** in the top corner, or use your phone's back gesture, when you're
    finished. Back closes the list and leaves you on the blueprint.
 
 Every tap counts the moment you make it. There's no separate confirm step. The keyboard stays up while you tap
-the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus](assets/add.svg) once, type `tin`, tap
+the buttons, so for Bronze you can type `cop`, tap **Add** and then ![Plus one](assets/plus-1.svg) once, type `tin`, tap
 **Add**, and never have to chase the keyboard away. Scroll the list when you want it gone.
 
 > **Note:** Nothing is saved until you tap ![Save](assets/save.svg) **Save** back on the blueprint. **Cancel**
 > still throws all of it away.
 
-Back on the blueprint, each requirement you've added gets a row with ![Minus](assets/remove.svg), an editable number,
-![Plus](assets/add.svg), and ![Delete](assets/delete.svg). ![Minus](assets/remove.svg) stops at 0, and typing 0
-doesn't remove anything either. The row stays put, so a fat-fingered edit can't quietly delete the Copper out of your
-Bronze. Tap ![Minus](assets/remove.svg) once more at 0, or tap ![Delete](assets/delete.svg), when you really do want it
-gone. If you accidentally leave one at 0, **Save** asks you about it before it saves anything.
+Back on the blueprint, each requirement you've added gets a card with its type, its category, ![Info](assets/info.svg),
+the same stepper, and ![Delete](assets/delete.svg). Stepping down stops at 0, and typing 0 doesn't remove anything
+either. The card stays put, so a fat-fingered edit can't quietly delete the Copper out of your Bronze. Tap a minus
+once more at 0, or tap ![Delete](assets/delete.svg), when you really do want it gone. If you accidentally leave one at
+0, **Save** asks you about it before it saves anything.
 
 ### Nesting blueprints
 

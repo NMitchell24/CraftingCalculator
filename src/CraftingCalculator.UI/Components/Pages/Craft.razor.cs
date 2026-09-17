@@ -135,6 +135,12 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
         return Task.CompletedTask;
     }
 
+    public Task RemoveAsync(IBaseQuantityRecord entry)
+    {
+        State.Remove((BlueprintQuantity)entry);
+        return Task.CompletedTask;
+    }
+
     private Task ClearBatchAsync()
     {
         State.Clear();

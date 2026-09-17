@@ -6,11 +6,11 @@ namespace CraftingCalculator.Domain.Models;
 /// <summary>
 /// Represents a component and quantity.
 /// </summary>
-public class ComponentQuantity : IBaseQuantityRecord
+public class ComponentQuantity(ComponentModel component, long quantity, int id) : IBaseQuantityRecord
 {
-    public int Id { get; set; }
-    public ComponentModel Component { get; set; }
-    public long Quantity { get; set; }
+    public int Id { get; private set; } = id;
+    public ComponentModel Component { get; } = component;
+    public long Quantity { get; set; } = quantity;
 
     public string Name
     {
@@ -40,19 +40,14 @@ public class ComponentQuantity : IBaseQuantityRecord
         }
     }
 
+    public IBaseDataRecord Record => Component;
+
     public double TotalCost => Component.Cost * Quantity;
 
     /// <summary>How long producing this many of the component takes.</summary>
     public TimeSpan TotalProductionTime => DurationMath.Scale(Component.ProductionTime, Quantity);
 
     public string DisplayName => Name + " x" + Quantity;
-
-    public ComponentQuantity(ComponentModel component, long quantity, int id)
-    {
-        Component = component;
-        Quantity = quantity;
-        Id = id;
-    }
 
     public ComponentQuantity Clone()
     {
@@ -61,7 +56,7 @@ public class ComponentQuantity : IBaseQuantityRecord
 
     public ComponentQuantity CloneForSave()
     {
-        ComponentQuantity ret = this.Clone();
+        ComponentQuantity ret = Clone();
         ret.Id = 0;
         return ret;
     }

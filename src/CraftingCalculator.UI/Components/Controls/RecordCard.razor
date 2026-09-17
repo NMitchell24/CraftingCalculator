@@ -5,7 +5,7 @@
            not also toggle that selection. Every wrapper below exists for the same reason. *@
         <span class="record-card-info" @onclick="() => { }" @onclick:stopPropagation="true">
             <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Tertiary"
-                           title="@InfoLabel" aria-label="@InfoLabel" OnClick="OnInfo" />
+                           title="@InfoLabel" aria-label="@InfoLabel" OnClick="ShowInfoAsync" />
         </span>
     </div>
     <div class="record-card-kind">

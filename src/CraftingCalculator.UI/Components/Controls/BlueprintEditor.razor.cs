@@ -76,11 +76,13 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
         await NotifyChangedAsync();
     }
 
-    private async Task RemoveAsync(IBaseQuantityRecord part)
+    public async Task RemoveAsync(IBaseQuantityRecord entry)
     {
-        BlueprintPartProcessor.Remove(Model, part);
+        BlueprintPartProcessor.Remove(Model, entry);
         await NotifyChangedAsync();
     }
+
+    private static string RemoveLabel(IBaseQuantityRecord part) => $"Remove {part.Name}";
 
     private Task NotifyChangedAsync() => OnChanged.InvokeAsync();
 }

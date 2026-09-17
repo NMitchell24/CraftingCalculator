@@ -19,4 +19,7 @@ public interface IRecordPickerTarget
 
     /// <summary>Sets the entry's quantity to <paramref name="quantity" />.</summary>
     Task SetQuantityAsync(IBaseQuantityRecord entry, long quantity);
+
+    /// <summary>Removes the entry from the collection.</summary>
+    Task RemoveAsync(IBaseQuantityRecord entry);
 }
