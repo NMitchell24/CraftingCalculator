@@ -56,6 +56,14 @@ public class BlueprintMap
     }
 
     /// <summary>
+    /// Removes exactly <paramref name="blueprintQuantity"/> from the list, leaving any other entry that shares its name.
+    /// </summary>
+    public void Remove(BlueprintQuantity blueprintQuantity)
+    {
+        _internalList.Remove(blueprintQuantity);
+    }
+
+    /// <summary>
     /// Reset the Map and clear all BlueprintQuantity objects
     /// </summary>
     public void Reset()

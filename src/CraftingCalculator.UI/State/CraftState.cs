@@ -110,7 +110,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     public void Remove(BlueprintQuantity target)
     {
-        _blueprintMap.RemoveAll(target.Blueprint);
+        _blueprintMap.Remove(target);
         Recalculate();
     }
 
@@ -184,7 +184,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
             if (blueprint is null)
             {
-                _blueprintMap.RemoveAll(entry.Blueprint);
+                _blueprintMap.Remove(entry);
             }
             else
             {
