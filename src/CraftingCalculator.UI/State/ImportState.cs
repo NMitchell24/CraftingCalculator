@@ -64,7 +64,7 @@ public sealed class ImportState(
     /// <summary>The blueprints the last merge would have nested inside themselves, by name; empty otherwise.</summary>
     public IReadOnlyList<string> CycleNames { get; private set; } = [];
 
-    public bool IsRunning =>
+    private bool IsRunning =>
         Step is ImportStep.OpeningFile or ImportStep.Validating or ImportStep.CheckingConflicts or ImportStep.Importing;
 
     /// <summary>Whether the selection can be imported: on <see cref="ImportStep.Review"/>, with a record selected.</summary>
@@ -126,7 +126,7 @@ public sealed class ImportState(
                 using FileStream stream = File.OpenRead(path);
                 ImportValidationResult read = TransferDocumentReader.Read(stream);
 
-                return (read, read.File is { } file ? DependencyGraphProcessor.Build(file.Snapshot) : null);
+                return (read, read.File is { } importFile ? DependencyGraphProcessor.Build(importFile.Snapshot) : null);
             });
 
             if (result.File is { } file && graph is not null)
@@ -356,26 +356,13 @@ public sealed class ImportState(
             return;
         }
 
+        // A replaced blueprint keeps its id, so the Craft batch reloads it by id rather than losing the user's batch.
         if (datasetId == selectedDataset.Id)
-        {
-            await ReloadCraftBatchAsync();
-        }
-
-        Finish("Data Imported");
-    }
-
-    // A replaced blueprint keeps its id, so the Craft batch reloads it by id rather than losing the user's batch.
-    private async Task ReloadCraftBatchAsync()
-    {
-        try
         {
             await craftState.ReloadBlueprintsAsync();
         }
-        catch (Exception exception)
-        {
-            // The import has already been written; a batch that couldn't refresh is no reason to report it failed.
-            Debug.WriteLine(exception);
-        }
+
+        Finish("Data Imported");
     }
 
     private void Finish(string message)

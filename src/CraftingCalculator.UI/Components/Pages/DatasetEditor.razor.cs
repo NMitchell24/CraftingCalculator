@@ -26,6 +26,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
+    [Inject] private CraftState CraftState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -89,6 +90,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         }
 
         await RecordService.SaveRecordAsync(_record);
+        await CraftState.ReloadBlueprintsAsync();
 
         _isDirty = false;
         Snackbar.Add($"Saved '{_record.Name}'", Severity.Success);
@@ -103,6 +105,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         }
 
         await RecordService.DeleteRecordAsync(_record);
+        await CraftState.ReloadBlueprintsAsync();
 
         _isDirty = false;
         Snackbar.Add($"Deleted '{_record.Name}'", Severity.Success);
