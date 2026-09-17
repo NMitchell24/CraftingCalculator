@@ -171,6 +171,23 @@ public class BlueprintDAOTests
     }
 
     [Test]
+    public async Task SaveAsync_RemovedChildBlueprint_DeletesItsLinkAndLeavesTheChild()
+    {
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+        BlueprintModel table = new() { Name = "Table" };
+        table.ChildBlueprints.Add(plank, 4);
+        BlueprintModel saved = await _blueprintDAO.SaveAsync(table);
+
+        BlueprintModel reloaded = (await _blueprintDAO.GetByIdAsync(saved.Id))!;
+        reloaded.ChildBlueprints.RemoveAll(plank);
+
+        await _blueprintDAO.SaveAsync(reloaded);
+
+        (await _blueprintDAO.GetByIdAsync(saved.Id))!.ChildBlueprints.BlueprintList.Should().BeEmpty();
+        (await _blueprintDAO.GetByIdAsync(plank.Id)).Should().NotBeNull();
+    }
+
+    [Test]
     public async Task DeleteAsync_RemovesTheBlueprint()
     {
         BlueprintModel saved = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Table" });

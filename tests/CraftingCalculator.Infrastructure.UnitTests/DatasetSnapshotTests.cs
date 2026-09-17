@@ -27,7 +27,7 @@ public class DatasetSnapshotTests
         _categoryDAO = new CategoryDAO(_fixture.DatasetFactory);
         _componentDAO = new ComponentDAO(_fixture.DatasetFactory);
         _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
-        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory, _blueprintDAO);
+        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory);
     }
 
     [TearDown]
@@ -68,7 +68,7 @@ public class DatasetSnapshotTests
         axe.ChildBlueprints.Add(bronze, 8);
         await _blueprintDAO.SaveAsync(axe);
 
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, [new BlueprintQuantity(axe, 5, 0)]);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, [new BlueprintQuantity(axe, 5)]);
 
         return (metals, copper, tin, wood, bronze, axe);
     }

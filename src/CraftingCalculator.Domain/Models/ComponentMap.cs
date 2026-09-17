@@ -1,30 +1,20 @@
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CraftingCalculator.Domain.Models;
 
 public class ComponentMap
 {
-    private readonly List<ComponentQuantity> _internalList = new List<ComponentQuantity>();
+    private readonly List<ComponentQuantity> _internalList = [];
     public ReadOnlyCollection<ComponentQuantity> ComponentList => _internalList.AsReadOnly();
-    public List<ComponentQuantity> RemovedComponents { get; } = new List<ComponentQuantity>();
 
-    public ComponentMap(ComponentMap map, bool cloneForSave)
+    private ComponentMap(ComponentMap map)
     {
-        _internalList = new List<ComponentQuantity>();
+        _internalList = [];
         foreach (ComponentQuantity componentQuantity in map.ComponentList)
         {
-            // Insures we don't retain references to the original ComponentQuantity object and cause those 
+            // Ensures we don't retain references to the original ComponentQuantity object and cause those
             // objects to get mutated elsewhere.
-            if (cloneForSave)
-            {
-                _internalList.Add(componentQuantity.CloneForSave());
-            }
-            else
-            {
-                _internalList.Add(componentQuantity.Clone());
-            }
+            _internalList.Add(componentQuantity.Clone());
         }
     }
 
@@ -41,30 +31,24 @@ public class ComponentMap
     /// <param name="quantity"></param>
     public void Add(ComponentModel? component, long quantity)
     {
-        if (component != null)
+        if (component == null)
         {
-            Add(component, quantity, 0);
+            return;
         }
-    }
 
-    public void Add(ComponentModel component, long quantity, int id)
-    {
-        if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name))
+        ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Name == component.Name);
+        if (existing != null)
         {
-            ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Name == component.Name);
-            if (existing != null)
-            {
-                existing.Quantity += quantity;
-            }
+            existing.Quantity += quantity;
         }
         else
         {
-            _internalList.Add(new ComponentQuantity(component, quantity, id));
+            _internalList.Add(new ComponentQuantity(component, quantity));
         }
     }
 
     /// <summary>
-    /// Decrement a ComponentQuantity by the provided amount.  
+    /// Decrement a ComponentQuantity by the provided amount.
     /// If the current Quantity - the provided quantity would be less than or equal to 0
     /// Then the Component will be removed.
     /// </summary>
@@ -89,15 +73,7 @@ public class ComponentMap
     /// <param name="component"></param>
     public void RemoveAll(ComponentModel component)
     {
-        if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name))
-        {
-            ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Name == component.Name);
-            if (existing != null)
-            {
-                RemovedComponents.Add(existing);
-                _internalList.Remove(existing);
-            }
-        }
+        _internalList.RemoveAll(componentQuantity => componentQuantity.Name == component.Name);
     }
 
     /// <summary>
@@ -114,15 +90,6 @@ public class ComponentMap
     /// <returns></returns>
     public ComponentMap Clone()
     {
-        return new ComponentMap(this, false);
-    }
-
-    /// <summary>
-    /// Return a clone of this map with the ID values on the internal ComponentQuantity objects cleared.
-    /// </summary>
-    /// <returns></returns>
-    public ComponentMap CloneForSave()
-    {
-        return new ComponentMap(this, true);
+        return new ComponentMap(this);
     }
 }

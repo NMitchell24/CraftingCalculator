@@ -108,36 +108,9 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
             .Select(dataset => dataset.Name)
             .SingleAsync();
 
-        List<SnapshotCategory> categories = await context.Categories
-            .AsNoTracking()
-            .OrderBy(category => category.Id)
-            .Select(category => new SnapshotCategory(category.Id, category.Name, category.Description))
-            .ToListAsync();
+        DatasetRecords records = await DatasetRecordsReader.ReadAsync(context);
 
-        List<SnapshotComponent> components = await context.Components
-            .AsNoTracking()
-            .OrderBy(component => component.Id)
-            .Select(component => new SnapshotComponent(
-                component.Id, component.Name, component.Description, component.Cost, component.ProductionTime,
-                component.CategoryId))
-            .ToListAsync();
-
-        // The link tables are read whole and grouped in memory, the way BlueprintDAO's LoadGraphAsync reads
-        // them, rather than through an Include per blueprint.
-        ILookup<int, QuantityLink> componentLinks = (await context.BlueprintComponents
-                .AsNoTracking()
-                .OrderBy(link => link.Id)
-                .Select(link => new { link.BlueprintId, link.ComponentId, link.Quantity })
-                .ToListAsync())
-            .ToLookup(link => link.BlueprintId, link => new QuantityLink(link.ComponentId, link.Quantity));
-
-        ILookup<int, QuantityLink> childLinks = (await context.BlueprintChildren
-                .AsNoTracking()
-                .OrderBy(link => link.Id)
-                .Select(link => new { link.ParentBlueprintId, link.ChildBlueprintId, link.Quantity })
-                .ToListAsync())
-            .ToLookup(link => link.ParentBlueprintId, link => new QuantityLink(link.ChildBlueprintId, link.Quantity));
-
+        // Read whole and grouped in memory, the way DatasetRecordsReader reads the blueprint links.
         ILookup<int, QuantityLink> favoriteLinks = (await context.FavoriteBlueprints
                 .AsNoTracking()
                 .OrderBy(link => link.Id)
@@ -145,19 +118,13 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
                 .ToListAsync())
             .ToLookup(link => link.FavoriteId, link => new QuantityLink(link.BlueprintId, link.Quantity));
 
-        List<Blueprint> blueprints = await context.Blueprints.AsNoTracking().OrderBy(blueprint => blueprint.Id).ToListAsync();
         List<Favorite> favorites = await context.Favorites.AsNoTracking().OrderBy(favorite => favorite.Id).ToListAsync();
 
         return new DatasetSnapshot(
             name,
-            categories,
-            components,
-            [
-                .. blueprints.Select(blueprint => new SnapshotBlueprint(
-                    blueprint.Id, blueprint.Name, blueprint.Description, blueprint.Value, blueprint.Yield,
-                    blueprint.ProductionTime, blueprint.CategoryId,
-                    [.. componentLinks[blueprint.Id]], [.. childLinks[blueprint.Id]]))
-            ],
+            records.Categories,
+            records.Components,
+            records.Blueprints,
             [
                 .. favorites.Select(favorite => new SnapshotFavorite(
                     favorite.Id, favorite.Name, [.. favoriteLinks[favorite.Id]]))
@@ -262,7 +229,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
 
             // The navigation rather than CategoryId: the copied category has no id until this all saves,
             // and EF fills the foreign key in from the principal it was inserted with.
-            Category = component.CategoryId is int categoryId ? categories[categoryId] : null
+            Category = component.CategoryId is { } categoryId ? categories[categoryId] : null
         });
 
         context.Components.AddRange(copies.Values);
@@ -291,11 +258,11 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
             Yield = blueprint.Yield,
             ProductionTime = blueprint.ProductionTime,
             DatasetId = datasetId,
-            Category = blueprint.CategoryId is int categoryId ? categories[categoryId] : null
+            Category = blueprint.CategoryId is { } categoryId ? categories[categoryId] : null
         });
 
-        // The link tables are read directly rather than through an Include, matching BlueprintDAO's
-        // LoadGraphAsync. Their query filters reach the dataset through the parent blueprint, so these
+        // The link tables are read directly rather than through an Include, matching
+        // DatasetRecordsReader. Their query filters reach the dataset through the parent blueprint, so these
         // arrive already scoped to the one being copied.
         foreach (BlueprintComponent link in await context.BlueprintComponents.AsNoTracking().ToListAsync())
         {

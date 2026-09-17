@@ -29,7 +29,7 @@ public class DatasetImportTests
         _categoryDAO = new CategoryDAO(_fixture.DatasetFactory);
         _componentDAO = new ComponentDAO(_fixture.DatasetFactory);
         _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
-        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory, _blueprintDAO);
+        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory);
     }
 
     [TearDown]
@@ -64,7 +64,7 @@ public class DatasetImportTests
         axe.ChildBlueprints.Add(bronze, 8);
         await _blueprintDAO.SaveAsync(axe);
 
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, [new BlueprintQuantity(axe, 5, 0)]);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, [new BlueprintQuantity(axe, 5)]);
 
         return await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
     }
@@ -212,7 +212,7 @@ public class DatasetImportTests
         await MergeAsync(incoming, current, new RecordKey(RecordKind.Component, 1));
 
         SnapshotComponent tin = Named(await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId), "Tin");
-        (tin.Cost, tin.CategoryId).Should().Be((3.0, (int?)null));
+        (tin.Cost, tin.CategoryId).Should().Be((3.0, null));
     }
 
     [Test]

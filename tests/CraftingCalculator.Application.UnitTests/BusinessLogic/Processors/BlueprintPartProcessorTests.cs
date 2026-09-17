@@ -8,9 +8,11 @@ namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Processors;
 [TestFixture]
 public class BlueprintPartProcessorTests
 {
-    private static ComponentModel NewComponent(int id, string name) => new ComponentModel { Id = id, Name = name };
+    private static ComponentModel NewComponent(int id, string name) =>
+        new() { Id = id, Name = name };
 
-    private static BlueprintModel NewBlueprint(int id, string name) => new BlueprintModel { Id = id, Name = name };
+    private static BlueprintModel NewBlueprint(int id, string name) =>
+        new() { Id = id, Name = name };
 
     [Test]
     public void GetComponents_ReturnsComponentsBeforeChildBlueprints_EachOrderedByName()
@@ -118,13 +120,12 @@ public class BlueprintPartProcessorTests
     public void Step_DownFromOne_KeepsThePartAtZero()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");
-        blueprint.Components.Add(NewComponent(2, "Screw"), 1, id: 11);
+        blueprint.Components.Add(NewComponent(2, "Screw"), 1);
 
         BlueprintPartProcessor.Step(blueprint, blueprint.Components.ComponentList[0], -1);
 
         blueprint.Components.ComponentList.Should().ContainSingle()
             .Which.Quantity.Should().Be(0);
-        blueprint.Components.RemovedComponents.Should().BeEmpty();
     }
 
     [Test]
@@ -140,29 +141,27 @@ public class BlueprintPartProcessorTests
     }
 
     [Test]
-    public void Step_DownFromZero_RemovesTheComponentAndRecordsItForTheDAO()
+    public void Step_DownFromZero_RemovesTheComponent()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");
-        blueprint.Components.Add(NewComponent(2, "Screw"), 3, id: 11);
+        blueprint.Components.Add(NewComponent(2, "Screw"), 3);
         blueprint.Components.ComponentList[0].Quantity = 0;
 
         BlueprintPartProcessor.Step(blueprint, blueprint.Components.ComponentList[0], -1);
 
         blueprint.Components.ComponentList.Should().BeEmpty();
-        blueprint.Components.RemovedComponents.Should().ContainSingle().Which.Id.Should().Be(11);
     }
 
     [Test]
-    public void Step_DownFromZero_RemovesTheChildBlueprintAndRecordsItForTheDAO()
+    public void Step_DownFromZero_RemovesTheChildBlueprint()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");
-        blueprint.ChildBlueprints.Add(NewBlueprint(4, "Bracket"), 2, id: 12);
+        blueprint.ChildBlueprints.Add(NewBlueprint(4, "Bracket"), 2);
         blueprint.ChildBlueprints.BlueprintList[0].Quantity = 0;
 
         BlueprintPartProcessor.Step(blueprint, blueprint.ChildBlueprints.BlueprintList[0], -1);
 
         blueprint.ChildBlueprints.BlueprintList.Should().BeEmpty();
-        blueprint.ChildBlueprints.RemovedBlueprints.Should().ContainSingle().Which.Id.Should().Be(12);
     }
 
     [Test]
@@ -181,16 +180,15 @@ public class BlueprintPartProcessorTests
     }
 
     [Test]
-    public void Remove_ChildBlueprint_RemovesItAndRecordsItForTheDAO()
+    public void Remove_ChildBlueprint_RemovesItAndLeavesTheComponents()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");
-        blueprint.Components.Add(NewComponent(2, "Screw"), 3, id: 11);
-        blueprint.ChildBlueprints.Add(NewBlueprint(4, "Bracket"), 2, id: 12);
+        blueprint.Components.Add(NewComponent(2, "Screw"), 3);
+        blueprint.ChildBlueprints.Add(NewBlueprint(4, "Bracket"), 2);
 
         BlueprintPartProcessor.Remove(blueprint, blueprint.ChildBlueprints.BlueprintList[0]);
 
         blueprint.ChildBlueprints.BlueprintList.Should().BeEmpty();
-        blueprint.ChildBlueprints.RemovedBlueprints.Should().ContainSingle().Which.Id.Should().Be(12);
         blueprint.Components.ComponentList.Should().ContainSingle();
     }
 }

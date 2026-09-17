@@ -23,8 +23,8 @@ public class FavoriteServiceTests
     [Test]
     public async Task SaveFavoriteAsync_SavesFavoriteAndItsQuantitiesThroughDAO()
     {
-        BlueprintFavorite favorite = new BlueprintFavorite { Name = "My Batch" };
-        List<BlueprintQuantity> quantities = [new BlueprintQuantity(new BlueprintModel { Name = "Widget" }, 2, 0)];
+        BlueprintFavorite favorite = new() { Name = "My Batch" };
+        List<BlueprintQuantity> quantities = [new(new BlueprintModel { Name = "Widget" }, 2)];
 
         await _service.SaveFavoriteAsync(favorite, quantities);
 
@@ -34,7 +34,7 @@ public class FavoriteServiceTests
     [Test]
     public async Task RenameFavoriteAsync_RenamesByIdThroughDAO()
     {
-        BlueprintFavorite favorite = new BlueprintFavorite { Id = 4, Name = "Old" };
+        BlueprintFavorite favorite = new() { Id = 4, Name = "Old" };
 
         await _service.RenameFavoriteAsync(favorite, "New");
 
@@ -54,8 +54,8 @@ public class FavoriteServiceTests
     {
         List<BlueprintFavorite> favorites =
         [
-            new BlueprintFavorite { Id = 2, Name = "Raid Kit" },
-            new BlueprintFavorite { Id = 7, Name = "Base Kit" }
+            new() { Id = 2, Name = "Raid Kit" },
+            new() { Id = 7, Name = "Base Kit" }
         ];
 
         await _service.DeleteFavoritesAsync(favorites);
