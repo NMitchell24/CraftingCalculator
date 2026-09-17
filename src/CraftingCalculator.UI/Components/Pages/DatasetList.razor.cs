@@ -30,6 +30,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
+    [Inject] private CraftState CraftState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -101,16 +102,19 @@ public partial class DatasetList : ComponentBase, IDisposable
         // TitleFor and DataType's description name the screen, where they are capitalized; an action label is a
         // sentence, where they are not.
         List<PageAction> actions =
-            [new($"New {_type.GetDescription().ToLowerInvariant()}", Icons.Material.Filled.Add, CreateNewAsync)];
+        [
+            new($"New {_type.GetDescription().ToLowerInvariant()}", Icons.Material.Filled.Add, CreateNewAsync),
+            new("Delete", Icons.Material.Filled.Delete, ToggleDeleteModeAsync,
+                Disabled: empty, Active: _mode == ListMode.Delete,
+                OnLongPress: _mode == ListMode.Delete ? ExitDeleteModeAsync : null),
+
+            new($"Delete all {TitleFor(_type).ToLowerInvariant()}", Icons.Material.Filled.DeleteForever,
+                DeleteAllAsync, Disabled: empty)
+        ];
 
         // Wired only while the mode is on, the one state the gesture means anything in. A hold
         // outside it is inert either way - the WebView delivers no click after a long press, so
         // that tap is lost whether or not a handler is attached.
-        actions.Add(new PageAction("Delete", Icons.Material.Filled.Delete, ToggleDeleteModeAsync,
-            Disabled: empty, Active: _mode == ListMode.Delete,
-            OnLongPress: _mode == ListMode.Delete ? ExitDeleteModeAsync : null));
-        actions.Add(new PageAction($"Delete all {TitleFor(_type).ToLowerInvariant()}", Icons.Material.Filled.DeleteForever,
-            DeleteAllAsync, Disabled: empty));
 
         PageShellState.Configure(this, new PageShellConfig(TitleFor(_type))
         {
@@ -127,6 +131,13 @@ public partial class DatasetList : ComponentBase, IDisposable
         // re-declared on every reload rather than only when the mode changes.
         ConfigureShell();
         StateHasChanged();
+    }
+
+    // A deleted record can be in the Craft batch, directly or nested, so the batch is read again along with the list.
+    private async Task ReloadAfterDeleteAsync()
+    {
+        await CraftState.ReloadBlueprintsAsync();
+        await ReloadAsync();
     }
 
     private void SetMode(ListMode mode)
@@ -198,7 +209,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
         await RecordService.DeleteRecordAsync(record);
         Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
-        await ReloadAsync();
+        await ReloadAfterDeleteAsync();
     }
 
     private async Task DeleteSelectedAsync()
@@ -215,7 +226,7 @@ public partial class DatasetList : ComponentBase, IDisposable
         }
 
         await RecordService.DeleteRecordsAsync(selected);
-        await ReloadAsync();
+        await ReloadAfterDeleteAsync();
 
         Snackbar.Add($"Deleted {selected.Count} {NounFor(_type, selected.Count)}", Severity.Success);
         SetMode(ListMode.Normal);
@@ -229,7 +240,7 @@ public partial class DatasetList : ComponentBase, IDisposable
         }
 
         await RecordService.DeleteAllOfTypeAsync(_type);
-        await ReloadAsync();
+        await ReloadAfterDeleteAsync();
 
         Snackbar.Add($"Deleted all {TitleFor(_type)}", Severity.Success);
         SetMode(ListMode.Normal);

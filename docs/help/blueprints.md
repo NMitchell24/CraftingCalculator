@@ -160,4 +160,4 @@ blueprint that uses it, however deep. So if you're editing Gunpowder and Ammo is
 
 Deleting a blueprint that another blueprint nests removes it from that parent's list too. The parent survives; it 
 just gets shorter. Same for a [favorite](favorites.md): deleting a blueprint drops it out of any saved batch that 
-referenced it.
+referenced it. And if it's sitting in your batch on the [Craft screen](craft-screen.md), it drops out of that too.

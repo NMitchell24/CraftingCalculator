@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
@@ -135,33 +136,57 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     /// <summary>
     /// Reads every blueprint in the batch again, keeping its quantity, so the batch prices what is saved now rather
-    /// than what was loaded. A blueprint that no longer exists keeps the copy the batch already had.
+    /// than what was loaded. A blueprint that no longer exists is removed from the batch. Call it after any write to
+    /// the dataset's records; a batch that fails to reload keeps what it had, and the failure is not rethrown.
     /// </summary>
     public async Task ReloadBlueprintsAsync()
     {
-        List<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
-
-        // SQLite blocks the thread it runs on, so the reads go to the background and only the batch changes here.
-        Dictionary<int, BlueprintModel> reloaded = await Task.Run(async () =>
+        if (_blueprintMap.BlueprintList.Count == 0)
         {
-            Dictionary<int, BlueprintModel> blueprints = [];
+            return;
+        }
 
-            foreach (int id in ids)
+        List<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
+        Dictionary<int, BlueprintModel?> reloaded;
+
+        try
+        {
+            // SQLite blocks the thread it runs on, so the reads go to the background and only the batch changes here.
+            reloaded = await Task.Run(async () =>
             {
-                if (await blueprintService.GetBlueprintByIdAsync(id) is { } blueprint)
-                {
-                    blueprints[id] = blueprint;
-                }
-            }
+                Dictionary<int, BlueprintModel?> blueprints = [];
 
-            return blueprints;
-        });
+                foreach (int id in ids)
+                {
+                    blueprints[id] = await blueprintService.GetBlueprintByIdAsync(id);
+                }
+
+                return blueprints;
+            });
+        }
+        catch (Exception exception)
+        {
+            // Every caller has already written its change, so a batch that couldn't refresh is no reason to report
+            // that write as failed.
+            Debug.WriteLine(exception);
+            return;
+        }
 
         // The user can change the batch while the reads run, so the blueprints are swapped into the batch as it is
-        // now. Rebuilding it from the ids read above would undo those changes.
-        foreach (BlueprintQuantity entry in _blueprintMap.BlueprintList)
+        // now. Rebuilding it from the ids read above would undo those changes, and an entry added during the reads
+        // has no result here and is left alone.
+        foreach (BlueprintQuantity entry in _blueprintMap.BlueprintList.ToList())
         {
-            if (reloaded.TryGetValue(entry.Blueprint.Id, out BlueprintModel? blueprint))
+            if (!reloaded.TryGetValue(entry.Blueprint.Id, out BlueprintModel? blueprint))
+            {
+                continue;
+            }
+
+            if (blueprint is null)
+            {
+                _blueprintMap.RemoveAll(entry.Blueprint);
+            }
+            else
             {
                 entry.Blueprint = blueprint;
             }

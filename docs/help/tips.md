@@ -119,14 +119,6 @@ category has nothing to filter to. Add it to a record and it appears.
 ![Save](assets/save.svg) **Save** stays grayed out until the record has a name. Name is a required field on every 
 record.
 
-### "I changed a component or blueprint and the calculations are wrong"
-
-You had the thing you changed already applied in the blueprint batch before you changed it. The blueprint batches 
-are snapshots of those blueprints or components at the point in time when you added them on the Craft screen. If you 
-change a blueprint or a component that is currently assigned to an active batch, delete and add it back to see the 
-updated information. If it was saved as a favorite, reload the favorite and it will update. These snapshots are 
-temporary and won't impact any saved favorites. Saved favorites reference the blueprint directly, not the snapshot.
-
 ## Things worth knowing
 
 - **The number in a quantity stepper is editable.** Tap it and type. Much faster than tapping **+** two

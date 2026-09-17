@@ -44,6 +44,12 @@ ask "what if I skipped this one?" without losing your place.
 **Load Favorite** at the top of the card swaps your whole batch for a saved one. See
 [Favorites](favorites.md).
 
+**The batch keeps up with your edits.** Say you've got Bronze in the batch and then install a mod that makes it
+cost 3 Copper instead of 2. Fix the blueprint on the [Dataset screen](dataset.md), come back, and the batch is
+already asking for 3. Same goes for a new cost on Copper or a renamed category. Your quantities stay exactly where
+you left them. Delete a blueprint that's in the batch, and it drops out of the batch too, since there's nothing left
+to craft.
+
 ### Stepping by ten
 
 Tapping ![Plus one](assets/plus-1.svg) sixty times to get to 60 arrows is the exact kind of grind this app is
