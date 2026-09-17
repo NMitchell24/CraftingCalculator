@@ -19,8 +19,10 @@ public enum ActionsBarMode
 
 /// <summary>
 /// Renders a page's <see cref="PageAction"/>s, either as the bottom actions bar or as extra rows in the
-/// nav drawer. Actions past <see cref="MaxVisible"/> collapse into an overflow menu, and an action that
-/// supplies <see cref="PageAction.OnLongPress"/> runs that instead when it is pressed and held.
+/// nav drawer. Actions past <see cref="MaxVisible"/> collapse into an overflow menu, taken from the end of
+/// the list but never an action that is <see cref="PageAction.Active"/> or supplies
+/// <see cref="PageAction.OnLongPress"/> while a plain action could go instead. An action that supplies
+/// <see cref="PageAction.OnLongPress"/> runs that instead of its click when it is pressed and held.
 /// </summary>
 public partial class ActionsBar : IDisposable
 {
@@ -35,15 +37,26 @@ public partial class ActionsBar : IDisposable
     [Parameter, EditorRequired] public int MaxVisible { get; set; }
 
     // At or under the cap everything fits; past it the last slot is spent on the overflow menu itself.
-    // The floor is what keeps OverflowCount honest: MaxVisible is a public parameter, and a caller
-    // passing 0 would otherwise make this -1 while Overflow still yields every action.
-    private int VisibleCount => Actions.Count <= MaxVisible ? Actions.Count : Math.Max(MaxVisible - 1, 0);
+    private int VisibleCount => Actions.Count <= MaxVisible ? Actions.Count : MaxVisible - 1;
 
-    private IEnumerable<PageAction> Visible => Actions.Take(VisibleCount);
+    private List<PageAction> _visible = [];
+    private List<PageAction> _overflow = [];
 
-    private IEnumerable<PageAction> Overflow => Actions.Skip(VisibleCount);
+    protected override void OnParametersSet()
+    {
+        // A menu item can be neither highlighted nor held, so an action that is Active or has a long press
+        // claims a visible slot before any plain action does. OrderBy is stable, so both lists keep page
+        // order.
+        HashSet<int> visibleIndexes =
+        [
+            .. Enumerable.Range(0, Actions.Count)
+                .OrderBy(index => Actions[index].Active || Actions[index].OnLongPress is not null ? 0 : 1)
+                .Take(VisibleCount)
+        ];
 
-    private int OverflowCount => Actions.Count - VisibleCount;
+        _visible = [.. Actions.Where((_, index) => visibleIndexes.Contains(index))];
+        _overflow = [.. Actions.Where((_, index) => !visibleIndexes.Contains(index))];
+    }
 
     private static Color ColorFor(PageAction action) => action.Active ? Color.Primary : Color.Default;
 
