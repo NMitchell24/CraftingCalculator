@@ -90,7 +90,8 @@ This shows up on the detail card when you tap the blueprint anywhere in the app.
 ## Adding requirements
 
 Tap ![Add](assets/add.svg) **Add requirements**. You get one list of everything this blueprint can use, components and
-blueprints together, sorted by name. The small line under each name tells you which one it is.
+blueprints together, sorted by name. Tap the ![Info](assets/info.svg) icon or use the Category filters if you're not 
+sure what type you're looking at.
 
 1. **Search:** start typing in ![Search](assets/search.svg) the search box and the list filters as you go.
    ![Filter](assets/filter-list.svg) narrows it down to a [category](categories.md) or two.
