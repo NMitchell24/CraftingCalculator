@@ -28,7 +28,7 @@
         @* Outside Delete mode the list is ReadOnly, so a card is a plain list item: no clickable styling, ripple,
            option role or tab stop. ReadOnly still invokes MudListItem.OnClick on a tap, which is why
            ToggleSelection keeps its own mode check. *@
-        <MudList T="IBaseDataRecord" Class="record-list" ReadOnly="@(_mode != ListMode.Delete)">
+        <MudList T="IBaseDataRecord" ReadOnly="@(_mode != ListMode.Delete)">
             @foreach (IBaseDataRecord record in FilteredRecords)
             {
                 <MudListItem T="IBaseDataRecord" Class="@RowClass(record)" OnClick="@(() => ToggleSelection(record))">
