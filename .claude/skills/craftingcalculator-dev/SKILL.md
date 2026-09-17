@@ -153,6 +153,17 @@ touching them. The short version:
   `Components/Controls`, dialogs in `Components/Dialogs`, layout in `Components/Layout`.
 - **Code-behind pattern:** `Foo.razor` (markup) + `Foo.razor.cs` (`public partial class Foo`). Put
   logic in the `.razor.cs`. Inject services with `@inject IXxxService _name`.
+- **Interfaces are declared once, on the code-behind class.** A component with a `.razor.cs` lists
+  `IDisposable`, `IAsyncDisposable` or any other interface in its `partial class` declaration, never as
+  `@implements` in the `.razor`. The compiler accepts the duplicate silently, so it drifts: remove the
+  interface from one file and the component still implements it through the other.
+
+  ```csharp
+  // Foo.razor.cs: the only place the interface appears
+  public partial class Foo : ComponentBase, IDisposable
+  ```
+
+  `@implements` is only for a `.razor` with no code-behind.
 - All UI is **MudBlazor** components; registered via `AddMudServices()`. Global usings in
   `Components/_Imports.razor`.
 - **Mobile-first.** Phone portrait is the design target; desktop is the widened case reached by
