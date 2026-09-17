@@ -102,6 +102,11 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
             .Where(fr => fr.FavoriteId == favoriteId)
             .ToListAsync();
 
+        if (rows.Count == 0)
+        {
+            return [];
+        }
+
         // One read of the dataset serves every row, rather than one per blueprint.
         DatasetRecords records = await DatasetRecordsReader.ReadAsync(context);
 
