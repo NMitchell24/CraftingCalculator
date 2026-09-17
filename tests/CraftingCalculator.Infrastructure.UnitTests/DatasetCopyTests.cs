@@ -28,7 +28,7 @@ public class DatasetCopyTests
         _categoryDAO = new CategoryDAO(_fixture.DatasetFactory);
         _componentDAO = new ComponentDAO(_fixture.DatasetFactory);
         _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
-        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory, _blueprintDAO);
+        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory);
     }
 
     [TearDown]
@@ -60,7 +60,7 @@ public class DatasetCopyTests
         await _blueprintDAO.SaveAsync(axe);
 
         await _favoritesDAO.SaveAsync(
-            new BlueprintFavorite { Name = "Starter kit" }, [new BlueprintQuantity(axe, 2, 0)]);
+            new BlueprintFavorite { Name = "Starter kit" }, [new BlueprintQuantity(axe, 2)]);
     }
 
     [Test]

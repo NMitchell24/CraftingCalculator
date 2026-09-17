@@ -1,11 +1,13 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.Domain.Models.Transfer;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
-public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory, IBlueprintDAO blueprintDAO) : IBlueprintFavoritesDAO
+public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) : IBlueprintFavoritesDAO
 {
     public async Task<List<BlueprintFavorite>> GetAllAsync()
     {
@@ -100,20 +102,15 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory, I
             .Where(fr => fr.FavoriteId == favoriteId)
             .ToListAsync();
 
-        List<BlueprintQuantity> result = [];
-        foreach (FavoriteBlueprint row in rows)
+        if (rows.Count == 0)
         {
-            BlueprintModel? blueprint = await blueprintDAO.GetByIdAsync(row.BlueprintId);
-            if (blueprint != null)
-            {
-                // Id is hardcoded to 0 here to match the old BlueprintFavoriteService quirk: a
-                // BlueprintQuantity reconstructed from a favorite never carries the FavoriteBlueprint row's
-                // own Id.
-                result.Add(new BlueprintQuantity(blueprint, row.Quantity, 0));
-            }
+            return [];
         }
 
-        return result;
+        // One read of the dataset serves every row, rather than one per blueprint.
+        DatasetRecords records = await DatasetRecordsReader.ReadAsync(context);
+
+        return [.. rows.Select(row => new BlueprintQuantity(SnapshotModelProcessor.ToBlueprintModel(records, row.BlueprintId), row.Quantity))];
     }
 
     private static BlueprintFavorite ToModel(Favorite entity) => new()

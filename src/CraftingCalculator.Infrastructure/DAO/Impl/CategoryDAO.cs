@@ -54,8 +54,8 @@ public class CategoryDAO(DatasetScopedContextFactory contextFactory) : ICategory
         await context.Categories.Where(categoryEntity => categoryEntity.Id == id).ExecuteDeleteAsync();
     }
 
-    /// <summary>The model for a loaded category entity. Shared with the DAOs that resolve a
-    /// record's category as part of a larger load.</summary>
+    /// <summary>The model for a loaded category entity. Shared with <see cref="ComponentDAO"/>, which
+    /// resolves a component's category as part of its load.</summary>
     internal static CategoryModel ToModel(Category entity) => new()
     {
         Id = entity.Id,

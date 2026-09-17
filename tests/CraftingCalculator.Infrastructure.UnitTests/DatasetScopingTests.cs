@@ -31,7 +31,7 @@ public class DatasetScopingTests
         _categoryDAO = new CategoryDAO(_fixture.DatasetFactory);
         _componentDAO = new ComponentDAO(_fixture.DatasetFactory);
         _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
-        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory, _blueprintDAO);
+        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory);
 
         _secondDatasetId = (await _datasetDAO.AddAsync("Rust")).Id;
     }

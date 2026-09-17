@@ -7,8 +7,8 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class BlueprintModel : ICategorizedRecord
 {
-    public ComponentMap Components { get; private set; }
-    public BlueprintMap ChildBlueprints { get; private set; }
+    public ComponentMap Components { get; private init; }
+    public BlueprintMap ChildBlueprints { get; private init; }
     public string? Name { get; set; }
     public int Id { get; set; }
     public string? Description { get; set; }
@@ -62,8 +62,6 @@ public class BlueprintModel : ICategorizedRecord
         ChildBlueprints = new BlueprintMap();
     }
 
-    public bool IsSelected { get; set; }
-
     public IBaseDataRecord Clone()
     {
         BlueprintModel clone = new()
@@ -87,8 +85,6 @@ public class BlueprintModel : ICategorizedRecord
         BlueprintModel ret = (BlueprintModel)Clone();
         ret.Name += " - Copy";
         ret.Id = 0;
-        ret.Components = Components.CloneForSave();
-        ret.ChildBlueprints = ChildBlueprints.CloneForSave();
 
         return ret;
     }

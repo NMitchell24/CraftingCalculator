@@ -1,28 +1,18 @@
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CraftingCalculator.Domain.Models;
 
 public class BlueprintMap
 {
-    private readonly List<BlueprintQuantity> _internalList = new List<BlueprintQuantity>();
+    private readonly List<BlueprintQuantity> _internalList = [];
     public ReadOnlyCollection<BlueprintQuantity> BlueprintList => _internalList.AsReadOnly();
-    public List<BlueprintQuantity> RemovedBlueprints { get; } = new List<BlueprintQuantity>();
 
-    public BlueprintMap(BlueprintMap map, bool cloneForSave)
+    private BlueprintMap(BlueprintMap map)
     {
-        _internalList = new List<BlueprintQuantity>();
+        _internalList = [];
         foreach (BlueprintQuantity blueprintQuantity in map.BlueprintList)
         {
-            if (cloneForSave)
-            {
-                _internalList.Add(blueprintQuantity.CloneForSave());
-            }
-            else
-            {
-                _internalList.Add(blueprintQuantity.Clone());
-            }
+            _internalList.Add(blueprintQuantity.Clone());
         }
     }
 
@@ -40,52 +30,20 @@ public class BlueprintMap
     /// <param name="quantity"></param>
     public void Add(BlueprintModel? blueprint, long quantity)
     {
-        if (blueprint != null)
+        if (blueprint == null)
         {
-            Add(blueprint, quantity, 0);
+            return;
         }
-    }
 
-    /// <summary>
-    /// Overload to preserve the data Identifier from the database.
-    /// </summary>
-    /// <param name="blueprint"></param>
-    /// <param name="quantity"></param>
-    /// <param name="id"></param>
-    public void Add(BlueprintModel blueprint, long quantity, int id)
-    {
-        if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name))
+        BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
+        if (existing != null)
         {
-            BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
-            if (existing != null)
-            {
-                existing.Quantity += quantity;
-            }
+            existing.Quantity += quantity;
         }
         else
         {
-            _internalList.Add(new BlueprintQuantity(blueprint, quantity, id));
+            _internalList.Add(new BlueprintQuantity(blueprint, quantity));
         }
-    }
-
-    /// <summary>
-    /// Decrement a BlueprintQuantity by the provided amount.  
-    /// If the current Quantity - the provided quantity would be less than or equal to 0
-    /// Then the blueprint will be removed.
-    /// </summary>
-    /// <param name="blueprint"></param>
-    /// <param name="quantity"></param>
-    public void Remove(BlueprintModel blueprint, long quantity)
-    {
-        if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name && blueprintQuantity.Quantity - quantity > 0))
-        {
-            Add(blueprint, -quantity);
-        }
-        else
-        {
-            RemoveAll(blueprint);
-        }
-
     }
 
     /// <summary>
@@ -94,15 +52,7 @@ public class BlueprintMap
     /// <param name="blueprint"></param>
     public void RemoveAll(BlueprintModel blueprint)
     {
-        if (_internalList.Any(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name))
-        {
-            BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
-            if (existing != null)
-            {
-                RemovedBlueprints.AddRange(_internalList.FindAll(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name));
-                _internalList.Remove(existing);
-            }
-        }
+        _internalList.RemoveAll(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
     }
 
     /// <summary>
@@ -115,11 +65,6 @@ public class BlueprintMap
 
     public BlueprintMap Clone()
     {
-        return new BlueprintMap(this, false);
-    }
-
-    public BlueprintMap CloneForSave()
-    {
-        return new BlueprintMap(this, true);
+        return new BlueprintMap(this);
     }
 }

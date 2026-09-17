@@ -8,12 +8,14 @@ namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Processors;
 [TestFixture]
 public class BatchProcessorTests
 {
-    private static ComponentModel NewComponent(string name, double cost) => new ComponentModel { Id = 1, Name = name, Cost = cost };
+    private static ComponentModel NewComponent(string name, double cost) =>
+        new() { Id = 1, Name = name, Cost = cost };
 
-    private static BlueprintModel NewBlueprint(string name, double value) => new BlueprintModel { Id = 1, Name = name, Value = value };
+    private static BlueprintModel NewBlueprint(string name, double value) =>
+        new() { Id = 1, Name = name, Value = value };
 
     private static BlueprintModel NewBlueprint(string name, double value, long yield) =>
-        new BlueprintModel { Id = 1, Name = name, Value = value, Yield = yield };
+        new() { Id = 1, Name = name, Value = value, Yield = yield };
 
     [Test]
     public void CalculateTotals_SingleBlueprint_ReturnsCostAndValue()
@@ -21,7 +23,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", 10);
         blueprint.Components.Add(NewComponent("Screw", 0.5), 2);
 
-        BlueprintQuantity batchEntry = new(blueprint, 3, id: 0);
+        BlueprintQuantity batchEntry = new(blueprint, 3);
 
         BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry]);
 
@@ -41,7 +43,7 @@ public class BatchProcessorTests
         BlueprintModel parent = NewBlueprint("Frame", 0);
         parent.ChildBlueprints.Add(child, 2);
 
-        BlueprintQuantity batchEntry = new(parent, 2, id: 0);
+        BlueprintQuantity batchEntry = new(parent, 2);
 
         BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry]);
 
@@ -59,8 +61,8 @@ public class BatchProcessorTests
         BlueprintModel right = NewBlueprint("Right Arm", 7);
         right.Components.Add(NewComponent("Bolt", 1), 1);
 
-        BlueprintQuantity leftEntry = new(left, 1, id: 0);
-        BlueprintQuantity rightEntry = new(right, 1, id: 0);
+        BlueprintQuantity leftEntry = new(left, 1);
+        BlueprintQuantity rightEntry = new(right, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals([leftEntry, rightEntry]);
 
@@ -76,7 +78,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", 0);
         blueprint.Components.Add(NewComponent("Free Sample", 0), 5);
 
-        BlueprintQuantity batchEntry = new(blueprint, 1, id: 0);
+        BlueprintQuantity batchEntry = new(blueprint, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry]);
 
@@ -91,7 +93,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", 0, yield: 2);
         blueprint.Components.Add(NewComponent("Screw", 1), 3);
 
-        BlueprintQuantity batchEntry = new(blueprint, 4, id: 0);
+        BlueprintQuantity batchEntry = new(blueprint, 4);
 
         BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry]);
 
@@ -114,7 +116,7 @@ public class BatchProcessorTests
         BlueprintModel handle = NewBlueprint("Handle", 0);
         handle.ChildBlueprints.Add(bracket, 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new(frame, 1, id: 0), new(handle, 1, id: 0)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new(frame, 1), new(handle, 1)]);
 
         totals.TotalCost.Should().Be(6); // two Bracket crafts, 3 Screws each
         BlueprintQuantity spare = totals.Surplus.BlueprintList.Should().ContainSingle().Subject;
@@ -129,7 +131,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Frame", 10, yield: 2);
         blueprint.Components.Add(NewComponent("Screw", 1), 1);
 
-        BlueprintQuantity batchEntry = new(blueprint, 3, id: 0);
+        BlueprintQuantity batchEntry = new(blueprint, 3);
 
         BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry]);
 
@@ -143,7 +145,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", 10);
         blueprint.Components.Add(NewComponent("Screw", 0.5), 2);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 3, id: 0)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 3)]);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.Zero);
     }
@@ -162,7 +164,7 @@ public class BatchProcessorTests
         soup.ProductionTime = TimeSpan.FromSeconds(30);
         soup.Components.Add(potato, 2);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(soup, 1, id: 0)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(soup, 1)]);
 
         // Two Potatoes at five minutes each, plus one thirty-second Soup craft.
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(630));
@@ -182,7 +184,7 @@ public class BatchProcessorTests
         bracket.ProductionTime = TimeSpan.FromSeconds(10);
         bracket.Components.Add(screw, 3);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(bracket, 4, id: 0)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(bracket, 4)]);
 
         // Four Brackets is two crafts: 2 x 10s of craft time, and 2 x 3 Screws at 1s each.
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(26));
@@ -198,7 +200,7 @@ public class BatchProcessorTests
         right.ProductionTime = TimeSpan.FromSeconds(7);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(left, 2, id: 0), new BlueprintQuantity(right, 3, id: 0)]);
+            [new BlueprintQuantity(left, 2), new BlueprintQuantity(right, 3)]);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(31)); // 2x5s + 3x7s
     }
@@ -213,7 +215,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", 1);
         blueprint.ProductionTime = TimeSpan.FromSeconds(5.5);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 10, id: 0)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 10)]);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(55));
     }
@@ -233,7 +235,7 @@ public class BatchProcessorTests
         blueprint.ProductionTime = TimeSpan.FromHours(24);
         blueprint.Components.Add(screw, 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, long.MaxValue, id: 0)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, long.MaxValue)]);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.MaxValue);
     }

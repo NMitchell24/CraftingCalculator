@@ -7,7 +7,6 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class BlueprintQuantity : IBaseQuantityRecord
 {
-    public int Id { get; private set; }
     public BlueprintModel Blueprint { get; set; }
 
     public long Quantity
@@ -50,11 +49,10 @@ public class BlueprintQuantity : IBaseQuantityRecord
 
     public string DisplayName => Name + " x" + Quantity;
 
-    public BlueprintQuantity(BlueprintModel blueprint, long quantity, int id)
+    public BlueprintQuantity(BlueprintModel blueprint, long quantity)
     {
         Blueprint = blueprint;
         Quantity = quantity;
-        Id = id;
     }
 
     /// <summary>
@@ -63,17 +61,6 @@ public class BlueprintQuantity : IBaseQuantityRecord
     /// <returns></returns>
     public BlueprintQuantity Clone()
     {
-        return new BlueprintQuantity(Blueprint, Quantity, Id);
-    }
-
-    /// <summary>
-    /// Clones for saving clears ID so that it can be saved as a new record.
-    /// </summary>
-    /// <returns></returns>
-    public BlueprintQuantity CloneForSave()
-    {
-        BlueprintQuantity ret = Clone();
-        ret.Id = 0;
-        return ret;
+        return new BlueprintQuantity(Blueprint, Quantity);
     }
 }

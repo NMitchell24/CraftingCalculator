@@ -16,7 +16,7 @@ public class BlueprintFavoritesDAOTests
     {
         _fixture = new SqliteTestFixture();
         _blueprintDAO = new BlueprintDAO(_fixture.DatasetFactory);
-        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory, _blueprintDAO);
+        _favoritesDAO = new BlueprintFavoritesDAO(_fixture.DatasetFactory);
     }
 
     [TearDown]
@@ -29,8 +29,8 @@ public class BlueprintFavoritesDAOTests
         BlueprintModel table = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Table" });
 
         await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Two" },
-            [new BlueprintQuantity(plank, 3, 0), new BlueprintQuantity(table, 1, 0)]);
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "One" }, [new BlueprintQuantity(plank, 5, 0)]);
+            [new BlueprintQuantity(plank, 3), new BlueprintQuantity(table, 1)]);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "One" }, [new BlueprintQuantity(plank, 5)]);
         await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Empty" }, []);
 
         List<BlueprintFavorite> favorites = await _favoritesDAO.GetAllAsync();
@@ -44,7 +44,7 @@ public class BlueprintFavoritesDAOTests
     {
         BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
         BlueprintFavorite saved = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Old" },
-            [new BlueprintQuantity(plank, 7, 0)]);
+            [new BlueprintQuantity(plank, 7)]);
 
         await _favoritesDAO.RenameAsync(saved.Id, "New");
 
@@ -61,10 +61,10 @@ public class BlueprintFavoritesDAOTests
         BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
 
         BlueprintFavorite one = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "One" },
-            [new BlueprintQuantity(plank, 3, 0)]);
+            [new BlueprintQuantity(plank, 3)]);
         BlueprintFavorite two = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Two" },
-            [new BlueprintQuantity(plank, 5, 0)]);
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Kept" }, [new BlueprintQuantity(plank, 7, 0)]);
+            [new BlueprintQuantity(plank, 5)]);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Kept" }, [new BlueprintQuantity(plank, 7)]);
 
         await _favoritesDAO.DeleteAsync([one.Id, two.Id]);
 

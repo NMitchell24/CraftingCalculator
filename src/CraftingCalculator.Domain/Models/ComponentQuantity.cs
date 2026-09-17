@@ -6,9 +6,8 @@ namespace CraftingCalculator.Domain.Models;
 /// <summary>
 /// Represents a component and quantity.
 /// </summary>
-public class ComponentQuantity(ComponentModel component, long quantity, int id) : IBaseQuantityRecord
+public class ComponentQuantity(ComponentModel component, long quantity) : IBaseQuantityRecord
 {
-    public int Id { get; private set; } = id;
     public ComponentModel Component { get; } = component;
     public long Quantity { get; set; } = quantity;
 
@@ -51,13 +50,6 @@ public class ComponentQuantity(ComponentModel component, long quantity, int id) 
 
     public ComponentQuantity Clone()
     {
-        return new ComponentQuantity(Component, Quantity, Id);
-    }
-
-    public ComponentQuantity CloneForSave()
-    {
-        ComponentQuantity ret = Clone();
-        ret.Id = 0;
-        return ret;
+        return new ComponentQuantity(Component, Quantity);
     }
 }

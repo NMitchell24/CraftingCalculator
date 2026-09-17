@@ -6,7 +6,7 @@ public static class ComponentProcessor
 {
     public static ComponentMap CombineComponents(ComponentMap source, ComponentMap dest, long multiplier)
     {
-        ComponentMap ret = new ComponentMap(dest, false);
+        ComponentMap ret = dest.Clone();
 
         foreach (ComponentQuantity component in source.ComponentList)
         {

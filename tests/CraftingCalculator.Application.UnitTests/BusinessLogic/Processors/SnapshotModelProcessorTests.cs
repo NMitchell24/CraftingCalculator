@@ -71,6 +71,19 @@ public class SnapshotModelProcessorTests
     }
 
     [Test]
+    public void ToBlueprintModels_BuildsEveryBlueprintOutInRecordOrder()
+    {
+        DatasetRecords records = new(Snapshot.Categories, Snapshot.Components, Snapshot.Blueprints);
+
+        List<BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(records);
+
+        blueprints.Select(blueprint => blueprint.Id).Should().Equal(Snapshot.Blueprints.Select(record => record.Id));
+        blueprints.Single(blueprint => blueprint.Id == BronzeAxe.Id)
+            .ChildBlueprints.BlueprintList.Single().Blueprint.Components.ComponentList.Select(part => (part.Name, part.Quantity))
+            .Should().Equal(("Copper", 2L), ("Tin", 1L));
+    }
+
+    [Test]
     public void ToFavoriteBlueprints_ReturnsEachBlueprintBuiltOutWithItsQuantity()
     {
         List<BlueprintQuantity> blueprints = SnapshotModelProcessor.ToFavoriteBlueprints(Snapshot, KarvePrep.Id);

@@ -49,8 +49,8 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
 
         // The link tables reach the dataset through their parent rather than carrying a column of their
         // own, which would be a second copy of the same fact and could drift from it. Filtering them is
-        // what scopes the direct BlueprintComponents/BlueprintChildren reads in BlueprintDAO's
-        // LoadGraphAsync, and it also satisfies EF's requirement that a required dependent of a
+        // what scopes the direct BlueprintComponents/BlueprintChildren reads in
+        // DatasetRecordsReader, and it also satisfies EF's requirement that a required dependent of a
         // filtered principal be filtered too.
         modelBuilder.Entity<BlueprintComponent>().HasQueryFilter(link => link.Blueprint.DatasetId == DatasetId);
         modelBuilder.Entity<BlueprintChild>().HasQueryFilter(link => link.ParentBlueprint.DatasetId == DatasetId);
@@ -60,15 +60,13 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
     /// <summary>Files new records under this context's dataset, so no DAO has to set it.</summary>
     private void StampDataset()
     {
-        foreach (EntityEntry<IDatasetScoped> entry in ChangeTracker.Entries<IDatasetScoped>())
+        // An entity that already names a dataset is left alone: the only writer of a non-zero value
+        // is a caller filing a record into a dataset other than the current one, which is what an
+        // import will do.
+        foreach (EntityEntry<IDatasetScoped> entry in ChangeTracker.Entries<IDatasetScoped>()
+                     .Where(entry => entry is { State: EntityState.Added, Entity.DatasetId: 0 }))
         {
-            // An entity that already names a dataset is left alone: the only writer of a non-zero value
-            // is a caller filing a record into a dataset other than the current one, which is what an
-            // import will do.
-            if (entry.State == EntityState.Added && entry.Entity.DatasetId == 0)
-            {
-                entry.Entity.DatasetId = DatasetId;
-            }
+            entry.Entity.DatasetId = DatasetId;
         }
     }
 }

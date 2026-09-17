@@ -15,8 +15,11 @@ public static class BlueprintPartProcessor
     /// </summary>
     public static List<IBaseQuantityRecord> GetParts(BlueprintModel blueprint)
     {
-        List<IBaseQuantityRecord> parts = [.. blueprint.Components.ComponentList];
-        parts.AddRange(blueprint.ChildBlueprints.BlueprintList);
+        List<IBaseQuantityRecord> parts =
+        [
+            .. blueprint.Components.ComponentList,
+            .. blueprint.ChildBlueprints.BlueprintList
+        ];
 
         return [.. parts.OrderBy(p => p.Type).ThenBy(p => p.Name)];
     }
@@ -71,9 +74,8 @@ public static class BlueprintPartProcessor
     /// <summary>Removes the part from the blueprint.</summary>
     public static void Remove(BlueprintModel blueprint, IBaseQuantityRecord part)
     {
-        // RemoveAll rather than a quantity of 0: it is what pushes the part onto the map's
-        // RemovedComponents/RemovedBlueprints list, which is the only signal BlueprintDAO.SaveAsync has
-        // that the underlying join row should be deleted.
+        // RemoveAll rather than a quantity of 0: a part at 0 is still on the blueprint (see GetPartsAtZero),
+        // and the save writes every part that is.
         switch (part)
         {
             case ComponentQuantity componentQuantity:
