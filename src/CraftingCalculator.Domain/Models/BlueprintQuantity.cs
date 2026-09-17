@@ -1,5 +1,4 @@
 using CraftingCalculator.Domain.Enums;
-using System;
 
 namespace CraftingCalculator.Domain.Models;
 
@@ -8,16 +7,13 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class BlueprintQuantity : IBaseQuantityRecord
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public BlueprintModel Blueprint { get; set; }
-    private long _quantity;
+
     public long Quantity
     {
-        get => _quantity;
-        set
-        {
-            _quantity = Math.Abs(value);
-        }
+        get;
+        set { field = Math.Abs(value); }
     }
 
     public string Name
@@ -48,9 +44,9 @@ public class BlueprintQuantity : IBaseQuantityRecord
         }
     }
 
-    public double TotalValue => Blueprint.Value * Quantity;
+    public IBaseDataRecord Record => Blueprint;
 
-    public bool IsSelected { get; set; }
+    public double TotalValue => Blueprint.Value * Quantity;
 
     public string DisplayName => Name + " x" + Quantity;
 
@@ -76,7 +72,7 @@ public class BlueprintQuantity : IBaseQuantityRecord
     /// <returns></returns>
     public BlueprintQuantity CloneForSave()
     {
-        BlueprintQuantity ret = this.Clone();
+        BlueprintQuantity ret = Clone();
         ret.Id = 0;
         return ret;
     }

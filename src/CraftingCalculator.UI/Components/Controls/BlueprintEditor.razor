@@ -31,24 +31,18 @@ else
     <MudList T="IBaseQuantityRecord" Class="record-list">
         @foreach (IBaseQuantityRecord part in Parts)
         {
-            <MudListItem T="IBaseQuantityRecord">
-                <div class="record-row">
-                    <div class="record-row-name">
-                        <MudText>@part.Name</MudText>
-                        <MudText Typo="Typo.caption" Class="record-row-caption">@part.Type.GetDescription()</MudText>
-                    </div>
-                    <div class="record-row-end">
-                        <div class="quantity-stepper">
-                            <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
-                                           OnClick="@(() => StepAsync(part, -1))" />
-                            <MudNumericField T="long" Value="part.Quantity" ValueChanged="@(v => SetQuantityAsync(part, v))"
-                                             Min="0" DebounceInterval="300" HideSpinButtons="true" Class="quantity-stepper-field" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
-                                           OnClick="@(() => StepAsync(part, 1))" />
-                        </div>
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAsync(part))" />
-                    </div>
-                </div>
+            <MudListItem T="IBaseQuantityRecord" Ripple="false">
+                <RecordCard Name="@part.Name" Kind="@part.Type.GetDescription()" Record="@part.Record">
+                    <Stepper>
+                        <QuantityStepper Quantity="@part.Quantity" OnStep="@(step => StepAsync(part, step))"
+                                         OnQuantityChanged="@(quantity => SetQuantityAsync(part, quantity))" />
+                    </Stepper>
+                    <Actions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                       title="@RemoveLabel(part)" aria-label="@RemoveLabel(part)"
+                                       OnClick="@(() => RemoveAsync(part))" />
+                    </Actions>
+                </RecordCard>
             </MudListItem>
         }
     </MudList>

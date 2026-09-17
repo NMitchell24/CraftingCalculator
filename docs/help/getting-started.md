@@ -74,7 +74,7 @@ Now we get into the real reason you're here. It's time to create your first **Bl
    so leave it at 1.
 5. **Production time per craft**: how long one craft takes at the bench in hours, minutes, and/or seconds. Optional. 
 6. Tap ![Add](assets/add.svg) **Add requirements**.
-7. Search for `Copper`, tap **Add**, then tap ![Plus](assets/add.svg) once so it reads `2`.
+7. Search for `Copper`, tap **Add**, then tap ![Plus one](assets/plus-1.svg) once so it reads `2`.
 8. Search for `Tin` and tap **Add**. One is all you need.
 9. Tap ![Close](assets/close.svg) **Close**, then **Save**.
 10. That's it. Your first **Blueprint** is locked in. But hold on tight, we're not quite finished yet.
@@ -113,7 +113,7 @@ steps at the forge for Bronze, and then a final step for the Axe itself.
 1. Tap ![Craft](assets/calculate.svg) **Craft** in the navigation bar.
 2. Tap **Craft blueprint**, or the ![Add](assets/add.svg) action.
 3. Tap ![Add](assets/add.svg) **Add** on `Bronze Axe`, then ![Close](assets/close.svg) **Close**.
-4. Use the ![Plus](assets/add.svg) stepper to set the quantity to 3.
+4. Tap ![Plus one](assets/plus-1.svg) twice so the quantity reads 3.
 
 Look at the **Components** list. There is your farming trip (or shopping list if you can't be bothered to actually 
 mine anything): 48 Copper, 24 Tin, 12 Wood, and 6 Leather Scraps. Look at the **Crafting Summary** for the totals, and 

@@ -28,16 +28,11 @@ public partial class RecordPickerDialog : ComponentBase
 
     private RecordFilter _filter = RecordFilter.Empty;
 
-    // Each row names its record's type only when Records mixes types; a list of one type would repeat the same word
-    // on every row.
-    private bool _showType;
-
     private List<IBaseDataRecord> FilteredRecords => RecordFilterProcessor.Apply(Records, _filter);
 
-    protected override void OnParametersSet() =>
-        _showType = Records.Select(record => record.Type).Distinct().Skip(1).Any();
-
     private void OnFilterChanged(RecordFilter filter) => _filter = filter;
+
+    private static string RemoveLabel(IBaseDataRecord record) => $"Remove {record.Name}";
 
     private void Close() => MudDialog.Close();
 }

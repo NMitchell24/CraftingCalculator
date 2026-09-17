@@ -1,8 +1,6 @@
 using CraftingCalculator.Domain.Models;
-using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
@@ -12,7 +10,6 @@ public partial class BatchList : ComponentBase, IDisposable
     [Parameter] public EventCallback OnAddBlueprints { get; set; }
 
     [Inject] private CraftState State { get; set; } = null!;
-    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     protected override void OnInitialized()
     {
@@ -20,9 +17,6 @@ public partial class BatchList : ComponentBase, IDisposable
     }
 
     private static string RemoveLabel(BlueprintQuantity selected) => $"Remove {selected.Name} from the batch";
-
-    private Task ShowInfoAsync(BlueprintQuantity selected) =>
-        InfoDialog.ShowAsync(DialogService, selected.Blueprint);
 
     public void Dispose()
     {

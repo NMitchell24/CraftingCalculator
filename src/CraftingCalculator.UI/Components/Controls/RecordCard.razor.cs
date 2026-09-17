@@ -1,5 +1,7 @@
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.UI.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
@@ -15,14 +17,18 @@ public partial class RecordCard : ComponentBase
     /// <summary>Caption under the name: "Blueprint", "Component", "Category" or "Favorite".</summary>
     [Parameter, EditorRequired] public string Kind { get; set; } = "";
 
-    /// <summary>The record whose category chip trails the kind; null for a row with no category (a favorite).</summary>
+    /// <summary>
+    /// The record whose category chip trails the kind and whose details the Info button opens; null for a row with no
+    /// category (a favorite).
+    /// </summary>
     [Parameter] public IBaseDataRecord? Record { get; set; }
 
     /// <summary>Extra identity lines, one per entry.</summary>
     [Parameter] public IReadOnlyList<string> Details { get; set; } = [];
 
-    /// <summary>Invoked by the Info button.</summary>
-    [Parameter, EditorRequired] public EventCallback OnInfo { get; set; }
+    /// <summary>Invoked by the Info button in place of opening <see cref="Record" />'s details. Required when
+    /// <see cref="Record" /> is null.</summary>
+    [Parameter] public EventCallback OnInfo { get; set; }
 
     /// <summary>The stepper zone: a QuantityStepper, or a picker's Add button. Null when the row has no quantity.</summary>
     [Parameter] public RenderFragment? Stepper { get; set; }
@@ -30,5 +36,10 @@ public partial class RecordCard : ComponentBase
     /// <summary>The actions zone, right-aligned. Null when the row has no actions.</summary>
     [Parameter] public RenderFragment? Actions { get; set; }
 
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+
     private string InfoLabel => $"Info for {Name}";
+
+    private Task ShowInfoAsync() =>
+        OnInfo.HasDelegate ? OnInfo.InvokeAsync() : InfoDialog.ShowAsync(DialogService, Record!);
 }

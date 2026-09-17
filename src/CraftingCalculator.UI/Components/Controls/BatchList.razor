@@ -16,7 +16,7 @@
             {
                 <MudListItem T="BlueprintQuantity" Ripple="false">
                     <RecordCard Name="@selected.Name" Kind="@selected.Blueprint.Type.GetDescription()"
-                                Record="@selected.Blueprint" OnInfo="@(() => ShowInfoAsync(selected))">
+                                Record="@selected.Blueprint">
                         <Stepper>
                             <QuantityStepper Quantity="@selected.Quantity" OnStep="@(step => State.Step(selected, step))"
                                              OnQuantityChanged="@(quantity => State.SetQuantity(selected, quantity))" />

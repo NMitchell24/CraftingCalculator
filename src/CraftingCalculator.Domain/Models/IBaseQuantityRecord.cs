@@ -8,4 +8,7 @@ public interface IBaseQuantityRecord
     long Quantity { get; set; }
     string Description { get; set; }
     DataType Type { get; set; }
+
+    /// <summary>The component or blueprint this is a quantity of.</summary>
+    IBaseDataRecord Record { get; }
 }
