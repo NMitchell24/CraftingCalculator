@@ -18,7 +18,7 @@ public interface IBlueprintService
 
     /// <summary>
     /// Builds the blueprint's component breakdown as a <see cref="BlueprintNode"/> tree, scaled by
-    /// <paramref name="quantity"/>.
+    /// <paramref name="quantity"/> and worked out under <paramref name="settings"/>.
     /// </summary>
-    BlueprintNode GetBlueprintNode(BlueprintModel blueprint, long quantity);
+    BlueprintNode GetBlueprintNode(BlueprintModel blueprint, long quantity, Datasettings settings);
 }

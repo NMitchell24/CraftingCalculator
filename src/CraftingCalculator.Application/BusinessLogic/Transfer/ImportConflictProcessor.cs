@@ -136,7 +136,8 @@ public static class ImportConflictProcessor
                         Id = Target(RecordKind.Favorite, record.Id),
                         Blueprints = TargetLinks(RecordKind.Blueprint, record.Blueprints)
                     })
-            ]);
+            ],
+            current.Settings);
 
         void NumberAdded(RecordKind kind, IEnumerable<int> incomingIds, IEnumerable<int> currentIds)
         {

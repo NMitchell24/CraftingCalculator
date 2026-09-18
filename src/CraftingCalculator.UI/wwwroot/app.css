@@ -917,6 +917,35 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-height: 44px;
 }
 
+/* The Datasettings card on the Dataset screen: one row per setting, the text taking the slack so the control
+   stays at the trailing edge, and a hairline between rows so each setting reads as its own. At large text sizes
+   the text wraps between words rather than pushing the switch off the row. */
+.datasetting-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+}
+
+.datasetting-row + .datasetting-row {
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.datasetting-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.datasetting-caption {
+    display: block;
+    color: var(--mud-palette-text-secondary);
+}
+
+.datasetting-row .mud-switch {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
 /* Import/Export hub (Components/Pages/ImportExport.razor) */
 
 /* Both cards fit on screen without scrolling in either orientation: each is the largest square the free

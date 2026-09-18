@@ -8,7 +8,8 @@ namespace CraftingCalculator.Application.BusinessLogic.Transfer;
 public static class TransferDocumentProcessor
 {
     /// <summary>
-    /// The export document for the <paramref name="selected"/> records of <paramref name="snapshot"/>. Refs
+    /// The export document for the <paramref name="selected"/> records of <paramref name="snapshot"/>, and its
+    /// settings whatever the selection. Refs
     /// are numbered from 1 per kind, in snapshot order, so no database id reaches the file.
     /// </summary>
     /// <exception cref="InvalidOperationException">
@@ -51,7 +52,8 @@ public static class TransferDocumentProcessor
                 .. extract.Favorites
                     .Select(favorite => new TransferFavorite(
                         favoriteRefs[favorite.Id], favorite.Name, Links(blueprintRefs, favorite.Blueprints)))
-            ]);
+            ],
+            new TransferDatasettings(UseYield: extract.Settings.UseYield));
     }
 
     /// <summary>Maps each of <paramref name="ids"/> to its ref, 1 up in the order given.</summary>

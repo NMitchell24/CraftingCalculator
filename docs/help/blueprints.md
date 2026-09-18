@@ -65,6 +65,8 @@ not enough.
 > to 0 would cause the app to divide by zero and break the universe. Negative yields also don't make sense. There's 
 > simply no case where crafting an item means you end up having to give back the materials you used.
 
+> **Note:** Don't see this field? **Use Yield** is off for this dataset. See [Use Yield](dataset.md#use-yield).
+
 ### Production time per craft
 
 How long **one craft** takes, in hours, minutes and/or seconds. Seconds accept a decimal, so a 1.5-second

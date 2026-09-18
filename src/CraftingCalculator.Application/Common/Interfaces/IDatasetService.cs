@@ -27,7 +27,7 @@ public interface IDatasetService
 
     /// <summary>
     /// Adds a dataset holding its own copy of everything in <paramref name="sourceId"/> - every category,
-    /// component, blueprint and favorite - and returns it with its assigned id. The copies are independent
+    /// component, blueprint and favorite, and its settings - and returns it with its assigned id. The copies are independent
     /// records, so editing either dataset afterwards leaves the other alone.
     /// </summary>
     Task<DatasetModel> CopyAsync(int sourceId, string name);
@@ -42,4 +42,10 @@ public interface IDatasetService
 
     /// <summary>Selects <paramref name="id"/> and persists the choice across launches.</summary>
     Task SwitchToAsync(int id);
+
+    /// <summary>
+    /// Saves <paramref name="settings"/> as the selected dataset's own and publishes them to
+    /// <see cref="ISelectedDatasetState.Settings"/>.
+    /// </summary>
+    Task SaveSettingsAsync(Datasettings settings);
 }

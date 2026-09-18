@@ -127,6 +127,28 @@ public class DatasetImportTests
     }
 
     [Test]
+    public async Task ImportAsNewAsync_TakesTheFilesSettings()
+    {
+        DatasetSnapshot source = await GivenTheBronzeChainAsync() with { Settings = new Datasettings(UseYield: false) };
+
+        DatasetModel imported = await _datasetDAO.ImportAsNewAsync("Valheim - Friend's", source);
+
+        (await _datasetDAO.GetSnapshotAsync(imported.Id)).Settings.Should().Be(new Datasettings(UseYield: false));
+    }
+
+    [Test]
+    public async Task MergeAsync_KeepsTheDatasetsOwnSettings()
+    {
+        DatasetSnapshot current = await GivenTheBronzeChainAsync();
+        DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Resin", "", 1, TimeSpan.Zero, null)],
+            [], [], new Datasettings(UseYield: false));
+
+        await MergeAsync(incoming, current);
+
+        (await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId)).Settings.Should().Be(Datasettings.Default);
+    }
+
+    [Test]
     public async Task ImportAsNewAsync_LeavesTheOtherDatasetsAlone()
     {
         DatasetSnapshot source = await GivenTheBronzeChainAsync();
@@ -164,7 +186,7 @@ public class DatasetImportTests
         DatasetSnapshot incoming = new("Friend's Valheim", [],
             [new SnapshotComponent(1, "copper", "", 99, TimeSpan.Zero, null)],
             [new SnapshotBlueprint(1, "Copper Plate", "", 12, 1, TimeSpan.Zero, null, [new QuantityLink(1, 3)], [])],
-            []);
+            [], Datasettings.Default);
 
         await MergeAsync(incoming, current);
 
@@ -186,7 +208,7 @@ public class DatasetImportTests
         DatasetSnapshot incoming = new("Friend's Valheim", [],
             [new SnapshotComponent(1, "Copper", "", 2, TimeSpan.Zero, null)],
             [new SnapshotBlueprint(1, "Bronze", "Better alloy", 10, 1, TimeSpan.FromMinutes(2), null, [new QuantityLink(1, 3)], [])],
-            []);
+            [], Datasettings.Default);
 
         await MergeAsync(incoming, current, new RecordKey(RecordKind.Blueprint, 1));
 
@@ -207,7 +229,7 @@ public class DatasetImportTests
     public async Task MergeAsync_ReplacingAComponent_ClearsACategoryTheFileDoesNotHave()
     {
         DatasetSnapshot current = await GivenTheBronzeChainAsync();
-        DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Tin", "", 3, TimeSpan.Zero, null)], [], []);
+        DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Tin", "", 3, TimeSpan.Zero, null)], [], [], Datasettings.Default);
 
         await MergeAsync(incoming, current, new RecordKey(RecordKind.Component, 1));
 
@@ -221,7 +243,7 @@ public class DatasetImportTests
         DatasetSnapshot current = await GivenTheBronzeChainAsync();
         DatasetSnapshot incoming = new("Friend's Valheim", [],
             [new SnapshotComponent(1, "Copper", "", 5, TimeSpan.Zero, null), new SnapshotComponent(2, "Tin", "", 7, TimeSpan.Zero, null)],
-            [], []);
+            [], [], Datasettings.Default);
 
         await MergeAsync(incoming, current, new RecordKey(RecordKind.Component, 1));
 
@@ -236,7 +258,7 @@ public class DatasetImportTests
         int bronzeId = BlueprintNamed(current, "Bronze").Id;
         DatasetSnapshot incoming = new("Friend's Valheim", [], [],
             [new SnapshotBlueprint(1, "Bronze", "", 6, 2, TimeSpan.Zero, null, [], [])],
-            [new SnapshotFavorite(1, "Bronze Axe run", [new QuantityLink(1, 30)])]);
+            [new SnapshotFavorite(1, "Bronze Axe run", [new QuantityLink(1, 30)])], Datasettings.Default);
 
         await MergeAsync(incoming, current, new RecordKey(RecordKind.Favorite, 1));
 
@@ -254,7 +276,7 @@ public class DatasetImportTests
         DatasetSnapshot incoming = new("Friend's Valheim",
             [new SnapshotCategory(1, "Tools", "")],
             [new SnapshotComponent(1, "Copper", "", 99, TimeSpan.Zero, null)],
-            [], []);
+            [], [], Datasettings.Default);
 
         // A conflict naming a row that isn't there: the dataset changed between the conflict check and the merge.
         MergePlan plan = new(incoming, [new ImportConflict(RecordKind.Component, 1, 999, "Copper")],
@@ -275,7 +297,7 @@ public class DatasetImportTests
         await _componentDAO.SaveAsync(new ComponentModel { Name = "Sulfur", Cost = 3 });
         DatasetSnapshot rustBefore = await _datasetDAO.GetSnapshotAsync(rust.Id);
 
-        DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Resin", "", 1, TimeSpan.Zero, null)], [], []);
+        DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Resin", "", 1, TimeSpan.Zero, null)], [], [], Datasettings.Default);
         await _datasetDAO.MergeAsync(SqliteTestFixture.DefaultDatasetId,
             new MergePlan(incoming, ImportConflictProcessor.Find(incoming, valheim), new HashSet<RecordKey>()));
 

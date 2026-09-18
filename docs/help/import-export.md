@@ -22,6 +22,9 @@ friend who's starting the same game.
 The screen opens with **everything selected**. If a full backup is all you're after, tap **Export data** and you're
 done.
 
+The file always carries the dataset's [Datasettings](dataset.md#datasettings), whatever records you pick. They're not
+records, so there's nothing to select.
+
 ### Picking what goes out
 
 Your records are split into four panels: ![Categories](assets/label.svg) **Categories**,
@@ -193,11 +196,12 @@ More detail on the panels: [Picking what goes out](import-export.md#picking-what
 
 The app asks how you want to bring it in:
 
-- **As new dataset:** makes a brand new dataset out of what you picked. The name comes prefilled with whatever the
-  dataset was called in the file, and the usual [unique-name rule](managing-datasets.md#adding-one) applies. You stay in
-  the dataset you're in, so switch over when you're ready.
+- **As new dataset:** makes a brand new dataset out of what you picked, set up with the file's
+  [Datasettings](dataset.md#datasettings). The name comes prefilled with whatever the dataset was called in the file,
+  and the usual [unique-name rule](managing-datasets.md#adding-one) applies. You stay in the dataset you're in, so
+  switch over when you're ready.
 - **Into this dataset:** adds what you picked to the dataset you're in right now. The question above the buttons names
-  it, so there's no guessing where it's going.
+  it, so there's no guessing where it's going. Your dataset keeps its own Datasettings; the file's are ignored.
 
 **As new dataset** is the safe bet. Nothing you already have changes, and if you don't like how it turned out you can
 [delete it](managing-datasets.md#deleting-one) and pretend it never happened.

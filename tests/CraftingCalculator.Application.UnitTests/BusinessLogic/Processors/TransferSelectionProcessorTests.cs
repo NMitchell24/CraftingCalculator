@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 using static CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer.BronzeChain;
@@ -282,7 +283,7 @@ public class TransferSelectionProcessorTests
     [Test]
     public void StateOf_AKindWithNoRecords_IsNone()
     {
-        DependencyGraph empty = DependencyGraphProcessor.Build(new DatasetSnapshot("Empty", [], [], [], []));
+        DependencyGraph empty = DependencyGraphProcessor.Build(new DatasetSnapshot("Empty", [], [], [], [], Datasettings.Default));
 
         TransferSelectionProcessor.StateOf(empty, new HashSet<RecordKey>(), RecordKind.Favorite).Should().Be(SelectionState.None);
     }
@@ -320,7 +321,7 @@ public class TransferSelectionProcessorTests
         [
             new SnapshotBlueprint(1, "Bronze Plate", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(2, 1)]),
             new SnapshotBlueprint(2, "Bronze Nails", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(1, 1)])
-        ], []);
+        ], [], Datasettings.Default);
         DependencyGraph graph = DependencyGraphProcessor.Build(cyclic);
 
         TransferSelectionProcessor.Select(graph, new HashSet<RecordKey>(), new RecordKey(RecordKind.Blueprint, 1))
@@ -348,7 +349,8 @@ public class TransferSelectionProcessorTests
             [Snapshot.Categories[0]],
             [Snapshot.Components[0], Snapshot.Components[1]],
             [Snapshot.Blueprints[0]],
-            []));
+            [],
+            Snapshot.Settings));
     }
 
     [Test]

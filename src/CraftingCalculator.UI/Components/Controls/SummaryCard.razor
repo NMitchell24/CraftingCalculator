@@ -27,16 +27,20 @@
             <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
         </div>
 
-        @* Listed rather than folded into Profit: surplus is stock on hand, not a sale. *@
-        <div class="summary-row">
-            <dt>Surplus Stock</dt>
-            <dd>@State.SurplusCount total</dd>
-        </div>
+        @* Listed rather than folded into Profit: surplus is stock on hand, not a sale. Without yield nothing is
+           ever overproduced, so the rows would only ever say zero. *@
+        @if (SelectedDataset.Settings.UseYield)
+        {
+            <div class="summary-row">
+                <dt>Surplus Stock</dt>
+                <dd>@State.SurplusCount total</dd>
+            </div>
 
-        <div class="summary-row">
-            <dt>Surplus Value</dt>
-            <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
-        </div>
+            <div class="summary-row">
+                <dt>Surplus Value</dt>
+                <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
+            </div>
+        }
 
         @* The one line a user is actually here for, so it is the only one that carries emphasis. *@
         <div class="summary-row">

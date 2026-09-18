@@ -66,7 +66,7 @@ You can still tap the number and type a quantity straight in.
 ## Crafting Summary
 
 Eight numbers, all of them linked directly to your selected blueprint(s). They update the instant you change a 
-blueprint quantity.
+blueprint quantity. It's six if [Use Yield](dataset.md#use-yield) is off, because the two surplus lines go away with it.
 
 | Line                  | What it means                                                                         |
 |-----------------------|---------------------------------------------------------------------------------------|
@@ -124,6 +124,9 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
 > explaining this appears under the tree whenever such a row is on screen.
 
 ### Surplus
+
+> **Note:** This tab only shows up when [Use Yield](dataset.md#use-yield) is on. With it off, nothing is ever
+> overproduced, so there'd be nothing to list.
 
 The leftovers. The extra crap you can save for later. When a recipe yields 4 and you need 6, you have to run it 
 twice. When you do, you end up with 2 more than you needed. This tab lists every one of those spares across the 

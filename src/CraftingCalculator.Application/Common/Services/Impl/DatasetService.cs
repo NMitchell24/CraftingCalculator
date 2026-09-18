@@ -11,8 +11,11 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
 
     public async Task InitializeAsync()
     {
-        if (selectedDataset.Id != 0 && await dao.GetByIdAsync(selectedDataset.Id) != null)
+        // Selected again even though the id is unchanged: the stored preference carries only the id, and this is
+        // what loads the dataset's settings.
+        if (selectedDataset.Id != 0 && await dao.GetByIdAsync(selectedDataset.Id) is { } stored)
         {
+            Select(stored);
             return;
         }
 
@@ -24,11 +27,11 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
         if (datasets.Count == 0)
         {
             DatasetModel created = await dao.AddAsync(DatasetConstants.DefaultName);
-            selectedDataset.Set(created.Id);
+            Select(created);
             return;
         }
 
-        selectedDataset.Set(datasets[0].Id);
+        Select(datasets[0]);
     }
 
     public async Task<bool> NameExistsAsync(string name, int exceptId = 0)
@@ -54,7 +57,7 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
         if (selectedDataset.Id == id)
         {
             DatasetModel replacement = (await dao.GetAllAsync()).First(dataset => dataset.Id != id);
-            selectedDataset.Set(replacement.Id);
+            Select(replacement);
         }
 
         await dao.DeleteAsync(id);
@@ -64,11 +67,19 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
     {
         // Guards against a stale dropdown selecting a dataset another path has already deleted, which
         // would otherwise leave every screen scoped to a missing dataset and silently empty.
-        if (await dao.GetByIdAsync(id) == null)
+        if (await dao.GetByIdAsync(id) is not { } dataset)
         {
             return;
         }
 
-        selectedDataset.Set(id);
+        Select(dataset);
     }
+
+    public async Task SaveSettingsAsync(Datasettings settings)
+    {
+        await dao.SetSettingsAsync(selectedDataset.Id, settings);
+        selectedDataset.Set(selectedDataset.Id, settings);
+    }
+
+    private void Select(DatasetModel dataset) => selectedDataset.Set(dataset.Id, dataset.Settings);
 }

@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Domain.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,7 +60,7 @@ public sealed class SqliteTestFixture : IDisposable
     }
 
     /// <summary>Points <see cref="Factory"/> and <see cref="DatasetFactory"/> at another dataset.</summary>
-    public void SelectDataset(int id) => _selectedDataset.Set(id);
+    public void SelectDataset(int id) => _selectedDataset.Set(id, Datasettings.Default);
 
     public void Dispose() => _keeperConnection.Dispose();
 
@@ -85,6 +86,12 @@ public sealed class SqliteTestFixture : IDisposable
     {
         public int Id { get; private set; } = id;
 
-        public void Set(int id) => Id = id;
+        public Datasettings Settings { get; private set; } = Datasettings.Default;
+
+        public void Set(int id, Datasettings settings)
+        {
+            Id = id;
+            Settings = settings;
+        }
     }
 }

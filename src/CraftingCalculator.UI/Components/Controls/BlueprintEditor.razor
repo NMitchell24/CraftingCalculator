@@ -4,9 +4,13 @@
 <MudNumericField @bind-Value="Model.Value" @bind-Value:after="NotifyChangedAsync" Label="Value per item"
                  Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" />
 
-@* Min is the user-facing guard; Blueprint.Yield clamps as well, for anything reaching the model another way. *@
-<MudNumericField T="long" @bind-Value="Model.Yield" @bind-Value:after="NotifyChangedAsync" Label="Yield per craft"
-                 Variant="Variant.Outlined" FullWidth="true" Min="1" Class="mb-4" />
+@* Min is the user-facing guard; Blueprint.Yield clamps as well, for anything reaching the model another way.
+   Hidden rather than cleared when the dataset does not use yield: the stored value is kept for when it does. *@
+@if (SelectedDataset.Settings.UseYield)
+{
+    <MudNumericField T="long" @bind-Value="Model.Yield" @bind-Value:after="NotifyChangedAsync" Label="Yield per craft"
+                     Variant="Variant.Outlined" FullWidth="true" Min="1" Class="mb-4" />
+}
 
 <ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
                      Label="Production time per craft" />

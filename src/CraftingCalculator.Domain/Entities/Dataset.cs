@@ -9,6 +9,9 @@ public class Dataset
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
+    /// <summary>Whether a blueprint's yield per craft counts; see <see cref="Models.Datasettings.UseYield"/>.</summary>
+    public bool UseYield { get; set; } = true;
+
     public List<Category> Categories { get; set; } = [];
 
     public List<Component> Components { get; set; } = [];

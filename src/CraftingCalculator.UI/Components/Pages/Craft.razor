@@ -46,7 +46,10 @@
                            the group into three full-width pills instead of letting a label wrap mid-word. *@
                         <MudToggleItem Value="CraftView.Materials">Components</MudToggleItem>
                         <MudToggleItem Value="CraftView.Steps">Steps</MudToggleItem>
-                        <MudToggleItem Value="CraftView.Surplus">Surplus</MudToggleItem>
+                        @if (UseYield)
+                        {
+                            <MudToggleItem Value="CraftView.Surplus">Surplus</MudToggleItem>
+                        }
                     </MudToggleGroup>
                 </div>
 
@@ -80,9 +83,12 @@
                 <div class="craft-pane @(_view == CraftView.Steps ? "craft-pane-active" : "")">
                     <StepsTree />
                 </div>
-                <div class="craft-pane @(_view == CraftView.Surplus ? "craft-pane-active" : "")">
-                    <SurplusList />
-                </div>
+                @if (UseYield)
+                {
+                    <div class="craft-pane @(_view == CraftView.Surplus ? "craft-pane-active" : "")">
+                        <SurplusList />
+                    </div>
+                }
             </MudPaper>
         </div>
     </div>

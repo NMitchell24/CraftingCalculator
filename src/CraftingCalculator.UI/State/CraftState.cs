@@ -11,7 +11,8 @@ namespace CraftingCalculator.UI.State;
 /// route", since this is genuine cross-page session state. Components subscribe to <see cref="Changed"/>
 /// in <c>OnInitialized</c> and unsubscribe in <c>Dispose</c>.
 /// </summary>
-public sealed class CraftState(IBlueprintService blueprintService, IFavoriteService favoriteService)
+public sealed class CraftState(
+    IBlueprintService blueprintService, IFavoriteService favoriteService, ISelectedDatasetState selectedDataset)
 {
     private readonly BlueprintMap _blueprintMap = new();
 
@@ -212,6 +213,9 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
         }
     }
 
+    /// <summary>Works the batch out again under the selected dataset's settings, after they have changed.</summary>
+    public void OnDatasettingsChanged() => Recalculate();
+
     /// <summary>Keeps <see cref="LoadedFavorite"/> in step when the favorite with <paramref name="id"/> is renamed.</summary>
     public void OnFavoriteRenamed(int id, string newName)
     {
@@ -309,14 +313,15 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     private void Recalculate()
     {
-        BatchTotals totals = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList);
+        Datasettings settings = selectedDataset.Settings;
+        BatchTotals totals = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList, settings);
 
         TotalCost = totals.TotalCost;
         TotalValue = totals.TotalValue;
         TotalProductionTime = totals.TotalProductionTime;
         TotalComponents = [.. totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
         SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
-        TreeRoots = [.. _blueprintMap.BlueprintList.Select(blueprintQuantity => blueprintService.GetBlueprintNode(blueprintQuantity.Blueprint, blueprintQuantity.Quantity))];
+        TreeRoots = [.. _blueprintMap.BlueprintList.Select(blueprintQuantity => blueprintService.GetBlueprintNode(blueprintQuantity.Blueprint, blueprintQuantity.Quantity, settings))];
 
         // Computed here rather than as expression-bodied properties: each walks the whole batch, and the
         // summary card reads them on every render.

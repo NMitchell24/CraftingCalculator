@@ -94,6 +94,26 @@ public class DatasetDAOTests
     }
 
     [Test]
+    public async Task AddAsync_StartsWithTheDefaultSettings()
+    {
+        DatasetModel saved = await _datasetDAO.AddAsync("Valheim");
+
+        (await _datasetDAO.GetByIdAsync(saved.Id))!.Settings.Should().Be(Datasettings.Default);
+    }
+
+    [Test]
+    public async Task SetSettingsAsync_ChangesOnlyThatDatasetsSettings()
+    {
+        DatasetModel rust = await _datasetDAO.AddAsync("Rust");
+        DatasetModel valheim = await _datasetDAO.AddAsync("Valheim");
+
+        await _datasetDAO.SetSettingsAsync(rust.Id, new Datasettings(UseYield: false));
+
+        (await _datasetDAO.GetByIdAsync(rust.Id))!.Settings.Should().Be(new Datasettings(UseYield: false));
+        (await _datasetDAO.GetByIdAsync(valheim.Id))!.Settings.Should().Be(Datasettings.Default);
+    }
+
+    [Test]
     public async Task DeleteAsync_RemovesTheDataset()
     {
         DatasetModel rust = await _datasetDAO.AddAsync("Rust");

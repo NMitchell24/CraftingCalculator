@@ -12,6 +12,8 @@ public class DatasetServiceTests
 {
     private const string SelectedDatasetKey = "selectedDatasetId";
 
+    private static readonly Datasettings NoYield = new(UseYield: false);
+
     private Mock<IDatasetDAO> _dao = null!;
     private FakePreferenceStore _preferences = null!;
     private SelectedDatasetState _selected = null!;
@@ -196,5 +198,55 @@ public class DatasetServiceTests
         // The selection is the caller's to move: copying a dataset other than the selected one is a
         // supported call, and it does not make that one the one you are working in.
         _selected.Id.Should().Be(1);
+    }
+
+    [Test]
+    public async Task InitializeAsync_StoredDatasetStillExists_LoadsItsSettings()
+    {
+        GivenDatasets(new DatasetModel { Id = 7, Name = "Rust", Settings = NoYield });
+        GivenStoredSelection(7);
+
+        await _service.InitializeAsync();
+
+        _selected.Settings.Should().Be(NoYield);
+    }
+
+    [Test]
+    public async Task SwitchToAsync_PublishesTheNewDatasetsSettings()
+    {
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust", Settings = NoYield });
+        GivenStoredSelection(1);
+        await _service.InitializeAsync();
+
+        await _service.SwitchToAsync(7);
+        _selected.Settings.Should().Be(NoYield);
+
+        await _service.SwitchToAsync(1);
+        _selected.Settings.Should().Be(Datasettings.Default);
+    }
+
+    [Test]
+    public async Task DeleteAsync_TheSelectedDataset_PublishesTheReplacementsSettings()
+    {
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default", Settings = NoYield }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(7);
+        await _service.InitializeAsync();
+
+        await _service.DeleteAsync(7);
+
+        _selected.Settings.Should().Be(NoYield);
+    }
+
+    [Test]
+    public async Task SaveSettingsAsync_SavesThemToTheSelectedDatasetAndPublishesThem()
+    {
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(7);
+        await _service.InitializeAsync();
+
+        await _service.SaveSettingsAsync(NoYield);
+
+        _dao.Verify(dao => dao.SetSettingsAsync(7, NoYield), Times.Once);
+        (_selected.Id, _selected.Settings).Should().Be((7, NoYield));
     }
 }

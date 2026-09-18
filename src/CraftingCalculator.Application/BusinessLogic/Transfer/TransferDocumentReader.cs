@@ -2,6 +2,7 @@ using System.Text.Json;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 
 namespace CraftingCalculator.Application.BusinessLogic.Transfer;
@@ -216,7 +217,8 @@ public static class TransferDocumentReader
                 blueprint.Ref, blueprint.Name, blueprint.Description, blueprint.Value, blueprint.Yield,
                 blueprint.ProductionTime, blueprint.Category, Links(blueprint.Components), Links(blueprint.Blueprints)))
         ],
-        [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))]);
+        [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))],
+        document.Datasettings is { } settings ? new Datasettings(UseYield: settings.UseYield) : Datasettings.Default);
 
     private static List<QuantityLink> Links(IEnumerable<QuantityRef> links) =>
         [.. links.Select(link => new QuantityLink(link.Ref, link.Quantity))];
