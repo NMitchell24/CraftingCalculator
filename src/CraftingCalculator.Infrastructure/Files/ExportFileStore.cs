@@ -11,8 +11,6 @@ namespace CraftingCalculator.Infrastructure.Files;
 /// <param name="directory">The folder the exports are saved to. Created on the first save.</param>
 public class ExportFileStore(string directory) : IExportFileStore
 {
-    private const int KeptExports = 5;
-
     private const string TempExtension = ".tmp";
 
     // Windows' reserved characters, stripped on every platform: a name has to stay valid wherever the file
@@ -25,7 +23,7 @@ public class ExportFileStore(string directory) : IExportFileStore
     // of the dataset. Generous against a long dataset name.
     private const int HeaderBytes = 64 * 1024;
 
-    public async Task<ExportFileInfo> SaveAsync(TransferDocument document)
+    public async Task<ExportFileInfo> SaveAsync(TransferDocument document, int keep)
     {
         Directory.CreateDirectory(directory);
 
@@ -48,7 +46,11 @@ public class ExportFileStore(string directory) : IExportFileStore
 
         File.Move(tempPath, path);
 
-        foreach (ExportFileInfo old in Exports().Skip(KeptExports))
+        // The new export is left out of the ordering: a device clock set back would otherwise rank it older
+        // than the exports it replaces, and keeping one would delete it.
+        string savedName = Path.GetFileName(path);
+
+        foreach (ExportFileInfo old in Exports().Where(export => export.FileName != savedName).Skip(keep - 1))
         {
             File.Delete(old.FullPath);
         }
@@ -56,12 +58,16 @@ public class ExportFileStore(string directory) : IExportFileStore
         return new ExportFileInfo(path, Path.GetFileName(path), document.DatasetName, document.ExportedAt);
     }
 
-    public ExportFileInfo? GetLatest() => Exports().FirstOrDefault();
+    public IReadOnlyList<ExportFileInfo> List() => [.. Exports()];
 
     /// <summary>The export files in the folder, newest first.</summary>
-    private IEnumerable<ExportFileInfo> Exports() => FilesWithExportExtension().Select(TryReadHeader).OfType<ExportFileInfo>();
+    private IEnumerable<ExportFileInfo> Exports() => FilesWithExportExtension()
+        .Select(TryReadHeader)
+        .OfType<ExportFileInfo>()
+        .OrderByDescending(export => export.CreatedAt)
+        .ThenByDescending(export => export.FileName, StringComparer.Ordinal);
 
-    /// <summary>The files in the folder with the export extension, newest first, whether or not they are exports.</summary>
+    /// <summary>The files in the folder with the export extension, whether or not they are exports.</summary>
     private IEnumerable<FileInfo> FilesWithExportExtension()
     {
         DirectoryInfo folder = new(directory);
@@ -74,9 +80,7 @@ public class ExportFileStore(string directory) : IExportFileStore
         // Filtered on Extension as well as the pattern: Windows matches a search pattern against short file
         // names too, which can let a longer extension through.
         return folder.EnumerateFiles($"*{TransferFormat.FileExtension}")
-            .Where(file => file.Extension.Equals(TransferFormat.FileExtension, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(file => file.LastWriteTimeUtc)
-            .ThenByDescending(file => file.Name, StringComparer.Ordinal);
+            .Where(file => file.Extension.Equals(TransferFormat.FileExtension, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

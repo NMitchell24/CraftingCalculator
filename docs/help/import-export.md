@@ -79,13 +79,22 @@ The export runs in the background. You'll see "Building your export…" under th
 and watch it. Go check the [Craft screen](craft-screen.md), come back whenever, and this screen will tell you how it
 went.
 
-When it's done, a card shows your **latest export**: the dataset it came from, when you made it, the file name, and
-where it's saved. That's the newest export on the device, whichever dataset it came from.
+When it's done, the new file appears at the top of your **Export history**, under the button.
 
 > **Note:** If a blueprint you've selected is nested inside itself, the export is refused and the screen names the
 > blueprints involved. A file like that could never be imported. Fix the blueprint in the
 > [editor](blueprints.md), or deselect it, and try again. You'll only see this on old data, because the editor
 > won't let you build a loop.
+
+### Export history
+
+Under the **Export data** button, every export still on the device gets a card, newest at the top. Each one shows
+the dataset it came from, when you made it, the file name, and where it's saved. Exports from different datasets all
+sit in the same list, which is why the dataset name is the first thing on the card.
+
+The app keeps your **five newest** exports by default and deletes the oldest ones each time you make a new one. Want
+more history, or less clutter? Change **Max history** in [Settings](settings.md#exports). Delete them yourself
+and they drop off this list too.
 
 ### Where the file goes
 
@@ -97,13 +106,13 @@ Every export is a `.ccdata` file named after its dataset and the moment you made
 - **iPhone and iPad:** open the Files app and go to **On My iPhone → Crafting Calculator → Exports** (it says
   **On My iPad** on an iPad).
 
-The app keeps your **five newest** exports and deletes the oldest one each time you make a sixth. If you delete them
-yourself, the card and the Share action disappear until you export again.
-
 ### Sharing
 
-Tap ![Share](assets/share.svg) **Share** to send your latest export somewhere: email it to yourself, drop it in your
-cloud drive, or send it to a friend. It stays grayed out until there's an export to share.
+Tap ![Share](assets/share.svg) on any card to send that export somewhere: email it to yourself, drop it in your
+cloud drive, or send it to a friend. That's the only way to get a file off an Android phone, and it's the step that
+turns an export into a real backup.
+
+If the file has gone missing since the screen last looked, the app tells you so instead of opening the share sheet.
 
 > **Note:** Exports live in the app's storage, so uninstalling the app or clearing its data deletes them along with
 > everything else. An export only counts as a backup once you've shared it somewhere that isn't this device.
@@ -120,7 +129,7 @@ app. Nothing lands in your data until you've seen what's in the file and said wh
 The screen opens on **Step 1: Select a file**. Tap **Select import file** in that card and your device's file picker
 opens.
 
-- **Windows:** it only shows `.ccdata` files. Your own exports are in the folder the latest export card shows.
+- **Windows:** it only shows `.ccdata` files. Your own exports are in the folder the export history cards show.
 - **Android:** it shows every file, because Android has no idea what a `.ccdata` is. Pick the one you want. Anything
   that isn't an export gets turned away in the next step.
 - **iPhone and iPad:** your own exports are under **On My iPhone → Crafting Calculator → Exports** (**On My iPad** on

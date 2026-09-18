@@ -8,14 +8,18 @@ public interface IExportFileStore
 {
     /// <summary>
     /// Saves <paramref name="document"/> as a new export file named after its dataset and export time, then
-    /// deletes the oldest export files beyond the newest five. An interrupted save never leaves a partial
-    /// file among the exports.
+    /// deletes the oldest export files beyond the newest <paramref name="keep"/>. An interrupted save never
+    /// leaves a partial file among the exports.
     /// </summary>
-    Task<ExportFileInfo> SaveAsync(TransferDocument document);
+    /// <param name="document">The records to write.</param>
+    /// <param name="keep">
+    /// How many exports to leave in the folder, counting the one being saved. At least one.
+    /// </param>
+    Task<ExportFileInfo> SaveAsync(TransferDocument document, int keep);
 
     /// <summary>
-    /// The most recently saved export file still in the folder, or null when there is none. Reads the folder
-    /// on every call, so a file deleted outside the app is never returned.
+    /// Every export file still in the folder, newest first. Reads the folder on every call, so a file deleted
+    /// outside the app is never returned.
     /// </summary>
-    ExportFileInfo? GetLatest();
+    IReadOnlyList<ExportFileInfo> List();
 }

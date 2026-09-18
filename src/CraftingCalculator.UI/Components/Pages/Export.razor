@@ -1,4 +1,5 @@
 @page "/dataset/import-export/export"
+@using CraftingCalculator.Domain.Models.Transfer
 
 <PageTitle>Export Data</PageTitle>
 
@@ -21,11 +22,21 @@
             <MudAlert Severity="Severity.Warning" Class="transfer-alert">@cycleMessage</MudAlert>
         }
 
+        <MudPaper Class="app-card" Elevation="0">
+            <MudText Typo="Typo.h6" Class="app-card-title display-title">Choose what you want to export</MudText>
+
+            <MudText Typo="Typo.body1">
+                Tap on any item to exclude it from the export. Tap the checkmark at the top of each group to
+                select or deselect an entire group. Exports you have created will display at the bottom of
+                the screen ordered from the most recent to the oldest.
+            </MudText>
+        </MudPaper>
+
         <TransferSelectionPanels Snapshot="_snapshot" Graph="_graph" Selected="_selected"
                                  SelectionChanged="ConfigureShell" />
 
         <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="transfer-action"
-                   StartIcon="@Icons.Material.Filled.Output" Disabled="@(!CanExport)" OnClick="ExportAsync">
+                   StartIcon="@Icons.Material.Filled.Output" Disabled="@(!CanExport)" OnClick="@ExportAsync">
             Export data
         </MudButton>
     }
@@ -46,14 +57,26 @@
             <MudAlert Severity="Severity.Error" Class="transfer-alert">@error</MudAlert>
         }
 
-        @if (ExportState.Latest is { } latest)
+        @if (ExportState.Exports.Count > 0)
         {
-            <div class="app-card transfer-latest">
-                <MudText Typo="Typo.subtitle1" Class="transfer-latest-title">Latest export: @latest.DatasetName</MudText>
-                <MudText Typo="Typo.body2">@latest.CreatedAt.ToLocalTime().ToString("f")</MudText>
-                <MudText Typo="Typo.caption" Class="transfer-latest-location">@latest.FileName</MudText>
-                <MudText Typo="Typo.caption" Class="transfer-latest-location">@LocationOf(latest)</MudText>
-            </div>
+            <MudPaper Class="app-card" Elevation="0">
+                <MudText Typo="Typo.subtitle1" Class="transfer-export-heading display-title">Export history</MudText>
+
+                @foreach (ExportFileInfo export in ExportState.Exports)
+                {
+                    <div class="app-card transfer-export" @key="export.FullPath">
+                        <div class="transfer-export-detail">
+                            <MudText Typo="Typo.subtitle1" Class="transfer-export-name">@export.DatasetName</MudText>
+                            <MudText Typo="Typo.body2">@export.CreatedAt.ToLocalTime().ToString("f")</MudText>
+                            <MudText Typo="Typo.caption" Class="transfer-export-location">@export.FileName</MudText>
+                            <MudText Typo="Typo.caption" Class="transfer-export-location">@LocationOf(export)</MudText>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Primary"
+                                       title="@ShareLabel(export)" aria-label="@ShareLabel(export)"
+                                       OnClick="@(() => ShareAsync(export))" />
+                    </div>
+                }
+            </MudPaper>
         }
     }
 </div>

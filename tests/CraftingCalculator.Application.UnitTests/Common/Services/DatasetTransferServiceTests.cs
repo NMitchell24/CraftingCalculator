@@ -20,6 +20,7 @@ public class DatasetTransferServiceTests
     private Mock<IDatasetDAO> _datasetDAO = null!;
     private Mock<ISelectedDatasetState> _selectedDataset = null!;
     private Mock<IExportFileStore> _exportFileStore = null!;
+    private Mock<IExportSettings> _exportSettings = null!;
     private DatasetTransferService _service = null!;
 
     [SetUp]
@@ -28,8 +29,10 @@ public class DatasetTransferServiceTests
         _datasetDAO = new Mock<IDatasetDAO>();
         _selectedDataset = new Mock<ISelectedDatasetState>();
         _exportFileStore = new Mock<IExportFileStore>();
+        _exportSettings = new Mock<IExportSettings>();
         _service = new DatasetTransferService(
-            _datasetDAO.Object, _selectedDataset.Object, _exportFileStore.Object, new FixedTimeProvider(Now));
+            _datasetDAO.Object, _selectedDataset.Object, _exportFileStore.Object, _exportSettings.Object,
+            new FixedTimeProvider(Now));
     }
 
     [Test]
@@ -47,8 +50,8 @@ public class DatasetTransferServiceTests
         HashSet<RecordKey> selected = [BronzeChain.Metals, BronzeChain.Copper];
         ExportFileInfo saved = new("/exports/Valheim.ccdata", "Valheim.ccdata", "Valheim", Now);
         TransferDocument? written = null;
-        _exportFileStore.Setup(store => store.SaveAsync(It.IsAny<TransferDocument>()))
-            .Callback<TransferDocument>(document => written = document)
+        _exportFileStore.Setup(store => store.SaveAsync(It.IsAny<TransferDocument>(), It.IsAny<int>()))
+            .Callback<TransferDocument, int>((document, _) => written = document)
             .ReturnsAsync(saved);
 
         ExportFileInfo result = await _service.ExportAsync(BronzeChain.Snapshot, selected, "1.2");
@@ -60,6 +63,19 @@ public class DatasetTransferServiceTests
     }
 
     [Test]
+    public async Task ExportAsync_KeepsAsManyExportsAsTheSettingSays()
+    {
+        HashSet<RecordKey> selected = [BronzeChain.Metals, BronzeChain.Copper];
+        _exportSettings.SetupGet(settings => settings.KeptExports).Returns(3);
+        _exportFileStore.Setup(store => store.SaveAsync(It.IsAny<TransferDocument>(), It.IsAny<int>()))
+            .ReturnsAsync(new ExportFileInfo("/exports/Valheim.ccdata", "Valheim.ccdata", "Valheim", Now));
+
+        await _service.ExportAsync(BronzeChain.Snapshot, selected, "1.2");
+
+        _exportFileStore.Verify(store => store.SaveAsync(It.IsAny<TransferDocument>(), 3), Times.Once);
+    }
+
+    [Test]
     public async Task ExportAsync_ASelectionMissingADependency_ThrowsWithoutSaving()
     {
         HashSet<RecordKey> selected = [BronzeChain.Copper];
@@ -67,16 +83,16 @@ public class DatasetTransferServiceTests
         Func<Task> act = () => _service.ExportAsync(BronzeChain.Snapshot, selected, "1.0");
 
         await act.Should().ThrowAsync<InvalidOperationException>();
-        _exportFileStore.Verify(store => store.SaveAsync(It.IsAny<TransferDocument>()), Times.Never);
+        _exportFileStore.Verify(store => store.SaveAsync(It.IsAny<TransferDocument>(), It.IsAny<int>()), Times.Never);
     }
 
     [Test]
-    public void GetLatestExport_ReturnsTheStoresLatestFile()
+    public void ListExports_ReturnsTheStoresFiles()
     {
-        ExportFileInfo latest = new("/exports/Valheim.ccdata", "Valheim.ccdata", "Valheim", Now);
-        _exportFileStore.Setup(store => store.GetLatest()).Returns(latest);
+        ExportFileInfo[] exports = [new("/exports/Valheim.ccdata", "Valheim.ccdata", "Valheim", Now)];
+        _exportFileStore.Setup(store => store.List()).Returns(exports);
 
-        _service.GetLatestExport().Should().BeSameAs(latest);
+        _service.ListExports().Should().BeSameAs(exports);
     }
 
     [Test]

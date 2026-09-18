@@ -10,8 +10,8 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
-/// Choose records from the current dataset and export them to a file, then share the newest export. The
-/// export itself runs in <see cref="ExportState"/>, so it carries on if the user leaves this page.
+/// Choose records from the current dataset and export them to a file, and share any export still on the
+/// device. The export itself runs in <see cref="ExportState"/>, so it carries on if the user leaves this page.
 /// </summary>
 public partial class Export : ComponentBase, IDisposable
 {
@@ -98,7 +98,7 @@ public partial class Export : ComponentBase, IDisposable
 
         if (!ExportState.IsRunning)
         {
-            await ExportState.RefreshLatestAsync();
+            await ExportState.RefreshExportsAsync();
         }
     }
 
@@ -106,12 +106,7 @@ public partial class Export : ComponentBase, IDisposable
         PageShellState.Configure(this, new PageShellConfig("Export Data")
         {
             ShowBack = true,
-            Actions =
-            [
-                new PageAction("Export data", Icons.Material.Filled.Output, ExportAsync, Disabled: !CanExport),
-                new PageAction("Share", Icons.Material.Filled.Share, ShareAsync,
-                    Disabled: ExportState.Latest is null || ExportState.IsRunning)
-            ]
+            Actions = [new PageAction("Export data", Icons.Material.Filled.Output, ExportAsync, Disabled: !CanExport)]
         });
 
     // Raised by the export's background task as well as by this page.
@@ -124,12 +119,16 @@ public partial class Export : ComponentBase, IDisposable
     private Task ExportAsync() =>
         CanExport ? ExportState.StartAsync(_snapshot!, _selected) : Task.CompletedTask;
 
-    private async Task ShareAsync()
+    private static string ShareLabel(ExportFileInfo export) => $"Share {export.FileName}";
+
+    private async Task ShareAsync(ExportFileInfo export)
     {
         // Re-read first: the file may have been deleted since the page last looked.
-        await ExportState.RefreshLatestAsync();
+        await ExportState.RefreshExportsAsync();
 
-        if (ExportState.Latest is not { } latest)
+        bool stillOnTheDevice = ExportState.Exports.Any(file => file.FullPath == export.FullPath);
+
+        if (!stillOnTheDevice)
         {
             Snackbar.Add("That export file is gone. Export again to make a new one.", Severity.Warning);
             return;
@@ -137,7 +136,7 @@ public partial class Export : ComponentBase, IDisposable
 
         try
         {
-            await ShareService.ShareFileAsync(latest.FullPath, "Share your export");
+            await ShareService.ShareFileAsync(export.FullPath, "Share your export");
         }
         catch (Exception exception)
         {

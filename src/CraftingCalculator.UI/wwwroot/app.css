@@ -1158,7 +1158,38 @@ html.keyboard-open .page-content-with-bottom-nav {
     gap: 12px;
 }
 
-.transfer-latest,
+.transfer-export-heading {
+    margin-bottom: 8px;
+}
+
+/* One export in the history, with its Share button beside its four lines of detail. align-items: center
+   because Share is the card's only action and there is nothing on the first line for it to line up with -
+   unlike .transfer-row, where the Info button belongs to the name it sits next to. */
+.transfer-export {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.transfer-export-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* The MudIconButton is 48px at every text size, and must not give width up to the detail column beside it. */
+.transfer-export > .mud-icon-button {
+    flex: 0 0 auto;
+}
+
+/* Wraps like every other record name in the app; a dataset name that is one word too long for a line by
+   itself breaks inside the word rather than run under the Share button. */
+.transfer-export-name {
+    overflow-wrap: break-word;
+}
+
 .transfer-file {
     display: flex;
     flex-direction: column;
@@ -1166,14 +1197,8 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* A Windows path has no spaces to break at, and would otherwise run off the card. */
-.transfer-latest-location {
+.transfer-export-location {
     color: var(--mud-palette-text-secondary);
-    overflow-wrap: anywhere;
-}
-
-/* Everything in it is read out of the import file, where a dataset name or app version can be one long unbroken
-   word. */
-.transfer-file {
     overflow-wrap: anywhere;
 }
 
@@ -1223,6 +1248,14 @@ html.keyboard-open .page-content-with-bottom-nav {
     display: block;
     margin-bottom: 8px;
     opacity: 0.7;
+}
+
+/* Holds two digits, so it is capped rather than stretched across .settings-page's 720px. Wide enough for the
+   outlined variant's "Max history" label notch, which is what sets the floor rather than the value. ch
+   rather than px for the same reason as .production-time-row: Android's WebView text zoom scales ch, so the
+   cap grows with the label instead of clipping it. */
+.settings-number-field {
+    max-width: 22ch;
 }
 
 /* Dataset editor (Components/Pages/DatasetEditor.razor + Components/Controls/*Editor.razor) */
