@@ -162,9 +162,8 @@ public partial class Favorites : ComponentBase, IDisposable
             return;
         }
 
-        string previousName = favorite.Name ?? "";
         await FavoriteService.RenameFavoriteAsync(favorite, name);
-        State.OnFavoriteRenamed(previousName, name);
+        State.OnFavoriteRenamed(favorite.Id, name);
 
         Snackbar.Add($"Renamed to '{name}'", Severity.Success);
         await ReloadAsync();
@@ -184,7 +183,7 @@ public partial class Favorites : ComponentBase, IDisposable
         }
 
         await FavoriteService.DeleteFavoriteAsync(favorite);
-        State.OnFavoriteDeleted(favorite.Name ?? "");
+        State.OnFavoriteDeleted(favorite.Id);
 
         Snackbar.Add($"Deleted '{favorite.Name}'", Severity.Success);
         await ReloadAsync();
@@ -228,7 +227,7 @@ public partial class Favorites : ComponentBase, IDisposable
 
         foreach (BlueprintFavorite favorite in favorites)
         {
-            State.OnFavoriteDeleted(favorite.Name ?? "");
+            State.OnFavoriteDeleted(favorite.Id);
         }
 
         await ReloadAsync();

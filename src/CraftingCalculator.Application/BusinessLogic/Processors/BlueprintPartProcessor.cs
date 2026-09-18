@@ -29,10 +29,10 @@ public static class BlueprintPartProcessor
     /// does not use it.
     /// </summary>
     public static IBaseQuantityRecord? FindPart(BlueprintModel blueprint, IBaseDataRecord record) =>
-        // Type and name, because name is what ComponentMap and BlueprintMap merge a repeated Add on.
+        // Type and id, because components and blueprints are numbered separately.
         blueprint.Components.ComponentList
             .Concat<IBaseQuantityRecord>(blueprint.ChildBlueprints.BlueprintList)
-            .FirstOrDefault(part => part.Type == record.Type && part.Name == record.Name);
+            .FirstOrDefault(part => part.Type == record.Type && part.Record.Id == record.Id);
 
     /// <summary>
     /// Adds the part to the blueprint, or raises the quantity of the matching part already on it by

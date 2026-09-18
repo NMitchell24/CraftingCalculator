@@ -32,6 +32,18 @@ public class FavoriteServiceTests
     }
 
     [Test]
+    public async Task SaveFavoriteAsync_ReturnsTheFavoriteTheDAOSaved()
+    {
+        BlueprintFavorite favorite = new() { Name = "My Batch" };
+        BlueprintFavorite saved = new() { Id = 9, Name = "My Batch" };
+        _dao.Setup(d => d.SaveAsync(favorite, It.IsAny<List<BlueprintQuantity>>())).ReturnsAsync(saved);
+
+        BlueprintFavorite result = await _service.SaveFavoriteAsync(favorite, []);
+
+        result.Should().BeSameAs(saved);
+    }
+
+    [Test]
     public async Task RenameFavoriteAsync_RenamesByIdThroughDAO()
     {
         BlueprintFavorite favorite = new() { Id = 4, Name = "Old" };

@@ -8,17 +8,31 @@ namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Processors;
 [TestFixture]
 public class BlueprintProcessorTests
 {
-    private static ComponentModel NewComponent(string name) => new ComponentModel { Id = 1, Name = name };
+    // Maps and batches match records on id, so each name gets an id of its own and a name used twice is one record.
+    private static readonly Dictionary<string, int> Ids = [];
 
-    private static BlueprintModel NewBlueprint(string name) => new BlueprintModel { Id = 1, Name = name };
+    private static int IdOf(string name)
+    {
+        if (Ids.TryGetValue(name, out int id))
+        {
+            return id;
+        }
 
-    private static BlueprintModel NewBlueprint(string name, long yield) => new BlueprintModel { Id = 1, Name = name, Yield = yield };
+        id = Ids.Count + 1;
+        Ids[name] = id;
+        return id;
+    }
+
+    private static ComponentModel NewComponent(string name) => new() { Id = IdOf(name), Name = name };
+
+    private static BlueprintModel NewBlueprint(string name) => new() { Id = IdOf(name), Name = name };
+
+    private static BlueprintModel NewBlueprint(string name, long yield) => new() { Id = IdOf(name), Name = name, Yield = yield };
 
     /// <summary>
-    /// Distinct ids, unlike <see cref="NewBlueprint(string)"/>: the cycle rule matches on id, so every
-    /// blueprint in these tests has to be told apart from the others.
+    /// Explicit ids, for the cycle tests, which have to control exactly which blueprints are the same one.
     /// </summary>
-    private static BlueprintModel NewBlueprint(int id, string name) => new BlueprintModel { Id = id, Name = name };
+    private static BlueprintModel NewBlueprint(int id, string name) => new() { Id = id, Name = name };
 
     [TestCase(0, 2, ExpectedResult = 0)]
     [TestCase(-5, 2, ExpectedResult = 0)]
