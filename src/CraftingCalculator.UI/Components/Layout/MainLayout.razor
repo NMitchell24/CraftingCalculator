@@ -20,7 +20,7 @@
         @* Three tracks with equal-width sides while the title fits (app.css) so it is centered on the
            viewport rather than on the space the icons leave - a MudSpacer would push it off-center on
            every page without a back arrow. The page's own actions live on the ActionsBar below, not up here.
-           data-height-var is read by the height-measuring script in index.html: the bar grows when its
+           data-height-var is read by the height-measuring script in js/layout.js: the bar grows when its
            title wraps, and everything that parks under it offsets by --app-bar-height (app.css). *@
         <MudAppBar Dense="true" Elevation="1" Style="padding-top: max(env(safe-area-inset-top), var(--safe-area-inset-top));"
                    data-height-var="--app-bar-height">

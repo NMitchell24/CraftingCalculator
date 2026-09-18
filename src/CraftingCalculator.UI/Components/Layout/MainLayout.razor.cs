@@ -61,6 +61,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private Breakpoint? _breakpoint;
     private BrowserWindowSize? _windowSize;
     private bool _unwinding;
+    private bool _restoreScrollPending;
 
     // Every dialog on screen, the top one last.
     private readonly List<IDialogReference> _openDialogs = [];
@@ -136,6 +137,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         PageShellState.Changed += StateHasChanged;
         ThemeState.Changed += OnThemeChanged;
         DialogService.DialogInstanceAddedAsync += OnDialogOpenedAsync;
+        Navigation.LocationChanged += OnLocationChanged;
 
         // An absent or unrecognized stored value leaves the drawer expanded.
         bool.TryParse(PreferenceStore.Get(DrawerCollapsedKey), out _drawerCollapsed);
@@ -148,6 +150,16 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
             await ApplyThemeAsync();
             await ViewportService.SubscribeAsync(this, fireImmediately: true);
             StateHasChanged();
+        }
+
+        // Held while OpenDestinationAsync unwinds: the body is left out, so a restore would settle against an empty
+        // document and clamp the offset to it. The render that brings the body back restores instead.
+        if (_restoreScrollPending && !_unwinding)
+        {
+            _restoreScrollPending = false;
+            // The destination page may still be growing, so the document can be too short to accept the offset
+            // yet; appScroll.restore re-applies it over the next few frames.
+            await Js.InvokeVoidAsync("appScroll.restore");
         }
 
         // Here rather than anywhere the state changes, so the frame the cloak fades off is the resolved
@@ -342,6 +354,10 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         }
     }
 
+    // The router has not rendered the destination yet, so the document is still showing, and sized to, the page
+    // being left. OnAfterRenderAsync restores once the new content is in place.
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _restoreScrollPending = true;
+
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
 
     // MudBlazor notifies on breakpoint changes only by default, and breakpoints are width-only, so a
@@ -362,6 +378,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         PageShellState.Changed -= StateHasChanged;
         ThemeState.Changed -= OnThemeChanged;
         DialogService.DialogInstanceAddedAsync -= OnDialogOpenedAsync;
+        Navigation.LocationChanged -= OnLocationChanged;
         BackButtonState.SetHandler(null);
 
         // Fire and forget: IDisposable cannot await, and the subscription only holds a JS listener -

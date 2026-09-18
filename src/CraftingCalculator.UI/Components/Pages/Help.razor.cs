@@ -29,7 +29,7 @@ public partial class Help : ComponentBase, IDisposable
 
     private HelpArticle? _article;
     private bool _loaded;
-    private bool _scrollPending;
+    private string _scrollTarget = "";
     private IDisposable? _navigationGuard;
 
     private static string ContentsHref => $"/{HelpTopics.HelpRoot}";
@@ -44,10 +44,9 @@ public partial class Help : ComponentBase, IDisposable
         _article = TopicId is null ? null : await HelpService.GetArticleAsync(TopicId);
         _loaded = true;
 
-        // Links inside an article route back into this same component, so Blazor updates the parameters
-        // in place and the WebView keeps whatever scroll offset the previous page was left at - which
-        // lands the reader partway down the page they just opened.
-        _scrollPending = true;
+        // Pages link to each other's headings (calculations.md#surplus), and HelpProcessor.RewriteLink keeps
+        // that fragment, so the heading it names is where this render is supposed to land.
+        _scrollTarget = new Uri(Navigation.Uri).Fragment.TrimStart('#');
 
         // The topic's own name is the H1 the Markdown opens with; the bar says which part of the app
         // this is, the way Settings does.
@@ -59,14 +58,14 @@ public partial class Help : ComponentBase, IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_scrollPending)
+        if (_scrollTarget.Length > 0)
         {
-            _scrollPending = false;
+            string target = _scrollTarget;
+            _scrollTarget = "";
 
-            // Not an unconditional reset to the top: pages link to each other's headings
-            // (calculations.md#surplus), and HelpProcessor.RewriteLink keeps that fragment, so the
-            // heading it names is where this render is supposed to land.
-            await Js.InvokeVoidAsync("helpScroll.toTarget", new Uri(Navigation.Uri).Fragment.TrimStart('#'));
+            // MainLayout dispatches appScroll.restore for the same navigation before this runs, so the page is
+            // already at the top when the heading is scrolled to.
+            await Js.InvokeVoidAsync("helpScroll.toTarget", target);
         }
 
         await base.OnAfterRenderAsync(firstRender);

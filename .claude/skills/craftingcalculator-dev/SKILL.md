@@ -206,7 +206,7 @@ beats exact alignment.** A new or changed component has to hold to these, or it 
   wider viewport and slides as the page scrolls. `overflow-x: hidden` on `html` does not stop it; fix the
   source (the hidden `<legend>` of an outlined field was one).
 - **Chrome that can grow is measured, not assumed.** The app bar wraps its title, so its height is read by the
-  `data-height-var` script in `index.html` into `--app-bar-height`, and everything that offsets by the bar
+  `data-height-var` script in `wwwroot/js/layout.js` into `--app-bar-height`, and everything that offsets by the bar
   reads `--app-bar-bottom`. A bar whose height depends on text takes the same attribute; a bar sized in `px`
   is checked at 200% (the editor action bar holds one line only because Delete is icon-only).
 - **No user content in a title or a button label**: the app bar, dialog titles, `MudMessageBox` buttons.

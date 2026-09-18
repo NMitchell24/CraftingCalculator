@@ -61,7 +61,7 @@ internal sealed class SafeAreaInsetsInjector(Android.Webkit.WebView webView)
 
         // Insets are device px; convert to CSS px in-page via the WebView's own devicePixelRatio
         // rather than guessing the display density (the two differ on some hardware).
-        // data-native-ime tells the keyboard script in index.html that the WebView already resizes around the
+        // data-native-ime tells js/keyboard.js that the WebView already resizes around the
         // keyboard here, so it leaves --keyboard-inset at 0 and .keyboard-open to this listener.
         string js =
             "document.documentElement.setAttribute('data-native-ime','');" +

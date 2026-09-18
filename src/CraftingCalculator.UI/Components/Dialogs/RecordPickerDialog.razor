@@ -21,7 +21,7 @@
                 @foreach (IBaseDataRecord record in FilteredRecords)
                 {
                     <MudListItem T="IBaseDataRecord" Ripple="false">
-                        @* index.html stops a tap on the buttons in a card's stepper and actions zones from taking focus
+                        @* js/keyboard.js stops a tap on the buttons in a card's stepper and actions zones from taking focus
                            off the search field, so the keyboard stays up between searches. *@
                         @if (Target.Find(record) is { } entry)
                         {

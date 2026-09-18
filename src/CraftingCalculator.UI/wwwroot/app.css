@@ -45,9 +45,9 @@ html, body {
     height: 100%;
 }
 
-/* Startup cloak - the markup and its dismissal live in index.html; this is only its appearance. Covers
-   the whole webview from the first paint until MainLayout reports the breakpoint and dark-mode values
-   in. Sits above every MudBlazor layer (its highest, the tooltip, is 1600) so no part of the
+/* Startup cloak - the markup lives in index.html and its dismissal in js/cloak.js; this is only its
+   appearance. Covers the whole webview from the first paint until MainLayout reports the breakpoint and
+   dark-mode values in. Sits above every MudBlazor layer (its highest, the tooltip, is 1600) so no part of the
    half-resolved layout shows through. The color is the MauiSplashScreen Color in
    CraftingCalculator.UI.csproj; the two have to be changed together. */
 .app-cloak {
@@ -59,7 +59,7 @@ html, body {
     justify-content: center;
     padding: 0 32px;
     background-color: #2E3440;
-    /* appCloak.dismiss in index.html reads this duration back off the element to decide how long to
+    /* appCloak.dismiss in js/cloak.js reads this duration back off the element to decide how long to
        keep the cloak mounted, so its timer cannot drift out of step with this transition. */
     transition: opacity 300ms ease-out;
 }
@@ -123,14 +123,14 @@ html, body {
        than the nav on purpose - it carries a page's actions, not a second set of destinations. */
     --actions-bar-height: 48px;
     /* The app bar's bottom edge in viewport coordinates. --app-bar-height is the bar's measured border-box
-       height, written onto <html> by the height-measuring script in index.html (MainLayout.razor tags the
+       height, written onto <html> by the height-measuring script in js/layout.js (MainLayout.razor tags the
        MudAppBar with data-height-var), because a title that wraps makes the bar taller than its nominal
        Dense height. The fallback is that nominal height - three quarters of --mud-appbar-height, plus the
        status-bar inset MainLayout pads the bar by on top - and only stands until the first measurement
        lands. Anything that pins itself directly under the bar offsets by this. */
     --app-bar-bottom: var(--app-bar-height, calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4 + max(env(safe-area-inset-top), var(--safe-area-inset-top))));
     /* How far the on-screen keyboard reaches up over the layout viewport, written by the keyboard script in
-       index.html. Only ever non-zero on iOS: Android's SafeAreaInsetsInjector shrinks the WebView instead. */
+       js/keyboard.js. Only ever non-zero on iOS: Android's SafeAreaInsetsInjector shrinks the WebView instead. */
     --keyboard-inset: 0px;
 }
 
@@ -152,7 +152,7 @@ html, body {
 /* MudBlazor fixes the Dense toolbar at this height (three quarters of --mud-appbar-height), which is
    what forced a long title into an ellipsis. Same selector as its rule, so this wins on source order:
    the bar keeps that height for a one-line title and grows to hold a wrapped one. The height-measuring
-   script in index.html is what tells the rest of the layout how tall it ended up (--app-bar-height). */
+   script in js/layout.js is what tells the rest of the layout how tall it ended up (--app-bar-height). */
 .mud-appbar.mud-appbar-dense .mud-toolbar-appbar {
     height: auto;
     min-height: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4);
@@ -240,7 +240,7 @@ html, body {
     padding-bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
-/* While the on-screen keyboard is up (.keyboard-open, see index.html) it covers the bottom bars rather than
+/* While the on-screen keyboard is up (.keyboard-open, see js/keyboard.js) it covers the bottom bars rather than
    lifting them: with the keyboard open a phone has about 685px of viewport, and three docked bars took a third
    of it away from the field being typed into. They come back when the keyboard closes. */
 html.keyboard-open .bottom-nav,
