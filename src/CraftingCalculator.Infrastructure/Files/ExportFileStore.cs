@@ -46,7 +46,11 @@ public class ExportFileStore(string directory) : IExportFileStore
 
         File.Move(tempPath, path);
 
-        foreach (ExportFileInfo old in Exports().Skip(keep))
+        // The new export is left out of the ordering: a device clock set back would otherwise rank it older
+        // than the exports it replaces, and keeping one would delete it.
+        string savedName = Path.GetFileName(path);
+
+        foreach (ExportFileInfo old in Exports().Where(export => export.FileName != savedName).Skip(keep - 1))
         {
             File.Delete(old.FullPath);
         }
@@ -57,9 +61,13 @@ public class ExportFileStore(string directory) : IExportFileStore
     public IReadOnlyList<ExportFileInfo> List() => [.. Exports()];
 
     /// <summary>The export files in the folder, newest first.</summary>
-    private IEnumerable<ExportFileInfo> Exports() => FilesWithExportExtension().Select(TryReadHeader).OfType<ExportFileInfo>();
+    private IEnumerable<ExportFileInfo> Exports() => FilesWithExportExtension()
+        .Select(TryReadHeader)
+        .OfType<ExportFileInfo>()
+        .OrderByDescending(export => export.CreatedAt)
+        .ThenByDescending(export => export.FileName, StringComparer.Ordinal);
 
-    /// <summary>The files in the folder with the export extension, newest first, whether or not they are exports.</summary>
+    /// <summary>The files in the folder with the export extension, whether or not they are exports.</summary>
     private IEnumerable<FileInfo> FilesWithExportExtension()
     {
         DirectoryInfo folder = new(directory);
@@ -72,9 +80,7 @@ public class ExportFileStore(string directory) : IExportFileStore
         // Filtered on Extension as well as the pattern: Windows matches a search pattern against short file
         // names too, which can let a longer extension through.
         return folder.EnumerateFiles($"*{TransferFormat.FileExtension}")
-            .Where(file => file.Extension.Equals(TransferFormat.FileExtension, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(file => file.LastWriteTimeUtc)
-            .ThenByDescending(file => file.Name, StringComparer.Ordinal);
+            .Where(file => file.Extension.Equals(TransferFormat.FileExtension, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

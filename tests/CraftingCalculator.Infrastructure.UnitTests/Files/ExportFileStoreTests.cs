@@ -133,6 +133,18 @@ public class ExportFileStoreTests
     }
 
     [Test]
+    public async Task SaveAsync_KeepingOne_AfterTheClockGoesBack_KeepsTheNewExport()
+    {
+        ExportFileInfo beforeClockChange = await _store.SaveAsync(Document("Valheim", FirstExport.AddHours(1)), keep: 1);
+        File.SetLastWriteTimeUtc(beforeClockChange.FullPath, DateTime.UtcNow.AddHours(1));
+
+        ExportFileInfo afterClockChange = await _store.SaveAsync(Document("Valheim", FirstExport), keep: 1);
+
+        File.Exists(afterClockChange.FullPath).Should().BeTrue();
+        File.Exists(beforeClockChange.FullPath).Should().BeFalse();
+    }
+
+    [Test]
     public async Task SaveAsync_AfterTheKeepCountDrops_DeletesEveryExportPastTheNewCount()
     {
         List<ExportFileInfo> saved = [];
@@ -170,7 +182,6 @@ public class ExportFileStoreTests
         Directory.CreateDirectory(_directory);
         string impostor = Path.Combine(_directory, $"Renamed{TransferFormat.FileExtension}");
         await File.WriteAllTextAsync(impostor, "definitely not json");
-        File.SetLastWriteTimeUtc(impostor, DateTime.UtcNow.AddHours(1));
         List<ExportFileInfo> saved = [];
 
         for (int export = 0; export < 6; export++)
@@ -190,9 +201,17 @@ public class ExportFileStoreTests
     public async Task List_ReturnsEveryExportNewestFirst()
     {
         ExportFileInfo older = await _store.SaveAsync(Document("Valheim", FirstExport), Keep);
-        // Two saves back to back can share a write time, and the name tiebreak would then put Valheim first.
-        File.SetLastWriteTimeUtc(older.FullPath, DateTime.UtcNow.AddHours(-1));
         ExportFileInfo newest = await _store.SaveAsync(Document("Rust", FirstExport.AddMinutes(1)), Keep);
+
+        _store.List().Select(export => export.FileName).Should().Equal(newest.FileName, older.FileName);
+    }
+
+    [Test]
+    public async Task List_OrdersByExportTime_WhateverTheFileWriteTimes()
+    {
+        ExportFileInfo older = await _store.SaveAsync(Document("Valheim", FirstExport), Keep);
+        ExportFileInfo newest = await _store.SaveAsync(Document("Rust", FirstExport.AddMinutes(1)), Keep);
+        File.SetLastWriteTimeUtc(newest.FullPath, DateTime.UtcNow.AddHours(-1));
 
         _store.List().Select(export => export.FileName).Should().Equal(newest.FileName, older.FileName);
     }
@@ -221,7 +240,6 @@ public class ExportFileStoreTests
         ExportFileInfo export = await _store.SaveAsync(Document("Valheim", FirstExport), Keep);
         string impostor = Path.Combine(_directory, $"Renamed{TransferFormat.FileExtension}");
         await File.WriteAllTextAsync(impostor, "definitely not json");
-        File.SetLastWriteTimeUtc(impostor, DateTime.UtcNow.AddHours(1));
 
         _store.List().Select(file => file.FileName).Should().Equal(export.FileName);
     }
