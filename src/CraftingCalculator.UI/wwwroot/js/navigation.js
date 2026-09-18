@@ -60,6 +60,7 @@ globalThis.appScroll = (() => {
     let settledPage = currentPage();
     // Non-null while a navigation is in flight: the destination index and the offset it should land at.
     let armedIndex = null;
+    let armedPage = null;
     let armedTarget = 0;
     let settleToken = 0;
     // Whether the pending entry change came from a back or forward step rather than a push.
@@ -129,7 +130,12 @@ globalThis.appScroll = (() => {
     }
 
     function arm(index) {
-        if (armedIndex === index) {
+        const page = currentPage();
+
+        // Same page as well as same index: MainLayout.OpenDestinationAsync steps back and then replaces the entry it
+        // reached, all before a restore, and the replacing page must not inherit the offset armed for the one it
+        // replaced.
+        if (armedIndex === index && armedPage === page) {
             return;
         }
 
@@ -146,6 +152,7 @@ globalThis.appScroll = (() => {
 
         popped = false;
         armedIndex = index;
+        armedPage = page;
         armedTarget = positions.get(index) ?? 0;
     }
 

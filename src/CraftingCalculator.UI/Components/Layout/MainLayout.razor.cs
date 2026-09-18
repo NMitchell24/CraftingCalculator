@@ -152,7 +152,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
             StateHasChanged();
         }
 
-        if (_restoreScrollPending)
+        // Held while OpenDestinationAsync unwinds: the body is left out, so a restore would settle against an empty
+        // document and clamp the offset to it. The render that brings the body back restores instead.
+        if (_restoreScrollPending && !_unwinding)
         {
             _restoreScrollPending = false;
             // The destination page may still be growing, so the document can be too short to accept the offset
