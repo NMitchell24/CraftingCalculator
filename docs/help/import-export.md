@@ -93,7 +93,7 @@ the dataset it came from, when you made it, the file name, and where it's saved.
 sit in the same list, which is why the dataset name is the first thing on the card.
 
 The app keeps your **five newest** exports by default and deletes the oldest ones each time you make a new one. Want
-more history, or less clutter? Change **Exports to keep** in [Settings](settings.md#exports). Delete them yourself
+more history, or less clutter? Change **Max history** in [Settings](settings.md#exports). Delete them yourself
 and they drop off this list too.
 
 ### Where the file goes
