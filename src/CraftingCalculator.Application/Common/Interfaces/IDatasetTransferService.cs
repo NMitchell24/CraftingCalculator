@@ -18,8 +18,8 @@ public interface IDatasetTransferService
     /// </exception>
     Task<ExportFileInfo> ExportAsync(DatasetSnapshot snapshot, IReadOnlySet<RecordKey> selected, string appVersion);
 
-    /// <summary>The most recent export file on the device, or null when there is none.</summary>
-    ExportFileInfo? GetLatestExport();
+    /// <summary>Every export file on the device, newest first.</summary>
+    IReadOnlyList<ExportFileInfo> ListExports();
 
     /// <summary>
     /// Adds a dataset named <paramref name="name"/>, trimmed, holding every record of <paramref name="incoming"/>,

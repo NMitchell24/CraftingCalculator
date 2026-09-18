@@ -5,9 +5,9 @@ using CraftingCalculator.Domain.Models.Transfer;
 namespace CraftingCalculator.UI.State;
 
 /// <summary>
-/// The export running in the background and the latest export file on the device: what has to outlive the
-/// Export page, which the user can leave while an export runs and come back to. Scoped. The page's selection
-/// is deliberately not held here; every visit starts again with everything selected.
+/// The export running in the background and the export files on the device: what has to outlive the Export
+/// page, which the user can leave while an export runs and come back to. Scoped. The page's selection is
+/// deliberately not held here; every visit starts again with everything selected.
 /// </summary>
 /// <remarks>
 /// <see cref="Changed"/> can be raised off the renderer's dispatcher, so a component subscribes with
@@ -17,29 +17,21 @@ public sealed class ExportState(IDatasetTransferService transferService)
 {
     public bool IsRunning { get; private set; }
 
-    /// <summary>The newest export file as of the last export or <see cref="RefreshLatestAsync"/>, or null.</summary>
-    public ExportFileInfo? Latest { get; private set; }
+    /// <summary>
+    /// The export files on the device as of the last export or <see cref="RefreshExportsAsync"/>, newest
+    /// first, or empty when there are none.
+    /// </summary>
+    public IReadOnlyList<ExportFileInfo> Exports { get; private set; } = [];
 
     /// <summary>What went wrong with the last export, in words for the user, or null if it succeeded.</summary>
     public string? LastError { get; private set; }
 
     public event Action? Changed;
 
-    /// <summary>Re-reads the newest export file from the device, so one deleted outside the app is dropped.</summary>
-    public async Task RefreshLatestAsync()
+    /// <summary>Re-reads the export files from the device, so ones deleted outside the app are dropped.</summary>
+    public async Task RefreshExportsAsync()
     {
-        try
-        {
-            Latest = await Task.Run(transferService.GetLatestExport);
-        }
-        catch (Exception exception)
-        {
-            // No ErrorBoundary exists, so an exception reaching the renderer freezes the whole app. A folder
-            // that cannot be read is reported as no export rather than as a failure.
-            Debug.WriteLine(exception);
-            Latest = null;
-        }
-
+        await ReadExportsAsync();
         Changed?.Invoke();
     }
 
@@ -66,18 +58,35 @@ public sealed class ExportState(IDatasetTransferService transferService)
 
         try
         {
-            Latest = await Task.Run(() => transferService.ExportAsync(snapshot, frozen, appVersion));
+            await Task.Run(() => transferService.ExportAsync(snapshot, frozen, appVersion));
         }
         catch (Exception exception)
         {
-            // Every exception, for the reason given in RefreshLatestAsync.
+            // Every exception, for the reason given in ReadExportsAsync.
             Debug.WriteLine(exception);
             LastError = "Your export couldn't be saved, so no file was written. Try again.";
         }
-        finally
+
+        // Read the folder back rather than prepend the saved file: the save also deletes the oldest exports
+        // beyond the number the user keeps.
+        await ReadExportsAsync();
+
+        IsRunning = false;
+        Changed?.Invoke();
+    }
+
+    private async Task ReadExportsAsync()
+    {
+        try
         {
-            IsRunning = false;
-            Changed?.Invoke();
+            Exports = await Task.Run(transferService.ListExports);
+        }
+        catch (Exception exception)
+        {
+            // No ErrorBoundary exists, so an exception reaching the renderer freezes the whole app. A folder
+            // that cannot be read is reported as no exports rather than as a failure.
+            Debug.WriteLine(exception);
+            Exports = [];
         }
     }
 }

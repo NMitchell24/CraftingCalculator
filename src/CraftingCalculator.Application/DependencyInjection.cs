@@ -11,6 +11,10 @@ public static class DependencyInjection
         // Singleton: startup resolves the selection in its own scope, not the one BlazorWebView
         // holds for the session.
         services.AddSingleton<ISelectedDatasetState, SelectedDatasetState>();
+
+        // Singleton for the same reason: it reads its stored value once, and the Settings screen and the
+        // export have to see the same one.
+        services.AddSingleton<IExportSettings, ExportSettings>();
         services.AddSingleton(TimeProvider.System);
 
         services.AddScoped<IDatasetService, DatasetService>();

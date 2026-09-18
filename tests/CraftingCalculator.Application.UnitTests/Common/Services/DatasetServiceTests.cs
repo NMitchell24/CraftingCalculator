@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Application.Common.Services.Impl;
 using CraftingCalculator.Domain.Models;
@@ -31,7 +30,7 @@ public class DatasetServiceTests
     /// </summary>
     private void GivenStoredSelection(int? storedId)
     {
-        if (storedId is int id)
+        if (storedId is { } id)
         {
             _preferences.Set(SelectedDatasetKey, id.ToString());
         }
@@ -197,15 +196,5 @@ public class DatasetServiceTests
         // The selection is the caller's to move: copying a dataset other than the selected one is a
         // supported call, and it does not make that one the one you are working in.
         _selected.Id.Should().Be(1);
-    }
-
-    /// <summary>Stands in for MAUI Preferences, which the Application layer never sees directly.</summary>
-    private sealed class FakePreferenceStore : IPreferenceStore
-    {
-        private readonly Dictionary<string, string> _values = [];
-
-        public string? Get(string key) => _values.GetValueOrDefault(key);
-
-        public void Set(string key, string value) => _values[key] = value;
     }
 }

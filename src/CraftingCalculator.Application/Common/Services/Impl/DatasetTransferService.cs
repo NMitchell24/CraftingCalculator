@@ -10,15 +10,17 @@ public class DatasetTransferService(
     IDatasetDAO datasetDAO,
     ISelectedDatasetState selectedDataset,
     IExportFileStore exportFileStore,
+    IExportSettings exportSettings,
     TimeProvider timeProvider) : IDatasetTransferService
 {
     public Task<DatasetSnapshot> LoadCurrentSnapshotAsync() => datasetDAO.GetSnapshotAsync(selectedDataset.Id);
 
     public Task<ExportFileInfo> ExportAsync(DatasetSnapshot snapshot, IReadOnlySet<RecordKey> selected, string appVersion) =>
         exportFileStore.SaveAsync(
-            TransferDocumentProcessor.ToDocument(snapshot, selected, timeProvider.GetUtcNow(), appVersion));
+            TransferDocumentProcessor.ToDocument(snapshot, selected, timeProvider.GetUtcNow(), appVersion),
+            exportSettings.KeptExports);
 
-    public ExportFileInfo? GetLatestExport() => exportFileStore.GetLatest();
+    public IReadOnlyList<ExportFileInfo> ListExports() => exportFileStore.List();
 
     public Task<DatasetModel> ImportAsNewAsync(DatasetSnapshot incoming, string name) =>
         datasetDAO.ImportAsNewAsync(name.Trim(), incoming);

@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 
@@ -7,6 +8,7 @@ public partial class Settings : ComponentBase, IDisposable
 {
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ThemeState ThemeState { get; set; } = null!;
+    [Inject] private IExportSettings ExportSettings { get; set; } = null!;
 
     private static string Version => $"{AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
 

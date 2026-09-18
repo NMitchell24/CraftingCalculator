@@ -11,8 +11,6 @@ namespace CraftingCalculator.Infrastructure.Files;
 /// <param name="directory">The folder the exports are saved to. Created on the first save.</param>
 public class ExportFileStore(string directory) : IExportFileStore
 {
-    private const int KeptExports = 5;
-
     private const string TempExtension = ".tmp";
 
     // Windows' reserved characters, stripped on every platform: a name has to stay valid wherever the file
@@ -25,7 +23,7 @@ public class ExportFileStore(string directory) : IExportFileStore
     // of the dataset. Generous against a long dataset name.
     private const int HeaderBytes = 64 * 1024;
 
-    public async Task<ExportFileInfo> SaveAsync(TransferDocument document)
+    public async Task<ExportFileInfo> SaveAsync(TransferDocument document, int keep)
     {
         Directory.CreateDirectory(directory);
 
@@ -48,7 +46,7 @@ public class ExportFileStore(string directory) : IExportFileStore
 
         File.Move(tempPath, path);
 
-        foreach (ExportFileInfo old in Exports().Skip(KeptExports))
+        foreach (ExportFileInfo old in Exports().Skip(keep))
         {
             File.Delete(old.FullPath);
         }
@@ -56,7 +54,7 @@ public class ExportFileStore(string directory) : IExportFileStore
         return new ExportFileInfo(path, Path.GetFileName(path), document.DatasetName, document.ExportedAt);
     }
 
-    public ExportFileInfo? GetLatest() => Exports().FirstOrDefault();
+    public IReadOnlyList<ExportFileInfo> List() => [.. Exports()];
 
     /// <summary>The export files in the folder, newest first.</summary>
     private IEnumerable<ExportFileInfo> Exports() => FilesWithExportExtension().Select(TryReadHeader).OfType<ExportFileInfo>();

@@ -22,6 +22,26 @@ Three choices for the app's theme:
 
 The change is instant. There's nothing to save and nothing to restart.
 
+## Exports
+
+**Max history** controls how many export files the app hangs onto. The default is 5, and you can set it anywhere from
+1 to 20.
+
+Every time you export, the app counts the files in its Exports folder and deletes the oldest ones until only this
+many are left. Since the one you just made is the newest one, it will never be deleted in this process. Set it to 1 and 
+each export replaces the last. Set it to 20, and you've got a running history of your last twenty backups.
+
+The number is inclusive, so nothing gets deleted until an export would push you past it.
+
+> **Tip:** A dataset with a few hundred records makes a small file, so 20 of them is nothing next to a single
+> screenshot. Turn it up if you like having a trail to fall back to. Turn it down if you only ever want the newest
+> one.
+
+Lowering the number doesn't delete anything right away. The extra files stick around until your next export, which
+is when the cleanup runs.
+
+More detail: [Import and Export](import-export.md#export-history).
+
 ## About
 
 The app's name, its version and build number, the copyright, the promise, and the license.
@@ -60,8 +80,8 @@ modpack.
 
 The way around that is an export. ![Dataset](assets/menu-book.svg) **Dataset** →
 ![Import/Export](assets/import-export.svg) **Import/Export** → ![Export Data](assets/output.svg) **Export Data**
-saves your records to a file, and ![Share](assets/share.svg) **Share** gets that file off the device and somewhere
-safe. See [Import and Export](import-export.md).
+saves your records to a file, and ![Share](assets/share.svg) on that file's card gets it off the device and
+somewhere safe. See [Import and Export](import-export.md).
 
 If you only want a batch's lists outside the app, the ![Copy](assets/content-copy.svg) **Copy**
 buttons on the Craft screen's Components and Surplus tabs put the list on your clipboard, ready to
