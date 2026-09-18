@@ -41,7 +41,7 @@ public partial class Import : ComponentBase, IDisposable
         }
 
         _renderedStep = ImportState.Step;
-        await Js.InvokeVoidAsync("scrollTo", 0, 0);
+        await Js.InvokeVoidAsync("appScroll.toTop");
     }
 
     private void ConfigureShell() =>
@@ -93,19 +93,23 @@ public partial class Import : ComponentBase, IDisposable
             $"Add it to '{datasetName}', or make a new dataset?",
             confirmText: "As new dataset", alternativeText: "Into this dataset");
 
-        if (choice == true)
+        switch (choice)
         {
-            string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-                DialogService, DatasetService, "Import as new dataset", "Create", snapshot.DatasetName.Trim());
-
-            if (name is not null)
+            case true:
             {
-                await ImportState.ImportAsNewAsync(name);
+                string? name = await DatasetPrompts.PromptForDatasetNameAsync(
+                    DialogService, DatasetService, "Import as new dataset", "Create", snapshot.DatasetName.Trim());
+
+                if (name is not null)
+                {
+                    await ImportState.ImportAsNewAsync(name);
+                }
+
+                break;
             }
-        }
-        else if (choice == false)
-        {
-            await ImportState.CheckConflictsAsync(datasetId, datasetName);
+            case false:
+                await ImportState.CheckConflictsAsync(datasetId, datasetName);
+                break;
         }
     }
 
