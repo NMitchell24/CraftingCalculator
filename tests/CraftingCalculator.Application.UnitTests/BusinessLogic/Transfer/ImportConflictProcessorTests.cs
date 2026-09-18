@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 
@@ -14,7 +15,7 @@ public class ImportConflictProcessorTests
         IReadOnlyList<SnapshotComponent>? components = null,
         IReadOnlyList<SnapshotBlueprint>? blueprints = null,
         IReadOnlyList<SnapshotFavorite>? favorites = null) =>
-        new("Valheim", categories ?? [], components ?? [], blueprints ?? [], favorites ?? []);
+        new("Valheim", categories ?? [], components ?? [], blueprints ?? [], favorites ?? [], Datasettings.Default);
 
     private static SnapshotComponent Component(int id, string name) => new(id, name, "", 0, TimeSpan.Zero, null);
 

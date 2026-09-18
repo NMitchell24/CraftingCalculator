@@ -62,7 +62,7 @@ public class SnapshotModelProcessorTests
         [
             new SnapshotBlueprint(1, "Bronze Plate", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(2, 1)]),
             new SnapshotBlueprint(2, "Bronze Nails", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(1, 1)])
-        ], []);
+        ], [], Datasettings.Default);
 
         BlueprintModel plate = SnapshotModelProcessor.ToBlueprintModel(cyclic, 1);
 

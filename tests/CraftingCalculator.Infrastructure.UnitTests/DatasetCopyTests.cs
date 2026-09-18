@@ -79,6 +79,16 @@ public class DatasetCopyTests
     }
 
     [Test]
+    public async Task CopyAsync_CopiesTheSettings()
+    {
+        await _datasetDAO.SetSettingsAsync(SqliteTestFixture.DefaultDatasetId, new Datasettings(UseYield: false));
+
+        DatasetModel copy = await _datasetDAO.CopyAsync(SqliteTestFixture.DefaultDatasetId, "Valheim - Modded");
+
+        (await _datasetDAO.GetByIdAsync(copy.Id))!.Settings.Should().Be(new Datasettings(UseYield: false));
+    }
+
+    [Test]
     public async Task CopyAsync_CopiesEveryFieldOfARecord()
     {
         await GivenTheBronzeChainAsync();

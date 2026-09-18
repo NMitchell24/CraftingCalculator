@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using Microsoft.AspNetCore.Components;
@@ -17,6 +18,8 @@ public partial class InfoDialog
     private bool _partsExpanded;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     /// <summary>The category, component or blueprint the dialog describes, or null when it describes a <see cref="Favorite"/>.</summary>
     [Parameter] public IBaseDataRecord? Record { get; set; }

@@ -10,7 +10,8 @@ namespace CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 
 /// <summary>
 /// A whole export file. Every <c>Ref</c> is local to the file and unique within its list, and every link
-/// names a <c>Ref</c> in the list for its kind.
+/// names a <c>Ref</c> in the list for its kind. <see cref="Datasettings"/> is null in a file that predates them,
+/// which stands for the settings a new dataset starts with.
 /// </summary>
 public sealed record TransferDocument(
     string Format,
@@ -21,7 +22,11 @@ public sealed record TransferDocument(
     IReadOnlyList<TransferCategory> Categories,
     IReadOnlyList<TransferComponent> Components,
     IReadOnlyList<TransferBlueprint> Blueprints,
-    IReadOnlyList<TransferFavorite> Favorites);
+    IReadOnlyList<TransferFavorite> Favorites,
+    TransferDatasettings? Datasettings = null);
+
+/// <summary>The dataset's own settings. Each member's default is the setting's default.</summary>
+public sealed record TransferDatasettings(bool UseYield = true);
 
 public sealed record TransferCategory(int Ref, string Name, string Description);
 

@@ -72,23 +72,25 @@ public static class BlueprintProcessor
     /// <summary>
     /// Flattens the blueprint's own components and every nested child blueprint's components into one
     /// combined map for <paramref name="quantity"/> of the blueprint, alongside the items its rounded-up
-    /// crafts produce beyond what was asked for and how long those crafts take.
+    /// crafts produce beyond what was asked for and how long those crafts take, all worked out under
+    /// <paramref name="settings"/>.
     /// </summary>
-    public static FlattenResult Flatten(BlueprintModel blueprint, long quantity)
+    public static FlattenResult Flatten(BlueprintModel blueprint, long quantity, Datasettings settings)
     {
         BlueprintMap surplus = new();
-        (ComponentMap components, TimeSpan productionTime) = Flatten(blueprint, quantity, surplus, 0);
+        (ComponentMap components, TimeSpan productionTime) = Flatten(blueprint, quantity, settings, surplus, 0);
 
         return new FlattenResult(components, surplus, productionTime);
     }
 
     private static (ComponentMap Components, TimeSpan ProductionTime) Flatten(
-        BlueprintModel blueprint, long quantity, BlueprintMap surplus, int depth)
+        BlueprintModel blueprint, long quantity, Datasettings settings, BlueprintMap surplus, int depth)
     {
         ThrowIfTooDeep(blueprint, depth);
 
-        long crafts = CraftsFor(quantity, blueprint.Yield);
-        long overproduced = crafts * blueprint.Yield - quantity;
+        long yield = YieldOf(blueprint, settings);
+        long crafts = CraftsFor(quantity, yield);
+        long overproduced = crafts * yield - quantity;
         if (overproduced > 0)
         {
             surplus.Add(blueprint, overproduced);
@@ -100,7 +102,7 @@ public static class BlueprintProcessor
         foreach (BlueprintQuantity child in blueprint.ChildBlueprints.BlueprintList)
         {
             (ComponentMap childComponents, TimeSpan childTime) =
-                Flatten(child.Blueprint, child.Quantity * crafts, surplus, depth + 1);
+                Flatten(child.Blueprint, child.Quantity * crafts, settings, surplus, depth + 1);
             combined = ComponentProcessor.CombineComponents(childComponents, combined, 1);
             productionTime = DurationMath.Add(productionTime, childTime);
         }
@@ -112,15 +114,18 @@ public static class BlueprintProcessor
     /// Builds the blueprint's component breakdown as a <see cref="BlueprintNode"/> tree, scaled by
     /// <paramref name="quantity"/>: one child node per component and per nested child blueprint,
     /// recursively. Children are scaled by the crafts <paramref name="quantity"/> takes, not by
-    /// <paramref name="quantity"/> itself, so a yield above 1 reduces everything below it.
+    /// <paramref name="quantity"/> itself, so a yield above 1 reduces everything below it. Each node's
+    /// yield is the one <paramref name="settings"/> gives the blueprint.
     /// </summary>
-    public static BlueprintNode BuildNode(BlueprintModel blueprint, long quantity) => BuildNode(blueprint, quantity, 0);
+    public static BlueprintNode BuildNode(BlueprintModel blueprint, long quantity, Datasettings settings) =>
+        BuildNode(blueprint, quantity, settings, 0);
 
-    private static BlueprintNode BuildNode(BlueprintModel blueprint, long quantity, int depth)
+    private static BlueprintNode BuildNode(BlueprintModel blueprint, long quantity, Datasettings settings, int depth)
     {
         ThrowIfTooDeep(blueprint, depth);
 
-        long crafts = CraftsFor(quantity, blueprint.Yield);
+        long yield = YieldOf(blueprint, settings);
+        long crafts = CraftsFor(quantity, yield);
         List<BlueprintNode> children = [];
 
         foreach (ComponentQuantity component in blueprint.Components.ComponentList)
@@ -136,13 +141,13 @@ public static class BlueprintProcessor
 
         foreach (BlueprintQuantity child in blueprint.ChildBlueprints.BlueprintList)
         {
-            children.Add(BuildNode(child.Blueprint, child.Quantity * crafts, depth + 1));
+            children.Add(BuildNode(child.Blueprint, child.Quantity * crafts, settings, depth + 1));
         }
 
         return new BlueprintNode(
             blueprint,
-            Quantity: quantity, Crafts: crafts, Yield: blueprint.Yield,
-            Surplus: crafts * blueprint.Yield - quantity,
+            Quantity: quantity, Crafts: crafts, Yield: yield,
+            Surplus: crafts * yield - quantity,
             ProductionTime: DurationMath.Scale(blueprint.ProductionTime, crafts),
             Children: children);
     }
@@ -153,6 +158,12 @@ public static class BlueprintProcessor
     /// than crafted, and false for a yield that happens to leave the two counts equal.
     /// </summary>
     public static bool CountsByCraft(BlueprintNode node) => !node.IsComponent && node.Crafts != node.Quantity;
+
+    /// <summary>
+    /// How many items one craft of <paramref name="blueprint"/> makes under <paramref name="settings"/>: its
+    /// own yield, or 1 when the dataset does not use yield.
+    /// </summary>
+    private static long YieldOf(BlueprintModel blueprint, Datasettings settings) => settings.UseYield ? blueprint.Yield : 1;
 
     private static void ThrowIfTooDeep(BlueprintModel blueprint, int depth)
     {

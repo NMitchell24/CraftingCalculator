@@ -25,8 +25,12 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     [Inject] private IClipboardService ClipboardService { get; set; } = null!;
     [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
     [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     private CraftView _view = CraftView.Materials;
+
+    // Without yield nothing is ever overproduced, so the Surplus tab would only ever be empty.
+    private bool UseYield => SelectedDataset.Settings.UseYield;
     private List<BlueprintFavorite> _favorites = [];
 
     private int _favoriteSelectNonce;

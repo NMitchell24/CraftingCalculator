@@ -147,6 +147,15 @@ touching them. The short version:
   whether the file carries it, follow the doc, then update its pinned list. `TransferFixtureTests` fails
   until the current version's fixture matches the writer's output.
 
+## Datasettings (per-dataset settings)
+
+Settings that belong to one dataset rather than the app (Use Yield is the first) are a `Datasettings` record, one
+column each on `Datasets`, published through `ISelectedDatasetState.Settings`, and carried in the export file.
+**Adding one follows [`docs/creating-new-datasettings.md`](../../../docs/creating-new-datasettings.md)**: read it
+first. It is a fixed checklist (record, column + hand-edited migration default, DAO mapping, transfer format,
+tripwire, Dataset screen row, the feature, tests, help, device check). Both `Fixtures/v{CurrentVersion}` files
+have to be regenerated, **`valheim.ccdata` included**, even though no test fails while it is stale.
+
 ## UI (Blazor + MudBlazor)
 
 - Pages in `src/CraftingCalculator.UI/Components/Pages` (`@page "/..."`), reusable controls in

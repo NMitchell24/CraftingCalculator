@@ -25,6 +25,9 @@ crafts = round up ( quantity needed / yield per craft )
 
 If your blueprint yields 1, crafts and items are the same number. If it yields more, they come apart.
 
+> **Note:** With [Use Yield](dataset.md#use-yield) off, every blueprint counts as yielding 1, whatever its own yield
+> says. Crafts and items are always the same number, and there's never any surplus.
+
 **Example:** Minecraft planks: 1 log yields **4** planks.
 
 | You need | Crafts | You get | Left over |

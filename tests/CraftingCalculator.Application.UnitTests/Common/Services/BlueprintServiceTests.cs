@@ -65,7 +65,7 @@ public class BlueprintServiceTests
         BlueprintModel blueprint = new BlueprintModel { Name = "Widget" };
         blueprint.Components.Add(new ComponentModel { Name = "Screw" }, 1);
 
-        BlueprintNode tree = _service.GetBlueprintNode(blueprint, 3);
+        BlueprintNode tree = _service.GetBlueprintNode(blueprint, 3, Datasettings.Default);
 
         tree.Name.Should().Be("Widget");
         tree.Quantity.Should().Be(3);

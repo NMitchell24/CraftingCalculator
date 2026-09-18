@@ -170,6 +170,42 @@ public class MigrationTests
     }
 
     /// <summary>
+    /// Datasettings arrived after datasets, and every dataset calculated with yield until then, so each one written
+    /// before them must come back with Use Yield on.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeDatasettings_TurnsUseYieldOnForExistingDatasets()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("AddDatasets");
+
+                // Raw SQL because the entity no longer describes a Datasets table without a UseYield column.
+                await context.Database.ExecuteSqlRawAsync("INSERT INTO Datasets (Id, Name) VALUES (2, 'Rust');");
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                (await context.Datasets.Select(dataset => dataset.UseYield).ToListAsync()).Should().Equal(true, true);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
+    /// <summary>
     /// Production time arrived after yield, so blueprints and components written before it must come
     /// back as instant rather than as some non-zero tick count read out of an unwritten column.
     /// </summary>

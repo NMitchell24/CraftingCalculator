@@ -19,6 +19,7 @@ public class TransferSchemaTripwireTests
 
     private static readonly (Type Entity, string[] Properties)[] Pinned =
     [
+        (typeof(Dataset), ["Id", "Name", "UseYield"]),
         (typeof(Category), ["Id", "Name", "Description", "DatasetId"]),
         (typeof(Component), ["Id", "Name", "Description", "Cost", "ProductionTime", "DatasetId", "CategoryId"]),
         (typeof(Blueprint), ["Id", "Name", "Description", "Value", "Yield", "ProductionTime", "DatasetId", "CategoryId"]),

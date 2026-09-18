@@ -37,6 +37,7 @@ one you were working in.
 | ![Components](assets/inventory-2.svg) Components     | The help you're reading now      |
 | ![Blueprints](assets/handyman.svg) Blueprints        |                                  |
 | ![Favorites](assets/star.svg) Favorites              |                                  |
+| [Datasettings](dataset.md#datasettings)              |                                  |
 
 Two datasets can happily use the same name for different things. A `Wood` component in your Rust dataset and a
 `Wood` component in your Valheim dataset are separate records with separate costs, and neither one knows the
@@ -67,7 +68,8 @@ empty.
 ![Dataset](assets/menu-book.svg) **Dataset** → ![Copy](assets/content-copy.svg) **Copy dataset**
 
 Builds a new dataset that starts out as a copy of the one you're in. Every category, every
-component, every blueprint, and every favorite, all of it copied across.
+component, every blueprint, and every favorite, all of it copied across. Its
+[Datasettings](dataset.md#datasettings) come along too.
 
 This is what you want when the second dataset is *mostly* the same as the first. Say you've spent a week
 building out `Rust - Vanilla`, and then you join a modded server that has custom Crafting Recipes. 

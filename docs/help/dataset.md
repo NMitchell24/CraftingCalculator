@@ -46,6 +46,44 @@ directly. Tapping anywhere on the card does the same thing.
 > The ![Import/Export](assets/import-export.svg) **Import/Export** action opens the screen for backing up and sharing
 > your records. See [Import and Export](import-export.md).
 
+## Datasettings
+
+Yes, that's a pun. No, I'm not sorry.
+
+The **Datasettings** card under the record cards holds the settings that belong to the dataset you're in, not to the
+whole app. Every game plays by its own rules, so each dataset gets its own copy. Flip one in your Rust dataset and your
+Valheim dataset doesn't budge. Switch datasets and the whole app follows whatever that dataset is set to.
+
+They also travel with the dataset. [Copying a dataset](managing-datasets.md#copying-one) copies them, and an
+[export](import-export.md) carries them along with your records.
+
+### Use Yield
+
+On by default. This is the switch for everything about recipes that hand you more than one item per craft.
+
+Some games give you exactly one of whatever you craft, every time. Or maybe you just don't care about stacks. Either
+way, the yield field is just clutter. Turn **Use Yield** off and all of it disappears for this dataset:
+
+- the **Yield per craft** field in the [blueprint editor](blueprints.md#yield-per-craft)
+- the **Surplus** tab on the [Craft screen](craft-screen.md)
+- the **Surplus Stock** and **Surplus Value** lines in the Crafting Summary
+- the **Yield per Craft** and **Surplus** rows on a blueprint's detail card
+
+The math changes too. With Use Yield off, every blueprint makes exactly 1 item per craft, whatever its yield says.
+That means there's never any surplus, because nothing ever gets overproduced.
+
+**Example:** Minecraft's 1 log → 4 planks, and you need 8 planks.
+
+| Use Yield | Crafts | Logs |
+|-----------|--------|------|
+| On        | 2      | 2    |
+| Off       | 8      | 8    |
+
+Turning it off doesn't erase anything. Every blueprint keeps the yield you gave it, just hidden. Turn it back on and
+your planks go right back to 4 per log.
+
+More detail: [How the Math Works](calculations.md).
+
 ## Inside a list
 
 Every record is a card. The top shows its name and its description, if you gave it one. That's it. No clutter, just

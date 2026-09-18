@@ -5,6 +5,7 @@ using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 
@@ -82,6 +83,22 @@ public class TransferDocumentReaderTests
         result.File!.ExportedAt.Should().Be(new DateTimeOffset(2026, 9, 12, 18, 4, 0, TimeSpan.Zero));
         result.File.AppVersion.Should().Be("1.0");
     }
+
+    [Test]
+    public void Read_AnExportWithUseYieldOff_ReturnsIt()
+    {
+        ImportValidationResult result = Read(BronzeChainDocument() with { Datasettings = new TransferDatasettings(UseYield: false) });
+
+        result.File!.Snapshot.Settings.Should().Be(new Datasettings(UseYield: false));
+    }
+
+    [Test]
+    public void Read_AFileWithNoDatasettings_ReadsAsTheDefaults() =>
+        ReadEdited(root => root.Remove("datasettings")).File!.Snapshot.Settings.Should().Be(Datasettings.Default);
+
+    [Test]
+    public void Read_DatasettingsMissingASetting_ReadsItAsItsDefault() =>
+        ReadEdited(root => root["datasettings"] = new JsonObject()).File!.Snapshot.Settings.Should().Be(Datasettings.Default);
 
     [Test]
     public void Read_AFileOverTheSizeLimit_IsRejectedWithoutBeingRead()

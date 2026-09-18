@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 using static CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer.BronzeChain;
@@ -26,6 +27,15 @@ public class TransferDocumentProcessorTests
         document.ExportedAt.Should().Be(ExportedAt);
         document.AppVersion.Should().Be("1.0");
         document.DatasetName.Should().Be("Valheim");
+    }
+
+    [Test]
+    public void ToDocument_WritesTheDatasettingsWhateverIsSelected()
+    {
+        DatasetSnapshot noYield = Snapshot with { Settings = new Datasettings(UseYield: false) };
+
+        TransferDocumentProcessor.ToDocument(noYield, new HashSet<RecordKey>(), ExportedAt, "1.0")
+            .Datasettings.Should().Be(new TransferDatasettings(UseYield: false));
     }
 
     [Test]

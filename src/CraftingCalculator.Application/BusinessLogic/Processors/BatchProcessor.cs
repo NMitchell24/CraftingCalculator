@@ -9,7 +9,8 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 /// </summary>
 public static class BatchProcessor
 {
-    public static BatchTotals CalculateTotals(IReadOnlyCollection<BlueprintQuantity> batch)
+    /// <summary>The totals for <paramref name="batch"/>, worked out under <paramref name="settings"/>.</summary>
+    public static BatchTotals CalculateTotals(IReadOnlyCollection<BlueprintQuantity> batch, Datasettings settings)
     {
         ComponentMap materials = new();
         BlueprintMap surplus = new();
@@ -19,7 +20,7 @@ public static class BatchProcessor
         foreach (BlueprintQuantity blueprintQuantity in batch)
         {
             FlattenResult flattened =
-                BlueprintProcessor.Flatten(blueprintQuantity.Blueprint, blueprintQuantity.Quantity);
+                BlueprintProcessor.Flatten(blueprintQuantity.Blueprint, blueprintQuantity.Quantity, settings);
 
             materials = ComponentProcessor.CombineComponents(flattened.Components, materials, 1);
 

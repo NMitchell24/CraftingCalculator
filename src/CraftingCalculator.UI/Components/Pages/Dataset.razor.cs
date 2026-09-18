@@ -250,6 +250,17 @@ public partial class Dataset : ComponentBase, IDisposable
         Snackbar.Add($"Deleted '{current.Name}'", Severity.Success);
     }
 
+    /// <summary>
+    /// Saves <paramref name="settings"/> as the selected dataset's. Every datasetting row's control saves through here.
+    /// </summary>
+    private async Task SaveSettingsAsync(Datasettings settings)
+    {
+        await Task.Run(() => DatasetService.SaveSettingsAsync(settings));
+
+        // The batch was worked out under the old setting, and the Craft screen only reads what CraftState holds.
+        State.OnDatasettingsChanged();
+    }
+
     private DatasetModel? Current => _datasets.FirstOrDefault(dataset => dataset.Id == SelectedDataset.Id);
 
     private string NameOf(int id) => _datasets.FirstOrDefault(dataset => dataset.Id == id)?.Name ?? "";

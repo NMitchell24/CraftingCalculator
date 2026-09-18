@@ -20,6 +20,7 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IRecordService RecordService { get; set; } = null!;
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     private List<IBaseQuantityRecord> Parts => BlueprintPartProcessor.GetParts(Model);
 

@@ -1,4 +1,5 @@
 using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 
 namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer;
@@ -50,5 +51,6 @@ internal static class BronzeChain
             new SnapshotFavorite(AxeRun.Id, "Bronze Axe run", [new QuantityLink(BronzeAxe.Id, 5)]),
             new SnapshotFavorite(KarvePrep.Id, "Karve prep",
                 [new QuantityLink(BronzeNails.Id, 10), new QuantityLink(BronzeAxe.Id, 1)])
-        ]);
+        ],
+        Datasettings.Default);
 }

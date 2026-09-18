@@ -92,7 +92,8 @@ public static class TransferSelectionProcessor
             [.. snapshot.Categories.Where(category => selected.Contains(new RecordKey(RecordKind.Category, category.Id)))],
             [.. snapshot.Components.Where(component => selected.Contains(new RecordKey(RecordKind.Component, component.Id)))],
             [.. snapshot.Blueprints.Where(blueprint => selected.Contains(new RecordKey(RecordKind.Blueprint, blueprint.Id)))],
-            [.. snapshot.Favorites.Where(favorite => selected.Contains(new RecordKey(RecordKind.Favorite, favorite.Id)))]);
+            [.. snapshot.Favorites.Where(favorite => selected.Contains(new RecordKey(RecordKind.Favorite, favorite.Id)))],
+            snapshot.Settings);
     }
 
     private static SelectionChange SelectClosure(

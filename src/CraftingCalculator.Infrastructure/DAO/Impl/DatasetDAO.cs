@@ -73,11 +73,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         // one. The query filters then do the work, so no read has to name DatasetId to keep another dataset's rows out.
         context.DatasetId = datasetId;
 
-        string name = await context.Datasets
-            .AsNoTracking()
-            .Where(dataset => dataset.Id == datasetId)
-            .Select(dataset => dataset.Name)
-            .SingleAsync();
+        Dataset dataset = await context.Datasets.AsNoTracking().SingleAsync(dataset => dataset.Id == datasetId);
 
         DatasetRecords records = await DatasetRecordsReader.ReadAsync(context);
 
@@ -92,14 +88,15 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         List<Favorite> favorites = await context.Favorites.AsNoTracking().OrderBy(favorite => favorite.Id).ToListAsync();
 
         return new DatasetSnapshot(
-            name,
+            dataset.Name,
             records.Categories,
             records.Components,
             records.Blueprints,
             [
                 .. favorites.Select(favorite => new SnapshotFavorite(
                     favorite.Id, favorite.Name, [.. favoriteLinks[favorite.Id]]))
-            ]);
+            ],
+            ToSettings(dataset));
     }
 
     public async Task<DatasetModel> ImportAsNewAsync(string name, DatasetSnapshot snapshot)
@@ -112,6 +109,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
         Dataset dataset = new() { Name = name };
+        ApplySettings(dataset, snapshot.Settings);
         context.Datasets.Add(dataset);
         await context.SaveChangesAsync();
 
@@ -144,6 +142,15 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         await context.Datasets
             .Where(dataset => dataset.Id == id)
             .ExecuteUpdateAsync(setters => setters.SetProperty(dataset => dataset.Name, name));
+    }
+
+    public async Task SetSettingsAsync(int id, Datasettings settings)
+    {
+        await using CraftingDataContext context = await contextFactory.CreateDbContextAsync();
+
+        Dataset dataset = await context.Datasets.SingleAsync(dataset => dataset.Id == id);
+        ApplySettings(dataset, settings);
+        await context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -365,6 +372,13 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
     private static DatasetModel ToModel(Dataset entity) => new()
     {
         Id = entity.Id,
-        Name = entity.Name
+        Name = entity.Name,
+        Settings = ToSettings(entity)
     };
+
+    // The two directions of the one mapping between the Datasets row and Datasettings, so a new setting is added to both
+    // in the same place. Named arguments, because settings of the same type would otherwise transpose silently.
+    private static Datasettings ToSettings(Dataset entity) => new(UseYield: entity.UseYield);
+
+    private static void ApplySettings(Dataset entity, Datasettings settings) => entity.UseYield = settings.UseYield;
 }

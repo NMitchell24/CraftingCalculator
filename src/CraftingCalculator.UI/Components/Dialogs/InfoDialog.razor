@@ -32,10 +32,13 @@
                         <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
                     </div>
 
-                    <div class="summary-row">
-                        <dt>Yield per Craft</dt>
-                        <dd>@blueprint.Yield</dd>
-                    </div>
+                    @if (SelectedDataset.Settings.UseYield)
+                    {
+                        <div class="summary-row">
+                            <dt>Yield per Craft</dt>
+                            <dd>@blueprint.Yield</dd>
+                        </div>
+                    }
 
                     <div class="summary-row">
                         <dt>Production Time per Craft</dt>
@@ -117,10 +120,13 @@
                         <dd>@step.Crafts</dd>
                     </div>
 
-                    <div class="summary-row">
-                        <dt>Surplus</dt>
-                        <dd>@step.Surplus</dd>
-                    </div>
+                    @if (SelectedDataset.Settings.UseYield)
+                    {
+                        <div class="summary-row">
+                            <dt>Surplus</dt>
+                            <dd>@step.Surplus</dd>
+                        </div>
+                    }
                 }
 
                 <div class="summary-row">

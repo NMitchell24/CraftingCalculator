@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Domain.Enums;
+using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
 using NUnit.Framework;
 using static CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer.BronzeChain;
@@ -140,5 +141,5 @@ public class DependencyGraphProcessorTests
         SnapshotOf([blueprint], components);
 
     private static DatasetSnapshot SnapshotOf(SnapshotBlueprint[] blueprints, SnapshotComponent[] components) =>
-        new("Test", [], components, blueprints, []);
+        new("Test", [], components, blueprints, [], Datasettings.Default);
 }

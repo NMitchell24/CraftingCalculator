@@ -11,6 +11,8 @@ public class BlueprintProcessorTests
     // Maps and batches match records on id, so each name gets an id of its own and a name used twice is one record.
     private static readonly Dictionary<string, int> Ids = [];
 
+    private static readonly Datasettings NoYield = new(UseYield: false);
+
     private static int IdOf(string name)
     {
         if (Ids.TryGetValue(name, out int id))
@@ -63,7 +65,7 @@ public class BlueprintProcessorTests
         blueprint.Components.Add(NewComponent("Screw"), 2);
         blueprint.Components.Add(NewComponent("Plate"), 1);
 
-        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 1);
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 1, Datasettings.Default);
 
         result.ComponentList.Should().HaveCount(2);
         result.ComponentList.Single(componentQuantity => componentQuantity.Name == "Screw").Quantity.Should().Be(2);
@@ -77,7 +79,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget");
         blueprint.Components.Add(NewComponent("Screw"), 2);
 
-        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(blueprint, 3);
+        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(blueprint, 3, Datasettings.Default);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Quantity.Should().Be(6); // 2 Screws x3 Widgets
@@ -89,7 +91,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", yield: 2);
         blueprint.Components.Add(NewComponent("Screw"), 2);
 
-        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 0);
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 0, Datasettings.Default);
 
         // A quantity of zero still lists the component, at zero, the way it did before yield existed.
         result.ComponentList.Should().ContainSingle().Subject.Quantity.Should().Be(0);
@@ -105,7 +107,7 @@ public class BlueprintProcessorTests
         BlueprintModel parent = NewBlueprint("Frame");
         parent.ChildBlueprints.Add(child, 2);
 
-        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(parent, 1);
+        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(parent, 1, Datasettings.Default);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Name.Should().Be("Screw");
@@ -124,7 +126,7 @@ public class BlueprintProcessorTests
         BlueprintModel parent = NewBlueprint("Frame");
         parent.ChildBlueprints.Add(child, 2);
 
-        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(parent, 1);
+        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(parent, 1, Datasettings.Default);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Name.Should().Be("Rivet");
@@ -144,7 +146,7 @@ public class BlueprintProcessorTests
         parent.ChildBlueprints.Add(left, 1);
         parent.ChildBlueprints.Add(right, 1);
 
-        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(parent, 1);
+        (ComponentMap result, _, _) = BlueprintProcessor.Flatten(parent, 1, Datasettings.Default);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Name.Should().Be("Bolt");
@@ -157,7 +159,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
         blueprint.Components.Add(NewComponent("Screw"), 3);
 
-        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 4);
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 4, Datasettings.Default);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Quantity.Should().Be(6); // 3 Screws x2 crafts, not x4 Brackets
@@ -170,7 +172,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
         blueprint.Components.Add(NewComponent("Screw"), 3);
 
-        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 3);
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 3, Datasettings.Default);
 
         result.ComponentList[0].Quantity.Should().Be(6); // 3 Screws x2 crafts to reach 3 Brackets
         BlueprintQuantity spare = surplus.BlueprintList.Should().ContainSingle().Subject;
@@ -187,11 +189,36 @@ public class BlueprintProcessorTests
         BlueprintModel parent = NewBlueprint("Frame");
         parent.ChildBlueprints.Add(child, 1);
 
-        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(parent, 4);
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(parent, 4, Datasettings.Default);
 
         result.ComponentList.Should().ContainSingle();
         result.ComponentList[0].Quantity.Should().Be(6); // 4 Brackets -> 2 crafts -> 3 Screws each
         surplus.BlueprintList.Should().BeEmpty();
+    }
+
+    [Test]
+    public void Flatten_YieldNotUsed_CraftsOncePerItemAndLeavesNoSurplus()
+    {
+        BlueprintModel child = NewBlueprint("Bracket", yield: 2);
+        child.Components.Add(NewComponent("Screw"), 3);
+
+        BlueprintModel parent = NewBlueprint("Frame", yield: 4);
+        parent.ChildBlueprints.Add(child, 1);
+
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(parent, 3, NoYield);
+
+        result.ComponentList.Should().ContainSingle().Subject.Quantity.Should().Be(9); // 3 Frames -> 3 Brackets -> 3 Screws each
+        surplus.BlueprintList.Should().BeEmpty();
+    }
+
+    [Test]
+    public void Flatten_YieldNotUsed_LeavesTheStoredYieldAlone()
+    {
+        BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
+
+        BlueprintProcessor.Flatten(blueprint, 3, NoYield);
+
+        blueprint.Yield.Should().Be(2);
     }
 
     [Test]
@@ -204,7 +231,7 @@ public class BlueprintProcessorTests
         BlueprintModel frame = NewBlueprint("Frame");
         frame.ChildBlueprints.Add(bracket, 2);
 
-        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(frame, 1);
+        (ComponentMap result, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(frame, 1, Datasettings.Default);
 
         result.ComponentList[0].Quantity.Should().Be(3); // one Bracket craft covers both Brackets
         surplus.BlueprintList.Should().BeEmpty();
@@ -216,7 +243,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Frame", yield: 2);
         blueprint.Components.Add(NewComponent("Screw"), 1);
 
-        (_, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 3);
+        (_, BlueprintMap surplus, _) = BlueprintProcessor.Flatten(blueprint, 3, Datasettings.Default);
 
         BlueprintQuantity spare = surplus.BlueprintList.Should().ContainSingle().Subject;
         spare.Name.Should().Be("Frame");
@@ -229,7 +256,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Self Referencing");
         blueprint.ChildBlueprints.Add(blueprint, 1);
 
-        Action act = () => BlueprintProcessor.Flatten(blueprint, 1);
+        Action act = () => BlueprintProcessor.Flatten(blueprint, 1, Datasettings.Default);
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -243,7 +270,7 @@ public class BlueprintProcessorTests
         BlueprintModel parent = NewBlueprint("Frame");
         parent.ChildBlueprints.Add(child, 2);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1, Datasettings.Default);
 
         tree.Name.Should().Be("Frame");
         BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
@@ -264,7 +291,7 @@ public class BlueprintProcessorTests
         parent.ChildBlueprints.Add(child, 2);
 
         // Four Frames, each needing two Brackets, each needing three Screws.
-        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 4);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 4, Datasettings.Default);
 
         tree.Quantity.Should().Be(4);
         BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
@@ -279,7 +306,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Frame");
         blueprint.Components.Add(NewComponent("Screw"), 1);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(blueprint, 4);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(blueprint, 4, Datasettings.Default);
 
         tree.Crafts.Should().Be(4);
         tree.Children.Should().ContainSingle().Subject.Crafts.Should().Be(0); // components are gathered, not crafted
@@ -290,11 +317,11 @@ public class BlueprintProcessorTests
     {
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
-        BlueprintNode three = BlueprintProcessor.BuildNode(blueprint, 3);
+        BlueprintNode three = BlueprintProcessor.BuildNode(blueprint, 3, Datasettings.Default);
         three.Quantity.Should().Be(3);
         three.Crafts.Should().Be(2);
 
-        BlueprintNode two = BlueprintProcessor.BuildNode(blueprint, 2);
+        BlueprintNode two = BlueprintProcessor.BuildNode(blueprint, 2, Datasettings.Default);
         two.Quantity.Should().Be(2);
         two.Crafts.Should().Be(1);
     }
@@ -305,8 +332,21 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
         // Three needs two crafts, which make four.
-        BlueprintProcessor.BuildNode(blueprint, 3).Surplus.Should().Be(1);
-        BlueprintProcessor.BuildNode(blueprint, 4).Surplus.Should().Be(0);
+        BlueprintProcessor.BuildNode(blueprint, 3, Datasettings.Default).Surplus.Should().Be(1);
+        BlueprintProcessor.BuildNode(blueprint, 4, Datasettings.Default).Surplus.Should().Be(0);
+    }
+
+    [Test]
+    public void BuildNode_YieldNotUsed_ReportsOneItemPerCraftAndNoSurplus()
+    {
+        BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
+        blueprint.Components.Add(NewComponent("Screw"), 3);
+
+        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 3, NoYield);
+
+        (node.Crafts, node.Yield, node.Surplus).Should().Be((3, 1, 0));
+        node.Children.Should().ContainSingle().Subject.Quantity.Should().Be(9);
+        BlueprintProcessor.CountsByCraft(node).Should().BeFalse();
     }
 
     [Test]
@@ -315,7 +355,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget");
         blueprint.Components.Add(NewComponent("Screw"), 2);
 
-        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1).Children.Should().ContainSingle().Subject;
+        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1, Datasettings.Default).Children.Should().ContainSingle().Subject;
 
         leaf.IsComponent.Should().BeTrue();
         leaf.Crafts.Should().Be(0);
@@ -332,7 +372,7 @@ public class BlueprintProcessorTests
     {
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 3);
 
-        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 4);
+        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 4, Datasettings.Default);
 
         node.Yield.Should().Be(3);
         node.Crafts.Should().Be(2);
@@ -350,7 +390,7 @@ public class BlueprintProcessorTests
         BlueprintModel parent = NewBlueprint("Frame");
         parent.ChildBlueprints.Add(child, 1);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 4);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 4, Datasettings.Default);
 
         BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
         childNode.Quantity.Should().Be(4); // still four Brackets needed
@@ -366,7 +406,7 @@ public class BlueprintProcessorTests
         BlueprintModel frame = NewBlueprint("Frame");
         frame.ChildBlueprints.Add(bracket, 2);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(frame, 1);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(frame, 1, Datasettings.Default);
 
         // What CraftState.CraftingStepCount sums: one Frame craft plus one Bracket craft.
         tree.Crafts.Should().Be(1);
@@ -378,7 +418,7 @@ public class BlueprintProcessorTests
     {
         BlueprintModel frame = NewBlueprint("Frame", yield: 2);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(frame, 100);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(frame, 100, Datasettings.Default);
 
         tree.Quantity.Should().Be(100);
         tree.Crafts.Should().Be(50);
@@ -390,7 +430,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Self Referencing");
         blueprint.ChildBlueprints.Add(blueprint, 1);
 
-        Action act = () => BlueprintProcessor.BuildNode(blueprint, 1);
+        Action act = () => BlueprintProcessor.BuildNode(blueprint, 1, Datasettings.Default);
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -401,7 +441,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget");
         blueprint.ProductionTime = TimeSpan.FromSeconds(5);
 
-        BlueprintProcessor.Flatten(blueprint, 3).ProductionTime.Should().Be(TimeSpan.FromSeconds(15));
+        BlueprintProcessor.Flatten(blueprint, 3, Datasettings.Default).ProductionTime.Should().Be(TimeSpan.FromSeconds(15));
     }
 
     /// <summary>
@@ -414,9 +454,9 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
         blueprint.ProductionTime = TimeSpan.FromSeconds(10);
 
-        BlueprintProcessor.Flatten(blueprint, 4).ProductionTime.Should().Be(TimeSpan.FromSeconds(20));
+        BlueprintProcessor.Flatten(blueprint, 4, Datasettings.Default).ProductionTime.Should().Be(TimeSpan.FromSeconds(20));
         // Three still takes two crafts, so it costs the same twenty seconds and leaves one spare.
-        BlueprintProcessor.Flatten(blueprint, 3).ProductionTime.Should().Be(TimeSpan.FromSeconds(20));
+        BlueprintProcessor.Flatten(blueprint, 3, Datasettings.Default).ProductionTime.Should().Be(TimeSpan.FromSeconds(20));
     }
 
     [Test]
@@ -430,7 +470,7 @@ public class BlueprintProcessorTests
         parent.ChildBlueprints.Add(child, 3);
 
         // One Frame craft (5s) plus three Bracket crafts (6s).
-        BlueprintProcessor.Flatten(parent, 1).ProductionTime.Should().Be(TimeSpan.FromSeconds(11));
+        BlueprintProcessor.Flatten(parent, 1, Datasettings.Default).ProductionTime.Should().Be(TimeSpan.FromSeconds(11));
     }
 
     /// <summary>
@@ -447,7 +487,7 @@ public class BlueprintProcessorTests
         blueprint.ProductionTime = TimeSpan.FromSeconds(30);
         blueprint.Components.Add(potato, 2);
 
-        BlueprintProcessor.Flatten(blueprint, 1).ProductionTime.Should().Be(TimeSpan.FromSeconds(30));
+        BlueprintProcessor.Flatten(blueprint, 1, Datasettings.Default).ProductionTime.Should().Be(TimeSpan.FromSeconds(30));
     }
 
     [Test]
@@ -456,7 +496,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget");
         blueprint.Components.Add(NewComponent("Screw"), 2);
 
-        BlueprintProcessor.Flatten(blueprint, 5).ProductionTime.Should().Be(TimeSpan.Zero);
+        BlueprintProcessor.Flatten(blueprint, 5, Datasettings.Default).ProductionTime.Should().Be(TimeSpan.Zero);
     }
 
     [Test]
@@ -469,7 +509,7 @@ public class BlueprintProcessorTests
         parent.ProductionTime = TimeSpan.FromSeconds(5);
         parent.ChildBlueprints.Add(child, 3);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1, Datasettings.Default);
 
         tree.ProductionTime.Should().Be(TimeSpan.FromSeconds(5));
         tree.Children.Should().ContainSingle().Subject.ProductionTime.Should().Be(TimeSpan.FromSeconds(6));
@@ -484,7 +524,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Soup");
         blueprint.Components.Add(potato, 2);
 
-        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 3).Children.Should().ContainSingle().Subject;
+        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 3, Datasettings.Default).Children.Should().ContainSingle().Subject;
 
         leaf.Quantity.Should().Be(6);
         leaf.ProductionTime.Should().Be(TimeSpan.FromMinutes(30));
@@ -500,7 +540,7 @@ public class BlueprintProcessorTests
         BlueprintModel parent = NewBlueprint("Frame");
         parent.ChildBlueprints.Add(child, 2);
 
-        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1);
+        BlueprintNode tree = BlueprintProcessor.BuildNode(parent, 1, Datasettings.Default);
 
         tree.Source.Should().BeSameAs(parent);
         BlueprintNode childNode = tree.Children.Should().ContainSingle().Subject;
@@ -513,7 +553,7 @@ public class BlueprintProcessorTests
     {
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
-        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 2);
+        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 2, Datasettings.Default);
 
         node.Crafts.Should().Be(1);
         BlueprintProcessor.CountsByCraft(node).Should().BeTrue();
@@ -525,7 +565,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", yield: 2);
 
         // One Bracket still takes one craft, so there is no second number to tell the user about.
-        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 1);
+        BlueprintNode node = BlueprintProcessor.BuildNode(blueprint, 1, Datasettings.Default);
 
         BlueprintProcessor.CountsByCraft(node).Should().BeFalse();
     }
@@ -533,7 +573,7 @@ public class BlueprintProcessorTests
     [Test]
     public void CountsByCraft_DefaultYield_IsFalse()
     {
-        BlueprintNode node = BlueprintProcessor.BuildNode(NewBlueprint("Frame"), 4);
+        BlueprintNode node = BlueprintProcessor.BuildNode(NewBlueprint("Frame"), 4, Datasettings.Default);
 
         BlueprintProcessor.CountsByCraft(node).Should().BeFalse();
     }
@@ -544,7 +584,7 @@ public class BlueprintProcessorTests
         BlueprintModel blueprint = NewBlueprint("Frame");
         blueprint.Components.Add(NewComponent("Screw"), 3);
 
-        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1).Children.Should().ContainSingle().Subject;
+        BlueprintNode leaf = BlueprintProcessor.BuildNode(blueprint, 1, Datasettings.Default).Children.Should().ContainSingle().Subject;
 
         BlueprintProcessor.CountsByCraft(leaf).Should().BeFalse();
     }

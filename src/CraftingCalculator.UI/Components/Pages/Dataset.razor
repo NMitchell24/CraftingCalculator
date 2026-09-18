@@ -61,6 +61,25 @@
             </MudPaper>
         </div>
     }
+
+    <MudPaper Class="app-card" Elevation="0">
+        <MudText Typo="Typo.subtitle1" Class="display-title">Datasettings</MudText>
+        <MudDivider Class="my-4" />
+
+        @* One .datasetting-row per setting: what it is on the left, the control on the right. *@
+        <div class="datasetting-row">
+            <div class="datasetting-text">
+                <MudText Typo="Typo.body1">Use Yield</MudText>
+                <MudText Typo="Typo.caption" Class="datasetting-caption">
+                    Blueprints can make more than one item per craft, and the extra shows up as surplus.
+                </MudText>
+            </div>
+            <MudSwitch T="bool" Value="SelectedDataset.Settings.UseYield"
+                       ValueChanged="@(useYield => SaveSettingsAsync(SelectedDataset.Settings with { UseYield = useYield }))"
+                       Color="Color.Primary" AriaLabel="Use Yield" />
+        </div>
+    </MudPaper>
+
 </div>
 
 <MudOverlay Visible="_busy" DarkBackground="true" ZIndex="9999">

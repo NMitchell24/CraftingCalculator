@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 
@@ -6,6 +7,7 @@ namespace CraftingCalculator.UI.Components.Controls;
 public partial class SummaryCard : ComponentBase, IDisposable
 {
     [Inject] private CraftState State { get; set; } = null!;
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     private string ProfitClass => State.Profit switch
     {
