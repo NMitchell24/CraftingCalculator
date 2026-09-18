@@ -77,8 +77,15 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
 
     public async Task SaveSettingsAsync(Datasettings settings)
     {
-        await dao.SetSettingsAsync(selectedDataset.Id, settings);
-        selectedDataset.Set(selectedDataset.Id, settings);
+        int id = selectedDataset.Id;
+        await dao.SetSettingsAsync(id, settings);
+
+        // The toggle saves off the UI thread, so a switch can land during the write. It has already published the
+        // new dataset's own settings, and these belong to the dataset that was selected when the save started.
+        if (selectedDataset.Id == id)
+        {
+            selectedDataset.Set(id, settings);
+        }
     }
 
     private void Select(DatasetModel dataset) => selectedDataset.Set(dataset.Id, dataset.Settings);

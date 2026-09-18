@@ -249,4 +249,22 @@ public class DatasetServiceTests
         _dao.Verify(dao => dao.SetSettingsAsync(7, NoYield), Times.Once);
         (_selected.Id, _selected.Settings).Should().Be((7, NoYield));
     }
+
+    [Test]
+    public async Task SaveSettingsAsync_ASwitchDuringTheWrite_LeavesTheNewDatasetsSettingsAlone()
+    {
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Valheim" }, new DatasetModel { Id = 7, Name = "Rust" });
+        GivenStoredSelection(1);
+        await _service.InitializeAsync();
+        TaskCompletionSource write = new();
+        _dao.Setup(dao => dao.SetSettingsAsync(1, NoYield)).Returns(write.Task);
+
+        Task save = _service.SaveSettingsAsync(NoYield);
+        await _service.SwitchToAsync(7);
+        write.SetResult();
+        await save;
+
+        _dao.Verify(dao => dao.SetSettingsAsync(1, NoYield), Times.Once);
+        (_selected.Id, _selected.Settings).Should().Be((7, Datasettings.Default));
+    }
 }
