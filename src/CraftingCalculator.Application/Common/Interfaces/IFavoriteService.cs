@@ -10,10 +10,11 @@ public interface IFavoriteService
     Task<List<BlueprintFavorite>> GetAllFavoritesAsync();
 
     /// <summary>
-    /// Saves or updates the favorite (any existing favorite of the same name is replaced first),
-    /// then saves <paramref name="quantities"/> as its blueprint quantities.
+    /// Saves <paramref name="quantities"/> as a favorite's blueprint quantities and returns that favorite: the one with
+    /// the id of <paramref name="favorite"/>, or, when it has no id, the one with its name, which is created if no
+    /// favorite has it.
     /// </summary>
-    Task SaveFavoriteAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities);
+    Task<BlueprintFavorite> SaveFavoriteAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities);
 
     /// <summary>Renames the favorite, keeping its saved blueprint quantities.</summary>
     Task RenameFavoriteAsync(BlueprintFavorite favorite, string newName);

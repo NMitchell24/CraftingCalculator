@@ -38,7 +38,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     // Reflects CraftState rather than holding a selection of its own, so clearing the batch or loading a
     // favorite from anywhere else moves the select with it.
     private int? SelectedFavoriteId =>
-        _favorites.FirstOrDefault(favorite => favorite.Name == State.LoadedFavoriteName)?.Id;
+        _favorites.FirstOrDefault(favorite => favorite.Id == State.LoadedFavorite?.Id)?.Id;
 
     private string FavoriteSelectLabel => _favorites.Count == 0 ? "No Favorites" : "Load Favorite";
 
@@ -115,7 +115,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     // The picker lists only blueprints and is only handed entries Find returned, so the casts below cannot fail.
     public IBaseQuantityRecord? Find(IBaseDataRecord record) =>
-        State.BlueprintQuantities.FirstOrDefault(entry => entry.Name == record.Name);
+        State.BlueprintQuantities.FirstOrDefault(entry => entry.Blueprint.Id == record.Id);
 
     public Task AddAsync(IBaseDataRecord record)
     {

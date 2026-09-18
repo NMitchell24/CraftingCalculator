@@ -41,6 +41,30 @@ public class BlueprintDAOTests
         reloaded.ChildBlueprints.BlueprintList.Should().ContainSingle(blueprintQuantity => blueprintQuantity.Blueprint.Name == "Plank" && blueprintQuantity.Quantity == 4);
     }
 
+    [Test]
+    public async Task SaveAsync_PartsSharingAName_KeepsEachPart()
+    {
+        ComponentModel wood = await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood" });
+        ComponentModel otherWood = await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood" });
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+        BlueprintModel otherPlank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+
+        BlueprintModel table = new() { Name = "Table" };
+        table.Components.Add(wood, 2);
+        table.Components.Add(otherWood, 3);
+        table.ChildBlueprints.Add(plank, 4);
+        table.ChildBlueprints.Add(otherPlank, 5);
+
+        BlueprintModel saved = await _blueprintDAO.SaveAsync(table);
+
+        BlueprintModel? reloaded = await _blueprintDAO.GetByIdAsync(saved.Id);
+        reloaded.Should().NotBeNull();
+        reloaded.Components.ComponentList.Select(part => (part.Component.Id, part.Quantity))
+            .Should().BeEquivalentTo([(wood.Id, 2L), (otherWood.Id, 3L)]);
+        reloaded.ChildBlueprints.BlueprintList.Select(part => (part.Blueprint.Id, part.Quantity))
+            .Should().BeEquivalentTo([(plank.Id, 4L), (otherPlank.Id, 5L)]);
+    }
+
     /// <summary>
     /// The Craft screen reads its components out of the blueprint graph rather than through
     /// <see cref="ComponentDAO" />, and that graph's entities are detached, so the category has to be

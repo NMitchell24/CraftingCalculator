@@ -8,14 +8,29 @@ namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Processors;
 [TestFixture]
 public class BatchProcessorTests
 {
+    // Maps and batches match records on id, so each name gets an id of its own and a name used twice is one record.
+    private static readonly Dictionary<string, int> Ids = [];
+
+    private static int IdOf(string name)
+    {
+        if (Ids.TryGetValue(name, out int id))
+        {
+            return id;
+        }
+
+        id = Ids.Count + 1;
+        Ids[name] = id;
+        return id;
+    }
+
     private static ComponentModel NewComponent(string name, double cost) =>
-        new() { Id = 1, Name = name, Cost = cost };
+        new() { Id = IdOf(name), Name = name, Cost = cost };
 
     private static BlueprintModel NewBlueprint(string name, double value) =>
-        new() { Id = 1, Name = name, Value = value };
+        new() { Id = IdOf(name), Name = name, Value = value };
 
     private static BlueprintModel NewBlueprint(string name, double value, long yield) =>
-        new() { Id = 1, Name = name, Value = value, Yield = yield };
+        new() { Id = IdOf(name), Name = name, Value = value, Yield = yield };
 
     [Test]
     public void CalculateTotals_SingleBlueprint_ReturnsCostAndValue()
@@ -73,6 +88,19 @@ public class BatchProcessorTests
     }
 
     [Test]
+    public void CalculateTotals_TwoComponentsSharingAName_CostsEachAtItsOwnPrice()
+    {
+        BlueprintModel blueprint = NewBlueprint("Hatchet", 50);
+        blueprint.Components.Add(new ComponentModel { Id = 100, Name = "Metal Fragments", Cost = 1 }, 75);
+        blueprint.Components.Add(new ComponentModel { Id = 101, Name = "Metal Fragments", Cost = 2 }, 25);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 1)]);
+
+        totals.Materials.ComponentList.Should().HaveCount(2);
+        totals.TotalCost.Should().Be(125);
+    }
+
+    [Test]
     public void CalculateTotals_ZeroCostComponent_ContributesNothingToCost()
     {
         BlueprintModel blueprint = NewBlueprint("Widget", 0);
@@ -116,7 +144,7 @@ public class BatchProcessorTests
         BlueprintModel handle = NewBlueprint("Handle", 0);
         handle.ChildBlueprints.Add(bracket, 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new(frame, 1), new(handle, 1)]);
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)]);
 
         totals.TotalCost.Should().Be(6); // two Bracket crafts, 3 Screws each
         BlueprintQuantity spare = totals.Surplus.BlueprintList.Should().ContainSingle().Subject;

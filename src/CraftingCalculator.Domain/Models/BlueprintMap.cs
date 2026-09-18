@@ -22,8 +22,8 @@ public class BlueprintMap
     }
 
     /// <summary>
-    /// Adds the Blueprint and quantity to the list if it does not exist.
-    /// If it does exist then it will just increase the quantity of the existing record
+    /// Adds the Blueprint and quantity to the list if no entry has its id.
+    /// If one does then it will just increase the quantity of the existing record
     /// by the quantity that is passed into this Add function.
     /// </summary>
     /// <param name="blueprint"></param>
@@ -35,7 +35,7 @@ public class BlueprintMap
             return;
         }
 
-        BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
+        BlueprintQuantity? existing = _internalList.Find(blueprintQuantity => blueprintQuantity.Blueprint.Id == blueprint.Id);
         if (existing != null)
         {
             existing.Quantity += quantity;
@@ -47,16 +47,16 @@ public class BlueprintMap
     }
 
     /// <summary>
-    /// Remove a BlueprintQuantity from the list entirely if it exists.
+    /// Removes the entry with the blueprint's id from the list, if there is one.
     /// </summary>
     /// <param name="blueprint"></param>
     public void RemoveAll(BlueprintModel blueprint)
     {
-        _internalList.RemoveAll(blueprintQuantity => blueprintQuantity.Blueprint.Name == blueprint.Name);
+        _internalList.RemoveAll(blueprintQuantity => blueprintQuantity.Blueprint.Id == blueprint.Id);
     }
 
     /// <summary>
-    /// Removes exactly <paramref name="blueprintQuantity"/> from the list, leaving any other entry that shares its name.
+    /// Removes exactly <paramref name="blueprintQuantity"/> from the list, leaving every other entry in place.
     /// </summary>
     public void Remove(BlueprintQuantity blueprintQuantity)
     {

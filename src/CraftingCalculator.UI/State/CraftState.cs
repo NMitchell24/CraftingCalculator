@@ -15,10 +15,9 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 {
     private readonly BlueprintMap _blueprintMap = new();
 
-    // Keyed by each node's full path from the tree root (see BlueprintTreeNode.Path), not by name
-    // alone - the same blueprint/component can appear more than once in one tree (e.g. a blueprint used both
-    // standalone in the batch and nested inside another batch blueprint), and keying by name alone made every
-    // occurrence share one expansion state instead of each position remembering its own.
+    // Keyed by each node's full path from the tree root (see PathOf), not by the record alone - the same
+    // blueprint/component can appear more than once in one tree (e.g. a blueprint used both standalone in the
+    // batch and nested inside another batch blueprint), and each position remembers its own expansion state.
     private readonly HashSet<string> _expandedPaths = [];
 
     public event Action? Changed;
@@ -64,7 +63,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     /// The favorite the current batch came from, or null when it was built by hand or cleared. Drives
     /// the "update or create new" branch of the save flow (see Components/Dialogs/FavoritePrompts).
     /// </summary>
-    public string? LoadedFavoriteName { get; private set; }
+    public BlueprintFavorite? LoadedFavorite { get; private set; }
 
     /// <summary>Adds a blueprint to the batch, or raises its quantity by one when it is already there.</summary>
     public void Add(BlueprintModel blueprint)
@@ -117,7 +116,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     public void Clear()
     {
         _blueprintMap.Reset();
-        LoadedFavoriteName = null;
+        LoadedFavorite = null;
         Recalculate();
     }
 
@@ -130,7 +129,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
             _blueprintMap.Add(quantity.Blueprint, quantity.Quantity);
         }
 
-        LoadedFavoriteName = favorite.Name;
+        LoadedFavorite = favorite;
         Recalculate();
     }
 
@@ -197,33 +196,43 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
 
     public Task<bool> FavoriteExistsAsync(string? name) => favoriteService.DoesFavoriteExistAsync(name);
 
-    public async Task SaveAsFavoriteAsync(string name)
+    /// <summary>
+    /// Saves the batch as the favorite named <paramref name="name"/>, replacing a favorite that already has the name,
+    /// and makes it <see cref="LoadedFavorite"/>.
+    /// </summary>
+    public async Task SaveAsFavoriteAsync(string name) =>
+        LoadedFavorite = await favoriteService.SaveFavoriteAsync(new BlueprintFavorite { Name = name }, [.. _blueprintMap.BlueprintList]);
+
+    /// <summary>Saves the batch over <see cref="LoadedFavorite"/>. Does nothing when no favorite is loaded.</summary>
+    public async Task UpdateLoadedFavoriteAsync()
     {
-        await favoriteService.SaveFavoriteAsync(new BlueprintFavorite { Name = name }, [.. _blueprintMap.BlueprintList]);
-        LoadedFavoriteName = name;
+        if (LoadedFavorite is { } loaded)
+        {
+            LoadedFavorite = await favoriteService.SaveFavoriteAsync(loaded, [.. _blueprintMap.BlueprintList]);
+        }
     }
 
-    /// <summary>Keeps <see cref="LoadedFavoriteName"/> in step when the loaded favorite is renamed.</summary>
-    public void OnFavoriteRenamed(string previousName, string newName)
+    /// <summary>Keeps <see cref="LoadedFavorite"/> in step when the favorite with <paramref name="id"/> is renamed.</summary>
+    public void OnFavoriteRenamed(int id, string newName)
     {
-        if (LoadedFavoriteName != previousName)
+        if (LoadedFavorite?.Id != id)
         {
             return;
         }
 
-        LoadedFavoriteName = newName;
+        LoadedFavorite = new BlueprintFavorite { Id = id, Name = newName };
         Changed?.Invoke();
     }
 
-    /// <summary>Keeps <see cref="LoadedFavoriteName"/> in step when the loaded favorite is deleted.</summary>
-    public void OnFavoriteDeleted(string name)
+    /// <summary>Keeps <see cref="LoadedFavorite"/> in step when the favorite with <paramref name="id"/> is deleted.</summary>
+    public void OnFavoriteDeleted(int id)
     {
-        if (LoadedFavoriteName != name)
+        if (LoadedFavorite?.Id != id)
         {
             return;
         }
 
-        LoadedFavoriteName = null;
+        LoadedFavorite = null;
         Changed?.Invoke();
     }
 
@@ -234,6 +243,13 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
     // is not on screen.
     public bool HasVisibleCraftCountedStep => AnyCountsByCraft(TreeRoots, "");
+
+    /// <summary>
+    /// The position of <paramref name="node"/> in the Crafting Steps tree, below the node at <paramref name="parentPath"/>
+    /// (empty for a tree root). Two records that share a name have different paths.
+    /// </summary>
+    // Type and id, because components and blueprints are numbered separately.
+    public static string PathOf(string parentPath, BlueprintNode node) => $"{parentPath}/{node.Source.Type}:{node.Source.Id}";
 
     public bool IsExpanded(string path) => _expandedPaths.Contains(path);
 
@@ -268,7 +284,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
                 return true;
             }
 
-            string path = $"{parentPath}/{node.Name}";
+            string path = PathOf(parentPath, node);
             if (IsExpanded(path) && AnyCountsByCraft(node.Children, path))
             {
                 return true;
@@ -285,7 +301,7 @@ public sealed class CraftState(IBlueprintService blueprintService, IFavoriteServ
     {
         foreach (BlueprintNode node in nodes)
         {
-            string path = $"{parentPath}/{node.Name}";
+            string path = PathOf(parentPath, node);
             into.Add(path);
             CollectPaths(node.Children, path, into);
         }

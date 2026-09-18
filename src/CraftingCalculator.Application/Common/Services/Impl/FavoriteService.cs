@@ -8,7 +8,7 @@ public class FavoriteService(IBlueprintFavoritesDAO dao) : IFavoriteService
 {
     public Task<List<BlueprintFavorite>> GetAllFavoritesAsync() => dao.GetAllAsync();
 
-    public Task SaveFavoriteAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities)
+    public Task<BlueprintFavorite> SaveFavoriteAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities)
         => dao.SaveAsync(favorite, quantities);
 
     public Task RenameFavoriteAsync(BlueprintFavorite favorite, string newName) => dao.RenameAsync(favorite.Id, newName);

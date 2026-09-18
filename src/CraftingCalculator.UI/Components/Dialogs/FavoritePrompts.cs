@@ -50,30 +50,27 @@ public static class FavoritePrompts
             return null;
         }
 
-        string? name = null;
-
-        if (state.LoadedFavoriteName is { } loaded)
+        if (state.LoadedFavorite is { } loaded)
         {
             bool? update = await ConfirmDialog.ChooseAsync(
                 dialogs,
                 "Update or create new?",
-                $"Would you like to update '{loaded}' or create a new favorite?",
+                $"Would you like to update '{loaded.Name}' or create a new favorite?",
                 confirmText: "Update", alternativeText: "Create new");
 
-            if (update is null)
+            switch (update)
             {
-                return null;
-            }
+                case null:
+                    return null;
+                case true:
+                    await state.UpdateLoadedFavoriteAsync();
+                    snackbar.Add($"Saved '{loaded.Name}'", Severity.Success);
 
-            if (update is true)
-            {
-                name = loaded;
+                    return loaded.Name;
             }
         }
 
-        name ??= await PromptForNewNameAsync(dialogs, state);
-
-        if (name is null)
+        if (await PromptForNewNameAsync(dialogs, state) is not { } name)
         {
             return null;
         }

@@ -23,8 +23,8 @@ public class ComponentMap
         //nothing
     }
     /// <summary>
-    /// Adds the component and quantity to the list if it does not exist.
-    /// If it does exist then it will just increase the quantity of the existing record
+    /// Adds the component and quantity to the list if no entry has its id.
+    /// If one does then it will just increase the quantity of the existing record
     /// by the quantity that is passed into this Add function.
     /// </summary>
     /// <param name="component"></param>
@@ -36,7 +36,7 @@ public class ComponentMap
             return;
         }
 
-        ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Name == component.Name);
+        ComponentQuantity? existing = _internalList.Find(componentQuantity => componentQuantity.Component.Id == component.Id);
         if (existing != null)
         {
             existing.Quantity += quantity;
@@ -56,7 +56,7 @@ public class ComponentMap
     /// <param name="quantity"></param>
     public void Remove(ComponentModel component, long quantity)
     {
-        if (_internalList.Any(componentQuantity => componentQuantity.Name == component.Name && componentQuantity.Quantity - quantity > 0))
+        if (_internalList.Any(componentQuantity => componentQuantity.Component.Id == component.Id && componentQuantity.Quantity - quantity > 0))
         {
             Add(component, -quantity);
         }
@@ -68,12 +68,12 @@ public class ComponentMap
     }
 
     /// <summary>
-    /// Remove a Component from the list entirely if it exists.
+    /// Removes the entry with the component's id from the list, if there is one.
     /// </summary>
     /// <param name="component"></param>
     public void RemoveAll(ComponentModel component)
     {
-        _internalList.RemoveAll(componentQuantity => componentQuantity.Name == component.Name);
+        _internalList.RemoveAll(componentQuantity => componentQuantity.Component.Id == component.Id);
     }
 
     /// <summary>

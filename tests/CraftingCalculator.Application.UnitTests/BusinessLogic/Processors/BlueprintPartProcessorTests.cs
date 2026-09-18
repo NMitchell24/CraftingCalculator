@@ -51,6 +51,30 @@ public class BlueprintPartProcessorTests
     }
 
     [Test]
+    public void FindPart_ComponentSharingANameWithAnotherPart_ReturnsItsOwnPart()
+    {
+        BlueprintModel blueprint = NewBlueprint(1, "Frame");
+        blueprint.Components.Add(NewComponent(2, "Screw"), 4);
+        blueprint.Components.Add(NewComponent(3, "Screw"), 6);
+
+        IBaseQuantityRecord? part = BlueprintPartProcessor.FindPart(blueprint, NewComponent(3, "Screw"));
+
+        part.Should().BeSameAs(blueprint.Components.ComponentList[1]);
+    }
+
+    [Test]
+    public void Remove_ComponentSharingANameWithAnotherPart_LeavesTheOtherInPlace()
+    {
+        BlueprintModel blueprint = NewBlueprint(1, "Frame");
+        blueprint.Components.Add(NewComponent(2, "Screw"), 4);
+        blueprint.Components.Add(NewComponent(3, "Screw"), 6);
+
+        BlueprintPartProcessor.Remove(blueprint, blueprint.Components.ComponentList[0]);
+
+        blueprint.Components.ComponentList.Should().ContainSingle().Which.Component.Id.Should().Be(3);
+    }
+
+    [Test]
     public void FindPart_RecordNotOnTheBlueprint_ReturnsNull()
     {
         BlueprintModel blueprint = NewBlueprint(1, "Frame");

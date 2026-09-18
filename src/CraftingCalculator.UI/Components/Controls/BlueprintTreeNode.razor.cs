@@ -18,14 +18,8 @@ public partial class BlueprintTreeNode : ComponentBase
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
-    /// <summary>
-    /// This node's position in the tree, e.g. "/Frame/Bracket" - distinct from <see cref="Node"/>.Name
-    /// so that CraftState can track expansion per tree position rather than per blueprint/component
-    /// name. The same blueprint can appear more than once in one tree (standalone in the batch and
-    /// nested inside another batch blueprint); keying by name alone would make every occurrence share
-    /// one expanded/collapsed state.
-    /// </summary>
-    private string Path => $"{ParentPath}/{Node.Name}";
+    /// <summary>This node's position in the tree. See <see cref="CraftState.PathOf"/>.</summary>
+    private string Path => CraftState.PathOf(ParentPath, Node);
 
     /// <summary>
     /// The row label: the step's name followed by how many of it this step covers.
