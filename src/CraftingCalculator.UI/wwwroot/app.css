@@ -1251,7 +1251,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* Holds two digits, so it is capped rather than stretched across .settings-page's 720px. Wide enough for the
-   outlined variant's "Exports to keep" label notch, which is what sets the floor rather than the value. ch
+   outlined variant's "Max history" label notch, which is what sets the floor rather than the value. ch
    rather than px for the same reason as .production-time-row: Android's WebView text zoom scales ch, so the
    cap grows with the label instead of clipping it. */
 .settings-number-field {
