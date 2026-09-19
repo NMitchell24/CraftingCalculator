@@ -31,7 +31,7 @@
                     {
                         <div class="summary-row">
                             <dt>Value per Item</dt>
-                            <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
+                            <dd>@CurrencyProcessor.Format(blueprint.Value, SelectedDataset.Settings)</dd>
                         </div>
                     }
 
@@ -57,7 +57,7 @@
                     {
                         <div class="summary-row">
                             <dt>Cost per Item</dt>
-                            <dd>@string.Format(FormatConstants.CurrencyFormat, component.Cost)</dd>
+                            <dd>@CurrencyProcessor.Format(component.Cost, SelectedDataset.Settings)</dd>
                         </div>
                     }
 

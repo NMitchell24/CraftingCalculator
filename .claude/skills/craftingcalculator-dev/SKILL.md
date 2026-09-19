@@ -58,7 +58,7 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   `InvalidOperationException` on overlapping async handlers).
 - **Naming:** interfaces `IXxxService` / `IXxxDAO`; impls in `Impl/` folders. Models in
   `Domain/Models`, entities in `Domain/Entities`, magic strings/enums in `Domain/Constants` and
-  `Domain/Enums` (e.g. `CategoryModel.All`, the currency format string).
+  `Domain/Enums` (e.g. `CategoryModel.All`, `HelpTopics`).
 - **Domain models vs. EF entities share names** (`Blueprint`, `Component`, `Category`) but live in
   different namespaces — `CraftingCalculator.Domain.Entities` vs. `CraftingCalculator.Domain.Models`.
   Alias at the few call sites (DAO impls) that need both in one file.

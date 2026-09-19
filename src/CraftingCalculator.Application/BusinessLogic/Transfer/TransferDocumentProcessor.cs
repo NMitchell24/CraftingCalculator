@@ -55,7 +55,8 @@ public static class TransferDocumentProcessor
             ],
             new TransferDatasettings(
                 UseYield: extract.Settings.UseYield, UseCosts: extract.Settings.UseCosts,
-                UseValues: extract.Settings.UseValues, UseCraftTime: extract.Settings.UseCraftTime));
+                UseValues: extract.Settings.UseValues, UseCraftTime: extract.Settings.UseCraftTime,
+                CurrencyLabel: extract.Settings.CurrencyLabel));
     }
 
     /// <summary>Maps each of <paramref name="ids"/> to its ref, 1 up in the order given.</summary>

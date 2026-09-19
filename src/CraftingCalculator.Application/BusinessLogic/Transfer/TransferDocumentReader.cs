@@ -220,7 +220,7 @@ public static class TransferDocumentReader
         [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))],
         document.Datasettings is { } settings
             ? new Datasettings(UseYield: settings.UseYield, UseCosts: settings.UseCosts, UseValues: settings.UseValues,
-                UseCraftTime: settings.UseCraftTime)
+                UseCraftTime: settings.UseCraftTime, CurrencyLabel: CurrencyProcessor.ToLabel(settings.CurrencyLabel))
             : Datasettings.Default);
 
     private static List<QuantityLink> Links(IEnumerable<QuantityRef> links) =>
@@ -258,6 +258,11 @@ public static class TransferDocumentReader
 
             CheckLength("The dataset name", document.DatasetName, MaxNameLength);
             CheckLength("The app version", document.AppVersion, MaxNameLength);
+
+            if (CurrencyProcessor.ToLabel(document.Datasettings?.CurrencyLabel) is { } currencyLabel)
+            {
+                CheckLength("The currency label", currencyLabel, CurrencyProcessor.MaxLabelLength);
+            }
 
             HashSet<int> categories = CheckRefs(Category, "categories", document.Categories, category => category.Ref, category => category.Name);
             HashSet<int> components = CheckRefs(Component, "components", document.Components, component => component.Ref, component => component.Name);

@@ -1,5 +1,5 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
-using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
@@ -22,7 +22,7 @@ public partial class SurplusList : ComponentBase, IDisposable
 
         if (SelectedDataset.Settings.UseValues)
         {
-            details.Add($"Value: {string.Format(FormatConstants.CurrencyFormat, blueprintQuantity.TotalValue)}");
+            details.Add($"Value: {CurrencyProcessor.Format(blueprintQuantity.TotalValue, SelectedDataset.Settings)}");
         }
 
         return details;

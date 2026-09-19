@@ -49,8 +49,8 @@ Dependency direction: **Domain ← Application ← Infrastructure ← UI**. Each
   `await using var context = await contextFactory.CreateDbContextAsync();` per operation. **Never
   register the `DbContext` itself** — `BlazorWebView` holds one `IServiceScope` for the whole app
   session, so a `Scoped` `DbContext` would live for the entire session.
-- **Magic strings/enums live in `Domain/Constants` and `Domain`** (e.g. `CategoryModel.All`, the
-  currency format string). Use them instead of inline literals.
+- **Magic strings/enums live in `Domain/Constants` and `Domain`** (e.g. `CategoryModel.All`,
+  `HelpTopics`). Use them instead of inline literals.
 - **Seed data is SQL** (`Infrastructure/Data/Seed/*.sql`, embedded resources) run once by the initial
   migration to establish the **initial** data state. **Once released, the seed is final — never edit it
   or re-run it.** Any data change now ships as a **new migration** that Inserts, Updates, or Deletes

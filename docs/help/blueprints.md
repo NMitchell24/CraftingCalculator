@@ -34,7 +34,8 @@ What **one finished item** is worth if you were to sell it in the game. This fee
 lines on the Craft screen.
 
 This can be whatever makes sense for your game: Caps, Tokens, Scrap, Units, Coins, Gold, whatever your game calls 
-its currency.
+its currency. Give the app that name too, and the Craft screen says 50 Coins instead of $50.00. See
+[Currency Name](dataset.md#currency-name).
 
 Leave it at 0 if your game has no currency system or if you only care about materials. The Value and Profit lines 
 will simply read zero, and you can ignore them.

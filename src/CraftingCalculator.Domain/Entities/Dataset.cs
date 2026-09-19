@@ -21,6 +21,9 @@ public class Dataset
     /// <summary>Whether production time is shown; see <see cref="Models.Datasettings.UseCraftTime"/>.</summary>
     public bool UseCraftTime { get; set; } = true;
 
+    /// <summary>What the dataset's money is called; see <see cref="Models.Datasettings.CurrencyLabel"/>.</summary>
+    public string? CurrencyLabel { get; set; }
+
     public List<Category> Categories { get; set; } = [];
 
     public List<Component> Components { get; set; } = [];

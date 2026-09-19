@@ -30,7 +30,8 @@ public sealed record TransferDatasettings(
     bool UseYield = true,
     bool UseCosts = true,
     bool UseValues = true,
-    bool UseCraftTime = true);
+    bool UseCraftTime = true,
+    string? CurrencyLabel = null);
 
 public sealed record TransferCategory(int Ref, string Name, string Description);
 
