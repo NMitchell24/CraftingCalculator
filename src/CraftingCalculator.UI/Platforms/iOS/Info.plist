@@ -42,7 +42,7 @@
     <array>
         <dict>
             <key>UTTypeIdentifier</key>
-            <string>com.sterlingturd.craftingcalculator.ccdata</string>
+            <string>com.sterlingtp.craftingcalculator.ccdata</string>
             <key>UTTypeDescription</key>
             <string>Crafting Calculator Data</string>
             <key>UTTypeConformsTo</key>
@@ -74,7 +74,7 @@
             <string>Owner</string>
             <key>LSItemContentTypes</key>
             <array>
-                <string>com.sterlingturd.craftingcalculator.ccdata</string>
+                <string>com.sterlingtp.craftingcalculator.ccdata</string>
             </array>
         </dict>
     </array>
