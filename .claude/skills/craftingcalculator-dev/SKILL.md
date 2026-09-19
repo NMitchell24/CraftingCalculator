@@ -241,12 +241,12 @@ deployment off, or the device keeps running the old assemblies:
 
 ```
 dotnet build src/CraftingCalculator.UI/CraftingCalculator.UI.csproj -f net10.0-android -t:SignAndroidPackage -p:EmbedAssembliesIntoApk=true
-adb install -r src/CraftingCalculator.UI/bin/Debug/net10.0-android/com.sterlingturd.craftingcalculator-Signed.apk
-MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingturd.craftingcalculator rm -rf files/.__override__
+adb install -r src/CraftingCalculator.UI/bin/Debug/net10.0-android/com.sterlingtp.craftingcalculator-Signed.apk
+MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingtp.craftingcalculator rm -rf files/.__override__
 ```
 
 Debug builds expose the WebView over the Chrome DevTools Protocol (`adb forward tcp:9222
-localabstract:webview_devtools_remote_<pid>`, pid from `adb shell pidof com.sterlingturd.craftingcalculator`;
+localabstract:webview_devtools_remote_<pid>`, pid from `adb shell pidof com.sterlingtp.craftingcalculator`;
 on Windows, launch with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=<port>`), so a short
 script can evaluate JS in the page instead of guessing from screenshots: `scrollWidth > clientWidth` on an
 element with `text-overflow: ellipsis` is a cut-off, a `Range` over one word whose `getClientRects()` spans two

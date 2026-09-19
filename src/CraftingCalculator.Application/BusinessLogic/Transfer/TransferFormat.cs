@@ -23,5 +23,5 @@ public static class TransferFormat
     // Platforms/iOS/Info.plist declares the same identifier. It is derived from the app id, so a change to the app id
     // changes it in both places.
     /// <summary>The uniform type identifier iOS knows an export file by.</summary>
-    public const string UniformTypeIdentifier = "com.sterlingturd.craftingcalculator.ccdata";
+    public const string UniformTypeIdentifier = "com.sterlingtp.craftingcalculator.ccdata";
 }

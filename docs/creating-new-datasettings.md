@@ -215,8 +215,8 @@ The diff should be the new member in the `datasettings` block and nothing else.
 3. Pull the newest file out of the app's export folder:
 
    ```bash
-   MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingturd.craftingcalculator ls files/Exports
-   MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingturd.craftingcalculator cat files/Exports/Valheim-<stamp>.ccdata > valheim.ccdata
+   MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingtp.craftingcalculator ls files/Exports
+   MSYS_NO_PATHCONV=1 adb exec-out run-as com.sterlingtp.craftingcalculator cat files/Exports/Valheim-<stamp>.ccdata > valheim.ccdata
    ```
 
 4. Before replacing the fixture, compare the two. Apart from `exportedAt` and the `datasettings` block, the records
