@@ -46,10 +46,7 @@ public partial class RecordPickerDialog : ComponentBase
         "That resource doesn't spawn here."
     ];
 
-    private string GetNoMatchPhrase()
-    {
-        return _noMatchPhrases[_random.Next(_noMatchPhrases.Count)];
-    }
+    private string GetNoMatchPhrase => _noMatchPhrases[_random.Next(_noMatchPhrases.Count)];
 
     private RecordFilter _filter = RecordFilter.Empty;
 
