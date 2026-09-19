@@ -38,7 +38,7 @@ The most common cause of "these numbers are twice what they should be" is a **Yi
 games love handing you several at once.
 
 See [How the Math Works](calculations.md) for exactly what yield changes. And if the field isn't there at all,
-[Use Yield](dataset.md#use-yield) is off for this dataset.
+[Calculate Yield](dataset.md#calculate-yield) is off for this dataset.
 
 ### Use Cost as an effort score
 
@@ -77,8 +77,8 @@ Then save it as a [favorite](favorites.md) and it survives the wipe.
 
 Check **Yield per craft** on every blueprint in that branch. This is the answer nine times out of ten.
 
-Can't find that field? Then [Use Yield](dataset.md#use-yield) is off, and every recipe counts as making one per craft.
-Turn it back on.
+Can't find that field? Then [Calculate Yield](dataset.md#calculate-yield) is off, and every recipe counts as making one
+per craft. Turn it back on.
 
 ### "It wants far fewer materials than the game does"
 

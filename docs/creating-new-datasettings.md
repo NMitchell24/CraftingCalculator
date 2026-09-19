@@ -152,14 +152,17 @@ start from the settings before the first tap and undo it:
 ```razor
 <div class="datasetting-row">
     <div class="datasetting-text">
-        <MudText Typo="Typo.body1">Use Production Time</MudText>
+        <MudText Typo="Typo.body1">Calculate Production Time</MudText>
         <MudText Typo="Typo.caption" Class="datasetting-caption">One sentence on what it does.</MudText>
     </div>
     <MudSwitch T="bool" Value="SelectedDataset.Settings.UseProductionTime"
                ValueChanged="@(value => UpdateSettingsAsync(settings => settings with { UseProductionTime = value }))"
-               Color="Color.Primary" AriaLabel="Use Production Time" />
+               Color="Color.Primary" AriaLabel="Calculate Production Time" />
 </div>
 ```
+
+The label the player reads starts with **Calculate**, not **Use**: `UseYield` is labeled Calculate Yield. The property
+keeps the shorter name; only the `MudText` and the `AriaLabel` say Calculate.
 
 A setting that isn't a bool takes whichever control fits (a `MudSelect` for an enum, a `MudNumericField` for a
 number) in the same row, bound the same way.
@@ -236,8 +239,9 @@ that overlap, so a new setting doesn't need its own tests there.
 
 User-facing changes update `docs/help/` in the same commit (see CLAUDE.md, "Help content is part of the feature"):
 
-- a `### <Setting name>` section under `## Datasettings` in `docs/help/dataset.md`: what it does, what it hides, what
-  it changes in the math, and a worked example with real numbers
+- a `### <Calculate label>` section under `## Datasettings` in `docs/help/dataset.md`, named as the switch is
+  (Calculate Yield, not Use Yield): what it does, what it hides, what it changes in the math, and a worked example
+  with real numbers
 - a short note, linked to that section, on every page that describes something the setting hides or changes
 
 `HelpServiceTests` checks that every cross-page link and anchor resolves.

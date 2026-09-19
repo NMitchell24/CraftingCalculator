@@ -81,39 +81,42 @@
         {
             <div class="datasetting-row">
                 <div class="datasetting-text">
-                    <MudText Typo="Typo.body1">Use Yield</MudText>
+                    <MudText Typo="Typo.body1">Calculate Yield</MudText>
                     <MudText Typo="Typo.caption" Class="datasetting-caption">
                         Blueprints can make more than one item per craft, and the extra shows up as surplus.
                     </MudText>
                 </div>
                 <MudSwitch T="bool" Value="SelectedDataset.Settings.UseYield"
-                           ValueChanged="@(useYield => UpdateSettingsAsync(settings => settings with { UseYield = useYield }))"
-                           Color="Color.Primary" AriaLabel="Use Yield" />
+                           ValueChanged="@(useYield => UpdateSettingsAsync(settings =>
+                                                            settings with { UseYield = useYield }))"
+                           Color="Color.Primary" AriaLabel="Calculate Yield" />
             </div>
         }
         else
         {
             <div class="datasetting-row">
                 <div class="datasetting-text">
-                    <MudText Typo="Typo.body1">Use Costs</MudText>
+                    <MudText Typo="Typo.body1">Calculate Costs</MudText>
                     <MudText Typo="Typo.caption" Class="datasetting-caption">
                         Components have a cost, and the Craft screen adds it up.
                     </MudText>
                 </div>
                 <MudSwitch T="bool" Value="SelectedDataset.Settings.UseCosts"
-                           ValueChanged="@(useCosts => UpdateSettingsAsync(settings => settings with { UseCosts = useCosts }))"
-                           Color="Color.Primary" AriaLabel="Use Costs" />
+                           ValueChanged="@(useCosts => UpdateSettingsAsync(settings =>
+                                                            settings with { UseCosts = useCosts }))"
+                           Color="Color.Primary" AriaLabel="Calculate Costs" />
             </div>
             <div class="datasetting-row">
                 <div class="datasetting-text">
-                    <MudText Typo="Typo.body1">Use Values</MudText>
+                    <MudText Typo="Typo.body1">Calculate Values</MudText>
                     <MudText Typo="Typo.caption" Class="datasetting-caption">
                         Blueprints have a value, and the Craft screen adds it up.
                     </MudText>
                 </div>
                 <MudSwitch T="bool" Value="SelectedDataset.Settings.UseValues"
-                           ValueChanged="@(useValues => UpdateSettingsAsync(settings => settings with { UseValues = useValues }))"
-                           Color="Color.Primary" AriaLabel="Use Values" />
+                           ValueChanged="@(useValues => UpdateSettingsAsync(settings =>
+                                                            settings with { UseValues = useValues }))"
+                           Color="Color.Primary" AriaLabel="Calculate Values" />
             </div>
         }
     </MudPaper>

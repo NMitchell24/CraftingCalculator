@@ -68,11 +68,11 @@ You can still tap the number and type a quantity straight in.
 Up to eight numbers, all of them linked directly to your selected blueprint(s). They update the instant you change a 
 blueprint quantity. Some of them go away when a [Datasetting](dataset.md#datasettings) is off:
 
-- **[Use Yield](dataset.md#use-yield) off:** no Surplus Stock or Surplus Value.
-- **[Use Costs](dataset.md#use-costs) off:** no Cost.
-- **[Use Values](dataset.md#use-values) off:** no Value or Surplus Value. If Use Costs is still on, Profit is renamed
-  **Cost** and shows what the batch costs as a negative number, in place of the usual Cost line.
-- **Use Costs and Use Values both off:** no Profit either.
+- **[Calculate Yield](dataset.md#calculate-yield) off:** no Surplus Stock or Surplus Value.
+- **[Calculate Costs](dataset.md#calculate-costs) off:** no Cost.
+- **[Calculate Values](dataset.md#calculate-values) off:** no Value or Surplus Value. If Calculate Costs is still on,
+  Profit is renamed **Cost** and shows what the batch costs as a negative number, in place of the usual Cost line.
+- **Calculate Costs and Calculate Values both off:** no Profit either.
 
 | Line                  | What it means                                                                         |
 |-----------------------|---------------------------------------------------------------------------------------|
@@ -103,7 +103,7 @@ you get **one** Iron line with the combined number. This is exactly what you wan
 standing in a mine or purchasing ore from a trader.
 
 Each card shows the component's name and two lines of figures: **Quantity** (`Quantity: x48`) and the
-**Cost** of that many. With [Use Costs](dataset.md#use-costs) off, it's just the quantity.
+**Cost** of that many. With [Calculate Costs](dataset.md#calculate-costs) off, it's just the quantity.
 
 > **Tip:** Tap ![Info](assets/info.svg) on a card to show a detailed breakdown of that component with its Name,
 > Description, Category and cost. 
@@ -131,15 +131,15 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
 
 ### Surplus
 
-> **Note:** This tab only shows up when [Use Yield](dataset.md#use-yield) is on. With it off, nothing is ever
-> overproduced, so there'd be nothing to list.
+> **Note:** This tab only shows up when [Calculate Yield](dataset.md#calculate-yield) is on. With it off, nothing is
+> ever overproduced, so there'd be nothing to list.
 
 The leftovers. The extra crap you can save for later. When a recipe yields 4 and you need 6, you have to run it 
 twice. When you do, you end up with 2 more than you needed. This tab lists every one of those spares across the 
 whole batch along with what they are worth.
 
 Each card works like the Components tab's: the blueprint's name, **Quantity** (`Quantity: x2`), and the
-**Value** of those spares. With [Use Values](dataset.md#use-values) off, it's just the quantity.
+**Value** of those spares. With [Calculate Values](dataset.md#calculate-values) off, it's just the quantity.
 ![Info](assets/info.svg) opens the blueprint's detail card.
 
 This isn't an error. It's just a side effect of a Blueprint that produces more than what you need. It's the app 
