@@ -9,7 +9,11 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 /// </summary>
 public static class BatchProcessor
 {
-    /// <summary>The totals for <paramref name="batch"/>, worked out under <paramref name="settings"/>.</summary>
+    /// <summary>
+    /// The totals for <paramref name="batch"/>, worked out under <paramref name="settings"/>. Without
+    /// <see cref="Datasettings.UseCosts"/> the total cost is 0; without <see cref="Datasettings.UseValues"/> the
+    /// total value and the surplus value are 0.
+    /// </summary>
     public static BatchTotals CalculateTotals(IReadOnlyCollection<BlueprintQuantity> batch, Datasettings settings)
     {
         ComponentMap materials = new();
@@ -33,16 +37,26 @@ public static class BatchProcessor
 
             //Value follows the quantity the batch asked for; what the rounding up overproduces is
             //reported through Surplus instead.
-            totalValue += blueprintQuantity.TotalValue;
+            if (settings.UseValues)
+            {
+                totalValue += blueprintQuantity.TotalValue;
+            }
         }
 
-        double totalCost = materials.ComponentList.Sum(componentQuantity => componentQuantity.TotalCost);
+        double totalCost = settings.UseCosts
+            ? materials.ComponentList.Sum(componentQuantity => componentQuantity.TotalCost)
+            : 0;
         //Component time is read off the merged materials instead of being accumulated during the walk:
         //it follows how many of each component the batch ends up needing, which is what that map already
         //holds. Components have no yield, so the multiplier is quantity rather than a craft count.
         TimeSpan componentTime = materials.ComponentList.Aggregate(
             TimeSpan.Zero, (total, componentQuantity) => DurationMath.Add(total, componentQuantity.TotalProductionTime));
 
-        return new BatchTotals(totalCost, totalValue, materials, surplus, DurationMath.Add(blueprintTime, componentTime));
+        double surplusValue = settings.UseValues
+            ? surplus.BlueprintList.Sum(blueprintQuantity => blueprintQuantity.TotalValue)
+            : 0;
+
+        return new BatchTotals(
+            totalCost, totalValue, materials, surplus, surplusValue, DurationMath.Add(blueprintTime, componentTime));
     }
 }

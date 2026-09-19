@@ -17,6 +17,13 @@ public partial class Dataset : ComponentBase, IDisposable
     /// <summary>One row of the landing page - a record type, its heading, icon, and current count.</summary>
     private sealed record DatasetSection(DataType Type, string Title, string Icon, string Caption);
 
+    /// <summary>The tabs of the Datasettings card, one per group of settings.</summary>
+    private enum DatasettingsView
+    {
+        General,
+        Economy
+    }
+
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
@@ -30,6 +37,7 @@ public partial class Dataset : ComponentBase, IDisposable
     private List<DatasetSection> Sections { get; set; } = [];
     private List<DatasetModel> _datasets = [];
     private bool _busy;
+    private DatasettingsView _datasettingsView = DatasettingsView.General;
 
     private int SelectedDatasetId => SelectedDataset.Id;
 

@@ -5,7 +5,8 @@ copy, the app follows the selected dataset's copy, and the settings travel with 
 and an export and import. The name is a pun on "dataset settings". It's on purpose, so keep it.
 
 Use Yield was the first one (branch `Datasettings-Use-Yield`). That branch laid all the groundwork, so adding another
-setting is a checklist of small edits, plus the code that actually uses the setting. This page is that checklist.
+setting is a checklist of small edits, plus the code that actually uses the setting. This page is that checklist. Use
+Costs and Use Values (branch `Economy-Datasettings`) followed it, and added two settings in one pass.
 
 App-wide preferences (theme, export history size) are **not** datasettings. They live in `IPreferenceStore` and on
 the Settings screen. If a setting should stay the same when the user switches games, it doesn't belong here.
@@ -136,9 +137,14 @@ Add the column to the `Dataset` entry in
 
 ### 6. The control on the Dataset screen
 
-One more `.datasetting-row` in the Datasettings card, under the last one. The CSS already draws the hairline between
-rows. The control saves through the page's one `SaveSettingsAsync`, which also recalculates the Craft screen's batch,
-so a row needs no handler of its own:
+One more `.datasetting-row` in the Datasettings card, under the last one of its tab. The card groups the settings into
+tabs (`DatasettingsView` in `Dataset.razor.cs`): **General** holds Use Yield, **Economy** holds Use Costs and Use
+Values. Put the row in the tab it belongs to. A setting that fits neither gets a new `DatasettingsView` member, a
+`MudToggleItem` and its own branch in the markup; with more than three tabs, recheck the `.pane-tabs` container query in
+`app.css`, which is calibrated for three labels.
+
+The CSS already draws the hairline between rows. The control saves through the page's one `SaveSettingsAsync`, which
+also recalculates the Craft screen's batch, so a row needs no handler of its own:
 
 ```razor
 <div class="datasetting-row">
@@ -167,7 +173,8 @@ This part depends on the setting. The patterns Use Yield set:
   can stay selected.
 
 Search the whole UI for every place the feature shows up. Use Yield touched the blueprint editor, the Craft screen's
-tabs, the Crafting Summary and `InfoDialog`, and it's easy to miss one.
+tabs, the Crafting Summary and `InfoDialog`; Use Costs and Use Values touched the editors, the Crafting Summary,
+`InfoDialog` and the `DetailsFor` lines of `MaterialsList` and `SurplusList`. It's easy to miss one.
 
 ### 8. Regenerate both v1 fixtures
 

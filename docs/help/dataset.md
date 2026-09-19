@@ -57,6 +57,9 @@ Valheim dataset doesn't budge. Switch datasets and the whole app follows whateve
 They also travel with the dataset. [Copying a dataset](managing-datasets.md#copying-one) copies them, and an
 [export](import-export.md) carries them along with your records.
 
+The card has two tabs. **General** holds [Use Yield](dataset.md#use-yield). **Economy** holds the money stuff:
+[Use Costs](dataset.md#use-costs) and [Use Values](dataset.md#use-values).
+
 ### Use Yield
 
 On by default. This is the switch for everything about recipes that hand you more than one item per craft.
@@ -83,6 +86,57 @@ Turning it off doesn't erase anything. Every blueprint keeps the yield you gave 
 your planks go right back to 4 per log.
 
 More detail: [How the Math Works](calculations.md).
+
+### Use Costs
+
+On the **Economy** tab, and on by default. This is the switch for what your components cost.
+
+Maybe your game has no shop, or you just don't want to price out every rock and stick. Turn **Use Costs** off and
+all of it disappears for this dataset:
+
+- the **Cost per item** field in the [component editor](components.md#cost-per-item)
+- the **Cost** line in the Crafting Summary
+- the cost on each row of the **Components** tab on the [Craft screen](craft-screen.md)
+- the **Cost per Item** row on a component's detail card
+
+The math changes too. Every component counts as costing 0, whatever you typed in. So a batch costs nothing, and your
+Profit is just its Value.
+
+### Use Values
+
+Also on the **Economy** tab, and also on by default. It's the mirror image of Use Costs: the switch for what your
+blueprints are worth.
+
+Turn **Use Values** off and this disappears for this dataset:
+
+- the **Value per item** field in the [blueprint editor](blueprints.md#value-per-item)
+- the **Value** and **Surplus Value** lines in the Crafting Summary
+- the value on each row of the **Surplus** tab on the [Craft screen](craft-screen.md)
+- the **Value per Item** row on a blueprint's detail card
+
+Every blueprint counts as worth 0. A batch is worth nothing, so your Profit is whatever it costs, as a negative number.
+Calling that "Profit" would be a stretch, so the bottom line of the Crafting Summary is renamed **Cost** instead. It
+keeps the minus sign and the red, and it takes the place of the usual Cost line, so you don't see the same number
+twice. That's handy if you use cost as an effort score and just want to see how deep in the hole a project puts you.
+
+**Example:** 5 Valheim Bronze, at 2 Copper and 1 Tin each. Copper costs 2, Tin costs 3, and a Bronze is worth 10.
+
+| Use Costs | Use Values | Cost | Value | Profit                  |
+|-----------|------------|------|-------|-------------------------|
+| On        | On         | 35   | 50    | 15                      |
+| Off       | On         | 0    | 50    | 50                      |
+| On        | Off        | 35   | 0     | −35 (shown as **Cost**) |
+| Off       | Off        | 0    | 0     | 0 (hidden)              |
+
+That's 10 Copper at 2 and 5 Tin at 3 for the cost, and 5 Bronze at 10 for the value.
+
+Turn **both** off and the app stops caring about money at all. The **Profit** line goes too, since it would only ever
+say 0, and you're left with a purely component-based calculator: what to gather, how many crafts, and how long it takes.
+
+Like Use Yield, neither switch erases anything. Every component keeps its cost and every blueprint keeps its value, just
+hidden. Turn them back on and your numbers are right where you left them.
+
+More detail: [How the Math Works](calculations.md#cost-value-and-profit).
 
 ## Inside a list
 

@@ -17,15 +17,22 @@
             <dd>@DurationProcessor.Format(State.TotalProductionTime)</dd>
         </div>
 
-        <div class="summary-row">
-            <dt>Cost</dt>
-            <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
-        </div>
+        @* Without values the bottom line is the cost already, so this row would repeat it. *@
+        @if (UseCosts && UseValues)
+        {
+            <div class="summary-row">
+                <dt>Cost</dt>
+                <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
+            </div>
+        }
 
-        <div class="summary-row">
-            <dt>Value</dt>
-            <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
-        </div>
+        @if (UseValues)
+        {
+            <div class="summary-row">
+                <dt>Value</dt>
+                <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
+            </div>
+        }
 
         @* Listed rather than folded into Profit: surplus is stock on hand, not a sale. Without yield nothing is
            ever overproduced, so the rows would only ever say zero. *@
@@ -36,16 +43,24 @@
                 <dd>@State.SurplusCount total</dd>
             </div>
 
-            <div class="summary-row">
-                <dt>Surplus Value</dt>
-                <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
-            </div>
+            @if (UseValues)
+            {
+                <div class="summary-row">
+                    <dt>Surplus Value</dt>
+                    <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
+                </div>
+            }
         }
 
-        @* The one line a user is actually here for, so it is the only one that carries emphasis. *@
-        <div class="summary-row">
-            <dt class="summary-profit">Profit</dt>
-            <dd class="@ProfitClass">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>
-        </div>
+        @* The one line a user is actually here for, so it is the only one that carries emphasis. With neither
+           costs nor values it would only ever say zero. Without values it is minus the cost, so it is labeled Cost
+           and keeps the negative figure and its color. *@
+        @if (UseCosts || UseValues)
+        {
+            <div class="summary-row">
+                <dt class="summary-profit">@(UseValues ? "Profit" : "Cost")</dt>
+                <dd class="@ProfitClass">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>
+            </div>
+        }
     </dl>
 </MudPaper>

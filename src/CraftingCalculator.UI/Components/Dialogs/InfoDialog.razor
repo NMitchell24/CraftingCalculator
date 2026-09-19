@@ -27,10 +27,13 @@
             <dl class="summary-list">
                 @if (Blueprint is { } blueprint)
                 {
-                    <div class="summary-row">
-                        <dt>Value per Item</dt>
-                        <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
-                    </div>
+                    @if (SelectedDataset.Settings.UseValues)
+                    {
+                        <div class="summary-row">
+                            <dt>Value per Item</dt>
+                            <dd>@string.Format(FormatConstants.CurrencyFormat, blueprint.Value)</dd>
+                        </div>
+                    }
 
                     @if (SelectedDataset.Settings.UseYield)
                     {
@@ -47,10 +50,13 @@
                 }
                 else if (Component is { } component)
                 {
-                    <div class="summary-row">
-                        <dt>Cost per Item</dt>
-                        <dd>@string.Format(FormatConstants.CurrencyFormat, component.Cost)</dd>
-                    </div>
+                    @if (SelectedDataset.Settings.UseCosts)
+                    {
+                        <div class="summary-row">
+                            <dt>Cost per Item</dt>
+                            <dd>@string.Format(FormatConstants.CurrencyFormat, component.Cost)</dd>
+                        </div>
+                    }
 
                     <div class="summary-row">
                         <dt>Production Time per Item</dt>

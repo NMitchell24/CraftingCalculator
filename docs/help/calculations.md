@@ -128,6 +128,11 @@ Three things to note:
 If you left every cost and value at zero, all three lines read zero. That's a perfectly reasonable way
 to use the app.
 
+> **Note:** With [Use Costs](dataset.md#use-costs) off, every component counts as costing 0, so Profit is just the
+> Value. With [Use Values](dataset.md#use-values) off, every blueprint counts as worth 0, so Profit is minus the Cost,
+> and the Crafting Summary calls that line **Cost**.
+> With both off, there's no money math at all and the lines are hidden.
+
 ## Crafting Time
 
 ```

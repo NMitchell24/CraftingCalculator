@@ -318,6 +318,7 @@ public sealed class CraftState(
 
         TotalCost = totals.TotalCost;
         TotalValue = totals.TotalValue;
+        SurplusValue = totals.SurplusValue;
         TotalProductionTime = totals.TotalProductionTime;
         TotalComponents = [.. totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
         SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
@@ -328,7 +329,6 @@ public sealed class CraftState(
         TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
         CraftingStepCount = CountCrafts(TreeRoots);
         SurplusCount = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.Quantity);
-        SurplusValue = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.TotalValue);
 
         Changed?.Invoke();
     }

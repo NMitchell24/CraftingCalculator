@@ -84,12 +84,16 @@ public class TransferDocumentReaderTests
         result.File.AppVersion.Should().Be("1.0");
     }
 
-    [Test]
-    public void Read_AnExportWithUseYieldOff_ReturnsIt()
+    [TestCase(false, false, true)]
+    [TestCase(true, false, false)]
+    public void Read_AnExportWithSettingsOff_ReturnsThem(bool useYield, bool useCosts, bool useValues)
     {
-        ImportValidationResult result = Read(BronzeChainDocument() with { Datasettings = new TransferDatasettings(UseYield: false) });
+        ImportValidationResult result = Read(BronzeChainDocument() with
+        {
+            Datasettings = new TransferDatasettings(UseYield: useYield, UseCosts: useCosts, UseValues: useValues)
+        });
 
-        result.File!.Snapshot.Settings.Should().Be(new Datasettings(UseYield: false));
+        result.File!.Snapshot.Settings.Should().Be(new Datasettings(UseYield: useYield, UseCosts: useCosts, UseValues: useValues));
     }
 
     [Test]

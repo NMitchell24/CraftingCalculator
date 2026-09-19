@@ -26,7 +26,7 @@ public sealed record TransferDocument(
     TransferDatasettings? Datasettings = null);
 
 /// <summary>The dataset's own settings. Each member's default is the setting's default.</summary>
-public sealed record TransferDatasettings(bool UseYield = true);
+public sealed record TransferDatasettings(bool UseYield = true, bool UseCosts = true, bool UseValues = true);
 
 public sealed record TransferCategory(int Ref, string Name, string Description);
 

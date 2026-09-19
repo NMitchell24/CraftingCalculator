@@ -920,6 +920,12 @@ html.keyboard-open .page-content-with-bottom-nav {
 /* The Datasettings card on the Dataset screen: one row per setting, the text taking the slack so the control
    stays at the trailing edge, and a hairline between rows so each setting reads as its own. At large text sizes
    the text wraps between words rather than pushing the switch off the row. */
+/* The Craft screen's tabs sit above a row of actions that spaces them from the pane; these sit straight on
+   the first setting, so they carry the gap themselves. */
+.datasettings-tabs {
+    margin-bottom: 8px;
+}
+
 .datasetting-row {
     display: flex;
     align-items: center;

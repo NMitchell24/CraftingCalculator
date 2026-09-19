@@ -42,6 +42,8 @@ You have options here, and none of them are wrong:
   of a slog is this project", and Profit tells you whether the payoff is worth the grind.
 - **Zero.** If you only want the raw materials, leave every cost at 0 and simply ignore the money lines.
 
+> **Note:** Don't see this field? **Use Costs** is off for this dataset. See [Use Costs](dataset.md#use-costs).
+
 ### Production time per item
 
 How long **one** takes to gather or produce, in hours, minutes and seconds.

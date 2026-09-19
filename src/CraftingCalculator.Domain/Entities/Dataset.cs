@@ -12,6 +12,12 @@ public class Dataset
     /// <summary>Whether a blueprint's yield per craft counts; see <see cref="Models.Datasettings.UseYield"/>.</summary>
     public bool UseYield { get; set; } = true;
 
+    /// <summary>Whether a component's cost counts; see <see cref="Models.Datasettings.UseCosts"/>.</summary>
+    public bool UseCosts { get; set; } = true;
+
+    /// <summary>Whether a blueprint's value counts; see <see cref="Models.Datasettings.UseValues"/>.</summary>
+    public bool UseValues { get; set; } = true;
+
     public List<Category> Categories { get; set; } = [];
 
     public List<Component> Components { get; set; } = [];

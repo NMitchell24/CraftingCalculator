@@ -133,6 +133,8 @@
     }
   ],
   "datasettings": {
-    "useYield": true
+    "useYield": true,
+    "useCosts": true,
+    "useValues": true
   }
 }

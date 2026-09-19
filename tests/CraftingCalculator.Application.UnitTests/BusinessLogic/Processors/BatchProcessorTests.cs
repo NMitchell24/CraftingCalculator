@@ -144,6 +144,47 @@ public class BatchProcessorTests
     }
 
     [Test]
+    public void CalculateTotals_CostsNotUsed_CostsNothingAndKeepsTheValue()
+    {
+        BlueprintModel blueprint = NewBlueprint("Bronze", 10);
+        blueprint.Components.Add(NewComponent("Copper", 2), 2);
+        blueprint.Components.Add(NewComponent("Tin", 3), 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 5)], new Datasettings(UseCosts: false));
+
+        totals.TotalCost.Should().Be(0);
+        totals.TotalValue.Should().Be(50);
+        totals.Materials.ComponentList.Select(componentQuantity => componentQuantity.Quantity).Should().BeEquivalentTo([10L, 5L]);
+    }
+
+    [Test]
+    public void CalculateTotals_ValuesNotUsed_IsWorthNothingAndKeepsTheCost()
+    {
+        BlueprintModel blueprint = NewBlueprint("Bronze", 10);
+        blueprint.Components.Add(NewComponent("Copper", 2), 2);
+        blueprint.Components.Add(NewComponent("Tin", 3), 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 5)], new Datasettings(UseValues: false));
+
+        totals.TotalCost.Should().Be(35); // 10 Copper x2 + 5 Tin x3
+        totals.TotalValue.Should().Be(0);
+    }
+
+    [Test]
+    public void CalculateTotals_NeitherCostsNorValuesUsed_StillCountsTheMaterials()
+    {
+        BlueprintModel blueprint = NewBlueprint("Bronze", 10);
+        blueprint.Components.Add(NewComponent("Copper", 2), 2);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            [new BlueprintQuantity(blueprint, 5)], new Datasettings(UseCosts: false, UseValues: false));
+
+        totals.TotalCost.Should().Be(0);
+        totals.TotalValue.Should().Be(0);
+        totals.Materials.ComponentList.Should().ContainSingle().Which.Quantity.Should().Be(10);
+    }
+
+    [Test]
     public void CalculateTotals_TwoBlueprintsNestingTheSameYieldingChild_RoundEachPositionIndependently()
     {
         // Each parent needs one Bracket, so each runs its own Bracket craft rather than sharing one
@@ -178,6 +219,19 @@ public class BatchProcessorTests
         BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry], Datasettings.Default);
 
         totals.TotalValue.Should().Be(30); // the 3 asked for, not the 4 produced
+        totals.Surplus.BlueprintList.Should().ContainSingle().Subject.Quantity.Should().Be(1);
+        totals.SurplusValue.Should().Be(10);
+    }
+
+    [Test]
+    public void CalculateTotals_ValuesNotUsed_SurplusIsWorthNothingButStillCounted()
+    {
+        BlueprintModel blueprint = NewBlueprint("Frame", 10, yield: 2);
+        blueprint.Components.Add(NewComponent("Screw", 1), 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 3)], new Datasettings(UseValues: false));
+
+        totals.SurplusValue.Should().Be(0);
         totals.Surplus.BlueprintList.Should().ContainSingle().Subject.Quantity.Should().Be(1);
     }
 

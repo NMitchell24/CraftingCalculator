@@ -39,6 +39,8 @@ its currency.
 Leave it at 0 if your game has no currency system or if you only care about materials. The Value and Profit lines 
 will simply read zero, and you can ignore them.
 
+> **Note:** Don't see this field? **Use Values** is off for this dataset. See [Use Values](dataset.md#use-values).
+
 ### Yield per craft
 
 **How many items one craft produces.** The minimum is 1, and it's 1 by default. In most cases, you can leave this at 
