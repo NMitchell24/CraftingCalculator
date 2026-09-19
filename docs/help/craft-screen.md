@@ -69,6 +69,7 @@ Up to eight numbers, all of them linked directly to your selected blueprint(s). 
 blueprint quantity. Some of them go away when a [Datasetting](dataset.md#datasettings) is off:
 
 - **[Calculate Yield](dataset.md#calculate-yield) off:** no Surplus Stock or Surplus Value.
+- **[Calculate Craft Time](dataset.md#calculate-craft-time) off:** no Crafting Time.
 - **[Calculate Costs](dataset.md#calculate-costs) off:** no Cost.
 - **[Calculate Values](dataset.md#calculate-values) off:** no Value or Surplus Value. If Calculate Costs is still on,
   Profit is renamed **Cost** and shows what the batch costs as a negative number, in place of the usual Cost line.
@@ -120,6 +121,8 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
 - The **arrow** on the left expands and collapses a branch.
 - **Tapping the row itself** opens its detail card. This shows a breakdown of the quantity, crafts, yield, surplus 
   and time for that exact position in the tree.
+- A row that takes time shows it at the right end, like `1:20`. Instant rows leave it off. With
+  [Calculate Craft Time](dataset.md#calculate-craft-time) off, no row shows a time.
 - ![Expand all](assets/unfold-more.svg) **Expand all** and ![Collapse all](assets/unfold-less.svg)
   **Collapse all** do what they say.
 - ![Blueprint](assets/handyman.svg) is a blueprint, something you craft.

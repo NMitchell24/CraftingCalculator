@@ -6,7 +6,8 @@ and an export and import. The name is a pun on "dataset settings". It's on purpo
 
 Use Yield was the first one (branch `Datasettings-Use-Yield`). That branch laid all the groundwork, so adding another
 setting is a checklist of small edits, plus the code that actually uses the setting. This page is that checklist. Use
-Costs and Use Values (branch `Economy-Datasettings`) followed it, and added two settings in one pass.
+Costs and Use Values (branch `Economy-Datasettings`) followed it, and added two settings in one pass. Use Craft Time
+(branch `Calculate-Craft-Time`) is the first that only hides UI and leaves the math alone.
 
 App-wide preferences (theme, export history size) are **not** datasettings. They live in `IPreferenceStore` and on
 the Settings screen. If a setting should stay the same when the user switches games, it doesn't belong here.
@@ -138,10 +139,10 @@ Add the column to the `Dataset` entry in
 ### 6. The control on the Dataset screen
 
 One more `.datasetting-row` in the Datasettings card, under the last one of its tab. The card groups the settings into
-tabs (`DatasettingsView` in `Dataset.razor.cs`): **General** holds Use Yield, **Economy** holds Use Costs and Use
-Values. Put the row in the tab it belongs to. A setting that fits neither gets a new `DatasettingsView` member, a
-`MudToggleItem` and its own branch in the markup; with more than three tabs, recheck the `.pane-tabs` container query in
-`app.css`, which is calibrated for three labels.
+tabs (`DatasettingsView` in `Dataset.razor.cs`): **General** holds Use Yield and Use Craft Time, **Economy** holds
+Use Costs and Use Values. Put the row in the tab it belongs to. A setting that fits neither gets a new
+`DatasettingsView` member, a `MudToggleItem` and its own branch in the markup; with more than three tabs, recheck the
+`.pane-tabs` container query in `app.css`, which is calibrated for three labels.
 
 The CSS already draws the hairline between rows. The control saves through the page's one `UpdateSettingsAsync`, which
 also recalculates the Craft screen's batch, so a row needs no handler of its own. Pass it the **change**, not a finished

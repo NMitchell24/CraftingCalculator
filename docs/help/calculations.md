@@ -143,6 +143,9 @@ Crafting Time  =  for every blueprint in the tree:  time per craft × its crafts
 In other words: how long the whole project takes if you did every single step yourself, one after
 another. It doesn't account for parallel smelters, and it doesn't factor in your friend helping.
 
+> **Note:** With [Calculate Craft Time](dataset.md#calculate-craft-time) off, none of this is shown. The times you
+> entered are kept, and nothing else on the Craft screen depends on them.
+
 Note the asymmetry, which isn't an oversight:
 
 - **Blueprint time is per craft**, so it scales with **crafts**. A recipe that yields 4 in ten seconds

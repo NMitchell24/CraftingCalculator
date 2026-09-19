@@ -91,6 +91,18 @@
                                                             settings with { UseYield = useYield }))"
                            Color="Color.Primary" AriaLabel="Calculate Yield" />
             </div>
+            <div class="datasetting-row">
+                <div class="datasetting-text">
+                    <MudText Typo="Typo.body1">Calculate Craft Time</MudText>
+                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                        Components and blueprints take time to make, and the Craft screen adds it up.
+                    </MudText>
+                </div>
+                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseCraftTime"
+                           ValueChanged="@(useCraftTime => UpdateSettingsAsync(settings =>
+                                                                settings with { UseCraftTime = useCraftTime }))"
+                           Color="Color.Primary" AriaLabel="Calculate Craft Time" />
+            </div>
         }
         else
         {

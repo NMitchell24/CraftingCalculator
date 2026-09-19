@@ -16,8 +16,12 @@
                      Variant="Variant.Outlined" FullWidth="true" Min="1" Class="mb-4" />
 }
 
-<ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
-                     Label="Production time per craft" />
+@* Hidden rather than cleared when the dataset does not use craft time: the stored value is kept for when it does. *@
+@if (SelectedDataset.Settings.UseCraftTime)
+{
+    <ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
+                         Label="Production time per craft" />
+}
 
 <CategorySelect Model="Model" OnChanged="NotifyChangedAsync" />
 

@@ -16,9 +16,13 @@ namespace CraftingCalculator.Domain.Models;
 /// Whether a blueprint's value counts. When false every blueprint is worth 0, whatever its stored value, so a
 /// batch is worth nothing and its profit is the negative of its cost.
 /// </param>
+/// <param name="UseCraftTime">
+/// Whether production time is shown. When false no production time is shown anywhere, whatever the stored times.
+/// </param>
 public sealed record Datasettings(bool UseYield = true,
     bool UseCosts = true,
-    bool UseValues = true)
+    bool UseValues = true,
+    bool UseCraftTime = true)
 {
     /// <summary>The settings a new dataset starts with, and that a record written before a setting existed implies.</summary>
     public static Datasettings Default { get; } = new();

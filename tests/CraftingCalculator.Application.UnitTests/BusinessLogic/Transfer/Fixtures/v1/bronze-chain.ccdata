@@ -135,6 +135,7 @@
   "datasettings": {
     "useYield": true,
     "useCosts": true,
-    "useValues": true
+    "useValues": true,
+    "useCraftTime": true
   }
 }
