@@ -100,7 +100,7 @@ for this dataset:
 - the **Production time per item** field in the [component editor](components.md#production-time-per-item)
 - the **Crafting Time** line in the Crafting Summary
 - the time at the end of each row on the **Steps** tab of the [Craft screen](craft-screen.md#steps)
-- the **Production Time** rows on a detail card, including **Total Production Time** on a step's
+- the **Production Time** rows on a detail card, including **Total Production Time** on individual steps
 
 Nothing else in the math changes. Time never feeds into crafts, materials, cost or value, so the rest of the Craft
 screen reads exactly the same either way.
