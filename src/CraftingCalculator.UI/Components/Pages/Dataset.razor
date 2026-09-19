@@ -87,7 +87,7 @@
                     </MudText>
                 </div>
                 <MudSwitch T="bool" Value="SelectedDataset.Settings.UseYield"
-                           ValueChanged="@(useYield => SaveSettingsAsync(SelectedDataset.Settings with { UseYield = useYield }))"
+                           ValueChanged="@(useYield => UpdateSettingsAsync(settings => settings with { UseYield = useYield }))"
                            Color="Color.Primary" AriaLabel="Use Yield" />
             </div>
         }
@@ -101,7 +101,7 @@
                     </MudText>
                 </div>
                 <MudSwitch T="bool" Value="SelectedDataset.Settings.UseCosts"
-                           ValueChanged="@(useCosts => SaveSettingsAsync(SelectedDataset.Settings with { UseCosts = useCosts }))"
+                           ValueChanged="@(useCosts => UpdateSettingsAsync(settings => settings with { UseCosts = useCosts }))"
                            Color="Color.Primary" AriaLabel="Use Costs" />
             </div>
             <div class="datasetting-row">
@@ -112,7 +112,7 @@
                     </MudText>
                 </div>
                 <MudSwitch T="bool" Value="SelectedDataset.Settings.UseValues"
-                           ValueChanged="@(useValues => SaveSettingsAsync(SelectedDataset.Settings with { UseValues = useValues }))"
+                           ValueChanged="@(useValues => UpdateSettingsAsync(settings => settings with { UseValues = useValues }))"
                            Color="Color.Primary" AriaLabel="Use Values" />
             </div>
         }

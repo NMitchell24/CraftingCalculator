@@ -259,11 +259,12 @@ public partial class Dataset : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Saves <paramref name="settings"/> as the selected dataset's. Every datasetting row's control saves through here.
+    /// Applies <paramref name="change"/> to the selected dataset's settings and saves them. Every datasetting row's
+    /// control saves through here.
     /// </summary>
-    private async Task SaveSettingsAsync(Datasettings settings)
+    private async Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change)
     {
-        await Task.Run(() => DatasetService.SaveSettingsAsync(settings));
+        await Task.Run(() => DatasetService.UpdateSettingsAsync(change));
 
         // The batch was worked out under the old setting, and the Craft screen only reads what CraftState holds.
         State.OnDatasettingsChanged();

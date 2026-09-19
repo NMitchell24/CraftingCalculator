@@ -5,8 +5,10 @@ using CraftingCalculator.Domain.Models;
 
 namespace CraftingCalculator.Application.Common.Services.Impl;
 
-public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDataset) : IDatasetService
+public sealed class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDataset) : IDatasetService, IDisposable
 {
+    private readonly SemaphoreSlim _settingsGate = new(1, 1);
+
     public Task<List<DatasetModel>> GetAllAsync() => dao.GetAllAsync();
 
     public async Task InitializeAsync()
@@ -75,18 +77,41 @@ public class DatasetService(IDatasetDAO dao, ISelectedDatasetState selectedDatas
         Select(dataset);
     }
 
-    public async Task SaveSettingsAsync(Datasettings settings)
+    public async Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change)
     {
         int id = selectedDataset.Id;
-        await dao.SetSettingsAsync(id, settings);
 
-        // The toggle saves off the UI thread, so a switch can land during the write. It has already published the
-        // new dataset's own settings, and these belong to the dataset that was selected when the save started.
-        if (selectedDataset.Id == id)
+        // The toggles save off the UI thread, so a second tap can land while the first write is still running. One
+        // update at a time, each reading the row the last one wrote: two updates that both started from the settings
+        // published before either would each write back the other's setting unchanged, and the later write would undo
+        // the earlier change. Read from the row rather than from selectedDataset, which a switch may already have
+        // moved to another dataset.
+        await _settingsGate.WaitAsync();
+        try
         {
-            selectedDataset.Set(id, settings);
+            // Null when the dataset was deleted while this update waited its turn.
+            if (await dao.GetByIdAsync(id) is not { } dataset)
+            {
+                return;
+            }
+
+            Datasettings settings = change(dataset.Settings);
+            await dao.SetSettingsAsync(id, settings);
+
+            // A switch can land during the write. It has already published the new dataset's own settings, and these
+            // belong to the dataset that was selected when the update started.
+            if (selectedDataset.Id == id)
+            {
+                selectedDataset.Set(id, settings);
+            }
+        }
+        finally
+        {
+            _settingsGate.Release();
         }
     }
+
+    public void Dispose() => _settingsGate.Dispose();
 
     private void Select(DatasetModel dataset) => selectedDataset.Set(dataset.Id, dataset.Settings);
 }
