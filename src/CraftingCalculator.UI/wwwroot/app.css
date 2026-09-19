@@ -1512,8 +1512,9 @@ html.keyboard-open .mud-snackbar-location-bottom-center {
 /* RecordPickerDialog wherever it is a centered card rather than full-screen. Sized by its content, the picker
    changed height, and MudBlazor re-centered it, on every keystroke in its search field. A fixed height holds it
    still: .mud-dialog is a flex column, so the content takes what the title leaves at any text size and scrolls
-   the list, or its "Nothing matches" line, inside that. Matched through the picker's ContentClass. 720px keeps a picker from becoming a wall of rows on a desktop monitor; below
-   that it takes all the height the rule above allows, which on a landscape phone is all there is. */
+   the list, or its nothing matches line, inside that. Matched through the picker's ContentClass. 720px keeps a
+   picker from becoming a wall of rows on a desktop monitor; below that it takes all the height the rule above
+   allows, which on a landscape phone is all there is. */
 .mud-dialog:not(.mud-dialog-fullscreen):has(.picker-dialog-content) {
     height: min(720px, calc(100dvh - 32px));
 }
