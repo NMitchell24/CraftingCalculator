@@ -18,6 +18,9 @@ public class Dataset
     /// <summary>Whether a blueprint's value counts; see <see cref="Models.Datasettings.UseValues"/>.</summary>
     public bool UseValues { get; set; } = true;
 
+    /// <summary>Whether production time is shown; see <see cref="Models.Datasettings.UseCraftTime"/>.</summary>
+    public bool UseCraftTime { get; set; } = true;
+
     public List<Category> Categories { get; set; } = [];
 
     public List<Component> Components { get; set; } = [];

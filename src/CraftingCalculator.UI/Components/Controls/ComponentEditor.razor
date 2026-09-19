@@ -8,9 +8,13 @@
                      Variant="Variant.Outlined" FullWidth="true" Min="0.0" Class="mb-4" />
 }
 
-@* Raw materials can still cost time - a Potato has to be grown before it can be cooked. *@
-<ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
-                     Label="Production time per item" />
+@* Raw materials can still cost time - a Potato has to be grown before it can be cooked. Hidden rather than
+   cleared when the dataset does not use craft time: the stored value is kept for when it does. *@
+@if (SelectedDataset.Settings.UseCraftTime)
+{
+    <ProductionTimeField @bind-Value="Model.ProductionTime" @bind-Value:after="NotifyChangedAsync"
+                         Label="Production time per item" />
+}
 
 <CategorySelect Model="Model" OnChanged="NotifyChangedAsync" />
 

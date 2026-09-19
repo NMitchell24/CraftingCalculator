@@ -379,12 +379,14 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
     // The two directions of the one mapping between the Datasets row and Datasettings, so a new setting is added to both
     // in the same place. Named arguments, because settings of the same type would otherwise transpose silently.
     private static Datasettings ToSettings(Dataset entity) =>
-        new(UseYield: entity.UseYield, UseCosts: entity.UseCosts, UseValues: entity.UseValues);
+        new(UseYield: entity.UseYield, UseCosts: entity.UseCosts, UseValues: entity.UseValues,
+            UseCraftTime: entity.UseCraftTime);
 
     private static void ApplySettings(Dataset entity, Datasettings settings)
     {
         entity.UseYield = settings.UseYield;
         entity.UseCosts = settings.UseCosts;
         entity.UseValues = settings.UseValues;
+        entity.UseCraftTime = settings.UseCraftTime;
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CraftingCalculator.Infrastructure.UnitTests;
 
@@ -161,6 +160,47 @@ public class MigrationTests
                 Blueprint table = await context.Blueprints.SingleAsync();
                 table.Name.Should().Be("Table");
                 table.Yield.Should().Be(1);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
+    /// <summary>
+    /// Use Craft Time arrived after the economy datasettings, and every dataset showed its production times until
+    /// then, so each one written before it must come back with it on and its other settings untouched.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeUseCraftTime_TurnsItOnForExistingDatasets()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("AddEconomyDatasettings");
+
+                // Raw SQL because the entity no longer describes a Datasets table without UseCraftTime.
+                await context.Database.ExecuteSqlRawAsync(
+                    "INSERT INTO Datasets (Id, Name, UseYield, UseCosts, UseValues) VALUES (2, 'Rust', 0, 0, 1);");
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                (await context.Datasets.OrderBy(dataset => dataset.Id)
+                        .Select(dataset => new { dataset.UseYield, dataset.UseCosts, dataset.UseValues, dataset.UseCraftTime })
+                        .ToListAsync())
+                    .Should().Equal(new { UseYield = true, UseCosts = true, UseValues = true, UseCraftTime = true },
+                        new { UseYield = false, UseCosts = false, UseValues = true, UseCraftTime = true });
             }
         }
         finally

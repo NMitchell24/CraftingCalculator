@@ -83,6 +83,9 @@ the same way it will show on the [Craft Screen](craft-screen.md) so you can chec
 > **Note:** This is per *craft*, not per *item*. A recipe that yields 4 in 10 seconds has a production time of
 > 10 seconds, not 2.5.
 
+> **Note:** Don't see this field? **Calculate Craft Time** is off for this dataset.
+> See [Calculate Craft Time](dataset.md#calculate-craft-time).
+
 ### Category
 
 A custom label for the blueprint. These labels allow you to more easily filter your 

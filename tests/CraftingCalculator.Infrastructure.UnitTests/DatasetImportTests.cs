@@ -126,11 +126,14 @@ public class DatasetImportTests
         Shape(await _datasetDAO.GetSnapshotAsync(imported.Id)).Should().BeEquivalentTo(Shape(source));
     }
 
-    [TestCase(false, false, true)]
-    [TestCase(true, false, false)]
-    public async Task ImportAsNewAsync_TakesTheFilesSettings(bool useYield, bool useCosts, bool useValues)
+    [TestCase(false, false, true, true)]
+    [TestCase(true, false, false, true)]
+    [TestCase(true, true, true, false)]
+    public async Task ImportAsNewAsync_TakesTheFilesSettings(
+        bool useYield, bool useCosts, bool useValues, bool useCraftTime)
     {
-        Datasettings settings = new(UseYield: useYield, UseCosts: useCosts, UseValues: useValues);
+        Datasettings settings =
+            new(UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime);
         DatasetSnapshot source = await GivenTheBronzeChainAsync() with { Settings = settings };
 
         DatasetModel imported = await _datasetDAO.ImportAsNewAsync("Valheim - Friend's", source);
@@ -143,7 +146,7 @@ public class DatasetImportTests
     {
         DatasetSnapshot current = await GivenTheBronzeChainAsync();
         DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Resin", "", 1, TimeSpan.Zero, null)],
-            [], [], new Datasettings(UseYield: false, UseCosts: false, UseValues: false));
+            [], [], new Datasettings(UseYield: false, UseCosts: false, UseValues: false, UseCraftTime: false));
 
         await MergeAsync(incoming, current);
 

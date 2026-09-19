@@ -56,6 +56,9 @@ will account for it.
 Leave it at zero and it reads as *Instant*, which is the honest answer for something you pick up off
 the ground.
 
+> **Note:** Don't see this field? **Calculate Craft Time** is off for this dataset.
+> See [Calculate Craft Time](dataset.md#calculate-craft-time).
+
 The numbers don't have to be exact. Even a rough estimate can give you a better idea of how long it will take to 
 collect 1000 of these than just leaving it at 0.
 

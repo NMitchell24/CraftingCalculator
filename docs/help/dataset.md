@@ -58,8 +58,8 @@ and your Valheim dataset doesn’t budge. Switch datasets and the app follows wh
 They also travel with the dataset. [Copying a dataset](managing-datasets.md#copying-one) copies them, and an
 [export](import-export.md) carries them along with your records.
 
-The card has two tabs. **General** holds [Calculate Yield](dataset.md#calculate-yield). **Economy** holds the money
-stuff: [Calculate Costs](dataset.md#calculate-costs) and [Calculate Values](dataset.md#calculate-values).
+The card has two tabs. **General** holds Calculate Yield and Calculate Craft Time. **Economy** holds the money stuff: 
+Calculate Costs and Calculate Values.
 
 ### Calculate Yield
 
@@ -87,6 +87,35 @@ Turning it off doesn't erase anything. Every blueprint keeps the yield you gave 
 your planks go right back to 4 per log.
 
 More detail: [How the Math Works](calculations.md).
+
+### Calculate Craft Time
+
+Also on the **General** tab, and also on by default. This is the switch for production time.
+
+Plenty of games never make you wait. Minecraft's crafting table hands you your planks the instant you click, so every
+time field in that dataset would just say *Instant* forever. Turn **Calculate Craft Time** off and all of it disappears
+for this dataset:
+
+- the **Production time per craft** field in the [blueprint editor](blueprints.md#production-time-per-craft)
+- the **Production time per item** field in the [component editor](components.md#production-time-per-item)
+- the **Crafting Time** line in the Crafting Summary
+- the time at the end of each row on the **Steps** tab of the [Craft screen](craft-screen.md#steps)
+- the **Production Time** rows on a detail card, including **Total Production Time** on individual steps
+
+Nothing else in the math changes. Time never feeds into crafts, materials, cost or value, so the rest of the Craft
+screen reads exactly the same either way.
+
+**Example:** you smelt 8 iron ore in a Minecraft furnace, at 10 seconds each.
+
+| Calculate Craft Time | Crafting Time | Everything else |
+|----------------------|---------------|-----------------|
+| On                   | 1:20          | Same            |
+| Off                  | Hidden        | Same            |
+
+Like the others, it doesn't erase anything. Every component and blueprint keeps the time you gave it, just hidden.
+Turn it back on and your furnace is back to 10 seconds a smelt.
+
+More detail: [How the Math Works](calculations.md#crafting-time).
 
 ### Calculate Costs
 

@@ -43,10 +43,13 @@
                         </div>
                     }
 
-                    <div class="summary-row">
-                        <dt>Production Time per Craft</dt>
-                        <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
-                    </div>
+                    @if (SelectedDataset.Settings.UseCraftTime)
+                    {
+                        <div class="summary-row">
+                            <dt>Production Time per Craft</dt>
+                            <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
+                        </div>
+                    }
                 }
                 else if (Component is { } component)
                 {
@@ -58,10 +61,13 @@
                         </div>
                     }
 
-                    <div class="summary-row">
-                        <dt>Production Time per Item</dt>
-                        <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
-                    </div>
+                    @if (SelectedDataset.Settings.UseCraftTime)
+                    {
+                        <div class="summary-row">
+                            <dt>Production Time per Item</dt>
+                            <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
+                        </div>
+                    }
                 }
             </dl>
         }
@@ -135,10 +141,13 @@
                     }
                 }
 
-                <div class="summary-row">
-                    <dt>Total Production Time</dt>
-                    <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
-                </div>
+                @if (SelectedDataset.Settings.UseCraftTime)
+                {
+                    <div class="summary-row">
+                        <dt>Total Production Time</dt>
+                        <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
+                    </div>
+                }
             </dl>
 
             <MudText Typo="Typo.caption" Class="info-dialog-step-note">Crafting Step Details apply to this step only.</MudText>

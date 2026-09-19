@@ -29,15 +29,22 @@ public class TransferDocumentProcessorTests
         document.DatasetName.Should().Be("Valheim");
     }
 
-    [TestCase(false, false, true)]
-    [TestCase(true, false, false)]
-    public void ToDocument_WritesTheDatasettingsWhateverIsSelected(bool useYield, bool useCosts, bool useValues)
+    [TestCase(false, false, true, true)]
+    [TestCase(true, false, false, true)]
+    [TestCase(true, true, true, false)]
+    public void ToDocument_WritesTheDatasettingsWhateverIsSelected(
+        bool useYield, bool useCosts, bool useValues, bool useCraftTime)
     {
         DatasetSnapshot snapshot =
-            Snapshot with { Settings = new Datasettings(UseYield: useYield, UseCosts: useCosts, UseValues: useValues) };
+            Snapshot with
+            {
+                Settings = new Datasettings(
+                    UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime)
+            };
 
         TransferDocumentProcessor.ToDocument(snapshot, new HashSet<RecordKey>(), ExportedAt, "1.0")
-            .Datasettings.Should().Be(new TransferDatasettings(UseYield: useYield, UseCosts: useCosts, UseValues: useValues));
+            .Datasettings.Should().Be(new TransferDatasettings(
+                UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime));
     }
 
     [Test]

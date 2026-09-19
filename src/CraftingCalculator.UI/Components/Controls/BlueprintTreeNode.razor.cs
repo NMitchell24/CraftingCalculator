@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
@@ -15,6 +16,8 @@ public partial class BlueprintTreeNode : ComponentBase
     [Parameter] public string ParentPath { get; set; } = "";
 
     [Inject] private CraftState State { get; set; } = null!;
+
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
@@ -36,9 +39,11 @@ public partial class BlueprintTreeNode : ComponentBase
     /// <summary>
     /// The step's production time, shown at the end of the row, or null to leave the row unadorned.
     /// </summary>
-    // An instant step is the common case in games with no crafting timers, and labelling every row
+    // An instant step is the common case in games with no crafting timers, and labeling every row
     // "Instant" would bury the handful of rows that do take time.
-    private string? EndText => Node.ProductionTime > TimeSpan.Zero ? DurationProcessor.Format(Node.ProductionTime) : null;
+    private string? EndText => SelectedDataset.Settings.UseCraftTime && Node.ProductionTime > TimeSpan.Zero
+        ? DurationProcessor.Format(Node.ProductionTime)
+        : null;
 
     private Task OpenDetailAsync() => InfoDialog.ShowAsync(DialogService, Node);
 }

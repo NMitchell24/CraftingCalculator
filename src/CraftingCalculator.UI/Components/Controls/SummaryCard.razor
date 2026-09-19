@@ -12,10 +12,13 @@
             <dd>@State.CraftingStepCount</dd>
         </div>
 
-        <div class="summary-row">
-            <dt>Crafting Time</dt>
-            <dd>@DurationProcessor.Format(State.TotalProductionTime)</dd>
-        </div>
+        @if (SelectedDataset.Settings.UseCraftTime)
+        {
+            <div class="summary-row">
+                <dt>Crafting Time</dt>
+                <dd>@DurationProcessor.Format(State.TotalProductionTime)</dd>
+            </div>
+        }
 
         @* Without values the bottom line is the cost already, so this row would repeat it. *@
         @if (UseCosts && UseValues)
