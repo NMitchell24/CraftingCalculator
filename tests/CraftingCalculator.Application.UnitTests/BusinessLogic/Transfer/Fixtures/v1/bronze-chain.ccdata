@@ -136,6 +136,7 @@
     "useYield": true,
     "useCosts": true,
     "useValues": true,
-    "useCraftTime": true
+    "useCraftTime": true,
+    "currencyLabel": null
   }
 }

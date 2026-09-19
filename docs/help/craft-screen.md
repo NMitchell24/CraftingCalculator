@@ -92,6 +92,9 @@ blueprint quantity. Some of them go away when a [Datasetting](dataset.md#dataset
 > 
 > See [How the Math Works](calculations.md) for the full reasoning and worked examples.
 
+> **Tip:** Money shows up in your device's currency until you tell it otherwise. Set a
+> [Currency Name](dataset.md#currency-name) and Cost, Value and Profit read 35 Coins instead of $35.00.
+
 ## The three result tabs
 
 The other card switches between three views of the same blueprint batch.

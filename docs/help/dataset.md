@@ -59,7 +59,7 @@ They also travel with the dataset. [Copying a dataset](managing-datasets.md#copy
 [export](import-export.md) carries them along with your records.
 
 The card has two tabs. **General** holds Calculate Yield and Calculate Craft Time. **Economy** holds the money stuff: 
-Calculate Costs and Calculate Values.
+Calculate Costs, Calculate Values and Currency Name.
 
 ### Calculate Yield
 
@@ -167,6 +167,39 @@ Like Calculate Yield, neither switch erases anything. Every component keeps its 
 value, just hidden. Turn them back on and your numbers are right where you left them.
 
 More detail: [How the Math Works](calculations.md#cost-value-and-profit).
+
+### Currency Name
+
+The last thing on the **Economy** tab, and the only one that isn't a switch. Out of the box, the app writes money the
+way your device does, so a phone in the US shows $200.00. That's fine for a spreadsheet, but nobody in Rust has ever
+paid for anything in dollars.
+
+Type what your game calls its money into **Currency Name**, and every amount in this dataset becomes the number
+followed by that name: 200 Gold, 1,500 Scrap, 75 Units. It shows up everywhere the app shows money:
+
+- the **Cost**, **Value**, **Surplus Value** and **Profit** lines in the Crafting Summary
+- the cost on each row of the **Components** tab, and the value on each row of the **Surplus** tab, on the
+  [Craft screen](craft-screen.md)
+- the **Cost per Item** and **Value per Item** rows on a detail card
+
+A few things to know:
+
+- **Twelve characters, tops:** plenty for Gold, Caps, Coins or Mega Credits. Any longer and it starts crowding the
+  numbers on a phone.
+- **Decimals only when there are some:** hardly any game hands you half a coin, so a whole number doesn't get a .00
+  stuck on the end. If an amount does come out to a fraction, you get up to two decimal places, like 12.5 Gold.
+- **Emoji work too:** want a coin instead of a word? Type 🪙 and you'll get 200 🪙.
+- **Empty means your device's currency:** clear the name and the dataset goes right back to dollars, euros, or
+  whatever your phone uses.
+
+**Example:** the same 5 Valheim Bronze, in a dataset where the money is called Coins, like the game's traders use.
+
+| Currency Name        | Cost     | Value    | Profit   |
+|----------------------|----------|----------|----------|
+| Empty, on a US phone | $35.00   | $50.00   | $15.00   |
+| Coins                | 35 Coins | 50 Coins | 15 Coins |
+
+It doesn't touch the math. Only how the numbers are written changes.
 
 ## Inside a list
 

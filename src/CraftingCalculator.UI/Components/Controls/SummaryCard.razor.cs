@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
@@ -12,7 +13,8 @@ public partial class SummaryCard : ComponentBase, IDisposable
     private bool UseCosts => SelectedDataset.Settings.UseCosts;
     private bool UseValues => SelectedDataset.Settings.UseValues;
 
-    private string ProfitClass => State.Profit switch
+    // Colored by the amount as shown, so a profit that reads zero is never red or green.
+    private string ProfitClass => CurrencyProcessor.Round(State.Profit) switch
     {
         > 0 => "summary-profit-positive",
         < 0 => "summary-profit-negative",

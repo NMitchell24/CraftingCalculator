@@ -84,20 +84,22 @@ public class TransferDocumentReaderTests
         result.File.AppVersion.Should().Be("1.0");
     }
 
-    [TestCase(false, false, true, true)]
-    [TestCase(true, false, false, true)]
-    [TestCase(true, true, true, false)]
+    [TestCase(false, false, true, true, "Gold")]
+    [TestCase(true, false, false, true, "Scrap")]
+    [TestCase(true, true, true, false, null)]
     public void Read_AnExportWithSettingsOff_ReturnsThem(
-        bool useYield, bool useCosts, bool useValues, bool useCraftTime)
+        bool useYield, bool useCosts, bool useValues, bool useCraftTime, string? currencyLabel)
     {
         ImportValidationResult result = Read(BronzeChainDocument() with
         {
             Datasettings = new TransferDatasettings(
-                UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime)
+                UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime,
+                CurrencyLabel: currencyLabel)
         });
 
         result.File!.Snapshot.Settings.Should().Be(new Datasettings(
-            UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime));
+            UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime,
+            CurrencyLabel: currencyLabel));
     }
 
     [Test]
@@ -107,6 +109,20 @@ public class TransferDocumentReaderTests
     [Test]
     public void Read_DatasettingsMissingASetting_ReadsItAsItsDefault() =>
         ReadEdited(root => root["datasettings"] = new JsonObject()).File!.Snapshot.Settings.Should().Be(Datasettings.Default);
+
+    [TestCase("", ExpectedResult = null)]
+    [TestCase("   ", ExpectedResult = null)]
+    [TestCase("  Gold  ", ExpectedResult = "Gold")]
+    [TestCase("  Mega Credits  ", ExpectedResult = "Mega Credits")]
+    public string? Read_ACurrencyLabel_ReadsAsTheEditorWouldSaveIt(string label) =>
+        Read(BronzeChainDocument() with { Datasettings = new TransferDatasettings(CurrencyLabel: label) })
+            .File!.Snapshot.Settings.CurrencyLabel;
+
+    [Test]
+    public void Read_ACurrencyLabelOverTheLimit_IsRejected() =>
+        ShouldBeRejectedWith(
+            Read(BronzeChainDocument() with { Datasettings = new TransferDatasettings(CurrencyLabel: "Galactic Credits") }),
+            "The currency label is longer than 12 characters.");
 
     [Test]
     public void Read_AFileOverTheSizeLimit_IsRejectedWithoutBeingRead()

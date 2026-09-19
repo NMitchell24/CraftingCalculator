@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
@@ -38,6 +39,7 @@ public partial class Dataset : ComponentBase, IDisposable
     private List<DatasetModel> _datasets = [];
     private bool _busy;
     private DatasettingsView _datasettingsView = DatasettingsView.General;
+    private MudTextField<string> _currencyNameField = null!;
 
     private int SelectedDatasetId => SelectedDataset.Id;
 
@@ -268,6 +270,22 @@ public partial class Dataset : ComponentBase, IDisposable
 
         // The batch was worked out under the old setting, and the Craft screen only reads what CraftState holds.
         State.OnDatasettingsChanged();
+    }
+
+    private async Task UpdateCurrencyLabelAsync(string? text)
+    {
+        string? label = CurrencyProcessor.ToLabel(text);
+
+        // The field only redraws when its bound Value changes, so "  Gold " over a saved "Gold", or only spaces over
+        // no label, would stay on screen as typed. SetTextAsync shows the cleaned-up label and raises ValueChanged
+        // again with it, and that second call saves.
+        if (label != text)
+        {
+            await _currencyNameField.SetTextAsync(label);
+            return;
+        }
+
+        await UpdateSettingsAsync(settings => settings with { CurrencyLabel = label });
     }
 
     private DatasetModel? Current => _datasets.FirstOrDefault(dataset => dataset.Id == SelectedDataset.Id);

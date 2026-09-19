@@ -37,7 +37,8 @@ screen.
 
 You have options here, and none of them are wrong:
 
-- **Actual currency**, if your game has a shop or a trader.
+- **Actual currency**, if your game has a shop or a trader. Set a [Currency Name](dataset.md#currency-name) and
+  the app calls it whatever the game does.
 - **An effort score.** Wood is 1, Iron Ore is 5, Black Metal Scrap is 40. Now "Cost" reads as "how much
   of a slog is this project", and Profit tells you whether the payoff is worth the grind.
 - **Zero.** If you only want the raw materials, leave every cost at 0 and simply ignore the money lines.

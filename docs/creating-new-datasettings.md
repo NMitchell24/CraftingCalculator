@@ -7,7 +7,8 @@ and an export and import. The name is a pun on "dataset settings". It's on purpo
 Use Yield was the first one (branch `Datasettings-Use-Yield`). That branch laid all the groundwork, so adding another
 setting is a checklist of small edits, plus the code that actually uses the setting. This page is that checklist. Use
 Costs and Use Values (branch `Economy-Datasettings`) followed it, and added two settings in one pass. Use Craft Time
-(branch `Calculate-Craft-Time`) is the first that only hides UI and leaves the math alone.
+(branch `Calculate-Craft-Time`) is the first that only hides UI and leaves the math alone. Currency Name (branch
+`Datasetting-CustomCurrency`) is the first that isn't a bool: a nullable string that changes how money is written.
 
 App-wide preferences (theme, export history size) are **not** datasettings. They live in `IPreferenceStore` and on
 the Settings screen. If a setting should stay the same when the user switches games, it doesn't belong here.
@@ -82,6 +83,9 @@ which would switch the setting off for every dataset that already exists. Don't 
 entity configuration instead: EF leaves a bool that equals its CLR default out of the INSERT, so a store default of
 `true` would override a dataset saved with the setting off. `20260918213843_AddDatasettings.cs` is the model.
 
+A nullable setting whose default is `null` needs no edit: the scaffolded nullable column already gives every existing
+dataset `null` (`20260919203450_AddCurrencyLabelDatasetting.cs`).
+
 Rewrite the migration's `.cs` file with a file-scoped namespace and no BOM (see `AddDatasettings`), because
 `dotnet format` fails CI otherwise. Leave the `.Designer.cs` as generated.
 
@@ -140,7 +144,7 @@ Add the column to the `Dataset` entry in
 
 One more `.datasetting-row` in the Datasettings card, under the last one of its tab. The card groups the settings into
 tabs (`DatasettingsView` in `Dataset.razor.cs`): **General** holds Use Yield and Use Craft Time, **Economy** holds
-Use Costs and Use Values. Put the row in the tab it belongs to. A setting that fits neither gets a new
+Use Costs, Use Values and Currency Name. Put the row in the tab it belongs to. A setting that fits neither gets a new
 `DatasettingsView` member, a `MudToggleItem` and its own branch in the markup; with more than three tabs, recheck the
 `.pane-tabs` container query in `app.css`, which is calibrated for three labels.
 
@@ -166,7 +170,10 @@ The label the player reads starts with **Calculate**, not **Use**: `UseYield` is
 keeps the shorter name; only the `MudText` and the `AriaLabel` say Calculate.
 
 A setting that isn't a bool takes whichever control fits (a `MudSelect` for an enum, a `MudNumericField` for a
-number) in the same row, bound the same way.
+number) in the same row, bound the same way. A control too wide to sit beside the text, like Currency Name's
+`MudTextField`, goes in a `datasetting-row datasetting-row-stacked` row, which puts it full width under the text.
+Normalize free text in one place before it's saved (Currency Name's is `CurrencyProcessor.ToLabel`), and run an
+imported file's value through the same method in `TransferDocumentReader.ToSnapshot`.
 
 ### 7. The feature itself
 

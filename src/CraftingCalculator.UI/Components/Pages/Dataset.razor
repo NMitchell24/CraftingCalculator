@@ -1,4 +1,5 @@
 @page "/dataset"
+@using System.Globalization
 
 <PageTitle>Dataset</PageTitle>
 
@@ -129,6 +130,20 @@
                            ValueChanged="@(useValues => UpdateSettingsAsync(settings =>
                                                             settings with { UseValues = useValues }))"
                            Color="Color.Primary" AriaLabel="Calculate Values" />
+            </div>
+            <div class="datasetting-row datasetting-row-stacked">
+                <div class="datasetting-text">
+                    <MudText Typo="Typo.body1">Currency Name</MudText>
+                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                        What your game calls its money, so amounts read like 200 Gold. Leave it empty for
+                        @CurrencyProcessor.Format(200, Datasettings.Default).
+                    </MudText>
+                </div>
+                <MudTextField T="string" @ref="_currencyNameField" Value="SelectedDataset.Settings.CurrencyLabel"
+                              ValueChanged="UpdateCurrencyLabelAsync"
+                              Placeholder="@CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol"
+                              MaxLength="CurrencyProcessor.MaxLabelLength" Variant="Variant.Outlined"
+                              Margin="Margin.Dense" FullWidth="true" aria-label="Currency Name" />
             </div>
         }
     </MudPaper>

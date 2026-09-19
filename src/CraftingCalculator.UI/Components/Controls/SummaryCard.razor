@@ -25,7 +25,7 @@
         {
             <div class="summary-row">
                 <dt>Cost</dt>
-                <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalCost)</dd>
+                <dd>@CurrencyProcessor.Format(State.TotalCost, SelectedDataset.Settings)</dd>
             </div>
         }
 
@@ -33,7 +33,7 @@
         {
             <div class="summary-row">
                 <dt>Value</dt>
-                <dd>@string.Format(FormatConstants.CurrencyFormat, State.TotalValue)</dd>
+                <dd>@CurrencyProcessor.Format(State.TotalValue, SelectedDataset.Settings)</dd>
             </div>
         }
 
@@ -50,7 +50,7 @@
             {
                 <div class="summary-row">
                     <dt>Surplus Value</dt>
-                    <dd>@string.Format(FormatConstants.CurrencyFormat, State.SurplusValue)</dd>
+                    <dd>@CurrencyProcessor.Format(State.SurplusValue, SelectedDataset.Settings)</dd>
                 </div>
             }
         }
@@ -62,7 +62,7 @@
         {
             <div class="summary-row">
                 <dt class="summary-profit">@(UseValues ? "Profit" : "Cost")</dt>
-                <dd class="@ProfitClass">@string.Format(FormatConstants.CurrencyFormat, State.Profit)</dd>
+                <dd class="@ProfitClass">@CurrencyProcessor.Format(State.Profit, SelectedDataset.Settings)</dd>
             </div>
         }
     </dl>
