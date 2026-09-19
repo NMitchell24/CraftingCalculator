@@ -5,7 +5,8 @@ copy, the app follows the selected dataset's copy, and the settings travel with 
 and an export and import. The name is a pun on "dataset settings". It's on purpose, so keep it.
 
 Use Yield was the first one (branch `Datasettings-Use-Yield`). That branch laid all the groundwork, so adding another
-setting is a checklist of small edits, plus the code that actually uses the setting. This page is that checklist.
+setting is a checklist of small edits, plus the code that actually uses the setting. This page is that checklist. Use
+Costs and Use Values (branch `Economy-Datasettings`) followed it, and added two settings in one pass.
 
 App-wide preferences (theme, export history size) are **not** datasettings. They live in `IPreferenceStore` and on
 the Settings screen. If a setting should stay the same when the user switches games, it doesn't belong here.
@@ -18,9 +19,9 @@ the Settings screen. If a setting should stay the same when the user switches ga
 | `Dataset` entity | `Domain/Entities/Dataset.cs` | One column per setting on the `Datasets` table. |
 | `ToSettings` / `ApplySettings` | `Infrastructure/DAO/Impl/DatasetDAO.cs` | The only mapping between the row and the record, one method for each direction. |
 | `ISelectedDatasetState.Settings` | `Application/Common/Interfaces` | The selected dataset's settings. `DatasetService` publishes them whenever the selection changes. |
-| `IDatasetService.SaveSettingsAsync` | `Application/Common/Services/Impl/DatasetService.cs` | Saves the selected dataset's settings and publishes them. |
+| `IDatasetService.UpdateSettingsAsync` | `Application/Common/Services/Impl/DatasetService.cs` | Applies one change to the selected dataset's saved settings, saves them and publishes them. |
 | `TransferDatasettings` | `Application/BusinessLogic/Transfer/Format/TransferDocument.cs` | The `datasettings` block in a `.ccdata` file. |
-| The Datasettings card | `UI/Components/Pages/Dataset.razor(.cs)` | One `.datasetting-row` per setting, all saving through `SaveSettingsAsync`. |
+| The Datasettings card | `UI/Components/Pages/Dataset.razor(.cs)` | One `.datasetting-row` per setting, all saving through `UpdateSettingsAsync`. |
 
 The data flows like this:
 
@@ -29,7 +30,7 @@ Datasets row ──ToSettings──▶ DatasetModel.Settings ──DatasetServic
                                                                                    │
             Craft screen, editors, dialogs, CraftState.Recalculate  ◀── read ──────┘
 
-Dataset.razor toggle ──▶ Dataset.SaveSettingsAsync ──▶ IDatasetService.SaveSettingsAsync ──▶ DatasetDAO.SetSettingsAsync
+Dataset.razor toggle ──▶ Dataset.UpdateSettingsAsync ──▶ IDatasetService.UpdateSettingsAsync ──▶ DatasetDAO.SetSettingsAsync
                                └──▶ CraftState.OnDatasettingsChanged (the batch is recalculated)
 ```
 
@@ -136,9 +137,17 @@ Add the column to the `Dataset` entry in
 
 ### 6. The control on the Dataset screen
 
-One more `.datasetting-row` in the Datasettings card, under the last one. The CSS already draws the hairline between
-rows. The control saves through the page's one `SaveSettingsAsync`, which also recalculates the Craft screen's batch,
-so a row needs no handler of its own:
+One more `.datasetting-row` in the Datasettings card, under the last one of its tab. The card groups the settings into
+tabs (`DatasettingsView` in `Dataset.razor.cs`): **General** holds Use Yield, **Economy** holds Use Costs and Use
+Values. Put the row in the tab it belongs to. A setting that fits neither gets a new `DatasettingsView` member, a
+`MudToggleItem` and its own branch in the markup; with more than three tabs, recheck the `.pane-tabs` container query in
+`app.css`, which is calibrated for three labels.
+
+The CSS already draws the hairline between rows. The control saves through the page's one `UpdateSettingsAsync`, which
+also recalculates the Craft screen's batch, so a row needs no handler of its own. Pass it the **change**, not a finished
+`Datasettings`: the service applies updates one at a time to the settings the last one saved, so two switches tapped
+while a save is still running both stick. A row that built the whole record from `SelectedDataset.Settings` would
+start from the settings before the first tap and undo it:
 
 ```razor
 <div class="datasetting-row">
@@ -147,7 +156,7 @@ so a row needs no handler of its own:
         <MudText Typo="Typo.caption" Class="datasetting-caption">One sentence on what it does.</MudText>
     </div>
     <MudSwitch T="bool" Value="SelectedDataset.Settings.UseProductionTime"
-               ValueChanged="@(value => SaveSettingsAsync(SelectedDataset.Settings with { UseProductionTime = value }))"
+               ValueChanged="@(value => UpdateSettingsAsync(settings => settings with { UseProductionTime = value }))"
                Color="Color.Primary" AriaLabel="Use Production Time" />
 </div>
 ```
@@ -167,7 +176,8 @@ This part depends on the setting. The patterns Use Yield set:
   can stay selected.
 
 Search the whole UI for every place the feature shows up. Use Yield touched the blueprint editor, the Craft screen's
-tabs, the Crafting Summary and `InfoDialog`, and it's easy to miss one.
+tabs, the Crafting Summary and `InfoDialog`; Use Costs and Use Values touched the editors, the Crafting Summary,
+`InfoDialog` and the `DetailsFor` lines of `MaterialsList` and `SurplusList`. It's easy to miss one.
 
 ### 8. Regenerate both v1 fixtures
 
@@ -219,8 +229,8 @@ Write the tests alongside the feature, not after it:
 | The writer writes it; the reader reads it, and defaults it when the member is missing | `TransferDocumentProcessorTests.cs`, `TransferDocumentReaderTests.cs` |
 | The feature's own behavior (the math, with the setting on and off) | The processor's tests, with a `new Datasettings(X: false)` |
 
-`DatasetServiceTests` already covers publishing the whole record on startup, switch, delete and save, so a new setting
-doesn't need its own tests there.
+`DatasetServiceTests` already covers publishing the whole record on startup, switch, delete and update, and updates
+that overlap, so a new setting doesn't need its own tests there.
 
 ### 10. Help
 

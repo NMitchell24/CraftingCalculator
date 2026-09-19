@@ -29,13 +29,15 @@ public class TransferDocumentProcessorTests
         document.DatasetName.Should().Be("Valheim");
     }
 
-    [Test]
-    public void ToDocument_WritesTheDatasettingsWhateverIsSelected()
+    [TestCase(false, false, true)]
+    [TestCase(true, false, false)]
+    public void ToDocument_WritesTheDatasettingsWhateverIsSelected(bool useYield, bool useCosts, bool useValues)
     {
-        DatasetSnapshot noYield = Snapshot with { Settings = new Datasettings(UseYield: false) };
+        DatasetSnapshot snapshot =
+            Snapshot with { Settings = new Datasettings(UseYield: useYield, UseCosts: useCosts, UseValues: useValues) };
 
-        TransferDocumentProcessor.ToDocument(noYield, new HashSet<RecordKey>(), ExportedAt, "1.0")
-            .Datasettings.Should().Be(new TransferDatasettings(UseYield: false));
+        TransferDocumentProcessor.ToDocument(snapshot, new HashSet<RecordKey>(), ExportedAt, "1.0")
+            .Datasettings.Should().Be(new TransferDatasettings(UseYield: useYield, UseCosts: useCosts, UseValues: useValues));
     }
 
     [Test]

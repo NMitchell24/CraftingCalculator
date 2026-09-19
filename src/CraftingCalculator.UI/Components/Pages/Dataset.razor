@@ -66,18 +66,56 @@
         <MudText Typo="Typo.subtitle1" Class="display-title">Datasettings</MudText>
         <MudDivider Class="my-4" />
 
-        @* One .datasetting-row per setting: what it is on the left, the control on the right. *@
-        <div class="datasetting-row">
-            <div class="datasetting-text">
-                <MudText Typo="Typo.body1">Use Yield</MudText>
-                <MudText Typo="Typo.caption" Class="datasetting-caption">
-                    Blueprints can make more than one item per craft, and the extra shows up as surplus.
-                </MudText>
-            </div>
-            <MudSwitch T="bool" Value="SelectedDataset.Settings.UseYield"
-                       ValueChanged="@(useYield => SaveSettingsAsync(SelectedDataset.Settings with { UseYield = useYield }))"
-                       Color="Color.Primary" AriaLabel="Use Yield" />
+        @* The Craft screen's segmented control, and its .pane-tabs container query stacks the pills the same way
+           when a label would not fit on one line. *@
+        <div class="pane-tabs datasettings-tabs">
+            <MudToggleGroup T="DatasettingsView" @bind-Value="_datasettingsView" Class="segmented"
+                            SelectedClass="segmented-selected" Outlined="false" Delimiters="false" Size="Size.Small">
+                <MudToggleItem Value="DatasettingsView.General">General</MudToggleItem>
+                <MudToggleItem Value="DatasettingsView.Economy">Economy</MudToggleItem>
+            </MudToggleGroup>
         </div>
+
+        @* One .datasetting-row per setting: what it is on the left, the control on the right. *@
+        @if (_datasettingsView == DatasettingsView.General)
+        {
+            <div class="datasetting-row">
+                <div class="datasetting-text">
+                    <MudText Typo="Typo.body1">Use Yield</MudText>
+                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                        Blueprints can make more than one item per craft, and the extra shows up as surplus.
+                    </MudText>
+                </div>
+                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseYield"
+                           ValueChanged="@(useYield => UpdateSettingsAsync(settings => settings with { UseYield = useYield }))"
+                           Color="Color.Primary" AriaLabel="Use Yield" />
+            </div>
+        }
+        else
+        {
+            <div class="datasetting-row">
+                <div class="datasetting-text">
+                    <MudText Typo="Typo.body1">Use Costs</MudText>
+                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                        Components have a cost, and the Craft screen adds it up.
+                    </MudText>
+                </div>
+                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseCosts"
+                           ValueChanged="@(useCosts => UpdateSettingsAsync(settings => settings with { UseCosts = useCosts }))"
+                           Color="Color.Primary" AriaLabel="Use Costs" />
+            </div>
+            <div class="datasetting-row">
+                <div class="datasetting-text">
+                    <MudText Typo="Typo.body1">Use Values</MudText>
+                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                        Blueprints have a value, and the Craft screen adds it up.
+                    </MudText>
+                </div>
+                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseValues"
+                           ValueChanged="@(useValues => UpdateSettingsAsync(settings => settings with { UseValues = useValues }))"
+                           Color="Color.Primary" AriaLabel="Use Values" />
+            </div>
+        }
     </MudPaper>
 
 </div>

@@ -72,10 +72,6 @@ public class DatasetImportTests
     /// <summary>A snapshot with every id replaced by the name it points at, so two datasets' records compare.</summary>
     private static object Shape(DatasetSnapshot snapshot)
     {
-        string Category(int? id) => snapshot.Categories.SingleOrDefault(category => category.Id == id)?.Name ?? "";
-        string Component(int id) => snapshot.Components.Single(component => component.Id == id).Name;
-        string Blueprint(int id) => snapshot.Blueprints.Single(blueprint => blueprint.Id == id).Name;
-
         return new
         {
             Categories = snapshot.Categories.Select(category => new { category.Name, category.Description }),
@@ -104,6 +100,10 @@ public class DatasetImportTests
                 Blueprints = favorite.Blueprints.Select(link => (Blueprint(link.TargetId), link.Quantity))
             })
         };
+
+        string Category(int? id) => snapshot.Categories.SingleOrDefault(category => category.Id == id)?.Name ?? "";
+        string Component(int id) => snapshot.Components.Single(component => component.Id == id).Name;
+        string Blueprint(int id) => snapshot.Blueprints.Single(blueprint => blueprint.Id == id).Name;
     }
 
     private static SnapshotComponent Named(DatasetSnapshot snapshot, string name) => snapshot.Components.Single(component => component.Name == name);
@@ -126,14 +126,16 @@ public class DatasetImportTests
         Shape(await _datasetDAO.GetSnapshotAsync(imported.Id)).Should().BeEquivalentTo(Shape(source));
     }
 
-    [Test]
-    public async Task ImportAsNewAsync_TakesTheFilesSettings()
+    [TestCase(false, false, true)]
+    [TestCase(true, false, false)]
+    public async Task ImportAsNewAsync_TakesTheFilesSettings(bool useYield, bool useCosts, bool useValues)
     {
-        DatasetSnapshot source = await GivenTheBronzeChainAsync() with { Settings = new Datasettings(UseYield: false) };
+        Datasettings settings = new(UseYield: useYield, UseCosts: useCosts, UseValues: useValues);
+        DatasetSnapshot source = await GivenTheBronzeChainAsync() with { Settings = settings };
 
         DatasetModel imported = await _datasetDAO.ImportAsNewAsync("Valheim - Friend's", source);
 
-        (await _datasetDAO.GetSnapshotAsync(imported.Id)).Settings.Should().Be(new Datasettings(UseYield: false));
+        (await _datasetDAO.GetSnapshotAsync(imported.Id)).Settings.Should().Be(settings);
     }
 
     [Test]
@@ -141,7 +143,7 @@ public class DatasetImportTests
     {
         DatasetSnapshot current = await GivenTheBronzeChainAsync();
         DatasetSnapshot incoming = new("Friend's Valheim", [], [new SnapshotComponent(1, "Resin", "", 1, TimeSpan.Zero, null)],
-            [], [], new Datasettings(UseYield: false));
+            [], [], new Datasettings(UseYield: false, UseCosts: false, UseValues: false));
 
         await MergeAsync(incoming, current);
 

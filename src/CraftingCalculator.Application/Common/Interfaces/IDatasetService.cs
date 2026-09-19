@@ -44,8 +44,10 @@ public interface IDatasetService
     Task SwitchToAsync(int id);
 
     /// <summary>
-    /// Saves <paramref name="settings"/> as the selected dataset's own and publishes them to
-    /// <see cref="ISelectedDatasetState.Settings"/>.
+    /// Applies <paramref name="change"/> to the selected dataset's saved settings, saves the result as its own and
+    /// publishes it to <see cref="ISelectedDatasetState.Settings"/>. Updates are applied one at a time, in the order
+    /// they were made, each to the result of the one before, so no update undoes another.
     /// </summary>
-    Task SaveSettingsAsync(Datasettings settings);
+    /// <param name="change">Returns the settings with the one change made, e.g. <c>s =&gt; s with { UseYield = false }</c>.</param>
+    Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change);
 }

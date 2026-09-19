@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.State;
@@ -8,17 +9,24 @@ namespace CraftingCalculator.UI.Components.Controls;
 public partial class SurplusList : ComponentBase, IDisposable
 {
     [Inject] private CraftState State { get; set; } = null!;
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     protected override void OnInitialized()
     {
         State.Changed += StateHasChanged;
     }
 
-    private static List<string> DetailsFor(BlueprintQuantity blueprintQuantity) =>
-    [
-        $"Quantity: x{blueprintQuantity.Quantity}",
-        $"Value: {string.Format(FormatConstants.CurrencyFormat, blueprintQuantity.TotalValue)}"
-    ];
+    private List<string> DetailsFor(BlueprintQuantity blueprintQuantity)
+    {
+        List<string> details = [$"Quantity: x{blueprintQuantity.Quantity}"];
+
+        if (SelectedDataset.Settings.UseValues)
+        {
+            details.Add($"Value: {string.Format(FormatConstants.CurrencyFormat, blueprintQuantity.TotalValue)}");
+        }
+
+        return details;
+    }
 
     public void Dispose()
     {

@@ -1,7 +1,7 @@
 {
   "format": "crafting-calculator-dataset",
   "formatVersion": 1,
-  "exportedAt": "2026-09-18T22:35:50.8534615+00:00",
+  "exportedAt": "2026-09-18T23:53:33.5039681+00:00",
   "appVersion": "2.0",
   "datasetName": "Valheim",
   "categories": [
@@ -931,6 +931,8 @@
     }
   ],
   "datasettings": {
-    "useYield": true
+    "useYield": true,
+    "useCosts": true,
+    "useValues": true
   }
 }

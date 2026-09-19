@@ -26,6 +26,9 @@ public class DatasetServiceTests
         _preferences = new FakePreferenceStore();
     }
 
+    [TearDown]
+    public void TearDown() => _service.Dispose();
+
     /// <summary>
     /// Builds the service over a selection state that has already read <paramref name="storedId"/> back
     /// from the preference store, which is the state a fresh launch starts in.
@@ -238,20 +241,20 @@ public class DatasetServiceTests
     }
 
     [Test]
-    public async Task SaveSettingsAsync_SavesThemToTheSelectedDatasetAndPublishesThem()
+    public async Task UpdateSettingsAsync_SavesTheChangeToTheSelectedDatasetAndPublishesIt()
     {
         GivenDatasets(new DatasetModel { Id = 1, Name = "Default" }, new DatasetModel { Id = 7, Name = "Rust" });
         GivenStoredSelection(7);
         await _service.InitializeAsync();
 
-        await _service.SaveSettingsAsync(NoYield);
+        await _service.UpdateSettingsAsync(settings => settings with { UseYield = false });
 
         _dao.Verify(dao => dao.SetSettingsAsync(7, NoYield), Times.Once);
         (_selected.Id, _selected.Settings).Should().Be((7, NoYield));
     }
 
     [Test]
-    public async Task SaveSettingsAsync_ASwitchDuringTheWrite_LeavesTheNewDatasetsSettingsAlone()
+    public async Task UpdateSettingsAsync_ASwitchDuringTheWrite_LeavesTheNewDatasetsSettingsAlone()
     {
         GivenDatasets(new DatasetModel { Id = 1, Name = "Valheim" }, new DatasetModel { Id = 7, Name = "Rust" });
         GivenStoredSelection(1);
@@ -259,12 +262,52 @@ public class DatasetServiceTests
         TaskCompletionSource write = new();
         _dao.Setup(dao => dao.SetSettingsAsync(1, NoYield)).Returns(write.Task);
 
-        Task save = _service.SaveSettingsAsync(NoYield);
+        Task update = _service.UpdateSettingsAsync(settings => settings with { UseYield = false });
         await _service.SwitchToAsync(7);
         write.SetResult();
-        await save;
+        await update;
 
         _dao.Verify(dao => dao.SetSettingsAsync(1, NoYield), Times.Once);
         (_selected.Id, _selected.Settings).Should().Be((7, Datasettings.Default));
+    }
+
+    [Test]
+    public async Task UpdateSettingsAsync_ASecondUpdateDuringTheFirstWrite_KeepsBothChanges()
+    {
+        // The row only takes a write once it completes, so an update that reads it before then sees the old settings.
+        Datasettings stored = Datasettings.Default;
+        TaskCompletionSource firstWrite = new();
+        _dao.Setup(dao => dao.GetByIdAsync(1)).ReturnsAsync(() => new DatasetModel { Id = 1, Name = "Valheim", Settings = stored });
+        _dao.Setup(dao => dao.SetSettingsAsync(1, It.IsAny<Datasettings>()))
+            .Returns(async (int _, Datasettings settings) =>
+            {
+                await firstWrite.Task;
+                stored = settings;
+            });
+        GivenStoredSelection(1);
+        await _service.InitializeAsync();
+
+        Task first = _service.UpdateSettingsAsync(settings => settings with { UseCosts = false });
+        Task second = _service.UpdateSettingsAsync(settings => settings with { UseValues = false });
+        firstWrite.SetResult();
+        await Task.WhenAll(first, second);
+
+        Datasettings both = new(UseCosts: false, UseValues: false);
+        stored.Should().Be(both);
+        _selected.Settings.Should().Be(both);
+    }
+
+    [Test]
+    public async Task UpdateSettingsAsync_TheDatasetIsGone_SavesNothing()
+    {
+        GivenDatasets(new DatasetModel { Id = 1, Name = "Valheim" });
+        GivenStoredSelection(1);
+        await _service.InitializeAsync();
+        _dao.Setup(dao => dao.GetByIdAsync(1)).ReturnsAsync((DatasetModel?)null);
+
+        await _service.UpdateSettingsAsync(settings => settings with { UseYield = false });
+
+        _dao.Verify(dao => dao.SetSettingsAsync(It.IsAny<int>(), It.IsAny<Datasettings>()), Times.Never);
+        _selected.Settings.Should().Be(Datasettings.Default);
     }
 }

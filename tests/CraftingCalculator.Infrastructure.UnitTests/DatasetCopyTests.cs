@@ -78,14 +78,16 @@ public class DatasetCopyTests
         (await _favoritesDAO.GetAllAsync()).Select(favorite => favorite.Name).Should().Equal("Starter kit");
     }
 
-    [Test]
-    public async Task CopyAsync_CopiesTheSettings()
+    [TestCase(false, false, true)]
+    [TestCase(true, false, false)]
+    public async Task CopyAsync_CopiesTheSettings(bool useYield, bool useCosts, bool useValues)
     {
-        await _datasetDAO.SetSettingsAsync(SqliteTestFixture.DefaultDatasetId, new Datasettings(UseYield: false));
+        Datasettings settings = new(UseYield: useYield, UseCosts: useCosts, UseValues: useValues);
+        await _datasetDAO.SetSettingsAsync(SqliteTestFixture.DefaultDatasetId, settings);
 
         DatasetModel copy = await _datasetDAO.CopyAsync(SqliteTestFixture.DefaultDatasetId, "Valheim - Modded");
 
-        (await _datasetDAO.GetByIdAsync(copy.Id))!.Settings.Should().Be(new Datasettings(UseYield: false));
+        (await _datasetDAO.GetByIdAsync(copy.Id))!.Settings.Should().Be(settings);
     }
 
     [Test]

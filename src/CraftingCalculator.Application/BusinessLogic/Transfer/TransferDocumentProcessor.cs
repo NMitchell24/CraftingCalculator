@@ -53,7 +53,9 @@ public static class TransferDocumentProcessor
                     .Select(favorite => new TransferFavorite(
                         favoriteRefs[favorite.Id], favorite.Name, Links(blueprintRefs, favorite.Blueprints)))
             ],
-            new TransferDatasettings(UseYield: extract.Settings.UseYield));
+            new TransferDatasettings(
+                UseYield: extract.Settings.UseYield, UseCosts: extract.Settings.UseCosts,
+                UseValues: extract.Settings.UseValues));
     }
 
     /// <summary>Maps each of <paramref name="ids"/> to its ref, 1 up in the order given.</summary>

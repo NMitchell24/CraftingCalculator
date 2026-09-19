@@ -17,6 +17,13 @@ public partial class Dataset : ComponentBase, IDisposable
     /// <summary>One row of the landing page - a record type, its heading, icon, and current count.</summary>
     private sealed record DatasetSection(DataType Type, string Title, string Icon, string Caption);
 
+    /// <summary>The tabs of the Datasettings card, one per group of settings.</summary>
+    private enum DatasettingsView
+    {
+        General,
+        Economy
+    }
+
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private IDatasetService DatasetService { get; set; } = null!;
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
@@ -30,6 +37,7 @@ public partial class Dataset : ComponentBase, IDisposable
     private List<DatasetSection> Sections { get; set; } = [];
     private List<DatasetModel> _datasets = [];
     private bool _busy;
+    private DatasettingsView _datasettingsView = DatasettingsView.General;
 
     private int SelectedDatasetId => SelectedDataset.Id;
 
@@ -251,11 +259,12 @@ public partial class Dataset : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Saves <paramref name="settings"/> as the selected dataset's. Every datasetting row's control saves through here.
+    /// Applies <paramref name="change"/> to the selected dataset's settings and saves them. Every datasetting row's
+    /// control saves through here.
     /// </summary>
-    private async Task SaveSettingsAsync(Datasettings settings)
+    private async Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change)
     {
-        await Task.Run(() => DatasetService.SaveSettingsAsync(settings));
+        await Task.Run(() => DatasetService.UpdateSettingsAsync(change));
 
         // The batch was worked out under the old setting, and the Craft screen only reads what CraftState holds.
         State.OnDatasettingsChanged();

@@ -218,7 +218,9 @@ public static class TransferDocumentReader
                 blueprint.ProductionTime, blueprint.Category, Links(blueprint.Components), Links(blueprint.Blueprints)))
         ],
         [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))],
-        document.Datasettings is { } settings ? new Datasettings(UseYield: settings.UseYield) : Datasettings.Default);
+        document.Datasettings is { } settings
+            ? new Datasettings(UseYield: settings.UseYield, UseCosts: settings.UseCosts, UseValues: settings.UseValues)
+            : Datasettings.Default);
 
     private static List<QuantityLink> Links(IEnumerable<QuantityRef> links) =>
         [.. links.Select(link => new QuantityLink(link.Ref, link.Quantity))];
