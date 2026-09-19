@@ -48,50 +48,51 @@ directly. Tapping anywhere on the card does the same thing.
 
 ## Datasettings
 
-Yes, that's a pun. No, I'm not sorry.
+Yes, that's a pun. No, I'm not sorry. (Sure, if we’re being pedantic about the exact linguistic category, it’s a 
+portmanteau… but who cares.)
 
 The **Datasettings** card under the record cards holds the settings that belong to the dataset you're in, not to the
-whole app. Every game plays by its own rules, so each dataset gets its own copy. Flip one in your Rust dataset and your
-Valheim dataset doesn't budge. Switch datasets and the whole app follows whatever that dataset is set to.
+whole app. Every game plays by its own rules, so each dataset gets its own copy. Flip a switch in your Rust dataset 
+and your Valheim dataset doesn’t budge. Switch datasets and the app follows whatever that dataset is set to.
 
 They also travel with the dataset. [Copying a dataset](managing-datasets.md#copying-one) copies them, and an
 [export](import-export.md) carries them along with your records.
 
-The card has two tabs. **General** holds [Use Yield](dataset.md#use-yield). **Economy** holds the money stuff:
-[Use Costs](dataset.md#use-costs) and [Use Values](dataset.md#use-values).
+The card has two tabs. **General** holds [Calculate Yield](dataset.md#calculate-yield). **Economy** holds the money
+stuff: [Calculate Costs](dataset.md#calculate-costs) and [Calculate Values](dataset.md#calculate-values).
 
-### Use Yield
+### Calculate Yield
 
 On by default. This is the switch for everything about recipes that hand you more than one item per craft.
 
 Some games give you exactly one of whatever you craft, every time. Or maybe you just don't care about stacks. Either
-way, the yield field is just clutter. Turn **Use Yield** off and all of it disappears for this dataset:
+way, the yield field is just clutter. Turn **Calculate Yield** off and all of it disappears for this dataset:
 
 - the **Yield per craft** field in the [blueprint editor](blueprints.md#yield-per-craft)
 - the **Surplus** tab on the [Craft screen](craft-screen.md)
 - the **Surplus Stock** and **Surplus Value** lines in the Crafting Summary
 - the **Yield per Craft** and **Surplus** rows on a blueprint's detail card
 
-The math changes too. With Use Yield off, every blueprint makes exactly 1 item per craft, whatever its yield says.
+The math changes too. With Calculate Yield off, every blueprint makes exactly 1 item per craft, whatever its yield says.
 That means there's never any surplus, because nothing ever gets overproduced.
 
 **Example:** Minecraft's 1 log → 4 planks, and you need 8 planks.
 
-| Use Yield | Crafts | Logs |
-|-----------|--------|------|
-| On        | 2      | 2    |
-| Off       | 8      | 8    |
+| Calculate Yield | Crafts | Logs |
+|-----------------|--------|------|
+| On              | 2      | 2    |
+| Off             | 8      | 8    |
 
 Turning it off doesn't erase anything. Every blueprint keeps the yield you gave it, just hidden. Turn it back on and
 your planks go right back to 4 per log.
 
 More detail: [How the Math Works](calculations.md).
 
-### Use Costs
+### Calculate Costs
 
 On the **Economy** tab, and on by default. This is the switch for what your components cost.
 
-Maybe your game has no shop, or you just don't want to price out every rock and stick. Turn **Use Costs** off and
+Maybe your game has no shop, or you just don't want to price out every rock and stick. Turn **Calculate Costs** off and
 all of it disappears for this dataset:
 
 - the **Cost per item** field in the [component editor](components.md#cost-per-item)
@@ -102,12 +103,12 @@ all of it disappears for this dataset:
 The math changes too. Every component counts as costing 0, whatever you typed in. So a batch costs nothing, and your
 Profit is just its Value.
 
-### Use Values
+### Calculate Values
 
-Also on the **Economy** tab, and also on by default. It's the mirror image of Use Costs: the switch for what your
+Also on the **Economy** tab, and also on by default. It's the mirror image of Calculate Costs: the switch for what your
 blueprints are worth.
 
-Turn **Use Values** off and this disappears for this dataset:
+Turn **Calculate Values** off and this disappears for this dataset:
 
 - the **Value per item** field in the [blueprint editor](blueprints.md#value-per-item)
 - the **Value** and **Surplus Value** lines in the Crafting Summary
@@ -121,20 +122,20 @@ twice. That's handy if you use cost as an effort score and just want to see how 
 
 **Example:** 5 Valheim Bronze, at 2 Copper and 1 Tin each. Copper costs 2, Tin costs 3, and a Bronze is worth 10.
 
-| Use Costs | Use Values | Cost | Value | Profit                  |
-|-----------|------------|------|-------|-------------------------|
-| On        | On         | 35   | 50    | 15                      |
-| Off       | On         | 0    | 50    | 50                      |
-| On        | Off        | 35   | 0     | −35 (shown as **Cost**) |
-| Off       | Off        | 0    | 0     | 0 (hidden)              |
+| Calculate Costs | Calculate Values | Cost | Value | Profit                  |
+|-----------------|------------------|------|-------|-------------------------|
+| On              | On               | 35   | 50    | 15                      |
+| Off             | On               | 0    | 50    | 50                      |
+| On              | Off              | 35   | 0     | −35 (shown as **Cost**) |
+| Off             | Off              | 0    | 0     | 0 (hidden)              |
 
 That's 10 Copper at 2 and 5 Tin at 3 for the cost, and 5 Bronze at 10 for the value.
 
 Turn **both** off and the app stops caring about money at all. The **Profit** line goes too, since it would only ever
 say 0, and you're left with a purely component-based calculator: what to gather, how many crafts, and how long it takes.
 
-Like Use Yield, neither switch erases anything. Every component keeps its cost and every blueprint keeps its value, just
-hidden. Turn them back on and your numbers are right where you left them.
+Like Calculate Yield, neither switch erases anything. Every component keeps its cost and every blueprint keeps its
+value, just hidden. Turn them back on and your numbers are right where you left them.
 
 More detail: [How the Math Works](calculations.md#cost-value-and-profit).
 

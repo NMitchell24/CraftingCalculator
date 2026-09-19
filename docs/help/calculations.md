@@ -25,8 +25,8 @@ crafts = round up ( quantity needed / yield per craft )
 
 If your blueprint yields 1, crafts and items are the same number. If it yields more, they come apart.
 
-> **Note:** With [Use Yield](dataset.md#use-yield) off, every blueprint counts as yielding 1, whatever its own yield
-> says. Crafts and items are always the same number, and there's never any surplus.
+> **Note:** With [Calculate Yield](dataset.md#calculate-yield) off, every blueprint counts as yielding 1, whatever its
+> own yield says. Crafts and items are always the same number, and there's never any surplus.
 
 **Example:** Minecraft planks: 1 log yields **4** planks.
 
@@ -128,9 +128,9 @@ Three things to note:
 If you left every cost and value at zero, all three lines read zero. That's a perfectly reasonable way
 to use the app.
 
-> **Note:** With [Use Costs](dataset.md#use-costs) off, every component counts as costing 0, so Profit is just the
-> Value. With [Use Values](dataset.md#use-values) off, every blueprint counts as worth 0, so Profit is minus the Cost,
-> and the Crafting Summary calls that line **Cost**.
+> **Note:** With [Calculate Costs](dataset.md#calculate-costs) off, every component counts as costing 0, so Profit is
+> just the Value. With [Calculate Values](dataset.md#calculate-values) off, every blueprint counts as worth 0, so Profit
+> is minus the Cost, and the Crafting Summary calls that line **Cost**.
 > With both off, there's no money math at all and the lines are hidden.
 
 ## Crafting Time

@@ -39,7 +39,8 @@ its currency.
 Leave it at 0 if your game has no currency system or if you only care about materials. The Value and Profit lines 
 will simply read zero, and you can ignore them.
 
-> **Note:** Don't see this field? **Use Values** is off for this dataset. See [Use Values](dataset.md#use-values).
+> **Note:** Don't see this field? **Calculate Values** is off for this dataset.
+> See [Calculate Values](dataset.md#calculate-values).
 
 ### Yield per craft
 
@@ -67,7 +68,8 @@ not enough.
 > to 0 would cause the app to divide by zero and break the universe. Negative yields also don't make sense. There's 
 > simply no case where crafting an item means you end up having to give back the materials you used.
 
-> **Note:** Don't see this field? **Use Yield** is off for this dataset. See [Use Yield](dataset.md#use-yield).
+> **Note:** Don't see this field? **Calculate Yield** is off for this dataset.
+> See [Calculate Yield](dataset.md#calculate-yield).
 
 ### Production time per craft
 
