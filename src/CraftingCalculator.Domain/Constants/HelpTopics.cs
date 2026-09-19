@@ -13,6 +13,9 @@ public static class HelpTopics
     /// <summary>The page the help button opens when the current route matches no other topic.</summary>
     public const string DefaultTopicId = "welcome";
 
+    /// <summary>The page that walks a new user from an empty database to a first finished calculation.</summary>
+    public const string GettingStartedTopicId = "getting-started";
+
     /// <summary>The route segment the in-app help pages live under.</summary>
     public const string HelpRoot = "help";
 
@@ -22,7 +25,7 @@ public static class HelpTopics
             "What this app does, and the three words you need to know.",
             [HelpRoot]),
 
-        new("getting-started", "Getting Started",
+        new(GettingStartedTopicId, "Getting Started",
             "Go from an empty database to your first finished calculation.",
             []),
 

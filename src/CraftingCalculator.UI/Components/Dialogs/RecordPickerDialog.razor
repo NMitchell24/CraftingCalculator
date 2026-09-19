@@ -11,9 +11,20 @@
     <DialogContent>
         <RecordSearchBar Records="Records" FilterList="FilterList" FilterChanged="OnFilterChanged" />
 
-        @if (FilteredRecords.Count == 0)
+        @* An empty picker is a new user's dataset far more often than it is a bad search, and they have no way
+           to tell the two apart. *@
+        @if (Records.Count == 0)
         {
-            <MudText Class="pa-4" Align="Align.Center">Nothing matches.</MudText>
+            <div class="pane-empty-state">
+                <MudText Typo="Typo.body1">It looks like you don't have any data yet.</MudText>
+                <MudText Typo="Typo.caption">New to the app? The Getting Started guide walks you through it.</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@GettingStartedHref"
+                           StartIcon="@Icons.Material.Filled.HelpOutline" Class="mt-2">Getting Started</MudButton>
+            </div>
+        }
+        else if (FilteredRecords.Count == 0)
+        {
+            <MudText Class="pa-4" Align="Align.Center">@GetNoMatchPhrase()</MudText>
         }
         else
         {
