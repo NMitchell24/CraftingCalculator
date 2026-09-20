@@ -10,12 +10,13 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Pages;
 
 /// <summary>
-/// Choose records from the current dataset and export them to a file, and share any export still on the
-/// device. The export itself runs in <see cref="ExportState"/>, so it carries on if the user leaves this page.
+/// Choose records from the current dataset and export them to a file, and download or share any export still
+/// on the device. The export itself runs in <see cref="ExportState"/>, so it carries on if the user leaves this page.
 /// </summary>
 public partial class Export : ComponentBase, IDisposable
 {
     [Inject] private IDatasetTransferService TransferService { get; set; } = null!;
+    [Inject] private IExportDownloader Downloader { get; set; } = null!;
     [Inject] private IShareService ShareService { get; set; } = null!;
     [Inject] private ExportState ExportState { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
@@ -119,18 +120,33 @@ public partial class Export : ComponentBase, IDisposable
     private Task ExportAsync() =>
         CanExport ? ExportState.StartAsync(_snapshot!, _selected) : Task.CompletedTask;
 
+    private static string DownloadLabel(ExportFileInfo export) => $"Download {export.FileName}";
+
     private static string ShareLabel(ExportFileInfo export) => $"Share {export.FileName}";
+
+    private async Task DownloadAsync(ExportFileInfo export)
+    {
+        if (!await StillOnTheDeviceAsync(export))
+        {
+            return;
+        }
+
+        try
+        {
+            await Downloader.SaveToDownloadsAsync(export.FullPath);
+            Snackbar.Add("Saved to your Downloads folder.", Severity.Success);
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine(exception);
+            Snackbar.Add("That export couldn't be saved to your Downloads folder.", Severity.Error);
+        }
+    }
 
     private async Task ShareAsync(ExportFileInfo export)
     {
-        // Re-read first: the file may have been deleted since the page last looked.
-        await ExportState.RefreshExportsAsync();
-
-        bool stillOnTheDevice = ExportState.Exports.Any(file => file.FullPath == export.FullPath);
-
-        if (!stillOnTheDevice)
+        if (!await StillOnTheDeviceAsync(export))
         {
-            Snackbar.Add("That export file is gone. Export again to make a new one.", Severity.Warning);
             return;
         }
 
@@ -143,6 +159,24 @@ public partial class Export : ComponentBase, IDisposable
             Debug.WriteLine(exception);
             Snackbar.Add("The share sheet couldn't be opened.", Severity.Error);
         }
+    }
+
+    /// <summary>
+    /// Whether <paramref name="export"/> is still on the device, telling the user when it is not. The export
+    /// history is re-read first, so a file deleted since the page last looked is caught here rather than by
+    /// the action failing.
+    /// </summary>
+    private async Task<bool> StillOnTheDeviceAsync(ExportFileInfo export)
+    {
+        await ExportState.RefreshExportsAsync();
+
+        if (ExportState.Exports.Any(file => file.FullPath == export.FullPath))
+        {
+            return true;
+        }
+
+        Snackbar.Add("That export file is gone. Export again to make a new one.", Severity.Warning);
+        return false;
     }
 
     // Where the user can find the file, which only a PC can show as a path: the Android folder is invisible to

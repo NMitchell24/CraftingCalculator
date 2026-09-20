@@ -1203,11 +1203,21 @@ html.keyboard-open .page-content-with-bottom-nav {
     margin-bottom: 8px;
 }
 
-/* One export in the history, with its Share button beside its four lines of detail. align-items: center
-   because Share is the card's only action and there is nothing on the first line for it to line up with -
-   unlike .transfer-row, where the Info button belongs to the name it sits next to. */
+/* One export in the history: four lines of detail beside its actions, on one line while both fit. Where they
+   don't, the detail takes the line and the actions drop below it. The flex basis does the switch with no
+   script, the way .production-time-row does: (24ch - 100%) * 999 is a huge width when the card is narrower
+   than 24ch, so the detail fills the line and pushes the actions off it, and a negative one when the card is
+   wider, which clamps to 0 so the detail grows into whatever the actions leave. ch rather than px because
+   Android's WebView text zoom scales ch but not the card's px width, so only ch tracks whether the detail
+   still has room. Measured in the detail's own font the card is about 17.3ch at Android's maximum Font size
+   and Display size (320px viewport, 200% text, where the two buttons left the detail 132px and the export
+   date broke across four lines), about 28.2ch at 395px / 130% and about 41.3ch at 448px / 100%. 24ch stacks
+   only the first. align-items: center because the actions belong to the card as a whole and there is nothing
+   on the first line for them to line up with - unlike .transfer-row, where the Info button belongs to the
+   name it sits next to. */
 .transfer-export {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
 }
@@ -1216,17 +1226,21 @@ html.keyboard-open .page-content-with-bottom-nav {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    flex: 1 1 auto;
+    flex: 1 1 calc((24ch - 100%) * 999);
     min-width: 0;
 }
 
-/* The MudIconButton is 48px at every text size, and must not give width up to the detail column beside it. */
-.transfer-export > .mud-icon-button {
+/* Download (Android only, where app storage is out of the user's reach) and Share. Each MudIconButton is 48px
+   at every text size, and the pair must not give width up to the detail beside them. The auto margin does
+   nothing until they have wrapped onto a line of their own, where it holds them at the right edge. */
+.transfer-export-actions {
+    display: flex;
     flex: 0 0 auto;
+    margin-left: auto;
 }
 
 /* Wraps like every other record name in the app; a dataset name that is one word too long for a line by
-   itself breaks inside the word rather than run under the Share button. */
+   itself breaks inside the word rather than run under the actions. */
 .transfer-export-name {
     overflow-wrap: break-word;
 }

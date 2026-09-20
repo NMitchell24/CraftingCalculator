@@ -105,20 +105,34 @@ Every export is a `.ccdata` file named after its dataset and the moment you made
 `Valheim-20260912-180400.ccdata`.
 
 - **Windows:** the card shows the folder, so you can go and grab it.
-- **Android:** it's saved in the app's own storage, where no other app can see it. Use Share to get it out.
+- **Android:** it's saved in the app's own storage, where no other app can see it. Download it or share it to get
+  it out.
 - **iPhone and iPad:** open the Files app and go to **On My iPhone → Crafting Calculator → Exports** (it says
   **On My iPad** on an iPad).
+
+### Downloading
+
+On Android only, because it's the only platform where the app's own storage is off limits to you.
+
+Tap ![Download](assets/download.svg) on any card and the app drops a copy of that export into your phone's
+**Downloads** folder, the same place anything you download in your browser lands. Any file manager can see it
+there, and so can the import screen the next time you need it.
+
+Tap it twice and you get two copies. Android numbers the second one `Valheim-20260912-180400 (1).ccdata` rather
+than writing over the first, exactly like a browser does.
 
 ### Sharing
 
 Tap ![Share](assets/share.svg) on any card to send that export somewhere: email it to yourself, drop it in your
-cloud drive, or send it to a friend. That's the only way to get a file off an Android phone, and it's the step that
-turns an export into a real backup.
+cloud drive, or send it to a friend. It's the step that turns an export into a real backup, because the copy ends
+up somewhere that isn't this device.
 
-If the file has gone missing since the screen last looked, the app tells you so instead of opening the share sheet.
+Either button checks the file is still there first. If it's gone, because you deleted it or a new export pushed it
+off the end of your history, the app tells you so instead.
 
 > **Note:** Exports live in the app's storage, so uninstalling the app or clearing its data deletes them along with
-> everything else. An export only counts as a backup once you've shared it somewhere that isn't this device.
+> everything else. A downloaded copy survives that, since it's out of the app's hands by then. An export only counts
+> as a real backup once it's somewhere that isn't this device at all.
 
 ## Import Data
 
@@ -133,8 +147,8 @@ The screen opens on **Step 1: Select a file**. Tap **Select import file** in tha
 opens.
 
 - **Windows:** it only shows `.ccdata` files. Your own exports are in the folder the export history cards show.
-- **Android:** it shows every file, because Android has no idea what a `.ccdata` is. Pick the one you want. Anything
-  that isn't an export gets turned away in the next step.
+- **Android:** it shows every file, because Android has no idea what a `.ccdata` is. Pick the one you want; your own
+  downloaded exports are in **Downloads**. Anything that isn't an export gets turned away in the next step.
 - **iPhone and iPad:** your own exports are under **On My iPhone → Crafting Calculator → Exports** (**On My iPad** on
   an iPad). A file somebody sent you is wherever you saved it.
 
