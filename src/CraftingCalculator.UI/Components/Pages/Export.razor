@@ -71,9 +71,17 @@
                             <MudText Typo="Typo.caption" Class="transfer-export-location">@export.FileName</MudText>
                             <MudText Typo="Typo.caption" Class="transfer-export-location">@LocationOf(export)</MudText>
                         </div>
-                        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Primary"
-                                       title="@ShareLabel(export)" aria-label="@ShareLabel(export)"
-                                       OnClick="@(() => ShareAsync(export))" />
+                        <div class="transfer-export-actions">
+                            @if (Downloader.IsSupported)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary"
+                                               title="@DownloadLabel(export)" aria-label="@DownloadLabel(export)"
+                                               OnClick="@(() => DownloadAsync(export))" />
+                            }
+                            <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Primary"
+                                           title="@ShareLabel(export)" aria-label="@ShareLabel(export)"
+                                           OnClick="@(() => ShareAsync(export))" />
+                        </div>
                     </div>
                 }
             </MudPaper>
