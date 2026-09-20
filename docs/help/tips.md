@@ -123,6 +123,16 @@ category has nothing to filter to. Add it to a record and it appears.
 ![Save](assets/save.svg) **Save** stays grayed out until the record has a name. Name is a required field on every 
 record.
 
+### "The app says it couldn't start"
+
+The app couldn't get to your database, so rather than hang on the splash screen forever it says so and stops.
+Nothing has been changed and nothing has been deleted; your dataset is still sitting there. Close the app and
+open it again, which sorts it out more often than you'd think.
+
+If it keeps doing it, the log is the thing I need. That screen tells you where the log lives, and on Android it
+has a **Save log to Downloads** button so you can grab a copy without getting into the app first. More detail:
+[Settings](settings.md#diagnostics).
+
 ## Things worth knowing
 
 - **The number in a quantity stepper is editable.** Tap it and type. Much faster than tapping **+** two

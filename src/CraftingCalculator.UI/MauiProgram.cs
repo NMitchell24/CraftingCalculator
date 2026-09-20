@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Infrastructure;
+using CraftingCalculator.UI.Logging;
 using CraftingCalculator.UI.Platform;
 using CraftingCalculator.UI.State;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,12 @@ public static partial class MauiProgram
     // Not "CraftingCalculator.Startup": the category is a prefix the logging filters match on, and this one
     // has to stay clear of the app's own namespaces so a future filter cannot silence the session header.
     private const string StartupCategory = "Startup";
+
+    /// <summary>
+    /// Whether the database was prepared successfully; false means the app has no data layer and
+    /// <see cref="App.CreateWindow" /> shows <see cref="StartupErrorPage" /> instead of <see cref="MainPage" />.
+    /// </summary>
+    internal static bool DatabaseReady { get; private set; }
 
     public static MauiApp CreateMauiApp()
     {
@@ -65,6 +72,10 @@ public static partial class MauiProgram
         builder.Services.AddScoped<PageShellState>();
         builder.Services.AddScoped<ThemeState>();
 
+        // The one page in the container, because App.CreateWindow has to build it from services rather than
+        // with new. Transient: on the happy path it is never constructed at all.
+        builder.Services.AddTransient<StartupErrorPage>();
+
         // The file log ships in Release: it is the only diagnostics a device in the field has.
 #if DEBUG
         // Unredacted on purpose, so a development log stays readable; the session header says so, and the
@@ -79,26 +90,47 @@ public static partial class MauiProgram
         MauiApp app = builder.Build();
 
         ILogger startupLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(StartupCategory);
+
+        // Before the header and the database work below: everything from here on is already covered by the
+        // last-resort hooks, and a failure in startup itself is exactly what has nowhere else to be recorded.
+        GlobalExceptionHandler.Install(startupLogger);
+
         LogSessionStarted(startupLogger, SessionHeader());
 
-        // The DB must exist (and be migrated) before any page loads, and a dataset must be selected
-        // before anything reads a record - every query is scoped to one, and DatasetScopedContextFactory
-        // throws rather than hand out a context with no dataset.
-        using IServiceScope scope = app.Services.CreateScope();
-        IDbContextFactory<CraftingDataContext> contextFactory =
-            scope.ServiceProvider.GetRequiredService<IDbContextFactory<CraftingDataContext>>();
-        using CraftingDataContext context = contextFactory.CreateDbContext();
-        context.Database.Migrate();
+        try
+        {
+            // The DB must exist (and be migrated) before any page loads, and a dataset must be selected
+            // before anything reads a record - every query is scoped to one, and DatasetScopedContextFactory
+            // throws rather than hand out a context with no dataset.
+            using IServiceScope scope = app.Services.CreateScope();
+            IDbContextFactory<CraftingDataContext> contextFactory =
+                scope.ServiceProvider.GetRequiredService<IDbContextFactory<CraftingDataContext>>();
+            using CraftingDataContext context = contextFactory.CreateDbContext();
+            context.Database.Migrate();
 
-        // Blocking, matching Migrate() above: CreateMauiApp is synchronous, and the app must not
-        // reach its first page until the selection is resolved.
-        scope.ServiceProvider.GetRequiredService<IDatasetService>().InitializeAsync().GetAwaiter().GetResult();
+            // Blocking, matching Migrate() above: CreateMauiApp is synchronous, and the app must not
+            // reach its first page until the selection is resolved.
+            scope.ServiceProvider.GetRequiredService<IDatasetService>().InitializeAsync().GetAwaiter().GetResult();
+
+            DatabaseReady = true;
+        }
+        catch (Exception exception)
+        {
+            // Swallowed rather than rethrown: this runs before any UI exists, so a throw here is a launch that
+            // dies with nothing on screen. StartupErrorPage reports it instead, and the entry above is what
+            // makes the failure diagnosable.
+            LogStartupFailed(startupLogger, exception);
+        }
 
         return app;
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Session started\n{Header}")]
     private static partial void LogSessionStarted(ILogger logger, string header);
+
+    [LoggerMessage(Level = LogLevel.Critical,
+        Message = "The database could not be prepared; the app started without a data layer")]
+    private static partial void LogStartupFailed(ILogger logger, Exception exception);
 
     /// <summary>App and device context, written once at the top of each session's log entries.</summary>
     private static string SessionHeader()

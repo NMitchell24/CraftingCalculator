@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.UI.Logging;
 using CraftingCalculator.UI.Platform;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -12,10 +13,6 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 /// </summary>
 public partial class LogViewerDialog : ComponentBase
 {
-    // A .log file has no registered media type and opens in nothing; the log is plain text, so it is saved as
-    // text and every platform already knows what to do with it.
-    private const string LogMimeType = "text/plain";
-
     private const string DownloadLabel = "Download the log";
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
@@ -55,27 +52,21 @@ public partial class LogViewerDialog : ComponentBase
 
     private async Task DownloadAsync()
     {
-        // One save at a time. The cache copy is named to the second, so two overlapping runs share a path that
-        // each one truncates with FileMode.Create and then deletes, and the second tap would only ever produce
-        // a duplicate of the first copy anyway. The Disabled binding alone would not do it: Blazor dispatches
+        // One save at a time, of text there is. The Disabled binding alone would not do it: Blazor dispatches
         // handlers serially but a second tap can arrive before the disabled state reaches the DOM, which is
         // also why this check-and-set cannot interleave.
-        if (_downloading)
+        if (_downloading || _text is not { } text)
         {
             return;
         }
 
         _downloading = true;
 
-        // What the user is looking at, not a re-read: the file may have grown since, and the two disagreeing
-        // would be worse than a copy that is a few entries behind.
-        string path = Path.Combine(
-            FileSystem.CacheDirectory, $"crafting-calculator-log-{DateTime.Now:yyyyMMdd-HHmmss}.txt");
-
         try
         {
-            await File.WriteAllTextAsync(path, _text);
-            await Downloader.SaveToDownloadsAsync(path, LogMimeType);
+            // What the user is looking at, not a re-read: the file may have grown since, and the two
+            // disagreeing would be worse than a copy that is a few entries behind.
+            await DiagnosticLogDownload.SaveAsync(Downloader, Logger, text);
             Snackbar.Add("Saved to your Downloads folder.", Severity.Success);
         }
         catch (Exception exception)
@@ -90,22 +81,7 @@ public partial class LogViewerDialog : ComponentBase
         }
         finally
         {
-            DeleteQuietly(path);
             _downloading = false;
-        }
-    }
-
-    // The cache is the device's to clear, but a copy of the log left in it is a second place the same text
-    // lives, so it goes as soon as the downloads folder has it.
-    private void DeleteQuietly(string path)
-    {
-        try
-        {
-            File.Delete(path);
-        }
-        catch (Exception exception)
-        {
-            LogTempDeleteFailed(Logger, exception);
         }
     }
 
@@ -113,7 +89,4 @@ public partial class LogViewerDialog : ComponentBase
 
     [LoggerMessage(Level = LogLevel.Error, Message = "The log could not be saved to the Downloads folder")]
     private static partial void LogDownloadFailed(ILogger logger, Exception exception);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "The log copy in the cache directory could not be deleted")]
-    private static partial void LogTempDeleteFailed(ILogger logger, Exception exception);
 }
