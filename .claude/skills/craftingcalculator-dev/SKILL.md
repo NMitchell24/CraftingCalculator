@@ -277,6 +277,9 @@ replace it. The one thing that must never appear in it is anything out of the us
 | Registration | `Infrastructure/DependencyInjection.cs` → `AddFileLogging` / `AddRedactedFileLogging` |
 | Read back by the UI | `IDiagnosticLog` in `Application/Common/Interfaces` (a layer-boundary interface, like `IExportFileStore`) |
 | Shown to the user | Settings' Diagnostics card → `UI/Components/Dialogs/LogViewerDialog.razor`, which also hands the text to `IFileDownloader` |
+| Saving a copy to Downloads | `UI/Logging/DiagnosticLogDownload.cs`, shared by the viewer and the startup error page |
+| Last-resort exception hooks | `UI/Logging/GlobalExceptionHandler.cs` |
+| Startup failure screen | `UI/StartupErrorPage.cs`, picked over `MainPage` by `App.CreateWindow` |
 | Wiring, log folder, session header | `UI/MauiProgram.cs` |
 
 **How it behaves.** Every entry is one open-append-close inside a `Lock`, so nothing is buffered and a crash
@@ -327,6 +330,27 @@ package reference, and it should not gain one.
 app can reach it, with `NSUrl.IsExcludedFromBackupKey` set. `Platforms/Android/Resources/xml/auto_backup_rules.xml`
 and `data_extraction_rules.xml` exclude `Logs` from both Android backup generations: a log describes the device
 that produced it, while the database and exports transfer with the user.
+
+**Nothing escapes without an entry.** `GlobalExceptionHandler.Install` runs immediately after `builder.Build()`,
+before the session header, and subscribes `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException`
+(which it also observes, so a fire-and-forget failure stays benign) and the platform's native-boundary hook:
+`AndroidEnvironment.UnhandledExceptionRaiser`, `ObjCRuntime.Runtime.MarshalManagedException` and WinUI's
+`Application.Current.UnhandledException`. Only the WinUI one recovers — it sets `Handled = true`, because WinUI
+would otherwise tear down a window that is still usable. Android and iOS are record-only: the native side has
+already unwound, and pretending otherwise would leave the app running on abandoned state.
+
+Every hook logs the `Exception` and nothing else that carries a message. **`UnhandledExceptionEventArgs.Message`
+on WinUI is deliberately not logged**, and a new hook must not log its platform's equivalent either: a string
+passed as a `[LoggerMessage]` parameter reaches the file through the formatted-message path, where the redactor
+collapses paths but does *not* mask quoted values — that masking runs only over an exception's own message. The
+non-`Exception` payload of `AppDomain.UnhandledException` is logged by `GetType().Name` for the same reason.
+
+**A startup failure is a screen, not a crash.** `MauiProgram` runs `Migrate()` and `IDatasetService.InitializeAsync()`
+inside a `try`, logs Critical on failure and sets `DatabaseReady`; `App.CreateWindow` reads it and shows
+`StartupErrorPage` instead of `MainPage`. That page is native C# controls, not a `BlazorWebView` — the Blazor app
+is built on the database that just failed, so the screen reporting it must not depend on any of it. It pins the
+Forge light palette (`AppTheme.ForgeColors`, `internal` for exactly this) because `ThemeState` lives in a Blazor
+scope that never started, and sets `SafeAreaEdges.All` so it clears the system bars under Android edge-to-edge.
 
 **Checking privacy needs a Release build.** A Debug log is deliberately unredacted, so it proves nothing.
 

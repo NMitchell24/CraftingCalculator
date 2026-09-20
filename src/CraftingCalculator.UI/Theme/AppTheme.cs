@@ -15,7 +15,9 @@ public static class AppTheme
     // that fills several slots (LightMuted, LightLines, ...) is one constant, with the slots it serves
     // noted inline. LightSlate, DarkSurface and LightPrimary are duplicated in
     // Platforms/Android/Resources/values/colors.xml, which cannot reference a C# constant: change both.
-    private static class ForgeColors
+    // Internal rather than private because StartupErrorPage paints native controls from the same palette -
+    // it renders outside the WebView, where MudBlazor's theme does not reach.
+    internal static class ForgeColors
     {
         public const string White = "#FFFFFF"; // Primary/Secondary/TertiaryContrastText + AppbarText, light only
 

@@ -7,8 +7,15 @@ namespace CraftingCalculator.UI;
 // reference to Microsoft.Maui.Controls.Application fully qualified.
 public partial class App : Microsoft.Maui.Controls.Application
 {
-    public App()
+    private readonly IServiceProvider _services;
+
+    // UseMauiApp<App> resolves this type from the container. The provider itself rather than
+    // StartupErrorPage's own dependencies: the page is built only when the database failed, and this class
+    // has no other reason to know what it takes.
+    public App(IServiceProvider services)
     {
+        _services = services;
+
         InitializeComponent();
 
         // MAUI applies its own soft-input mode to the activity at runtime, and its default - Pan -
@@ -21,5 +28,8 @@ public partial class App : Microsoft.Maui.Controls.Application
             .UseWindowSoftInputModeAdjust(WindowSoftInputModeAdjust.Resize);
     }
 
-    protected override Window CreateWindow(IActivationState? activationState) => new(new MainPage());
+    protected override Window CreateWindow(IActivationState? activationState) => new(
+        MauiProgram.DatabaseReady
+            ? new MainPage()
+            : _services.GetRequiredService<StartupErrorPage>());
 }
