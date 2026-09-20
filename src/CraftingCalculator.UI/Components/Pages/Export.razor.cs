@@ -88,7 +88,8 @@ public partial class Export : ComponentBase, IDisposable
         }
         catch (Exception exception)
         {
-            // No ErrorBoundary exists, so a throw out of a load path freezes the whole app.
+            // Caught rather than left to the page boundary: the screen states the failure in its own words,
+            // and stays up with its back arrow rather than becoming a generic error card.
             LogSnapshotLoadFailed(Logger, exception);
             _loadError = "Your dataset couldn't be loaded for export. Go back and try again.";
         }

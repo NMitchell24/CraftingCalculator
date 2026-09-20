@@ -99,7 +99,8 @@ public sealed partial class ImportState(
         }
         catch (Exception exception)
         {
-            // No ErrorBoundary exists, so an exception reaching the renderer freezes the whole app.
+            // Caught rather than left to the page boundary: this says what failed in the app's own words and
+            // keeps the wizard on screen, where the user can pick another file.
             LogFilePickerFailed(logger, exception);
             StartOver();
             Error = "That file couldn't be opened. Try again, or choose a different file.";

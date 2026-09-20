@@ -133,6 +133,30 @@ If it keeps doing it, the log is the thing I need. That screen tells you where t
 has a **Save log to Downloads** button so you can grab a copy without getting into the app first. More detail:
 [Settings](settings.md#diagnostics).
 
+### "A screen turned into 'Something went wrong'"
+
+That screen ran into a problem, so the app swapped it for a card that says so instead of sitting there frozen and
+pretending everything is fine. It's not you, it's me, and whatever happened is already in the log.
+
+The button on the card is your way out. It says **Back to Craft** everywhere except the [Craft screen](craft-screen.md)
+itself, where it says **Try again** and has another go at the same screen. Everything else is untouched: your
+dataset, your favorites, and the batch you were building.
+
+If a dialog is what ran into trouble, it closes itself and a red message turns up at the top of the screen to say
+so. The screen underneath carries on as it was, with anything you'd typed still in it. Close the message with its
+![Close](assets/close.svg) or just move to another screen; it doesn't follow you around.
+
+### "The whole app turned into 'Crafting Calculator ran into a problem'"
+
+Same idea, one level up: something went wrong outside any single screen, so there was no screen left to keep.
+Your data is fine, and nothing has been changed or deleted.
+
+- **Try again:** picks up where you were, batch and all. Try this one first.
+- **Restart:** reloads the app. It's the bigger hammer, and it costs you the batch you were building.
+  Anything you saved is safe.
+
+If either card keeps coming back, the log is the thing I need. See [Settings](settings.md#diagnostics).
+
 ## Things worth knowing
 
 - **The number in a quantity stepper is editable.** Tap it and type. Much faster than tapping **+** two

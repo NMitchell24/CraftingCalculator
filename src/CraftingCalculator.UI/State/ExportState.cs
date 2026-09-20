@@ -83,8 +83,9 @@ public sealed partial class ExportState(IDatasetTransferService transferService,
         }
         catch (Exception exception)
         {
-            // No ErrorBoundary exists, so an exception reaching the renderer freezes the whole app. A folder
-            // that cannot be read is reported as no exports rather than as a failure.
+            // Caught rather than left to the page boundary: a folder that cannot be read is reported as no
+            // exports, which is still a screen the user can export from, where the boundary would replace the
+            // whole page with an error card.
             LogExportsUnreadable(logger, exception);
             Exports = [];
         }

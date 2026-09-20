@@ -377,6 +377,31 @@ html.keyboard-open .page-content-with-bottom-nav {
     padding-right: 8px;
 }
 
+/* The dialog boundary's report (MainLayout.razor), at the top of the content area on whichever screen the
+   failure happened on. Spaced like the inline alerts on the transfer screens, which it is the shell's twin of. */
+.dialog-error-alert {
+    margin-bottom: 16px;
+}
+
+/* The page boundary's error card (MainLayout.razor), which takes the failed page's place inside the shell.
+   One centered column rather than the left-aligned shape the app's other cards take: there is no screen
+   content beside it to line up with. Everything stacks, so a large OS text size only makes it taller. It
+   follows .app-card here because it restates that rule's padding, and two one-class rules are decided by
+   source order. */
+.page-error-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 12px;
+    text-align: center;
+}
+
+/* The gap already spaces the title off the line below it. */
+.page-error-card .app-card-title {
+    margin-bottom: 0;
+}
+
 /* Craft screen (Components/Pages/Calculate.razor + Components/Controls/*) */
 
 /* Stacked by default; two columns only where both dimensions are ample (see the media query below). */
@@ -1747,23 +1772,124 @@ html.keyboard-open .mud-dialog-container {
     opacity: 0.7;
 }
 
-#blazor-error-ui {
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+/* The app boundary's error screen (Components/Layout/FatalError.razor). Nothing on it can be inherited:
+   it renders with MudBlazor's theme provider torn down, so the palette variables every Mud component draws
+   itself from, and the body face the theme names, are both gone. Every value is pinned for the same reason
+   .app-cloak's are. The colors are the dark palette's on the splash slate (Theme/AppTheme.ForgeColors),
+   which is the ground the app started on and the one StartupErrorPage reports its own failure over. */
+.fatal-error {
     position: fixed;
-    width: 100%;
-    z-index: 1400;
+    inset: 0;
+    /* Above .app-cloak (2000): a failure inside MainLayout can land before the cloak has been dismissed,
+       and FatalError's own dismissal of it is a JS call that may not reach anything. Below
+       #blazor-error-ui (2100), which is what reports a failure this screen could not survive itself. */
+    z-index: 2050;
+    display: flex;
+    overflow-y: auto;
+    padding: calc(24px + max(env(safe-area-inset-top), var(--safe-area-inset-top))) calc(24px + var(--edge-inset-right)) calc(24px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom))) calc(24px + var(--edge-inset-left));
+    background-color: #2E3440;
+    color: #E4E7EC;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-#blazor-error-ui .dismiss {
+/* Centered by auto margins rather than by justify-content/align-items, for the reason .log-viewer-text
+   gives: with negative free space an auto margin resolves to zero and the panel scrolls normally, while a
+   centering keyword overflows past the scroll container's start edge where nothing can reach it. The cap is
+   in ch so it follows Android's text zoom, which scales ch and leaves em alone - it is a measure, not a
+   breakpoint, and on a phone the panel is narrower than this at every text size. */
+.fatal-error-panel {
+    margin: auto;
+    max-width: 44ch;
+}
+
+/* Mirrors .app-cloak-text and is declared after .display-title for the same reason: see that block. One step
+   down from the cloak's 34px, which is a single phrase alone on the screen; this one leads body copy. */
+.fatal-error-title {
+    margin: 0 0 16px;
+    color: #E4E7EC;
+    font-size: 1.75rem;
+    line-height: 1.3;
+}
+
+.fatal-error-body {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.fatal-error-hint {
+    color: #98A1B0;
+}
+
+.fatal-error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+/* The pair shares a line while both fit and stacks when they do not, each still full width: the basis is in
+   ch so that decision follows the text's zoomed size rather than a fixed px guess. font: inherit because a
+   native button does not take the family from the page, and this page's family is pinned above. */
+.fatal-error-button {
+    flex: 1 1 14ch;
+    min-height: 44px;
+    padding: 12px 16px;
+    border: 1px solid #E39A5C;
+    border-radius: 4px;
+    background-color: #E39A5C;
+    color: #1B1E24;
+    font: inherit;
+    font-weight: 600;
     cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
+}
+
+.fatal-error-button-quiet {
+    background-color: transparent;
+    color: #E39A5C;
+}
+
+/* Blazor's own last-resort bar, shown by blazor.webview.js when an exception reaches the renderer with no
+   boundary left to catch it - FatalError itself failing, or a throw out of an ErrorContent. The stock
+   template's 1400 put it under the Mud app bar (1500) and under .app-cloak (2000), so the one message the
+   user could still be given was hidden behind the frozen screen it was reporting. The pinned colors and
+   family are for the same reason .fatal-error pins its own.
+   display stays none: the script shows this bar by setting an inline display of block, so what is below has
+   to be a layout that works as a block - hence inline children that wrap with the text rather than a flex
+   row this cannot rely on. */
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2100;
+    padding: 12px 16px;
+    padding-bottom: calc(12px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    background-color: #2E3440;
+    color: #E4E7EC;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.4);
+}
+
+#blazor-error-ui .reload {
+    color: #E39A5C;
+}
+
+/* A real button rather than the template's bare span, which is neither focusable nor announced, on the only
+   control that dismisses this bar; the script binds the click by class either way. Inline-block so it flows
+   and wraps with the message instead of the template's absolutely positioned corner, which at a large OS
+   text size sat on top of the words. */
+#blazor-error-ui .dismiss {
+    display: inline-block;
+    min-width: 44px;
+    min-height: 44px;
+    border: 0;
+    background: none;
+    color: #E4E7EC;
+    font: inherit;
+    cursor: pointer;
 }
 
 /* The notch an outlined field cuts in its border for the floated label. MudBlazor sizes it from a hidden

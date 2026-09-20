@@ -6,9 +6,21 @@
 <MudThemeProvider Theme="AppTheme.Theme" @ref="_themeProvider" @bind-IsDarkMode="_isDarkMode"
                   ObserveSystemDarkModeChange="@(ThemeState.Mode == ThemeMode.System)" />
 <MudPopoverProvider />
-@* The app's dialog house style, set once here rather than in every ShowAsync/ShowMessageBoxAsync call.
-   RecordPickerDialog and LogViewerDialog override it (FullScreen on xs). *@
-<MudDialogProvider MaxWidth="MaxWidth.Small" FullWidth="true" CloseOnEscapeKey="true" BackdropClick="true" />
+@* Dialogs render here rather than under @Body, so the page boundary below is no use to them: a throw from
+   inside a dialog needs a boundary of its own, or it reaches the renderer and freezes the app. OnFaulted is
+   what puts the provider back - see MainLayout.OnDialogFaulted. *@
+<LoggingErrorBoundary @ref="_dialogBoundary" Scope="dialog" OnFaulted="OnDialogFaulted">
+    <ChildContent>
+        @* The app's dialog house style, set once here rather than in every ShowAsync/ShowMessageBoxAsync call.
+           RecordPickerDialog and LogViewerDialog override it (FullScreen on xs). *@
+        <MudDialogProvider MaxWidth="MaxWidth.Small" FullWidth="true" CloseOnEscapeKey="true" BackdropClick="true" />
+    </ChildContent>
+    <ErrorContent>
+        @* Nothing: the failure is reported by the dialog OnDialogFaulted opens once the provider is back, and
+           an error card here would be a dialog-shaped hole left on top of a page that is still perfectly usable.
+           This fragment exists so the boundary renders it instead of Blazor's own default error markup. *@
+    </ErrorContent>
+</LoggingErrorBoundary>
 <MudSnackbarProvider />
 
 @* The Breakpoint is cascaded from here rather than by a MudBreakpointProvider: this layout needs the
@@ -80,11 +92,40 @@
         }
 
         <MudMainContent Class="@MainContentClass">
+            @if (_dialogFailed)
+            {
+                @* Reported on the screen rather than in a dialog of its own. The dialog system is what just
+                   failed, so asking the provider that failed to render the report can fail in turn - and that
+                   loops, because Recover resets the error count ErrorBoundaryBase would otherwise stop it with
+                   (measured: ~90% CPU and the whole three-file log ring rewritten inside a minute). This is
+                   MainLayout's own markup, outside both boundaries, and it needs no provider at all. D10's
+                   third case: a failure that belongs to the screen it happened on. *@
+                <MudAlert Severity="Severity.Error" Class="dialog-error-alert" ShowCloseIcon="true"
+                          CloseIconClicked="DismissDialogFailure">
+                    The dialog I was supposed to show ran into a problem so I closed it. The problem has been written to the log.
+                </MudAlert>
+            }
+
             @* Left out while OpenDestinationAsync steps back through history, so the pages it passes are never
                created and the page being left is disposed before the first step. *@
             @if (!_unwinding)
             {
-                @Body
+                @* Around the page only: the app bar, the nav and the actions bar are outside it, so a page that
+                   fails leaves the user somewhere to go. Page loads are deliberately left unguarded - a throw on
+                   the way in belongs here rather than in a catch that renders half a screen. *@
+                <LoggingErrorBoundary @ref="_pageBoundary" Scope="page">
+                    <ChildContent>@Body</ChildContent>
+                    <ErrorContent>
+                        <MudPaper Class="app-card page-error-card" Elevation="0">
+                            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                            <MudText Typo="Typo.subtitle1" Class="app-card-title display-title">Something went wrong</MudText>
+                            <MudText>This screen ran into a problem. It's not you. It's me. The problem has been written to the log.</MudText>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ClearPageErrorAsync">
+                                @PageErrorActionLabel
+                            </MudButton>
+                        </MudPaper>
+                    </ErrorContent>
+                </LoggingErrorBoundary>
             }
         </MudMainContent>
 

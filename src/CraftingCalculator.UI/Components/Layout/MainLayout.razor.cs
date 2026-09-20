@@ -1,6 +1,7 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Constants;
+using CraftingCalculator.UI.Components.Controls;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
@@ -50,6 +51,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private const double ActionsDividerHeight = 17;
 
     private MudThemeProvider _themeProvider = null!;
+    private LoggingErrorBoundary _dialogBoundary = null!;
+    // Null while _unwinding leaves the page out of the layout altogether.
+    private LoggingErrorBoundary? _pageBoundary;
     private bool _isDarkMode;
     private bool _themeResolved;
     private bool _cloakDismissed;
@@ -62,6 +66,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private BrowserWindowSize? _windowSize;
     private bool _unwinding;
     private bool _restoreScrollPending;
+    private bool _dialogFailed;
 
     // Every dialog on screen, the top one last.
     private readonly List<IDialogReference> _openDialogs = [];
@@ -143,6 +148,16 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         bool.TryParse(PreferenceStore.Get(DrawerCollapsedKey), out _drawerCollapsed);
     }
 
+    // The router hands the layout its new page through Body, so this runs exactly once per navigation: it is
+    // where a page boundary showing its error card is put back, and where a dialog failure reported on the
+    // screen it happened on stops following the user around. Not LocationChanged, which fires while the router
+    // is still resolving the route and would leave the card over the incoming page.
+    protected override void OnParametersSet()
+    {
+        _pageBoundary?.Recover();
+        _dialogFailed = false;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -209,6 +224,32 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // MudDialogProvider in MainLayout.razor). Back arrives from platform code rather than a Blazor event handler, and closing re-renders
     // MudDialogProvider, so the close goes through InvokeAsync.
     private void CloseTopDialog() => _ = InvokeAsync(() => DialogService.Close(_openDialogs[^1], DialogResult.Cancel()));
+
+    /// <summary>
+    /// Clears up after the dialog boundary: the provider and every dialog in it are gone by the time this runs,
+    /// so this completes what the app was waiting on and brings a fresh provider back.
+    /// </summary>
+    private void OnDialogFaulted()
+    {
+        // Dismissed rather than dropped: ConfirmAsync and every other caller is awaiting IDialogReference.Result,
+        // and a dialog that is no longer on screen would leave them waiting forever. Over a copy, because each
+        // Dismiss completes the ForgetWhenClosedAsync that removes it from this list.
+        foreach (IDialogReference dialog in _openDialogs.ToList())
+        {
+            dialog.Dismiss(DialogResult.Cancel());
+        }
+
+        // Those removals are continuations of the Result task above and land whenever they land. Until they do,
+        // this list names dialogs that are no longer on screen, and a back press would close one of those
+        // instead of leaving the screen. Clearing here closes that window; the continuations then find nothing.
+        _openDialogs.Clear();
+        BackButtonState.SetHandler(null);
+
+        _dialogBoundary.Recover();
+        _dialogFailed = true;
+    }
+
+    private void DismissDialogFailure() => _dialogFailed = false;
 
     private async Task ApplyThemeAsync()
     {
@@ -283,6 +324,25 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // history.back() rather than a NavigateTo to the page underneath, which would push a second copy of
     // that page and leave the one being closed behind it for the system back gesture to reopen.
     private ValueTask StepBackAsync() => Js.InvokeVoidAsync("history.back");
+
+    // Craft is where every other screen's error card sends the user, so on Craft itself the only thing left to
+    // offer is another attempt at the same page.
+    private bool OnCraftScreen => CurrentRoute.Length == 0;
+
+    private string PageErrorActionLabel => OnCraftScreen ? "Try again" : "Back to Craft";
+
+    private Task ClearPageErrorAsync()
+    {
+        if (!OnCraftScreen)
+        {
+            // Not a plain NavigateTo: this unwinds history to Craft as well, so the system back gesture cannot
+            // walk straight back into the page that just failed.
+            return OpenDestinationAsync(Destinations[0]);
+        }
+
+        _pageBoundary?.Recover();
+        return Task.CompletedTask;
+    }
 
     /// <summary>
     /// Opens <paramref name="destination"/> with history reset beneath it: Craft is the first entry, and every

@@ -278,7 +278,9 @@ replace it. The one thing that must never appear in it is anything out of the us
 | Read back by the UI | `IDiagnosticLog` in `Application/Common/Interfaces` (a layer-boundary interface, like `IExportFileStore`) |
 | Shown to the user | Settings' Diagnostics card → `UI/Components/Dialogs/LogViewerDialog.razor`, which also hands the text to `IFileDownloader` |
 | Saving a copy to Downloads | `UI/Logging/DiagnosticLogDownload.cs`, shared by the viewer and the startup error page |
+| Error boundaries | `UI/Components/Controls/LoggingErrorBoundary.cs`, three of them (see below) |
 | Last-resort exception hooks | `UI/Logging/GlobalExceptionHandler.cs` |
+| Whole-app failure screen | `UI/Components/Layout/FatalError.razor`, the app boundary's error content |
 | Startup failure screen | `UI/StartupErrorPage.cs`, picked over `MainPage` by `App.CreateWindow` |
 | Wiring, log folder, session header | `UI/MauiProgram.cs` |
 
@@ -344,6 +346,36 @@ on WinUI is deliberately not logged**, and a new hook must not log its platform'
 passed as a `[LoggerMessage]` parameter reaches the file through the formatted-message path, where the redactor
 collapses paths but does *not* mask quoted values — that masking runs only over an exception's own message. The
 non-`Exception` payload of `AppDomain.UnhandledException` is logged by `GetType().Name` for the same reason.
+
+**Three error boundaries, and nothing freezes the renderer.** An unhandled throw in a component's lifecycle or
+event handler tears the renderer down, and a `BlazorWebView` then keeps its last frame - the app reads as frozen
+rather than crashed, which is why the boundaries exist at all. `LoggingErrorBoundary` is an `ErrorBoundary` that
+logs under its `Scope` and raises `OnFaulted`; it overrides `OnErrorAsync` **without** calling base, so each
+failure is one entry under the app's own category rather than two.
+
+- **`page`** wraps `@Body` in `MainLayout`, so the app bar, the nav and the actions bar survive a page that
+  fails, and the card offers Back to Craft (Try again on Craft itself). `MainLayout.OnParametersSet` recovers it,
+  because the router handing the layout a new `Body` is the signal that the failed screen has been left;
+  `LocationChanged` fires too early and raced the router. Page **loads stay unguarded** - a throw on the way in
+  belongs to this boundary, not to a catch that renders half a screen.
+- **`dialog`** wraps `MudDialogProvider`, which renders outside `@Body` and so is out of the page boundary's
+  reach. Its `ErrorContent` is empty, and `MainLayout.OnDialogFaulted` does the recovery: dismiss every open
+  dialog (an awaiter of `IDialogReference.Result` would otherwise wait forever), clear `_openDialogs`,
+  `Recover()` for a fresh provider, and raise the inline `.dialog-error-alert` banner on the screen underneath,
+  which keeps its state and its edits. **The report is never itself a dialog.** The dialog system is what just
+  failed, and a report that asks the failed provider to render it can fail in turn - which loops forever,
+  because `Recover()` resets the `MaximumErrorCount` that would otherwise stop it. Measured on device before
+  the banner replaced the dialog: ~90% CPU and the whole three-file log ring rewritten inside a minute. This is
+  also why `OnFaulted` is raised from the boundary's own `OnAfterRenderAsync` rather than `OnErrorAsync`: the
+  faulted provider is only disposed by the render that swaps `ErrorContent` in, and `ErrorBoundaryBase` sets
+  `CurrentException` **after** `OnErrorAsync` has returned.
+- **`app`** wraps the `Router` in `Routes.razor` and shows `FatalError`, which is plain HTML with pinned colors:
+  the theme provider died with the layout, so there are no `--mud-palette` variables left. It dismisses the
+  startup cloak itself, since a `MainLayout` that throws before `appCloak.dismiss` would leave "Stoking the
+  forge..." on screen forever.
+
+`#blazor-error-ui` (index.html, app.css) is the last resort behind all three, restyled to sit above the cloak and
+to wrap its text at any OS text size.
 
 **A startup failure is a screen, not a crash.** `MauiProgram` runs `Migrate()` and `IDatasetService.InitializeAsync()`
 inside a `try`, logs Critical on failure and sets `DatabaseReady`; `App.CreateWindow` reads it and shows
