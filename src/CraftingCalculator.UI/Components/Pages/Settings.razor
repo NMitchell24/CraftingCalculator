@@ -25,6 +25,18 @@
     </MudPaper>
 
     <MudPaper Class="app-card" Elevation="0">
+        <MudText Typo="Typo.subtitle1" Class="settings-section-title display-title">Diagnostics</MudText>
+        <MudDivider Class="my-4" />
+
+        <MudText Typo="Typo.body2">
+            The app keeps a small log on this device of what it did and anything that went wrong. It never
+            records your dataset, and it stays here unless you send it somewhere.
+        </MudText>
+
+        <MudButton Color="Color.Primary" OnClick="ShowLogsAsync" Class="mt-2">View logs</MudButton>
+    </MudPaper>
+
+    <MudPaper Class="app-card" Elevation="0">
         <MudText Typo="Typo.subtitle1" Class="settings-section-title display-title">About</MudText>
         <MudDivider Class="my-4" />
 

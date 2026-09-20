@@ -53,7 +53,7 @@ public static partial class MauiProgram
 
         builder.Services.AddSingleton<BackButtonState>();
         builder.Services.AddSingleton<IClipboardService, ClipboardService>();
-        builder.Services.AddSingleton<IExportDownloader, ExportDownloader>();
+        builder.Services.AddSingleton<IFileDownloader, FileDownloader>();
         builder.Services.AddSingleton<IImportFilePicker, ImportFilePicker>();
         builder.Services.AddSingleton<IPreferenceStore, PreferenceStore>();
         builder.Services.AddSingleton<IShareService, ShareService>();
@@ -103,7 +103,7 @@ public static partial class MauiProgram
     /// <summary>App and device context, written once at the top of each session's log entries.</summary>
     private static string SessionHeader()
     {
-        // DeviceInfo.Name is the name the user gave the device ("Nate's iPhone"), so it is not one of these.
+        // DeviceInfo.Name is the name the user gave the device ("My iPhone"), so it is not one of these.
         string[] lines =
         [
             $"App: Crafting Calculator {AppInfo.Current.VersionString} (build {AppInfo.Current.BuildString})",

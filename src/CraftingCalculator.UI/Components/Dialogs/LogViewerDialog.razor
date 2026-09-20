@@ -1,0 +1,42 @@
+@* No DialogActions: the dialog only shows what is already on the device, so Close is the only way out and it
+   sits in the title. The header above the log is fixed and the text scrolls under it (app.css). *@
+<MudDialog ContentClass="log-dialog-content">
+    <TitleContent>
+        <div class="closable-dialog-title">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Close" aria-label="Close" />
+            <MudText Typo="Typo.h6" Class="closable-dialog-title-text">Logs</MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div class="log-dialog-header">
+            <div class="log-dialog-location">
+                <MudText Typo="Typo.caption">Log file</MudText>
+                <MudText Typo="Typo.body2">@Location</MudText>
+            </div>
+            @if (Downloader.IsSupported)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary"
+                               title="@DownloadLabel" aria-label="@DownloadLabel" Disabled="@(_text is null || _downloading)"
+                               OnClick="DownloadAsync" />
+            }
+        </div>
+
+        @if (_text is null)
+        {
+            <div class="transfer-status">
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                <MudText Typo="Typo.body1">Reading the log…</MudText>
+            </div>
+        }
+        else if (_text.Length == 0)
+        {
+            <MudText Class="pa-4" Align="Align.Center">Nothing logged yet.</MudText>
+        }
+        else
+        {
+            <div class="log-viewer-scroll">
+                <pre class="log-viewer-text">@_text</pre>
+            </div>
+        }
+    </DialogContent>
+</MudDialog>

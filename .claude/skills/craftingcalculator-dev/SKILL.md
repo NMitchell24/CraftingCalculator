@@ -190,10 +190,13 @@ layout that had assumed text of a known width. The rule that settled every case:
 beats exact alignment.** A new or changed component has to hold to these, or it reintroduces the same bugs:
 
 - **Nothing is ever ellipsized or broken inside a word.** Not a record name, not a label, not a title, not a
-  button. The one exception is the value inside a `MudSelect`, which a select cannot wrap. So: no
-  `text-overflow: ellipsis`, no `overflow-wrap: anywhere` on a label (it breaks "Componen / ts" as soon as the
-  column is narrow), no `&shy;`. User content that can be one enormous word gets `min-width: 0` plus
-  `overflow-wrap: break-word`, which only breaks a word that would not fit a whole line by itself.
+  button. There are two exceptions: the value inside a `MudSelect`, which a select cannot wrap, and the raw log
+  text in `LogViewerDialog` (`.log-viewer-text`), which is machine output rather than copy — a stack frame is a
+  single 100+ character token, and `overflow-wrap: anywhere` is what keeps it out of the dialog's min-content so
+  it cannot widen the layout viewport. Otherwise: no `text-overflow: ellipsis`, no `overflow-wrap: anywhere` on a
+  label (it breaks "Componen / ts" as soon as the column is narrow), no `&shy;`. User content that can be one
+  enormous word gets `min-width: 0` plus `overflow-wrap: break-word`, which only breaks a word that would not fit
+  a whole line by itself.
 - **When things do not fit on one line, they stack; they do not shrink.** A label/value row puts the value
   under the label, right-aligned; a segmented control becomes full-width pills; a dialog's buttons stack with
   the confirming action on top (`flex-wrap: wrap-reverse` + `white-space: nowrap`); three fields become three
@@ -273,6 +276,7 @@ replace it. The one thing that must never appear in it is anything out of the us
 | Release-only scrubbing | `Infrastructure/Logging/LogRedactor.cs` |
 | Registration | `Infrastructure/DependencyInjection.cs` → `AddFileLogging` / `AddRedactedFileLogging` |
 | Read back by the UI | `IDiagnosticLog` in `Application/Common/Interfaces` (a layer-boundary interface, like `IExportFileStore`) |
+| Shown to the user | Settings' Diagnostics card → `UI/Components/Dialogs/LogViewerDialog.razor`, which also hands the text to `IFileDownloader` |
 | Wiring, log folder, session header | `UI/MauiProgram.cs` |
 
 **How it behaves.** Every entry is one open-append-close inside a `Lock`, so nothing is buffered and a crash

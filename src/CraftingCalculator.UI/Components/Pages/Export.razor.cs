@@ -16,12 +16,16 @@ namespace CraftingCalculator.UI.Components.Pages;
 public partial class Export : ComponentBase, IDisposable
 {
     [Inject] private IDatasetTransferService TransferService { get; set; } = null!;
-    [Inject] private IExportDownloader Downloader { get; set; } = null!;
+    [Inject] private IFileDownloader Downloader { get; set; } = null!;
     [Inject] private IShareService ShareService { get; set; } = null!;
     [Inject] private ExportState ExportState { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private ILogger<Export> Logger { get; set; } = null!;
+
+    // .ccdata is the app's own extension, so no registered media type describes it. The downloads folder
+    // requires one, and this is what Android itself falls back to for a file it cannot identify.
+    private const string ExportMimeType = "application/octet-stream";
 
     private DatasetSnapshot? _snapshot;
     private DependencyGraph? _graph;
@@ -134,7 +138,7 @@ public partial class Export : ComponentBase, IDisposable
 
         try
         {
-            await Downloader.SaveToDownloadsAsync(export.FullPath);
+            await Downloader.SaveToDownloadsAsync(export.FullPath, ExportMimeType);
             Snackbar.Add("Saved to your Downloads folder.", Severity.Success);
         }
         catch (Exception exception)

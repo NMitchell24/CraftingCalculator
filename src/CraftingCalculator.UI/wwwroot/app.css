@@ -1523,14 +1523,69 @@ html.keyboard-open .mud-snackbar-location-bottom-center {
     max-height: calc(100dvh - 32px);
 }
 
-/* RecordPickerDialog wherever it is a centered card rather than full-screen. Sized by its content, the picker
-   changed height, and MudBlazor re-centered it, on every keystroke in its search field. A fixed height holds it
-   still: .mud-dialog is a flex column, so the content takes what the title leaves at any text size and scrolls
-   the list, or its nothing matches line, inside that. Matched through the picker's ContentClass. 720px keeps a
+/* RecordPickerDialog and LogViewerDialog wherever they are a centered card rather than full-screen. Sized by
+   its content, the picker changed height, and MudBlazor re-centered it, on every keystroke in its search field,
+   and the log viewer would do the same when the file finished loading under the spinner. A fixed height holds
+   them still: .mud-dialog is a flex column, so the content takes what the title leaves at any text size and
+   scrolls the list, or the log text, inside that. Matched through each dialog's ContentClass. 720px keeps a
    picker from becoming a wall of rows on a desktop monitor; below that it takes all the height the rule above
    allows, which on a landscape phone is all there is. */
-.mud-dialog:not(.mud-dialog-fullscreen):has(.picker-dialog-content) {
+.mud-dialog:not(.mud-dialog-fullscreen):has(.picker-dialog-content),
+.mud-dialog:not(.mud-dialog-fullscreen):has(.log-dialog-content) {
     height: min(720px, calc(100dvh - 32px));
+}
+
+/* Components/Dialogs/LogViewerDialog.razor. The location and Download stay put and the log scrolls under them,
+   so the content is a column whose second child takes the slack. */
+.mud-dialog-content.log-dialog-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* The location can be a full file path on Windows, which is one long unbreakable token; min-width lets it
+   shrink so Download keeps its place, and the path wraps rather than pushing the row wider. The rule matches
+   the MudDivider under each Settings section title: at the largest text sizes the header wraps to three lines
+   and would otherwise run straight into the monospace log scrolling under it. */
+.log-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+    margin-bottom: 8px;
+}
+
+.log-dialog-location {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+/* column-reverse so the log opens on its newest line with no JS: the scroll origin of a reversed column is its
+   visual bottom. */
+.log-viewer-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+/* The one place the app breaks inside a word. This is machine output, not copy: a stack frame is a single
+   100+ character token, and anywhere is what keeps it from adding that token's width to the dialog's
+   min-content and sliding the fixed bars on Android (see the overflow rules above).
+
+   margin-bottom is the main-START margin of a reversed column, so auto absorbs the free space below the text
+   and a log too short to scroll sits at the top of the box instead of floating at its bottom. It has to be the
+   auto margin and not justify-content: with negative free space the spec resolves an auto margin to zero, while
+   a justify-content of flex-end overflows past the scroll container's start edge, where nothing can scroll to
+   it - measured on Android, which silently clipped 26000px of log. */
+.log-viewer-text {
+    margin: 0 0 auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: monospace;
 }
 
 /* A button label never wraps inside its button; when the row cannot fit every button on one line, the
@@ -1561,33 +1616,34 @@ html.keyboard-open .mud-dialog-container {
     letter-spacing: 0.02em;
 }
 
-/* A FullScreen MudDialog (RecordPickerDialog on xs - Components/Dialogs/RecordPickerDialog.razor)
-   draws from y=0 same as the app bar, so its title needs the same safe-area clearance. A normal
-   (non-fullscreen) dialog is centered with margin and never reaches the real top of the screen, so
-   this is scoped to .mud-dialog-fullscreen only. */
+/* A FullScreen MudDialog (RecordPickerDialog and LogViewerDialog on xs) draws from y=0 same as the app
+   bar, so its title needs the same safe-area clearance. A normal (non-fullscreen) dialog is centered
+   with margin and never reaches the real top of the screen, so this is scoped to
+   .mud-dialog-fullscreen only. */
 .mud-dialog-fullscreen .mud-dialog-title {
     padding-top: calc(16px + max(env(safe-area-inset-top), var(--safe-area-inset-top)));
 }
 
-/* Components/Dialogs/RecordPickerDialog.razor. Close and the title share the title row, and the title takes the
-   slack. At the largest text sizes the title wraps to two lines. The title spans a second 1fr row: an item that
-   crosses a flexible track grows only that track, so the first row stays as tall as Close and Close centers in
-   it. No column gap: the button already pads itself. */
-.picker-dialog-title {
+/* The title row of a dialog whose only way out is a Close icon (Components/Dialogs/RecordPickerDialog.razor,
+   LogViewerDialog.razor). Close and the title share the row, and the title takes the slack. At the largest text
+   sizes the title wraps to two lines. The title spans a second 1fr row: an item that crosses a flexible track
+   grows only that track, so the first row stays as tall as Close and Close centers in it. No column gap: the
+   button already pads itself. */
+.closable-dialog-title {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     align-items: center;
 }
 
-.picker-dialog-title > .mud-button-root {
+.closable-dialog-title > .mud-button-root {
     grid-row: 1;
 }
 
 /* Stretched over both rows with its text centered, so a one-line title still lines up with the buttons.
    overflow-wrap is the guard for a word wider than the column: horizontal overflow on Android widens the layout
    viewport and slides the fixed bars. */
-.picker-dialog-title-text {
+.closable-dialog-title-text {
     grid-row: 1 / span 2;
     align-self: stretch;
     display: flex;
