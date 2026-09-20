@@ -16,7 +16,7 @@
             @if (Downloader.IsSupported)
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Primary"
-                               title="@DownloadLabel" aria-label="@DownloadLabel" Disabled="@(_text is null)"
+                               title="@DownloadLabel" aria-label="@DownloadLabel" Disabled="@(_text is null || _downloading)"
                                OnClick="DownloadAsync" />
             }
         </div>

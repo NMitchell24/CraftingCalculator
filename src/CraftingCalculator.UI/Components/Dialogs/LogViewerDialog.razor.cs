@@ -30,6 +30,8 @@ public partial class LogViewerDialog : ComponentBase
     // nothing in it yet.
     private string? _text;
 
+    private bool _downloading;
+
     private string Location => DiagnosticLogLocation.Describe(Log);
 
     /// <summary>Opens the log viewer, full screen on a phone and a large card anywhere else.</summary>
@@ -53,6 +55,18 @@ public partial class LogViewerDialog : ComponentBase
 
     private async Task DownloadAsync()
     {
+        // One save at a time. The cache copy is named to the second, so two overlapping runs share a path that
+        // each one truncates with FileMode.Create and then deletes, and the second tap would only ever produce
+        // a duplicate of the first copy anyway. The Disabled binding alone would not do it: Blazor dispatches
+        // handlers serially but a second tap can arrive before the disabled state reaches the DOM, which is
+        // also why this check-and-set cannot interleave.
+        if (_downloading)
+        {
+            return;
+        }
+
+        _downloading = true;
+
         // What the user is looking at, not a re-read: the file may have grown since, and the two disagreeing
         // would be worse than a copy that is a few entries behind.
         string path = Path.Combine(
@@ -77,6 +91,7 @@ public partial class LogViewerDialog : ComponentBase
         finally
         {
             DeleteQuietly(path);
+            _downloading = false;
         }
     }
 
