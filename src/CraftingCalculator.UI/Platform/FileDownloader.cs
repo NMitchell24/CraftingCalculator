@@ -8,27 +8,23 @@ using CraftingCalculator.Application.Common.Interfaces;
 
 namespace CraftingCalculator.UI.Platform;
 
-public class ExportDownloader : IExportDownloader
+public class FileDownloader : IFileDownloader
 {
 #if ANDROID
-    // .ccdata is the app's own extension, so no registered media type describes it. MediaStore requires one,
-    // and this is what Android itself falls back to for a file it cannot identify.
-    private const string MimeType = "application/octet-stream";
-
     // Android is the only platform that hides FileSystem.AppDataDirectory from the user, so it is the only one
-    // where an export has to be copied anywhere for them to reach it.
+    // where a file has to be copied anywhere for them to reach it.
     public bool IsSupported => true;
 
-    public async Task SaveToDownloadsAsync(string path)
+    public async Task SaveToDownloadsAsync(string path, string mimeType)
     {
         ContentResolver resolver = Android.App.Application.Context.ContentResolver!;
 
         ContentValues values = new();
         values.Put(MediaStore.IMediaColumns.DisplayName, Path.GetFileName(path));
-        values.Put(MediaStore.IMediaColumns.MimeType, MimeType);
+        values.Put(MediaStore.IMediaColumns.MimeType, mimeType);
         values.Put(MediaStore.IMediaColumns.RelativePath, AndroidEnvironment.DirectoryDownloads);
 
-        // A pending row is hidden from every other app, so a file manager can never open a half-written export.
+        // A pending row is hidden from every other app, so a file manager can never open a half-written copy.
         // Cleared once the copy is complete.
         values.Put(MediaStore.IMediaColumns.IsPending, 1);
 
@@ -69,6 +65,6 @@ public class ExportDownloader : IExportDownloader
 #else
     public bool IsSupported => false;
 
-    public Task SaveToDownloadsAsync(string path) => throw new NotSupportedException();
+    public Task SaveToDownloadsAsync(string path, string mimeType) => throw new NotSupportedException();
 #endif
 }

@@ -42,6 +42,61 @@ is when the cleanup runs.
 
 More detail: [Import and Export](import-export.md#export-history).
 
+## Diagnostics
+
+The app keeps a log. Not the fun kind you turn into planks. The boring kind that tells me what happened when you
+tell me something broke.
+
+There's no crash reporter and no telemetry in this app, so if something goes wrong on your device, I have nothing
+to go on unless you hand it to me. That's what this is for. It lives on your phone, it never goes anywhere by
+itself, and you can read every line of it.
+
+**View logs** opens it: ![Settings](assets/settings.svg) **Settings** → **View logs**. Newest entries are at the
+bottom, and that's where it opens. Tap ![Close](assets/close.svg) **Close** when you're done.
+
+### What's in it
+
+- **The session header:** the app's version and build, your OS version, and your device's manufacturer, model and
+  type (phone, tablet, desktop). One of these is written every time the app starts.
+- **Errors:** anything that went wrong, what the app was trying to do at the time, and the developer-facing detail
+  I need to find it in the code.
+
+### What's never in it
+
+Anything you typed. No component names, no blueprint names, no categories, no dataset names, no numbers you
+entered, no file names. Your device's *name* isn't in there either, only its model, so it says `Google Pixel 8`
+and not whatever you decided to call the thing.
+
+That's deliberate, and it's enforced twice. The app is written not to put your data in the log in the first
+place, and then a second pass scrubs anything that slipped through in a system error message. So you can send me
+a log without reading it first, though I'd rather you read it. It's your device.
+
+> **Note:** Your dataset has nothing to do with the log, and the log has nothing to do with your dataset. Deleting
+> one doesn't touch the other.
+
+### How big it gets
+
+Capped, and not by much. The app writes to one file until it hits 128 KB, then starts a new one and keeps the two
+previous ones. The oldest gets deleted. Three files, about 384 KB total, forever. It can't creep up on your
+storage, and it can't fill your device while you're not looking.
+
+The trade-off is that the log only covers recent history. If something broke a month and a hundred launches ago,
+that entry is long gone. Grab the log while the problem is fresh.
+
+### Getting it off the device
+
+Where it lives depends on the platform, same as an export:
+
+- **Windows:** the dialog shows the full path. Open that folder and the file is right there.
+- **Android:** it's in the app's own storage, where nothing else can reach it, so the dialog gives you a
+  ![Download](assets/download.svg) button. Tap it and a copy lands in your **Downloads** folder as a `.txt` file,
+  ready to attach to anything.
+- **iPhone and iPad:** open the Files app and go to **On My iPhone → Crafting Calculator → Logs** (it says **On My
+  iPad** on an iPad). It sits next to the **Exports** folder.
+
+The copy is a snapshot of what you were looking at. The app keeps logging after you take it, so a copy from
+yesterday won't have today's errors in it.
+
 ## About
 
 The app's name, its version and build number, the copyright, the promise, and the license.
@@ -70,7 +125,7 @@ Everything you create — every component, blueprint, category and favorite — 
   anywhere. When I said 100% free, I meant it. Your data is **not** some hidden cost. The app does keep a small
   diagnostic log on your device so I have something to go on when you tell me it broke. It records what the app
   itself did, never your components or blueprints, and it stays on your device unless you decide to send it to
-  me. On iOS you'll see it as a **Logs** folder next to **Exports** in the Files app.
+  me. You can read the whole thing.
 
 All of your [datasets](managing-datasets.md) share that one database file, so this applies to every one of
 them at once.
