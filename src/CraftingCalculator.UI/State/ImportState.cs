@@ -1,9 +1,9 @@
-using System.Diagnostics;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.Domain.Models.Transfer;
+using Microsoft.Extensions.Logging;
 using MudBlazor;
 
 namespace CraftingCalculator.UI.State;
@@ -18,12 +18,13 @@ namespace CraftingCalculator.UI.State;
 /// <see cref="Changed"/> can be raised off the renderer's dispatcher, so a component subscribes with
 /// <c>_ = InvokeAsync(StateHasChanged)</c> rather than calling <c>StateHasChanged</c> directly.
 /// </remarks>
-public sealed class ImportState(
+public sealed partial class ImportState(
     IDatasetTransferService transferService,
     IImportFilePicker filePicker,
     ISelectedDatasetState selectedDataset,
     CraftState craftState,
-    ISnackbar snackbar)
+    ISnackbar snackbar,
+    ILogger<ImportState> logger)
 {
     private string? _filePath;
     private DatasetSnapshot? _chosen;
@@ -99,7 +100,7 @@ public sealed class ImportState(
         catch (Exception exception)
         {
             // No ErrorBoundary exists, so an exception reaching the renderer freezes the whole app.
-            Debug.WriteLine(exception);
+            LogFilePickerFailed(logger, exception);
             StartOver();
             Error = "That file couldn't be opened. Try again, or choose a different file.";
             Changed?.Invoke();
@@ -145,7 +146,7 @@ public sealed class ImportState(
         catch (Exception exception)
         {
             // Every exception, for the reason given above.
-            Debug.WriteLine(exception);
+            LogImportFileUnreadable(logger, exception);
             ValidationErrors = ["The file couldn't be read. Try choosing it again."];
             Step = ImportStep.Invalid;
         }
@@ -376,7 +377,7 @@ public sealed class ImportState(
     {
         // Every exception, for the reason given in PickFileAsync. Both writes run in one transaction, so nothing was
         // changed.
-        Debug.WriteLine(exception);
+        LogImportFailed(logger, exception, returnTo);
         ClearConflicts();
         Error = "Your data couldn't be imported, so nothing was changed. Try again.";
         Step = returnTo == ImportStep.ResolveConflicts ? ImportStep.Review : returnTo;
@@ -394,7 +395,7 @@ public sealed class ImportState(
             catch (IOException exception)
             {
                 // The cache folder is the platform's to clear; a copy left behind is overwritten by the next pick.
-                Debug.WriteLine(exception);
+                LogStagedFileNotDeleted(logger, exception);
             }
         }
 
@@ -422,4 +423,18 @@ public sealed class ImportState(
         Replace.Clear();
         CycleNames = [];
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The import file picker failed; no file was staged")]
+    private static partial void LogFilePickerFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The staged import file could not be read or validated")]
+    private static partial void LogImportFileUnreadable(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error,
+        Message = "The import failed and was rolled back, returning to step {ReturnTo}")]
+    private static partial void LogImportFailed(ILogger logger, Exception exception, ImportStep returnTo);
+
+    [LoggerMessage(Level = LogLevel.Warning,
+        Message = "The staged import file could not be deleted from the cache")]
+    private static partial void LogStagedFileNotDeleted(ILogger logger, Exception exception);
 }

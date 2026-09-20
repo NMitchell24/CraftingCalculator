@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Backup rules for Android 11 and lower (android:fullBackupContent). Diagnostic logs describe the device
+     that produced them and must not ride along in a cloud backup; the SQLite database and the Exports folder
+     are deliberately NOT excluded - a user's datasets surviving a device restore is a feature. -->
+<full-backup-content>
+    <exclude domain="file" path="Logs" />
+</full-backup-content>

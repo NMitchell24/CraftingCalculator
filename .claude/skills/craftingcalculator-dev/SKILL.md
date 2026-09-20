@@ -260,6 +260,72 @@ of tokens if the output is read back. **Do not run it on your own initiative. As
 change warrants it; a single-component change gets the one-screen check above. Any scripts that automate the
 walk are machine-local and not part of the repo; do not go looking for them.
 
+## Logging and privacy
+
+The app writes a diagnostic log to a file on the device, in **Release as well as Debug** — it is the only
+diagnostics a device in the field has, and there is no telemetry, no crash reporter and no network call to
+replace it. The one thing that must never appear in it is anything out of the user's dataset.
+
+| Piece | Where |
+|---|---|
+| Sink (`ILoggerProvider`, hand-rolled, no Serilog) | `Infrastructure/Logging/FileLoggerProvider.cs` |
+| Entry formatter | `Infrastructure/Logging/FileLogger.cs` |
+| Release-only scrubbing | `Infrastructure/Logging/LogRedactor.cs` |
+| Registration | `Infrastructure/DependencyInjection.cs` → `AddFileLogging` / `AddRedactedFileLogging` |
+| Read back by the UI | `IDiagnosticLog` in `Application/Common/Interfaces` (a layer-boundary interface, like `IExportFileStore`) |
+| Wiring, log folder, session header | `UI/MauiProgram.cs` |
+
+**How it behaves.** Every entry is one open-append-close inside a `Lock`, so nothing is buffered and a crash
+loses nothing. `crafting-calculator.log` rotates at `MaxFileSizeBytes` (128 KB) into `.1.log` and `.2.log`;
+`RetainedArchives` is 2, so the device holds at most 3 files / ~384 KB forever, with no retention sweep and no
+dates in the file names. `Write` and `ReadAll` swallow every exception: diagnostics must never crash the app.
+`ReadAll()` concatenates the retained files oldest first.
+
+**Debug and Release differ on purpose.** `MauiProgram` picks: Debug registers the sink with no redactor and
+writes `exception.ToString()` raw so development logs stay readable, and the session header says
+`Redaction: off (Debug build)` so a dev log is never mistaken for one that is safe to send. Release registers a
+`LogRedactor` built from the app's folders. The `#if DEBUG` lives in the UI head, never inside Infrastructure,
+so the sink's tests exercise redaction in any configuration.
+
+**What the redactor does**, when it is there:
+
+- **Paths** under any known root (app data, cache, Documents, the Windows user profile) collapse to
+  `<path>.ext`. The scan does not stop at a space — a dataset name can contain one, and an export is named
+  `{dataset}-{yyyyMMdd-HHmmss}.ccdata` — so it runs to a real terminator and then hands back the trailing words
+  that read as prose rather than as part of a file name.
+- **Quoted values in exception messages** become `'***'`. The pattern guards against letters on either side, so
+  "couldn't" is not read as an opening quote. `SqliteException` is exempt: its message names tables, columns and
+  constraints, which are the schema and not the user's data.
+- **Type names and stack traces are always kept in full.** When redacting, the formatter never calls
+  `exception.ToString()` — it walks the chain (`InnerException`, `AggregateException.InnerExceptions`) itself.
+
+**The call-site rules (L1–L4) are in `CLAUDE.md`** and are the part that actually keeps the promise: the redactor
+only catches what the *framework* wrote into an exception message, never what a call site chose to log. Adding a
+log call means adding a `[LoggerMessage]` partial method to the class that logs, which makes the class `partial`
+and gives it an `ILogger<T>` (a primary-constructor parameter on a state class, an `[Inject]` property on a page).
+
+```csharp
+// ExportState.cs — the shape every log call in this repo takes
+public sealed partial class ExportState(IDatasetTransferService transferService, ILogger<ExportState> logger)
+{
+    // ... catch (Exception exception) { LogExportFailed(logger, exception); ... }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The export could not be written; no file was saved")]
+    private static partial void LogExportFailed(ILogger logger, Exception exception);
+}
+```
+
+The message is a constant and dev-actionable: it says what the app was doing and what state it left behind, and
+it names nothing the user typed. **`CraftingCalculator.Application` stays logging-free** — it has no logging
+package reference, and it should not gain one.
+
+**Location and backup.** `AppDataDirectory/Logs` on Android and Windows; `MyDocuments/Logs` on iOS, so the Files
+app can reach it, with `NSUrl.IsExcludedFromBackupKey` set. `Platforms/Android/Resources/xml/auto_backup_rules.xml`
+and `data_extraction_rules.xml` exclude `Logs` from both Android backup generations: a log describes the device
+that produced it, while the database and exports transfer with the user.
+
+**Checking privacy needs a Release build.** A Debug log is deliberately unredacted, so it proves nothing.
+
 ## Built-in help (`docs/help`)
 
 The app ships a manual. The **?** in the app bar (`MainLayout.ToggleHelpAsync`) opens the help page for the

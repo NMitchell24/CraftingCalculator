@@ -77,6 +77,9 @@ pairing from Windows.
   supported combination with EF Core.
 - Data layer (`Microsoft.EntityFrameworkCore.Sqlite`) bundles native SQLite for iOS — no extra
   native-SQLite work needed.
+- **The diagnostic log's iOS path has never run.** It compiles, but the iCloud backup exclusion on the
+  `Documents/Logs` folder is unverified. Once the Simulator runs the app, work through
+  [logging-on-apple.md](logging-on-apple.md).
 
 ## Mac Catalyst (future head, not built yet)
 

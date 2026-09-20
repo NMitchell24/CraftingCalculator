@@ -1,10 +1,10 @@
-using System.Diagnostics;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models.Transfer;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
@@ -21,6 +21,7 @@ public partial class Export : ComponentBase, IDisposable
     [Inject] private ExportState ExportState { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private ILogger<Export> Logger { get; set; } = null!;
 
     private DatasetSnapshot? _snapshot;
     private DependencyGraph? _graph;
@@ -84,7 +85,7 @@ public partial class Export : ComponentBase, IDisposable
         catch (Exception exception)
         {
             // No ErrorBoundary exists, so a throw out of a load path freezes the whole app.
-            Debug.WriteLine(exception);
+            LogSnapshotLoadFailed(Logger, exception);
             _loadError = "Your dataset couldn't be loaded for export. Go back and try again.";
         }
 
@@ -138,7 +139,7 @@ public partial class Export : ComponentBase, IDisposable
         }
         catch (Exception exception)
         {
-            Debug.WriteLine(exception);
+            LogDownloadFailed(Logger, exception);
             Snackbar.Add("That export couldn't be saved to your Downloads folder.", Severity.Error);
         }
     }
@@ -156,7 +157,7 @@ public partial class Export : ComponentBase, IDisposable
         }
         catch (Exception exception)
         {
-            Debug.WriteLine(exception);
+            LogShareFailed(Logger, exception);
             Snackbar.Add("The share sheet couldn't be opened.", Severity.Error);
         }
     }
@@ -196,4 +197,13 @@ public partial class Export : ComponentBase, IDisposable
         ExportState.Changed -= OnExportChanged;
         PageShellState.Reset(this);
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The dataset snapshot could not be loaded for export")]
+    private static partial void LogSnapshotLoadFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The export could not be saved to the Downloads folder")]
+    private static partial void LogDownloadFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The share sheet could not be opened for the export")]
+    private static partial void LogShareFailed(ILogger logger, Exception exception);
 }

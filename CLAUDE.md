@@ -141,6 +141,37 @@ the rules that matter most often:
 
 ---
 
+## Logging and privacy
+
+The app writes a diagnostic log to a file on the device in **Release as well as Debug** — it is the only
+diagnostics a device in the field has. `Infrastructure/Logging/FileLoggerProvider` is the sink, registered from
+`MauiProgram` and read back by the UI through `IDiagnosticLog` in `Application/Common/Interfaces`. It rotates at
+128 KB across three files, so the device never holds more than ~384 KB, whatever happens.
+
+**The user's dataset never appears in it.** In Release a `LogRedactor` in the sink is the backstop: it collapses
+paths under the app's folders to `<path>.ext` and masks quoted values in exception messages. A **Debug** build
+deliberately writes exceptions raw so development logs stay readable, so a call site that logs user content leaks
+it on every machine the app is built on. The rules are what keep the promise; the redactor only catches what the
+framework puts in an exception message.
+
+- **L1 — all app logging is `[LoggerMessage]`.** Source-generated partial methods, declared in the class that
+  logs. Never call `logger.LogError(...)` and friends directly:
+  `grep -rnE "\.Log(Trace|Debug|Information|Warning|Error|Critical)\(" src/` finds nothing.
+- **L2 — parameters are only** an `Exception`, an enum, a `bool`, a count, or a string the app itself authored: a
+  compile-time operation name, a route, a control's own label, a `GetType().Name`, a session header field. Never a
+  record, dataset or category name, never a file name, never a path the user chose.
+- **L3 — our own `throw` messages** follow the same rule: constants plus ids, enums and counts, never user-entered
+  text. A thrown message ends up in the log. `BlueprintProcessor.ThrowIfTooDeep` names the blueprint's **id**.
+- **L4 — EF sensitive logging stays DEBUG-only and never reaches the file.** `EnableSensitiveDataLogging` makes a
+  failed command log its parameter values (`[Parameters=[@p0='Bronze'...]`) at Error, so `AddFileLogging` filters
+  `Microsoft.EntityFrameworkCore` to `None` in **both** configurations. The debugger output window still gets it.
+
+Log location is `AppDataDirectory/Logs` (`MyDocuments/Logs` on iOS, so the Files app can reach it). The Android
+backup rules exclude it: diagnostics stay on the device that produced them, while the database transfers with the
+user.
+
+---
+
 ## Key commands
 
 ```bash
