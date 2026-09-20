@@ -339,6 +339,12 @@ before the session header, and subscribes `AppDomain.UnhandledException`, `TaskS
 would otherwise tear down a window that is still usable. Android and iOS are record-only: the native side has
 already unwound, and pretending otherwise would leave the app running on abandoned state.
 
+Every hook logs the `Exception` and nothing else that carries a message. **`UnhandledExceptionEventArgs.Message`
+on WinUI is deliberately not logged**, and a new hook must not log its platform's equivalent either: a string
+passed as a `[LoggerMessage]` parameter reaches the file through the formatted-message path, where the redactor
+collapses paths but does *not* mask quoted values — that masking runs only over an exception's own message. The
+non-`Exception` payload of `AppDomain.UnhandledException` is logged by `GetType().Name` for the same reason.
+
 **A startup failure is a screen, not a crash.** `MauiProgram` runs `Migrate()` and `IDatasetService.InitializeAsync()`
 inside a `try`, logs Critical on failure and sets `DatabaseReady`; `App.CreateWindow` reads it and shows
 `StartupErrorPage` instead of `MainPage`. That page is native C# controls, not a `BlazorWebView` — the Blazor app

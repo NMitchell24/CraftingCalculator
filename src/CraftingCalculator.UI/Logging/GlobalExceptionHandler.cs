@@ -61,11 +61,11 @@ internal static partial class GlobalExceptionHandler
         // CraftingCalculator.Application namespace, hence the full name.
         Microsoft.UI.Xaml.Application.Current.UnhandledException += (_, args) =>
         {
-            // args.Message is logged beside the exception because WinUI frequently hands over an Exception
-            // with no StackTrace attached, leaving the message as the only description of the failure. It is
-            // framework-authored text, and the redactor still collapses any path in it; what it does not
-            // reach is quoted-value masking, which only runs over exception messages.
-            LogWindowsUnhandled(logger, args.Exception, args.Message);
+            // args.Message is deliberately not logged beside the exception. It is WinUI's rendering of the
+            // same failure, so it adds nothing the walk below does not already record - and as a log
+            // parameter it would reach the file with paths collapsed but quoted values intact, because the
+            // sink masks quoted values only in an exception's own message.
+            LogWindowsUnhandled(logger, args.Exception);
             args.Handled = true;
         };
 #endif
@@ -98,7 +98,7 @@ internal static partial class GlobalExceptionHandler
 #endif
 #if WINDOWS
     [LoggerMessage(Level = LogLevel.Critical,
-        Message = "Unhandled exception reached WinUI and was handled; the app was left running\n{Message}")]
-    private static partial void LogWindowsUnhandled(ILogger logger, Exception exception, string message);
+        Message = "Unhandled exception reached WinUI and was handled; the app was left running")]
+    private static partial void LogWindowsUnhandled(ILogger logger, Exception exception);
 #endif
 }
