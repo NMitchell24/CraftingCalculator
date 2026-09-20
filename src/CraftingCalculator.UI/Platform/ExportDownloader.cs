@@ -39,22 +39,32 @@ public class ExportDownloader : IExportDownloader
 
         try
         {
-            await using Stream source = File.OpenRead(path);
-            await using Stream destination = resolver.OpenOutputStream(target)
-                                             ?? throw new IOException("The new file in the downloads folder couldn't be opened.");
+            // Scoped rather than declared: the streams have to be flushed and closed before the row is
+            // published, and a declaration would dispose them at the end of this try instead.
+            await using (Stream source = File.OpenRead(path))
+            await using (Stream destination = resolver.OpenOutputStream(target)
+                                              ?? throw new IOException("The new file in the downloads folder couldn't be opened."))
+            {
+                await source.CopyToAsync(destination);
+            }
 
-            await source.CopyToAsync(destination);
+            values.Clear();
+            values.Put(MediaStore.IMediaColumns.IsPending, 0);
+
+            // Update reports how many rows it changed, and none means the row is no longer there to clear the
+            // pending flag on. The file would stay invisible, so this counts as a failure rather than a save.
+            if (resolver.Update(target, values, null, null) == 0)
+            {
+                throw new IOException("The downloads folder didn't publish the new file.");
+            }
         }
         catch
         {
-            // Still pending, so the row would strand a file the user can neither see nor delete.
+            // Anything that failed before the flag was cleared leaves the row pending, stranding a file the
+            // user can neither see nor delete.
             resolver.Delete(target, null, null);
             throw;
         }
-
-        values.Clear();
-        values.Put(MediaStore.IMediaColumns.IsPending, 0);
-        resolver.Update(target, values, null, null);
     }
 #else
     public bool IsSupported => false;
