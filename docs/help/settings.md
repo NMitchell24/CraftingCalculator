@@ -67,7 +67,10 @@ Everything you create — every component, blueprint, category and favorite — 
 - **No account.** There's nothing to sign up for and nothing to log into.
 - **No internet.** The app makes no network calls at all. It works in a tent, on a plane, in a basement, or on the moon.
 - **No telemetry.** The app doesn't collect anything about you or your dataset, and it doesn't send anything
-  anywhere. When I said 100% free, I meant it. Your data is **not** some hidden cost.
+  anywhere. When I said 100% free, I meant it. Your data is **not** some hidden cost. The app does keep a small
+  diagnostic log on your device so I have something to go on when you tell me it broke. It records what the app
+  itself did, never your components or blueprints, and it stays on your device unless you decide to send it to
+  me. On iOS you'll see it as a **Logs** folder next to **Exports** in the Files app.
 
 All of your [datasets](managing-datasets.md) share that one database file, so this applies to every one of
 them at once.

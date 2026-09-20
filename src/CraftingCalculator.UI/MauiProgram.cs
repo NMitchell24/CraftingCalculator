@@ -6,11 +6,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
+#if IOS
+using Foundation;
+#endif
 
 namespace CraftingCalculator.UI;
 
-public static class MauiProgram
+public static partial class MauiProgram
 {
+    // Not "CraftingCalculator.Startup": the category is a prefix the logging filters match on, and this one
+    // has to stay clear of the app's own namespaces so a future filter cannot silence the session header.
+    private const string StartupCategory = "Startup";
+
     public static MauiApp CreateMauiApp()
     {
         MauiAppBuilder builder = MauiApp.CreateBuilder();
@@ -58,12 +65,21 @@ public static class MauiProgram
         builder.Services.AddScoped<PageShellState>();
         builder.Services.AddScoped<ThemeState>();
 
+        // The file log ships in Release: it is the only diagnostics a device in the field has.
 #if DEBUG
+        // Unredacted on purpose, so a development log stays readable; the session header says so, and the
+        // choice is made here rather than inside the sink so its tests run in any configuration.
+        builder.Logging.AddFileLogging(GetLogsPath());
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
+#else
+        builder.Logging.AddRedactedFileLogging(GetLogsPath(), RedactedRoots());
 #endif
 
         MauiApp app = builder.Build();
+
+        ILogger startupLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(StartupCategory);
+        LogSessionStarted(startupLogger, SessionHeader());
 
         // The DB must exist (and be migrated) before any page loads, and a dataset must be selected
         // before anything reads a record - every query is scoped to one, and DatasetScopedContextFactory
@@ -81,8 +97,61 @@ public static class MauiProgram
         return app;
     }
 
+    [LoggerMessage(Level = LogLevel.Information, Message = "Session started\n{Header}")]
+    private static partial void LogSessionStarted(ILogger logger, string header);
+
+    /// <summary>App and device context, written once at the top of each session's log entries.</summary>
+    private static string SessionHeader()
+    {
+        // DeviceInfo.Name is the name the user gave the device ("Nate's iPhone"), so it is not one of these.
+        string[] lines =
+        [
+            $"App: Crafting Calculator {AppInfo.Current.VersionString} (build {AppInfo.Current.BuildString})",
+            $"OS: {DeviceInfo.Current.Platform} {DeviceInfo.Current.VersionString}",
+            $"Device: {DeviceInfo.Current.Manufacturer} {DeviceInfo.Current.Model} ({DeviceInfo.Current.Idiom})",
+#if DEBUG
+            "Redaction: off (Debug build)"
+#else
+            "Redaction: on"
+#endif
+        ];
+
+        return string.Join(Environment.NewLine, lines);
+    }
+
+#if !DEBUG
+    /// <summary>The folders whose contents are the user's, and so never appear in the log by name.</summary>
+    private static IReadOnlyList<string> RedactedRoots() =>
+    [
+        FileSystem.AppDataDirectory,
+        FileSystem.CacheDirectory,
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        // Windows is unpackaged, so the account name is in every one of the paths above; a file the user
+        // picked to import is somewhere else under the same profile.
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+    ];
+#endif
+
     private static string GetDatabasePath()
         => Path.Combine(FileSystem.AppDataDirectory, "CraftingCalculator.db3");
+
+    // A subdirectory of its own, so the Android backup rules can exclude the logs while the database beside
+    // them stays backed up.
+    private static string GetLogsPath()
+    {
+#if IOS
+        // Documents is what the Files app shows, so a user can hand over a log without a cable. Excluded from
+        // iCloud: diagnostics are the device's, and must not ride along in the user's backup.
+        string logsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Logs");
+        Directory.CreateDirectory(logsPath);
+        using NSUrl url = NSUrl.FromFilename(logsPath);
+        _ = url.SetResource(NSUrl.IsExcludedFromBackupKey, NSNumber.FromBoolean(true));
+
+        return logsPath;
+#else
+        return Path.Combine(FileSystem.AppDataDirectory, "Logs");
+#endif
+    }
 
     // Resolved on every launch and never stored: the iOS sandbox path carries a container id that changes when
     // the app is reinstalled.

@@ -169,8 +169,9 @@ public static class BlueprintProcessor
     {
         if (depth > MaxBlueprintDepth)
         {
+            // By id, not by name: this message reaches the log, which never carries anything the user typed.
             throw new InvalidOperationException(
-                $"Blueprint graph exceeded the maximum depth of {MaxBlueprintDepth}; check for a cycle involving '{blueprint.Name}'.");
+                $"Blueprint graph exceeded the maximum depth of {MaxBlueprintDepth}; check for a cycle involving blueprint {blueprint.Id}.");
         }
     }
 }

@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models.Transfer;
+using Microsoft.Extensions.Logging;
 
 namespace CraftingCalculator.UI.State;
 
@@ -13,7 +13,7 @@ namespace CraftingCalculator.UI.State;
 /// <see cref="Changed"/> can be raised off the renderer's dispatcher, so a component subscribes with
 /// <c>_ = InvokeAsync(StateHasChanged)</c> rather than calling <c>StateHasChanged</c> directly.
 /// </remarks>
-public sealed class ExportState(IDatasetTransferService transferService)
+public sealed partial class ExportState(IDatasetTransferService transferService, ILogger<ExportState> logger)
 {
     public bool IsRunning { get; private set; }
 
@@ -63,7 +63,7 @@ public sealed class ExportState(IDatasetTransferService transferService)
         catch (Exception exception)
         {
             // Every exception, for the reason given in ReadExportsAsync.
-            Debug.WriteLine(exception);
+            LogExportFailed(logger, exception);
             LastError = "Your export couldn't be saved, so no file was written. Try again.";
         }
 
@@ -85,8 +85,14 @@ public sealed class ExportState(IDatasetTransferService transferService)
         {
             // No ErrorBoundary exists, so an exception reaching the renderer freezes the whole app. A folder
             // that cannot be read is reported as no exports rather than as a failure.
-            Debug.WriteLine(exception);
+            LogExportsUnreadable(logger, exception);
             Exports = [];
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The export could not be written; no file was saved")]
+    private static partial void LogExportFailed(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "The exports folder could not be read; reporting no exports")]
+    private static partial void LogExportsUnreadable(ILogger logger, Exception exception);
 }

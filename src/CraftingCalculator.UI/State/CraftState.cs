@@ -1,7 +1,7 @@
-using System.Diagnostics;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CraftingCalculator.UI.State;
 
@@ -11,8 +11,11 @@ namespace CraftingCalculator.UI.State;
 /// route", since this is genuine cross-page session state. Components subscribe to <see cref="Changed"/>
 /// in <c>OnInitialized</c> and unsubscribe in <c>Dispose</c>.
 /// </summary>
-public sealed class CraftState(
-    IBlueprintService blueprintService, IFavoriteService favoriteService, ISelectedDatasetState selectedDataset)
+public sealed partial class CraftState(
+    IBlueprintService blueprintService,
+    IFavoriteService favoriteService,
+    ISelectedDatasetState selectedDataset,
+    ILogger<CraftState> logger)
 {
     private readonly BlueprintMap _blueprintMap = new();
 
@@ -168,7 +171,7 @@ public sealed class CraftState(
         {
             // Every caller has already written its change, so a batch that couldn't refresh is no reason to report
             // that write as failed.
-            Debug.WriteLine(exception);
+            LogBatchReloadFailed(logger, exception);
             return;
         }
 
@@ -332,4 +335,8 @@ public sealed class CraftState(
 
         Changed?.Invoke();
     }
+
+    [LoggerMessage(Level = LogLevel.Error,
+        Message = "The batch blueprints could not be reloaded; the batch is left as it was")]
+    private static partial void LogBatchReloadFailed(ILogger logger, Exception exception);
 }
