@@ -79,7 +79,7 @@ log, here's the drill:
 3. Grab the log from **View logs** and send it over.
 4. Turn it back off.
 
-With it on, every screen and button press goes in the log, and that's the stuff that pushes old entries out of the
+With it on, screen changes, dialog closes, and the important actions go in the log, and that's the stuff that pushes old entries out of the
 size cap below. Nothing breaks if you forget step 4. The log just covers less history than it would otherwise.
 
 Flipping the switch goes in the log too, either way, so I can see where the trail starts and stops.
