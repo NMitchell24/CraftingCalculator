@@ -56,15 +56,33 @@ bottom, and that's where it opens. Tap ![Close](assets/close.svg) **Close** when
 
 ### What's in it
 
-- **The session header:** the app's version and build, your OS version, and your device's manufacturer, model and
-  type (phone, tablet, desktop). One of these is written every time the app starts.
-- **Where you went:** every screen you open, every dialog you close, and the bigger stuff you do: the buttons in the
-  actions bar, every save, delete and rename, each step of an import, and how many records went into an export.
-  Little things like expanding a tree or bumping a quantity aren't in there. A screen is written the way the app
-  names it, not the way you do, so editing your Bronze Axe shows up as `/dataset/blueprint/{id}`. That's enough
-  for me to retrace your steps without seeing your stuff.
+- **The session header:** the app's version and build, your OS version, your device's manufacturer, model and type
+  (phone, tablet, desktop), and whether trace logging is on. One of these is written every time the app starts.
 - **Errors:** anything that went wrong, what the app was trying to do at the time, and the developer-facing detail
   I need to find it in the code.
+- **Where you went:** only with trace logging on (more on that below). Every screen you open, every dialog you
+  close, and the bigger stuff you do: the buttons in the actions bar, every save, delete and rename, each step of an
+  import, and how many records went into an export. Little things like expanding a tree or bumping a quantity aren't
+  in there. A screen is written the way the app names it, not the way you do, so editing your Bronze Axe shows up
+  as `/dataset/blueprint/{id}`. That's enough for me to retrace your steps without seeing your stuff.
+
+### Trace logging
+
+**Enable Trace Logging** sits right above **View logs**, and it's off out of the box. Off, the log is short: the
+session header and whatever went wrong. That's usually all I need.
+
+Sometimes it isn't. An error tells me *what* broke, but not always how you got there. If I ask you for a fuller
+log, here's the drill:
+
+1. Turn on **Enable Trace Logging**.
+2. Do the thing that broke again.
+3. Grab the log from **View logs** and send it over.
+4. Turn it back off.
+
+With it on, every screen and button press goes in the log, and that's the stuff that pushes old entries out of the
+size cap below. Nothing breaks if you forget step 4. The log just covers less history than it would otherwise.
+
+Flipping the switch goes in the log too, either way, so I can see where the trail starts and stops.
 
 ### What's never in it
 

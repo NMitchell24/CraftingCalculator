@@ -96,7 +96,11 @@ public static partial class MauiProgram
         // last-resort hooks, and a failure in startup itself is exactly what has nowhere else to be recorded.
         GlobalExceptionHandler.Install(startupLogger);
 
-        LogSessionStarted(startupLogger, SessionHeader());
+        // Resolving it is what applies the stored choice to the log, so it happens before the first screen can
+        // write a breadcrumb.
+        IDiagnosticSettings diagnosticSettings = app.Services.GetRequiredService<IDiagnosticSettings>();
+
+        LogSessionStarted(startupLogger, SessionHeader(diagnosticSettings.TraceLogging));
 
         try
         {
@@ -134,7 +138,7 @@ public static partial class MauiProgram
     private static partial void LogStartupFailed(ILogger logger, Exception exception);
 
     /// <summary>App and device context, written once at the top of each session's log entries.</summary>
-    private static string SessionHeader()
+    private static string SessionHeader(bool traceLogging)
     {
         // DeviceInfo.Name is the name the user gave the device ("My iPhone"), so it is not one of these.
         string[] lines =
@@ -142,6 +146,7 @@ public static partial class MauiProgram
             $"App: Crafting Calculator {AppInfo.Current.VersionString} (build {AppInfo.Current.BuildString})",
             $"OS: {DeviceInfo.Current.Platform} {DeviceInfo.Current.VersionString}",
             $"Device: {DeviceInfo.Current.Manufacturer} {DeviceInfo.Current.Model} ({DeviceInfo.Current.Idiom})",
+            $"Trace logging: {(traceLogging ? "on" : "off")}",
 #if DEBUG
             "Redaction: off (Debug build)"
 #else

@@ -14,9 +14,9 @@ internal sealed class FileLogger(FileLoggerProvider provider, string categoryNam
 
     public bool IsEnabled(LogLevel logLevel)
     {
-        // Level filtering is the logging framework's job (SetMinimumLevel / AddFilter at registration); this
-        // sink accepts whatever the framework lets through.
-        return logLevel != LogLevel.None;
+        // The framework's filters decide which categories reach this sink at all; the level floor is applied
+        // here instead, because it changes while the app runs and the framework caches its own per logger.
+        return logLevel != LogLevel.None && logLevel >= provider.MinimumLevel;
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,

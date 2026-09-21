@@ -481,10 +481,10 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
             });
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Navigated to {Route}")]
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Navigated to {Route}")]
     private static partial void LogNavigated(ILogger logger, string route);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Dialog {DialogType} closed (canceled: {Canceled})")]
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Dialog {DialogType} closed (canceled: {Canceled})")]
     private static partial void LogDialogClosed(ILogger logger, string dialogType, bool canceled);
 
     [LoggerMessage(Level = LogLevel.Warning,

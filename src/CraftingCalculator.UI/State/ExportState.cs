@@ -95,7 +95,7 @@ public sealed partial class ExportState(IDatasetTransferService transferService,
         }
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Export started ({Count} records)")]
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Export started ({Count} records)")]
     private static partial void LogExportStarted(ILogger logger, int count);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "The export could not be written; no file was saved")]

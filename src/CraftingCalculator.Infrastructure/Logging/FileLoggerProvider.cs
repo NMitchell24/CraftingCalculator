@@ -25,7 +25,19 @@ internal sealed class FileLoggerProvider(string logDirectory, LogRedactor? redac
 
     private readonly Lock _gate = new();
 
+    // Read by every logger on every call and set from the UI thread, so a write must be visible at once.
+    private volatile bool _traceEnabled;
+
     public string FilePath { get; } = Path.Combine(logDirectory, LogFileName);
+
+    public bool TraceEnabled
+    {
+        get => _traceEnabled;
+        set => _traceEnabled = value;
+    }
+
+    /// <summary>The least severe level written, as <see cref="TraceEnabled"/> currently sets it.</summary>
+    internal LogLevel MinimumLevel => _traceEnabled ? LogLevel.Trace : LogLevel.Information;
 
     public ILogger CreateLogger(string categoryName) => new FileLogger(this, categoryName, redactor);
 

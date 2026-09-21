@@ -77,13 +77,13 @@
             </MudToggleGroup>
         </div>
 
-        @* One .datasetting-row per setting: what it is on the left, the control on the right. *@
+        @* One .setting-row per setting: what it is on the left, the control on the right. *@
         @if (_datasettingsView == DatasettingsView.General)
         {
-            <div class="datasetting-row">
-                <div class="datasetting-text">
+            <div class="setting-row">
+                <div class="setting-text">
                     <MudText Typo="Typo.body1">Calculate Yield</MudText>
-                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                    <MudText Typo="Typo.caption" Class="setting-caption">
                         Blueprints can make more than one item per craft, and the extra shows up as surplus.
                     </MudText>
                 </div>
@@ -92,10 +92,10 @@
                                                             settings with { UseYield = useYield }))"
                            Color="Color.Primary" AriaLabel="Calculate Yield" />
             </div>
-            <div class="datasetting-row">
-                <div class="datasetting-text">
+            <div class="setting-row">
+                <div class="setting-text">
                     <MudText Typo="Typo.body1">Calculate Craft Time</MudText>
-                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                    <MudText Typo="Typo.caption" Class="setting-caption">
                         Components and blueprints take time to make, and the Craft screen adds it up.
                     </MudText>
                 </div>
@@ -107,10 +107,10 @@
         }
         else
         {
-            <div class="datasetting-row">
-                <div class="datasetting-text">
+            <div class="setting-row">
+                <div class="setting-text">
                     <MudText Typo="Typo.body1">Calculate Costs</MudText>
-                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                    <MudText Typo="Typo.caption" Class="setting-caption">
                         Components have a cost, and the Craft screen adds it up.
                     </MudText>
                 </div>
@@ -119,10 +119,10 @@
                                                             settings with { UseCosts = useCosts }))"
                            Color="Color.Primary" AriaLabel="Calculate Costs" />
             </div>
-            <div class="datasetting-row">
-                <div class="datasetting-text">
+            <div class="setting-row">
+                <div class="setting-text">
                     <MudText Typo="Typo.body1">Calculate Values</MudText>
-                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                    <MudText Typo="Typo.caption" Class="setting-caption">
                         Blueprints have a value, and the Craft screen adds it up.
                     </MudText>
                 </div>
@@ -131,10 +131,10 @@
                                                             settings with { UseValues = useValues }))"
                            Color="Color.Primary" AriaLabel="Calculate Values" />
             </div>
-            <div class="datasetting-row datasetting-row-stacked">
-                <div class="datasetting-text">
+            <div class="setting-row setting-row-stacked">
+                <div class="setting-text">
                     <MudText Typo="Typo.body1">Currency Name</MudText>
-                    <MudText Typo="Typo.caption" Class="datasetting-caption">
+                    <MudText Typo="Typo.caption" Class="setting-caption">
                         What your game calls its money, so amounts read like 200 Gold. Leave it empty for
                         @CurrencyProcessor.Format(200, Datasettings.Default).
                     </MudText>

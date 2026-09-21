@@ -11,6 +11,9 @@ namespace CraftingCalculator.Infrastructure;
 
 public static class DependencyInjection
 {
+    // The root namespace, so every logger the app creates with ILogger<T> falls under it.
+    private const string AppCategoryPrefix = "CraftingCalculator";
+
     extension(IServiceCollection services)
     {
         /// <summary>
@@ -78,7 +81,13 @@ public static class DependencyInjection
     {
         logging.AddProvider(provider);
 
-        // Framework categories log at Information and would fill the size-capped file on their own.
+        // The app's own categories reach the sink at every level, and its floor is the one
+        // IDiagnosticLog.TraceEnabled moves. Only the app's: third-party libraries keep the framework's default
+        // of Information, since MudBlazor alone writes dozens of Trace lines per screen.
+        logging.AddFilter<FileLoggerProvider>(AppCategoryPrefix, LogLevel.Trace);
+
+        // Framework categories log at Information and would fill the size-capped file on their own. Longer
+        // category prefixes win, so these two hold whether or not trace logging is on.
         logging.AddFilter<FileLoggerProvider>("Microsoft", LogLevel.Warning);
 
         // EF is off entirely, in both configurations: AddDatabaseServices turns on EnableSensitiveDataLogging

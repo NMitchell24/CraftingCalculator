@@ -69,7 +69,7 @@ public sealed partial class ActionGuard(IDialogService dialogs, ILogger<ActionGu
         }
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Action started: {Operation}")]
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Action started: {Operation}")]
     private static partial void LogActionStarted(ILogger logger, string operation);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Action failed: {Operation}")]

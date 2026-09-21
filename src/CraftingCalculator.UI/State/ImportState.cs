@@ -439,7 +439,7 @@ public sealed partial class ImportState(
         CycleNames = [];
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Import step {Step}")]
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Import step {Step}")]
     private static partial void LogImportStep(ILogger logger, ImportStep step);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "The import file picker failed; no file was staged")]

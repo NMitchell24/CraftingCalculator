@@ -15,6 +15,7 @@ public static class DependencyInjection
         // Singleton for the same reason: it reads its stored value once, and the Settings screen and the
         // export have to see the same one.
         services.AddSingleton<IExportSettings, ExportSettings>();
+        services.AddSingleton<IDiagnosticSettings, DiagnosticSettings>();
         services.AddSingleton(TimeProvider.System);
 
         services.AddScoped<IDatasetService, DatasetService>();

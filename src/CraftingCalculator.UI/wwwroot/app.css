@@ -964,43 +964,44 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-height: 44px;
 }
 
-/* The Datasettings card on the Dataset screen: one row per setting, the text taking the slack so the control
-   stays at the trailing edge, and a hairline between rows so each setting reads as its own. At large text sizes
-   the text wraps between words rather than pushing the switch off the row. */
+/* A labeled setting and its control, on the Dataset screen's Datasettings card and Settings' Diagnostics card:
+   one row per setting, the text taking the slack so the control stays at the trailing edge, and a hairline
+   between rows so each setting reads as its own. At large text sizes the text wraps between words rather than
+   pushing the switch off the row. */
 /* The Craft screen's tabs sit above a row of actions that spaces them from the pane; these sit straight on
    the first setting, so they carry the gap themselves. */
 .datasettings-tabs {
     margin-bottom: 8px;
 }
 
-.datasetting-row {
+.setting-row {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 6px 0;
 }
 
-.datasetting-row + .datasetting-row {
+.setting-row + .setting-row {
     border-top: 1px solid var(--mud-palette-lines-default);
 }
 
-.datasetting-text {
+.setting-text {
     flex: 1 1 auto;
     min-width: 0;
 }
 
-.datasetting-caption {
+.setting-caption {
     display: block;
     color: var(--mud-palette-text-secondary);
 }
 
-.datasetting-row .mud-switch {
+.setting-row .mud-switch {
     flex: 0 0 auto;
     margin: 0;
 }
 
 /* A text field has no narrow width to sit beside the text at, so it takes the full row below it. */
-.datasetting-row-stacked {
+.setting-row-stacked {
     flex-direction: column;
     align-items: stretch;
 }
