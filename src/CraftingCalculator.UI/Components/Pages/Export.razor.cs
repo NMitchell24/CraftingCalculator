@@ -123,6 +123,14 @@ public partial class Export : ComponentBase, IDisposable
     private void OnExportChanged() => _ = FireAndForget.RunAsync(
         () => InvokeAsync(() =>
         {
+            // Same guard as Import.OnImportChanged, and for the same reason: ExportState outlives this page,
+            // so a callback queued before Dispose unsubscribes can land after the incoming page has already
+            // configured the shared shell, and ConfigureShell would take the title and actions off it.
+            if (_disposed)
+            {
+                return;
+            }
+
             ConfigureShell();
             StateHasChanged();
         }),

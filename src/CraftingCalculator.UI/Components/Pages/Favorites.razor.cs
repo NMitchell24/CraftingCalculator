@@ -157,9 +157,11 @@ public partial class Favorites : ComponentBase, IDisposable
             {
                 await FavoriteService.RenameFavoriteAsync(favorite, name);
                 State.OnFavoriteRenamed(favorite.Id, name);
-
-                await ReloadAsync();
             });
+
+        // See DeleteSelectedAsync. The message above promises the old name is still there, so the list has to
+        // be re-read rather than left showing whichever name it happened to have.
+        await ReloadAsync();
 
         if (renamed)
         {
@@ -187,9 +189,11 @@ public partial class Favorites : ComponentBase, IDisposable
             {
                 await FavoriteService.DeleteFavoriteAsync(favorite);
                 State.OnFavoriteDeleted(favorite.Id);
-
-                await ReloadAsync();
             });
+
+        // See DeleteSelectedAsync: the reload is a load, and it runs whether or not the delete was reported
+        // as having worked.
+        await ReloadAsync();
 
         if (deleted)
         {
@@ -212,13 +216,19 @@ public partial class Favorites : ComponentBase, IDisposable
         bool deleted = await Guard.RunAsync(
             "Favorites.DeleteSelected", DeleteFailedMessage, () => DeleteManyAsync(selected));
 
-        if (deleted)
+        // Always, and outside the guard: the delete is one statement and cannot half-apply, but the reload
+        // behind it can still fail, and a delete reported as failed after it committed would leave the cards
+        // on screen.
+        await ReloadAsync();
+
+        if (!deleted)
         {
-            Snackbar.Add($"Deleted {selected.Count} {NounFor(selected.Count)}", Severity.Success);
+            // The mode and the selection stay: they are the user's work, which is the whole reason the guard
+            // exists, and they are what a second attempt needs.
+            return;
         }
 
-        // Left whichever way it went: the selection is either deleted or reported as failed, and keeping the
-        // mode on would leave the user staring at highlighted cards with a dialog telling them nothing happened.
+        Snackbar.Add($"Deleted {selected.Count} {NounFor(selected.Count)}", Severity.Success);
         SetMode(ListMode.Normal);
     }
 
@@ -232,15 +242,19 @@ public partial class Favorites : ComponentBase, IDisposable
         bool deleted = await Guard.RunAsync(
             "Favorites.DeleteAll", DeleteFailedMessage, () => DeleteManyAsync(_favorites));
 
-        if (deleted)
+        // See DeleteSelectedAsync.
+        await ReloadAsync();
+
+        if (!deleted)
         {
-            Snackbar.Add("Deleted all favorites", Severity.Success);
+            return;
         }
 
+        Snackbar.Add("Deleted all favorites", Severity.Success);
         SetMode(ListMode.Normal);
     }
 
-    /// <summary>Deletes the favorites, keeping <see cref="CraftState"/> in step, then reloads the list.</summary>
+    /// <summary>Deletes the favorites, keeping <see cref="CraftState"/> in step.</summary>
     private async Task DeleteManyAsync(IReadOnlyList<BlueprintFavorite> favorites)
     {
         await FavoriteService.DeleteFavoritesAsync(favorites);
@@ -249,8 +263,6 @@ public partial class Favorites : ComponentBase, IDisposable
         {
             State.OnFavoriteDeleted(favorite.Id);
         }
-
-        await ReloadAsync();
     }
 
     private Task<bool> ConfirmDeleteManyAsync(int count)

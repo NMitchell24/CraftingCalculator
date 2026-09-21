@@ -126,9 +126,14 @@ public sealed partial class CraftState(
 
     public async Task LoadFavoriteAsync(BlueprintFavorite favorite)
     {
+        // Read before the batch is touched. Resetting first empties the user's batch and then leaves it empty
+        // if the read throws, and the Craft screen's failure dialog promises the opposite - it tells them the
+        // batch is as they left it.
+        List<BlueprintQuantity> quantities = await favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite);
+
         _blueprintMap.Reset();
 
-        foreach (BlueprintQuantity quantity in await favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite))
+        foreach (BlueprintQuantity quantity in quantities)
         {
             _blueprintMap.Add(quantity.Blueprint, quantity.Quantity);
         }
