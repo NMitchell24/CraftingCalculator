@@ -53,6 +53,9 @@ Under the line at the bottom of the card are its buttons:
 Names need to be unique. You can't create two favorites called `Raid Kit`. If the favorite you're renaming is the 
 one currently loaded on the Craft screen, the Craft screen updates to the new name.
 
+Type a name another favorite already has and the app says so and asks you again, with what you typed still in the
+box. Tweak it rather than starting over.
+
 There is no **New** action here, and that's deliberate: a favorite is made *from* a batch, and the
 batch lives on the Craft screen. Build it there, save it there. This screen just exists for you to manage the 
 favorites you create.

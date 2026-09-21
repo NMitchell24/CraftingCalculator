@@ -21,10 +21,16 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IRecordService RecordService { get; set; } = null!;
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
 
     private List<IBaseQuantityRecord> Parts => BlueprintPartProcessor.GetParts(Model);
 
-    private async Task OpenAddPartsAsync()
+    private Task OpenAddPartsAsync() => Guard.RunAsync(
+        "BlueprintEditor.OpenAddParts",
+        "I couldn't open the requirements picker. Your edits are still here.",
+        ShowAddPartsAsync);
+
+    private async Task ShowAddPartsAsync()
     {
         List<IBaseDataRecord> components = await RecordService.GetRecordsAsync(DataType.Component);
 

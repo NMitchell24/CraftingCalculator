@@ -1,6 +1,7 @@
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.UI.Logging;
 using CraftingCalculator.UI.Platform;
+using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
@@ -19,7 +20,7 @@ public partial class LogViewerDialog : ComponentBase
 
     [Inject] private IDiagnosticLog Log { get; set; } = null!;
     [Inject] private IFileDownloader Downloader { get; set; } = null!;
-    [Inject] private IDialogService Dialogs { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private ILogger<LogViewerDialog> Logger { get; set; } = null!;
 
@@ -66,18 +67,20 @@ public partial class LogViewerDialog : ComponentBase
         {
             // What the user is looking at, not a re-read: the file may have grown since, and the two
             // disagreeing would be worse than a copy that is a few entries behind.
-            await DiagnosticLogDownload.SaveAsync(Downloader, Logger, text);
-            Snackbar.Add("Saved to your Downloads folder.", Severity.Success);
-        }
-        catch (Exception exception)
-        {
-            LogDownloadFailed(Logger, exception);
+            // Its own closing line: the guard's default sends the user to the log in Settings, which is the
+            // screen they are standing on. Holding the text opens the WebView's own selection menu, which
+            // offers Select all and Copy - checked on the emulator, since the advice is only worth giving if
+            // the gesture is really there.
+            bool saved = await Guard.RunAsync(
+                "LogViewer.Download",
+                "I couldn't save the log to your Downloads folder.",
+                () => DiagnosticLogDownload.SaveAsync(Downloader, Logger, text),
+                help: "You can still get it out by hand: press and hold the log, pick Select all, then Copy.");
 
-            await ConfirmDialog.AlertAsync(
-                Dialogs,
-                "The log wasn't saved",
-                "The log couldn't be saved to your Downloads folder. Try again, and if it keeps failing "
-                + "you can still read it here.");
+            if (saved)
+            {
+                Snackbar.Add("Saved to your Downloads folder.", Severity.Success);
+            }
         }
         finally
         {
@@ -86,7 +89,4 @@ public partial class LogViewerDialog : ComponentBase
     }
 
     private void Close() => MudDialog.Close();
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "The log could not be saved to the Downloads folder")]
-    private static partial void LogDownloadFailed(ILogger logger, Exception exception);
 }

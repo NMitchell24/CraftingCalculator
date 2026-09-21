@@ -16,7 +16,8 @@ namespace CraftingCalculator.UI.State;
 /// </summary>
 /// <remarks>
 /// <see cref="Changed"/> can be raised off the renderer's dispatcher, so a component subscribes with
-/// <c>_ = InvokeAsync(StateHasChanged)</c> rather than calling <c>StateHasChanged</c> directly.
+/// <c>_ = FireAndForget.RunAsync(() =&gt; InvokeAsync(StateHasChanged), DispatchExceptionAsync)</c> rather
+/// than calling <c>StateHasChanged</c> directly.
 /// </remarks>
 public sealed partial class ImportState(
     IDatasetTransferService transferService,
@@ -103,7 +104,7 @@ public sealed partial class ImportState(
             // keeps the wizard on screen, where the user can pick another file.
             LogFilePickerFailed(logger, exception);
             StartOver();
-            Error = "That file couldn't be opened. Try again, or choose a different file.";
+            Error = "I couldn't open that file. Try again, or choose a different one.";
             Changed?.Invoke();
             return;
         }
@@ -148,7 +149,7 @@ public sealed partial class ImportState(
         {
             // Every exception, for the reason given above.
             LogImportFileUnreadable(logger, exception);
-            ValidationErrors = ["The file couldn't be read. Try choosing it again."];
+            ValidationErrors = ["I couldn't read that file. Try choosing it again."];
             Step = ImportStep.Invalid;
         }
 
@@ -380,7 +381,7 @@ public sealed partial class ImportState(
         // changed.
         LogImportFailed(logger, exception, returnTo);
         ClearConflicts();
-        Error = "Your data couldn't be imported, so nothing was changed. Try again.";
+        Error = "I couldn't import your data. Nothing was changed.";
         Step = returnTo == ImportStep.ResolveConflicts ? ImportStep.Review : returnTo;
         Changed?.Invoke();
     }

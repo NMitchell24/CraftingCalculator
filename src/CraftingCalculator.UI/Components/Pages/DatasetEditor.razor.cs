@@ -31,6 +31,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
 
     private IBaseDataRecord? _record;
     private DataType _type;
@@ -84,31 +85,55 @@ public partial class DatasetEditor : ComponentBase, IDisposable
 
     private async Task SaveAsync()
     {
-        if (_record is null || !await DatasetPrompts.ConfirmSaveAsync(DialogService, _record))
+        if (_record is not { } record || !await DatasetPrompts.ConfirmSaveAsync(DialogService, record))
         {
             return;
         }
 
-        await RecordService.SaveRecordAsync(_record);
-        await CraftState.ReloadBlueprintsAsync();
+        // _isDirty and the editor's fields are only cleared on success, so a failed save leaves the user on
+        // their edits with the leave prompt still armed, and Save can simply be tapped again.
+        bool saved = await Guard.RunAsync(
+            "DatasetEditor.Save",
+            "I couldn't save your changes. Your edits are still here.",
+            async () =>
+            {
+                await RecordService.SaveRecordAsync(record);
+                await CraftState.ReloadBlueprintsAsync();
+            });
+
+        if (!saved)
+        {
+            return;
+        }
 
         _isDirty = false;
-        Snackbar.Add($"Saved '{_record.Name}'", Severity.Success);
+        Snackbar.Add($"Saved '{record.Name}'", Severity.Success);
         await ReturnToListAsync();
     }
 
     private async Task DeleteAsync()
     {
-        if (_record is null || !await DatasetPrompts.ConfirmDeleteAsync(DialogService, _record))
+        if (_record is not { } record || !await DatasetPrompts.ConfirmDeleteAsync(DialogService, record))
         {
             return;
         }
 
-        await RecordService.DeleteRecordAsync(_record);
-        await CraftState.ReloadBlueprintsAsync();
+        bool deleted = await Guard.RunAsync(
+            "DatasetEditor.Delete",
+            "I couldn't delete that record.",
+            async () =>
+            {
+                await RecordService.DeleteRecordAsync(record);
+                await CraftState.ReloadBlueprintsAsync();
+            });
+
+        if (!deleted)
+        {
+            return;
+        }
 
         _isDirty = false;
-        Snackbar.Add($"Deleted '{_record.Name}'", Severity.Success);
+        Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
         await ReturnToListAsync();
     }
 

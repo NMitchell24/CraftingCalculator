@@ -11,7 +11,8 @@ namespace CraftingCalculator.UI.State;
 /// </summary>
 /// <remarks>
 /// <see cref="Changed"/> can be raised off the renderer's dispatcher, so a component subscribes with
-/// <c>_ = InvokeAsync(StateHasChanged)</c> rather than calling <c>StateHasChanged</c> directly.
+/// <c>_ = FireAndForget.RunAsync(() =&gt; InvokeAsync(StateHasChanged), DispatchExceptionAsync)</c> rather
+/// than calling <c>StateHasChanged</c> directly.
 /// </remarks>
 public sealed partial class ExportState(IDatasetTransferService transferService, ILogger<ExportState> logger)
 {
@@ -64,7 +65,7 @@ public sealed partial class ExportState(IDatasetTransferService transferService,
         {
             // Every exception, for the reason given in ReadExportsAsync.
             LogExportFailed(logger, exception);
-            LastError = "Your export couldn't be saved, so no file was written. Try again.";
+            LastError = "I couldn't save your export.";
         }
 
         // Read the folder back rather than prepend the saved file: the save also deletes the oldest exports

@@ -34,6 +34,11 @@ public partial class DatasetList : ComponentBase, IDisposable
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
+
+    // One message for all three delete paths, so it says nothing about how many records were involved: the
+    // list behind the dialog still shows them either way.
+    private const string DeleteFailedMessage = "I couldn't finish that delete.";
 
     private DataType _type;
     private List<IBaseDataRecord> _records = [];
@@ -207,9 +212,18 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await RecordService.DeleteRecordAsync(record);
-        Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
+        bool deleted = await Guard.RunAsync(
+            "DatasetList.Delete", DeleteFailedMessage, () => RecordService.DeleteRecordAsync(record));
+
+        // Outside the guard and unconditional, which is the rule this repo writes down: the delete is the
+        // command, the reload is a load. Inside it, a delete that committed and then failed on the way back
+        // would skip the reload and leave the row on screen under a dialog saying nothing was removed.
         await ReloadAfterDeleteAsync();
+
+        if (deleted)
+        {
+            Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
+        }
     }
 
     private async Task DeleteSelectedAsync()
@@ -225,8 +239,20 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await RecordService.DeleteRecordsAsync(selected);
+        bool deleted = await Guard.RunAsync(
+            "DatasetList.DeleteSelected", DeleteFailedMessage, () => RecordService.DeleteRecordsAsync(selected));
+
+        // Always, and outside the guard: RecordService.DeleteRecordsAsync walks the selection one record at a
+        // time, so a failure part way through has already deleted some of them. Reloading here is what keeps
+        // the list honest about which ones survived.
         await ReloadAfterDeleteAsync();
+
+        if (!deleted)
+        {
+            // The mode and the selection stay: they are the user's work, which is the whole reason the guard
+            // exists, and they are what a second attempt needs.
+            return;
+        }
 
         Snackbar.Add($"Deleted {selected.Count} {NounFor(_type, selected.Count)}", Severity.Success);
         SetMode(ListMode.Normal);
@@ -239,8 +265,16 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await RecordService.DeleteAllOfTypeAsync(_type);
+        bool deleted = await Guard.RunAsync(
+            "DatasetList.DeleteAll", DeleteFailedMessage, () => RecordService.DeleteAllOfTypeAsync(_type));
+
+        // See DeleteSelectedAsync: this walks the records one at a time too.
         await ReloadAfterDeleteAsync();
+
+        if (!deleted)
+        {
+            return;
+        }
 
         Snackbar.Add($"Deleted all {TitleFor(_type)}", Severity.Success);
         SetMode(ListMode.Normal);

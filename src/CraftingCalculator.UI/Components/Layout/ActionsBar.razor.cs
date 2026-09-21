@@ -1,6 +1,5 @@
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 // MudBlazor.Color and Microsoft.Maui.Graphics.Color are both in scope in this project's global usings.
 using Color = MudBlazor.Color;
@@ -35,6 +34,11 @@ public partial class ActionsBar : IDisposable
     /// actions never overflow.
     /// </summary>
     [Parameter, EditorRequired] public int MaxVisible { get; set; }
+
+    [Inject] private ActionGuard Guard { get; set; } = null!;
+
+    // Whatever the action was, said without naming it: its label is already on the control the user tapped.
+    private const string FailureMessage = "I couldn't finish that action.";
 
     // At or under the cap everything fits; past it the last slot is spent on the overflow menu itself.
     private int VisibleCount => Actions.Count <= MaxVisible ? Actions.Count : MaxVisible - 1;
@@ -80,10 +84,13 @@ public partial class ActionsBar : IDisposable
         CancellationTokenSource pressed = new();
         _longPress = pressed;
 
-        _ = RunLongPressAsync(action.OnLongPress, pressed.Token);
+        // Discarded on purpose: the press is over once the delay starts, and nothing here waits for the
+        // handler. FireAndForget is what keeps an escaping exception from faulting this task unobserved.
+        _ = FireAndForget.RunAsync(
+            () => RunLongPressAsync(action, action.OnLongPress, pressed.Token), DispatchExceptionAsync);
     }
 
-    private async Task RunLongPressAsync(Func<Task> onLongPress, CancellationToken token)
+    private async Task RunLongPressAsync(PageAction action, Func<Task> onLongPress, CancellationToken token)
     {
         try
         {
@@ -98,23 +105,8 @@ public partial class ActionsBar : IDisposable
         // in immediate succession, and InvokeActionAsync reads this to swallow that click.
         _longPressFired = true;
 
-        try
-        {
-            // Task.Delay resumes off the renderer's sync context, so the handler has to be marshalled back.
-            await InvokeAsync(onLongPress);
-        }
-        catch (ObjectDisposedException)
-        {
-            // The component was torn down while the handler ran, so there is no renderer left to
-            // report to. Dispose cancels the token, but only the Task.Delay above observes it.
-        }
-        catch (Exception exception)
-        {
-            // BeginLongPress discards this task, so an escaping exception would fault it unobserved
-            // rather than surfacing. DispatchExceptionAsync routes it to the renderer the way an
-            // awaited EventCallback would.
-            await DispatchExceptionAsync(exception);
-        }
+        // Task.Delay resumes off the renderer's sync context, so the handler has to be marshalled back.
+        await InvokeAsync(() => RunGuardedAsync(action, onLongPress));
     }
 
     private void StopLongPress()
@@ -128,12 +120,25 @@ public partial class ActionsBar : IDisposable
     {
         if (!_longPressFired)
         {
-            return action.OnClick();
+            return RunGuardedAsync(action, action.OnClick);
         }
 
         _longPressFired = false;
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Runs one of the page's handlers through <see cref="ActionGuard"/>, which is what keeps a failing action
+    /// on the screen it belongs to.
+    /// </summary>
+    /// <remarks>
+    /// This component renders outside the layout's page boundary - it is the bottom bar and the drawer, not
+    /// <c>@Body</c> - so a throw from a handler invoked here would skip that boundary and take the whole app
+    /// down to the app boundary's card. A page that wants better copy than <see cref="FailureMessage"/> nests
+    /// a guard of its own inside the handler; this one then sees nothing to catch.
+    /// </remarks>
+    private Task RunGuardedAsync(PageAction action, Func<Task> handler) =>
+        Guard.RunAsync($"Action:{action.Label}", FailureMessage, handler);
 
     public void Dispose() => StopLongPress();
 }

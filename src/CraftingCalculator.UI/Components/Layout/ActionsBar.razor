@@ -27,7 +27,7 @@
                     @foreach (PageAction action in _overflow)
                     {
                         <MudMenuItem Icon="@action.Icon" Disabled="@action.Disabled"
-                                     OnClick="@(() => action.OnClick())">@action.Label</MudMenuItem>
+                                     OnClick="@(() => RunGuardedAsync(action, action.OnClick))">@action.Label</MudMenuItem>
                     }
                 </MudMenu>
             }
@@ -58,7 +58,7 @@
                 @foreach (PageAction action in _overflow)
                 {
                     <MudMenuItem Icon="@action.Icon" Disabled="@action.Disabled"
-                                 OnClick="@(() => action.OnClick())">@action.Label</MudMenuItem>
+                                 OnClick="@(() => RunGuardedAsync(action, action.OnClick))">@action.Label</MudMenuItem>
                 }
             </MudMenu>
         }

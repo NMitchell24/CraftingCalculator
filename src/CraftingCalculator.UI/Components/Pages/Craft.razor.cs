@@ -26,6 +26,11 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
     [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
+
+    // Both Copy buttons hand the clipboard a list that is already on screen, so there is no state worth
+    // reassuring anyone about - the list is right there either way.
+    private const string CopyFailedMessage = "I couldn't copy that to your clipboard.";
 
     private CraftView _view = CraftView.Materials;
 
@@ -88,13 +93,21 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
         if (_favorites.FirstOrDefault(favorite => favorite.Id == favoriteId) is { } selected)
         {
-            await FavoritePrompts.LoadAsync(DialogService, Snackbar, State, selected);
+            await Guard.RunAsync(
+                "Craft.LoadFavorite",
+                "I couldn't load that favorite. Your batch is as you left it.",
+                () => FavoritePrompts.LoadAsync(DialogService, Snackbar, State, selected));
         }
     }
 
     private void OnViewChanged(CraftView view) => _view = view;
 
-    private async Task OpenPickerAsync()
+    private Task OpenPickerAsync() => Guard.RunAsync(
+        "Craft.OpenPicker",
+        "I couldn't open the blueprint picker.",
+        ShowPickerAsync);
+
+    private async Task ShowPickerAsync()
     {
         List<BlueprintModel> blueprints = await BlueprintService.GetAllBlueprintsAsync();
 
@@ -154,24 +167,33 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     private async Task CopyMaterialsAsync()
     {
         string text = string.Join(Environment.NewLine, State.TotalComponents.Select(componentQuantity => componentQuantity.DisplayName));
-        await ClipboardService.SetTextAsync(text);
-        Snackbar.Add("Copied components to clipboard", Severity.Success);
+
+        if (await Guard.RunAsync("Craft.CopyMaterials", CopyFailedMessage, () => ClipboardService.SetTextAsync(text)))
+        {
+            Snackbar.Add("Copied components to clipboard", Severity.Success);
+        }
     }
 
     private async Task CopySurplusAsync()
     {
         string text = string.Join(Environment.NewLine, State.SurplusStock.Select(blueprintQuantity => blueprintQuantity.DisplayName));
-        await ClipboardService.SetTextAsync(text);
-        Snackbar.Add("Copied surplus to clipboard", Severity.Success);
-    }
 
-    private async Task SaveAsFavoriteAsync()
-    {
-        if (await FavoritePrompts.SaveBatchAsync(DialogService, Snackbar, State) is not null)
+        if (await Guard.RunAsync("Craft.CopySurplus", CopyFailedMessage, () => ClipboardService.SetTextAsync(text)))
         {
-            await ReloadFavoritesAsync();
+            Snackbar.Add("Copied surplus to clipboard", Severity.Success);
         }
     }
+
+    private Task SaveAsFavoriteAsync() => Guard.RunAsync(
+        "Craft.SaveAsFavorite",
+        "I couldn't save that favorite. Your batch is still here.",
+        async () =>
+        {
+            if (await FavoritePrompts.SaveBatchAsync(DialogService, Snackbar, State) is not null)
+            {
+                await ReloadFavoritesAsync();
+            }
+        });
 
     public void Dispose()
     {

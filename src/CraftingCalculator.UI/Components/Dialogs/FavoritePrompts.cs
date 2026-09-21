@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.State;
 using MudBlazor;
@@ -8,8 +9,8 @@ using Color = MudBlazor.Color;
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
-/// The prompt sequences for saving the current batch as a favorite and for loading one back into it,
-/// used by the Craft screen.
+/// The prompt sequences for saving the current batch as a favorite and for loading one back into it, used by
+/// the Craft screen, and the rename sequence the Favorites screen runs.
 /// </summary>
 public static class FavoritePrompts
 {
@@ -79,6 +80,51 @@ public static class FavoritePrompts
         snackbar.Add($"Saved '{name}'", Severity.Success);
 
         return name;
+    }
+
+    /// <summary>
+    /// Asks for a new name for <paramref name="favorite"/>, re-asking until it is one no other favorite uses
+    /// or the user backs out. Returns the new name, or null if they backed out or kept the name it has.
+    /// </summary>
+    public static async Task<string?> PromptForRenameAsync(
+        IDialogService dialogs, IFavoriteService favorites, BlueprintFavorite favorite)
+    {
+        string entered = favorite.Name ?? "";
+
+        while (true)
+        {
+            DialogParameters parameters = new()
+            {
+                ["Label"] = "Favorite name",
+                ["InitialValue"] = entered,
+                ["ConfirmText"] = "Rename"
+            };
+
+            IDialogReference dialogRef = await dialogs.ShowAsync<TextInputDialog>("Rename favorite", parameters);
+            DialogResult? result = await dialogRef.Result;
+
+            if (result is null or { Canceled: true } || result.Data is not string name
+                || string.IsNullOrWhiteSpace(name) || name == favorite.Name)
+            {
+                return null;
+            }
+
+            if (!await favorites.DoesFavoriteExistAsync(name))
+            {
+                return name;
+            }
+
+            // A loop rather than PromptForNewNameAsync's overwrite branch: that one is saving a new favorite,
+            // where overwriting is a choice the user can make, while renaming onto an existing name would
+            // merge two favorites into one. The rejected name is carried back into the field so the user
+            // edits it rather than retyping it.
+            entered = name;
+
+            await ConfirmDialog.AlertAsync(
+                dialogs,
+                "Name already in use",
+                $"A favorite named '{name}' already exists. Pick a different name.");
+        }
     }
 
     /// <summary>

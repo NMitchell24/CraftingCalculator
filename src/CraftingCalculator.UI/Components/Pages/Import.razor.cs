@@ -20,6 +20,7 @@ public partial class Import : ComponentBase, IDisposable
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IJSRuntime Js { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
 
     private ImportStep _renderedStep;
     private bool _disposed;
@@ -61,19 +62,30 @@ public partial class Import : ComponentBase, IDisposable
         });
 
     // Raised by the wizard's background steps as well as by this page.
-    private void OnImportChanged() => _ = InvokeAsync(() =>
-    {
-        // Can be queued before Dispose unsubscribes, and configuring then would take the shell from the next page.
-        if (_disposed)
+    private void OnImportChanged() => _ = FireAndForget.RunAsync(
+        () => InvokeAsync(() =>
         {
-            return;
-        }
+            // Can be queued before Dispose unsubscribes, and configuring then would take the shell from the
+            // next page.
+            if (_disposed)
+            {
+                return;
+            }
 
-        ConfigureShell();
-        StateHasChanged();
-    });
+            ConfigureShell();
+            StateHasChanged();
+        }),
+        DispatchExceptionAsync);
 
-    private async Task ImportDataAsync()
+    // ImportState catches everything its own steps throw and reports it inline on the step card, so what
+    // this guard is left with is the choices made on the way in - reading the dataset names, and the two
+    // prompts - none of which has written anything yet.
+    private Task ImportDataAsync() => Guard.RunAsync(
+        "Import.ImportData",
+        "I couldn't start the import.",
+        ChooseImportTargetAsync);
+
+    private async Task ChooseImportTargetAsync()
     {
         if (!ImportState.CanImport || ImportState.ImportFile is not { Snapshot: var snapshot })
         {
