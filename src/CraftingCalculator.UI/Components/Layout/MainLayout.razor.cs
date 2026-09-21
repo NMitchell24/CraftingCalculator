@@ -5,6 +5,7 @@ using CraftingCalculator.UI.Components.Controls;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using MudBlazor;
 using MudBlazor.Services;
@@ -21,6 +22,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     [Inject] private IBrowserViewportService ViewportService { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private BackButtonState BackButtonState { get; set; } = null!;
+    [Inject] private ILogger<MainLayout> Logger { get; set; } = null!;
 
     /// <summary>One of the app's top-level destinations in the side rail and the bottom nav.</summary>
     private sealed record Destination(string Label, string Route, string Icon, NavLinkMatch Match);
@@ -191,11 +193,13 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 
     // Raised by the Settings page, so this has to reach the renderer's dispatcher rather than run as
     // an async void handler - ApplyThemeAsync does JS interop for the System case.
-    private void OnThemeChanged() => _ = InvokeAsync(async () =>
-    {
-        await ApplyThemeAsync();
-        StateHasChanged();
-    });
+    private void OnThemeChanged() => _ = FireAndForget.RunAsync(
+        () => InvokeAsync(async () =>
+        {
+            await ApplyThemeAsync();
+            StateHasChanged();
+        }),
+        DispatchExceptionAsync);
 
     private Task OnDialogOpenedAsync(IDialogReference dialog)
     {
@@ -203,7 +207,7 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         BackButtonState.SetHandler(CloseTopDialog);
 
         // Not awaited: ShowAsync awaits this handler, so waiting here for the dialog to close would hold ShowAsync open.
-        _ = ForgetWhenClosedAsync(dialog);
+        _ = FireAndForget.RunAsync(() => ForgetWhenClosedAsync(dialog), DispatchExceptionAsync);
         return Task.CompletedTask;
     }
 
@@ -223,7 +227,18 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // Back cancels the top dialog, which is what Escape does to every dialog in the app (CloseOnEscapeKey on the
     // MudDialogProvider in MainLayout.razor). Back arrives from platform code rather than a Blazor event handler, and closing re-renders
     // MudDialogProvider, so the close goes through InvokeAsync.
-    private void CloseTopDialog() => _ = InvokeAsync(() => DialogService.Close(_openDialogs[^1], DialogResult.Cancel()));
+    private void CloseTopDialog() => _ = FireAndForget.RunAsync(
+        () => InvokeAsync(() =>
+        {
+            // ForgetWhenClosedAsync clears this handler as a continuation of the closing dialog's Result, which
+            // lands whenever it lands: a back press in the gap between the last dialog closing and that
+            // continuation running arrives here with nothing left to close.
+            if (_openDialogs.Count > 0)
+            {
+                DialogService.Close(_openDialogs[^1], DialogResult.Cancel());
+            }
+        }),
+        DispatchExceptionAsync);
 
     /// <summary>
     /// Clears up after the dialog boundary: the provider and every dialog in it are gone by the time this runs,
@@ -442,7 +457,18 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         BackButtonState.SetHandler(null);
 
         // Fire and forget: IDisposable cannot await, and the subscription only holds a JS listener -
-        // nothing downstream depends on the unsubscribe having completed.
-        _ = ViewportService.UnsubscribeAsync(this);
+        // nothing downstream depends on the unsubscribe having completed. This layout is being torn down, so
+        // a failure is logged rather than dispatched: there is no renderer left to show it on.
+        _ = FireAndForget.RunAsync(
+            () => ViewportService.UnsubscribeAsync(this),
+            exception =>
+            {
+                LogViewportUnsubscribeFailed(Logger, exception);
+                return Task.CompletedTask;
+            });
     }
+
+    [LoggerMessage(Level = LogLevel.Warning,
+        Message = "The layout could not unsubscribe from viewport notifications while being disposed")]
+    private static partial void LogViewportUnsubscribeFailed(ILogger logger, Exception exception);
 }

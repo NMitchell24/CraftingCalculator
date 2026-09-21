@@ -34,6 +34,11 @@ public partial class DatasetList : ComponentBase, IDisposable
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
+
+    // One message for all three delete paths, so it says nothing about how many records were involved: the
+    // list behind the dialog still shows them either way.
+    private const string DeleteFailedMessage = "I couldn't finish that delete.";
 
     private DataType _type;
     private List<IBaseDataRecord> _records = [];
@@ -207,9 +212,19 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await RecordService.DeleteRecordAsync(record);
-        Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
-        await ReloadAfterDeleteAsync();
+        bool deleted = await Guard.RunAsync(
+            "DatasetList.Delete",
+            DeleteFailedMessage,
+            async () =>
+            {
+                await RecordService.DeleteRecordAsync(record);
+                await ReloadAfterDeleteAsync();
+            });
+
+        if (deleted)
+        {
+            Snackbar.Add($"Deleted '{record.Name}'", Severity.Success);
+        }
     }
 
     private async Task DeleteSelectedAsync()
@@ -225,10 +240,22 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await RecordService.DeleteRecordsAsync(selected);
-        await ReloadAfterDeleteAsync();
+        bool deleted = await Guard.RunAsync(
+            "DatasetList.DeleteSelected",
+            DeleteFailedMessage,
+            async () =>
+            {
+                await RecordService.DeleteRecordsAsync(selected);
+                await ReloadAfterDeleteAsync();
+            });
 
-        Snackbar.Add($"Deleted {selected.Count} {NounFor(_type, selected.Count)}", Severity.Success);
+        if (deleted)
+        {
+            Snackbar.Add($"Deleted {selected.Count} {NounFor(_type, selected.Count)}", Severity.Success);
+        }
+
+        // Left whichever way it went: the selection is either deleted or reported as failed, and keeping the
+        // mode on would leave the user staring at highlighted rows with a dialog telling them nothing happened.
         SetMode(ListMode.Normal);
     }
 
@@ -239,10 +266,20 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
-        await RecordService.DeleteAllOfTypeAsync(_type);
-        await ReloadAfterDeleteAsync();
+        bool deleted = await Guard.RunAsync(
+            "DatasetList.DeleteAll",
+            DeleteFailedMessage,
+            async () =>
+            {
+                await RecordService.DeleteAllOfTypeAsync(_type);
+                await ReloadAfterDeleteAsync();
+            });
 
-        Snackbar.Add($"Deleted all {TitleFor(_type)}", Severity.Success);
+        if (deleted)
+        {
+            Snackbar.Add($"Deleted all {TitleFor(_type)}", Severity.Success);
+        }
+
         SetMode(ListMode.Normal);
     }
 

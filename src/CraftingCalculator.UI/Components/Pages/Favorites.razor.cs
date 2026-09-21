@@ -31,6 +31,11 @@ public partial class Favorites : ComponentBase, IDisposable
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
+
+    // One message for all three delete paths, so it says nothing about how many favorites were involved: the
+    // list behind the dialog still shows them either way.
+    private const string DeleteFailedMessage = "I couldn't finish that delete.";
 
     private List<BlueprintFavorite> _favorites = [];
     private ListMode _mode = ListMode.Normal;
@@ -140,33 +145,26 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private async Task RenameAsync(BlueprintFavorite favorite)
     {
-        DialogParameters parameters = new()
-        {
-            ["Label"] = "Favorite name",
-            ["InitialValue"] = favorite.Name ?? "",
-            ["ConfirmText"] = "Rename"
-        };
-
-        IDialogReference dialogRef = await DialogService.ShowAsync<TextInputDialog>("Rename favorite", parameters);
-        DialogResult? result = await dialogRef.Result;
-
-        if (result is null or { Canceled: true } || result.Data is not string name
-            || string.IsNullOrWhiteSpace(name) || name == favorite.Name)
+        if (await FavoritePrompts.PromptForRenameAsync(DialogService, FavoriteService, favorite) is not { } name)
         {
             return;
         }
 
-        if (await FavoriteService.DoesFavoriteExistAsync(name))
+        bool renamed = await Guard.RunAsync(
+            "Favorites.Rename",
+            "I couldn't rename that favorite. It still has its old name.",
+            async () =>
+            {
+                await FavoriteService.RenameFavoriteAsync(favorite, name);
+                State.OnFavoriteRenamed(favorite.Id, name);
+
+                await ReloadAsync();
+            });
+
+        if (renamed)
         {
-            Snackbar.Add($"A favorite named '{name}' already exists", Severity.Warning);
-            return;
+            Snackbar.Add($"Renamed to '{name}'", Severity.Success);
         }
-
-        await FavoriteService.RenameFavoriteAsync(favorite, name);
-        State.OnFavoriteRenamed(favorite.Id, name);
-
-        Snackbar.Add($"Renamed to '{name}'", Severity.Success);
-        await ReloadAsync();
     }
 
     private async Task DeleteAsync(BlueprintFavorite favorite)
@@ -182,11 +180,21 @@ public partial class Favorites : ComponentBase, IDisposable
             return;
         }
 
-        await FavoriteService.DeleteFavoriteAsync(favorite);
-        State.OnFavoriteDeleted(favorite.Id);
+        bool deleted = await Guard.RunAsync(
+            "Favorites.Delete",
+            DeleteFailedMessage,
+            async () =>
+            {
+                await FavoriteService.DeleteFavoriteAsync(favorite);
+                State.OnFavoriteDeleted(favorite.Id);
 
-        Snackbar.Add($"Deleted '{favorite.Name}'", Severity.Success);
-        await ReloadAsync();
+                await ReloadAsync();
+            });
+
+        if (deleted)
+        {
+            Snackbar.Add($"Deleted '{favorite.Name}'", Severity.Success);
+        }
     }
 
     private async Task DeleteSelectedAsync()
@@ -201,9 +209,16 @@ public partial class Favorites : ComponentBase, IDisposable
             return;
         }
 
-        await DeleteManyAsync(selected);
+        bool deleted = await Guard.RunAsync(
+            "Favorites.DeleteSelected", DeleteFailedMessage, () => DeleteManyAsync(selected));
 
-        Snackbar.Add($"Deleted {selected.Count} {NounFor(selected.Count)}", Severity.Success);
+        if (deleted)
+        {
+            Snackbar.Add($"Deleted {selected.Count} {NounFor(selected.Count)}", Severity.Success);
+        }
+
+        // Left whichever way it went: the selection is either deleted or reported as failed, and keeping the
+        // mode on would leave the user staring at highlighted cards with a dialog telling them nothing happened.
         SetMode(ListMode.Normal);
     }
 
@@ -214,9 +229,14 @@ public partial class Favorites : ComponentBase, IDisposable
             return;
         }
 
-        await DeleteManyAsync(_favorites);
+        bool deleted = await Guard.RunAsync(
+            "Favorites.DeleteAll", DeleteFailedMessage, () => DeleteManyAsync(_favorites));
 
-        Snackbar.Add("Deleted all favorites", Severity.Success);
+        if (deleted)
+        {
+            Snackbar.Add("Deleted all favorites", Severity.Success);
+        }
+
         SetMode(ListMode.Normal);
     }
 

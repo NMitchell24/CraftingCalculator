@@ -279,6 +279,8 @@ replace it. The one thing that must never appear in it is anything out of the us
 | Shown to the user | Settings' Diagnostics card → `UI/Components/Dialogs/LogViewerDialog.razor`, which also hands the text to `IFileDownloader` |
 | Saving a copy to Downloads | `UI/Logging/DiagnosticLogDownload.cs`, shared by the viewer and the startup error page |
 | Error boundaries | `UI/Components/Controls/LoggingErrorBoundary.cs`, three of them (see below) |
+| Failed commands | `UI/State/ActionGuard.cs`, scoped; `ActionsBar` wraps every `PageAction` in it |
+| Discarded tasks | `UI/State/FireAndForget.cs` |
 | Last-resort exception hooks | `UI/Logging/GlobalExceptionHandler.cs` |
 | Whole-app failure screen | `UI/Components/Layout/FatalError.razor`, the app boundary's error content |
 | Startup failure screen | `UI/StartupErrorPage.cs`, picked over `MainPage` by `App.CreateWindow` |
@@ -383,6 +385,59 @@ inside a `try`, logs Critical on failure and sets `DatabaseReady`; `App.CreateWi
 is built on the database that just failed, so the screen reporting it must not depend on any of it. It pins the
 Forge light palette (`AppTheme.ForgeColors`, `internal` for exactly this) because `ThemeState` lives in a Blazor
 scope that never started, and sets `SafeAreaEdges.All` so it clears the system bars under Android edge-to-edge.
+
+**A failed command is a dialog, not a boundary.** `ActionGuard` (`UI/State`, scoped) runs anything that saves,
+deletes, renames, imports or exports: `Guard.RunAsync("Page.Operation", "words for the user", () => ...)` logs the
+exception, states the failure in a dialog under one shared title, and returns false with the screen exactly as it
+was - the unsaved edits still in the fields, the Delete Mode selection still highlighted, the batch still built.
+That is the whole reason it exists rather than letting a boundary take the failure: the boundary replaces the
+screen, and replacing the screen throws away the work the user was in the middle of.
+
+`ActionsBar` wraps every `PageAction` in a guard, including both overflow menus and the long press, because that
+component renders outside `@Body` - the bottom bar and the drawer, not the page - so a throw from a page action
+would skip the page boundary entirely and take the app down to `FatalError`. A page that wants better copy than
+the bar's generic message nests a guard of its own inside the handler; the bar's then sees nothing to catch. The
+operation name is a compile-time constant (L2) and it reads verbatim in the log viewer, so write it for whoever
+is diagnosing the failure. `PageAction.Label` is the app's own words for the same reason: the bar logs it.
+
+**The copy is one sentence in the first person, and it never ends in "Try again."** "I couldn't save your
+changes." - the app owns the failure, the way the help pages already do, without reaching for the boundary
+cards' "It's not you. It's me.", which goes stale fast when twenty dialogs share it. Add what state the user's
+own work is in only where the screen does not already show it ("Your edits are still here.", "Your batch is as
+you left it."); on a list the records are visibly still there, so saying nothing was removed is noise. The
+retry closer is left out on purpose: nothing a command does here is a network call, so the usual causes are a
+bug, a full disk or a permission, none of which clear on a second tap. `ActionGuard` appends `FailureHelp` -
+one line pointing at the log in Settings - to every message, so the escalation has a single home and no caller
+retypes it. A caller whose own screen would make that line nonsense passes `help:` instead; `LogViewerDialog`
+is the only one, because it is already showing the log, and it names the WebView's own long-press Select all /
+Copy as the way out by hand. The same voice covers the inline `MudAlert` failures in `ImportState`/`ExportState`, which the
+guard cannot reach; those keep a state clause where it is genuinely reassuring ("so no file was written") and
+keep real advice where there is some ("Try again, or choose a different one." - a different file is the fix).
+
+A **load** is not a command and is not guarded. A throw on the way into a screen belongs to the page boundary,
+which is the right outcome when there is nothing left to keep; the exception is a screen that can state the
+failure itself and stay usable (`Export`'s snapshot load, every `ImportState` step), which reports inline with a
+`MudAlert`.
+
+**A discarded task goes through `FireAndForget.RunAsync`.** A bare `_ = SomethingAsync()` leaves an escaping
+exception to fault a task nobody observes: it only surfaces when the finalizer collects it, which reaches
+`TaskScheduler.UnobservedTaskException` an arbitrary time later and never reaches the screen.
+`FireAndForget.RunAsync(work, onFault)` swallows `ObjectDisposedException` - the component was torn down
+mid-flight - and hands anything else to `onFault`, which is `DispatchExceptionAsync` from a live component and a
+`[LoggerMessage]` from a `Dispose` that has no renderer left. Every `_ =` in `CraftingCalculator.UI` is one of
+these or a discard of something that is not a `Task`.
+
+**Toast, dialog or inline alert** is one rule, and it settles every case:
+
+| The thing that happened | Where the user reads it |
+|---|---|
+| It worked, or here's a hint | a toast, `Severity.Success` or `Severity.Info` only |
+| It didn't happen, or you have to choose or fix something | a dialog - `ConfirmDialog`, or the one `ActionGuard` puts up |
+| It failed, and it belongs to this screen | an inline `MudAlert` on that screen |
+
+There is no central toast wrapper - a one-line `Snackbar.Add` is already the whole thing, and wrapping it would
+be a Lazy Element. `grep -rnE "Snackbar\.Add\(.*Severity\.(Error|Warning)" src/` finds nothing, and that grep
+is the check.
 
 **Checking privacy needs a Release build.** A Debug log is deliberately unredacted, so it proves nothing.
 

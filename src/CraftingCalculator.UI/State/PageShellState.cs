@@ -4,7 +4,10 @@ namespace CraftingCalculator.UI.State;
 /// One action a page contributes to the shell. Rendered as an icon button on the bottom actions bar in
 /// portrait and as a nav item inside the drawer on wider viewports.
 /// </summary>
-/// <param name="Label">The action's accessible name, and its label wherever the shell shows text.</param>
+/// <param name="Label">
+/// The action's accessible name, and its label wherever the shell shows text. Always the app's own words and
+/// never anything the user typed: the shell logs it as the name of the operation whenever the action runs.
+/// </param>
 /// <param name="Icon">A Material icon path, normally from <c>Icons.Material.Filled</c>.</param>
 /// <param name="OnClick">Runs when the action is invoked.</param>
 /// <param name="Disabled">True to render the action but refuse interaction.</param>

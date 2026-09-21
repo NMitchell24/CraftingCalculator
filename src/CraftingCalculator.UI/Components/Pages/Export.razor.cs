@@ -2,6 +2,7 @@ using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models.Transfer;
+using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,8 @@ public partial class Export : ComponentBase, IDisposable
     [Inject] private ExportState ExportState { get; set; } = null!;
     [Inject] private PageShellState PageShellState { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
     [Inject] private ILogger<Export> Logger { get; set; } = null!;
 
     // .ccdata is the app's own extension, so no registered media type describes it. The downloads folder
@@ -117,11 +120,13 @@ public partial class Export : ComponentBase, IDisposable
         });
 
     // Raised by the export's background task as well as by this page.
-    private void OnExportChanged() => _ = InvokeAsync(() =>
-    {
-        ConfigureShell();
-        StateHasChanged();
-    });
+    private void OnExportChanged() => _ = FireAndForget.RunAsync(
+        () => InvokeAsync(() =>
+        {
+            ConfigureShell();
+            StateHasChanged();
+        }),
+        DispatchExceptionAsync);
 
     private Task ExportAsync() =>
         CanExport ? ExportState.StartAsync(_snapshot!, _selected) : Task.CompletedTask;
@@ -137,15 +142,14 @@ public partial class Export : ComponentBase, IDisposable
             return;
         }
 
-        try
+        bool saved = await Guard.RunAsync(
+            "Export.Download",
+            "I couldn't save that export to your Downloads folder.",
+            () => Downloader.SaveToDownloadsAsync(export.FullPath, ExportMimeType));
+
+        if (saved)
         {
-            await Downloader.SaveToDownloadsAsync(export.FullPath, ExportMimeType);
             Snackbar.Add("Saved to your Downloads folder.", Severity.Success);
-        }
-        catch (Exception exception)
-        {
-            LogDownloadFailed(Logger, exception);
-            Snackbar.Add("That export couldn't be saved to your Downloads folder.", Severity.Error);
         }
     }
 
@@ -156,15 +160,10 @@ public partial class Export : ComponentBase, IDisposable
             return;
         }
 
-        try
-        {
-            await ShareService.ShareFileAsync(export.FullPath, "Share your export");
-        }
-        catch (Exception exception)
-        {
-            LogShareFailed(Logger, exception);
-            Snackbar.Add("The share sheet couldn't be opened.", Severity.Error);
-        }
+        await Guard.RunAsync(
+            "Export.Share",
+            "I couldn't open the share sheet.",
+            () => ShareService.ShareFileAsync(export.FullPath, "Share your export"));
     }
 
     /// <summary>
@@ -181,7 +180,13 @@ public partial class Export : ComponentBase, IDisposable
             return true;
         }
 
-        Snackbar.Add("That export file is gone. Export again to make a new one.", Severity.Warning);
+        // A dialog rather than a toast: the button the user tapped did not happen, and the way forward is
+        // to export again.
+        await ConfirmDialog.AlertAsync(
+            DialogService,
+            "That export is gone",
+            "That export file isn't on the device any more. Export again to make a new one.");
+
         return false;
     }
 
@@ -206,9 +211,4 @@ public partial class Export : ComponentBase, IDisposable
     [LoggerMessage(Level = LogLevel.Error, Message = "The dataset snapshot could not be loaded for export")]
     private static partial void LogSnapshotLoadFailed(ILogger logger, Exception exception);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "The export could not be saved to the Downloads folder")]
-    private static partial void LogDownloadFailed(ILogger logger, Exception exception);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "The share sheet could not be opened for the export")]
-    private static partial void LogShareFailed(ILogger logger, Exception exception);
 }

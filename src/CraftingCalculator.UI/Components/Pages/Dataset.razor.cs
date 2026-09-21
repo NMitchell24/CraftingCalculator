@@ -34,6 +34,13 @@ public partial class Dataset : ComponentBase, IDisposable
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
+    [Inject] private ActionGuard Guard { get; set; } = null!;
+
+    // Every guard on this page wraps WhileBusyAsync rather than sitting inside it: that method's finally is
+    // what takes the busy overlay down, so a failure reported from inside would put a dialog on top of a
+    // spinner that never stops.
+    private const string SettingsFailedMessage =
+        "I couldn't save that setting. It's still set the way it was.";
 
     private List<DatasetSection> Sections { get; set; } = [];
     private List<DatasetModel> _datasets = [];
@@ -106,6 +113,12 @@ public partial class Dataset : ComponentBase, IDisposable
         finally
         {
             _busy = false;
+
+            // Rendered here rather than left to the render Blazor queues once the handler returns: the
+            // ActionGuard wrapping this call awaits its failure dialog after this finally has run, and the
+            // overlay is z-index 9999, above the dialog. Without this the spinner stays up over the report,
+            // greying it out and still turning as if the work were going on.
+            StateHasChanged();
         }
     }
 
@@ -147,7 +160,10 @@ public partial class Dataset : ComponentBase, IDisposable
     }
 
     /// <summary>The switcher's own action, which is the one case where switching is not part of another.</summary>
-    private Task OnDatasetSelectedAsync(int id) => WhileBusyAsync(() => SwitchAsync(id));
+    private Task OnDatasetSelectedAsync(int id) => Guard.RunAsync(
+        "Dataset.Switch",
+        "I couldn't open that dataset.",
+        () => WhileBusyAsync(() => SwitchAsync(id)));
 
     private async Task SwitchAsync(int id)
     {
@@ -177,14 +193,17 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await WhileBusyAsync(async () =>
-        {
-            DatasetModel created = await Task.Run(() => DatasetService.CreateAsync(name));
+        await Guard.RunAsync(
+            "Dataset.Add",
+            "I couldn't create that dataset.",
+            () => WhileBusyAsync(async () =>
+            {
+                DatasetModel created = await Task.Run(() => DatasetService.CreateAsync(name));
 
-            // Switched to immediately: creating a dataset is how a user starts a second game, and leaving
-            // them on the old one would make the new one look like it had not been created.
-            await SwitchAsync(created.Id);
-        });
+                // Switched to immediately: creating a dataset is how a user starts a second game, and leaving
+                // them on the old one would make the new one look like it had not been created.
+                await SwitchAsync(created.Id);
+            }));
     }
 
     private async Task CopyAsync()
@@ -205,14 +224,18 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await WhileBusyAsync(async () =>
-        {
-            DatasetModel created = await Task.Run(() => DatasetService.CopyAsync(current.Id, name));
+        await Guard.RunAsync(
+            "Dataset.Copy",
+            "I couldn't make that copy.",
+            () => WhileBusyAsync(async () =>
+            {
+                DatasetModel created = await Task.Run(() => DatasetService.CopyAsync(current.Id, name));
 
-            // Switched to immediately, the same as a newly created dataset: the copy exists to be the one
-            // that gets the variations, so leaving the user on the original would be the wrong place to stand.
-            await SwitchAsync(created.Id);
-        });
+                // Switched to immediately, the same as a newly created dataset: the copy exists to be the one
+                // that gets the variations, so leaving the user on the original would be the wrong place to
+                // stand.
+                await SwitchAsync(created.Id);
+            }));
     }
 
     private async Task RenameAsync()
@@ -230,13 +253,19 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await WhileBusyAsync(async () =>
-        {
-            await Task.Run(() => DatasetService.RenameAsync(current.Id, name));
-            await ReloadAsync();
-        });
+        bool renamed = await Guard.RunAsync(
+            "Dataset.Rename",
+            "I couldn't rename that dataset. It still has its old name.",
+            () => WhileBusyAsync(async () =>
+            {
+                await Task.Run(() => DatasetService.RenameAsync(current.Id, name));
+                await ReloadAsync();
+            }));
 
-        Snackbar.Add($"Renamed to '{name}'", Severity.Success);
+        if (renamed)
+        {
+            Snackbar.Add($"Renamed to '{name}'", Severity.Success);
+        }
     }
 
     private async Task DeleteAsync()
@@ -246,31 +275,41 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await WhileBusyAsync(async () =>
+        bool deleted = await Guard.RunAsync(
+            "Dataset.Delete",
+            "I couldn't delete that dataset.",
+            () => WhileBusyAsync(async () =>
+            {
+                await Task.Run(() => DatasetService.DeleteAsync(current.Id));
+
+                // The service has already moved the selection off the deleted dataset, so the batch is now
+                // holding blueprints from a dataset that no longer exists.
+                State.Clear();
+
+                await ReloadAsync();
+            }));
+
+        if (deleted)
         {
-            await Task.Run(() => DatasetService.DeleteAsync(current.Id));
-
-            // The service has already moved the selection off the deleted dataset, so the batch is now
-            // holding blueprints from a dataset that no longer exists.
-            State.Clear();
-
-            await ReloadAsync();
-        });
-
-        Snackbar.Add($"Deleted '{current.Name}'", Severity.Success);
+            Snackbar.Add($"Deleted '{current.Name}'", Severity.Success);
+        }
     }
 
     /// <summary>
     /// Applies <paramref name="change"/> to the selected dataset's settings and saves them. Every datasetting row's
     /// control saves through here.
     /// </summary>
-    private async Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change)
-    {
-        await Task.Run(() => DatasetService.UpdateSettingsAsync(change));
+    private Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change) => Guard.RunAsync(
+        "Dataset.UpdateSettings",
+        SettingsFailedMessage,
+        async () =>
+        {
+            await Task.Run(() => DatasetService.UpdateSettingsAsync(change));
 
-        // The batch was worked out under the old setting, and the Craft screen only reads what CraftState holds.
-        State.OnDatasettingsChanged();
-    }
+            // The batch was worked out under the old setting, and the Craft screen only reads what CraftState
+            // holds.
+            State.OnDatasettingsChanged();
+        });
 
     private async Task UpdateCurrencyLabelAsync(string? text)
     {
@@ -310,18 +349,24 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        await WhileBusyAsync(async () =>
+        bool deleted = await Guard.RunAsync(
+            "Dataset.DeleteAllData",
+            "I couldn't empty that dataset.",
+            () => WhileBusyAsync(async () =>
+            {
+                await Task.Run(() => DatabaseAdminService.DeleteAllDataAsync());
+
+                // The batch on the Craft screen holds Blueprint models that no longer exist in the
+                // database - left alone it would keep pricing out deleted blueprints.
+                State.Clear();
+
+                await ReloadAsync();
+            }));
+
+        if (deleted)
         {
-            await Task.Run(() => DatabaseAdminService.DeleteAllDataAsync());
-
-            // The batch on the Craft screen holds Blueprint models that no longer exist in the
-            // database - left alone it would keep pricing out deleted blueprints.
-            State.Clear();
-
-            await ReloadAsync();
-        });
-
-        Snackbar.Add($"Deleted all data in '{NameOf(SelectedDataset.Id)}'", Severity.Success);
+            Snackbar.Add($"Deleted all data in '{NameOf(SelectedDataset.Id)}'", Severity.Success);
+        }
     }
 
     public void Dispose() => PageShellState.Reset(this);

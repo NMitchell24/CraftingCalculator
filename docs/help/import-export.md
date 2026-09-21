@@ -127,8 +127,9 @@ Tap ![Share](assets/share.svg) on any card to send that export somewhere: email 
 cloud drive, or send it to a friend. It's the step that turns an export into a real backup, because the copy ends
 up somewhere that isn't this device.
 
-Either button checks the file is still there first. If it's gone, because you deleted it or a new export pushed it
-off the end of your history, the app tells you so instead.
+Either button checks the file is still there first. If it's gone, because you deleted it or a new export pushed
+it off the end of your history, the app says so and nothing happens. Same if the download or the share itself hits
+a problem: you get a message saying so, and the export is still sitting on its card.
 
 > **Note:** Exports live in the app's storage, so uninstalling the app or clearing its data deletes them along with
 > everything else. A downloaded copy survives that, since it's out of the app's hands by then. An export only counts

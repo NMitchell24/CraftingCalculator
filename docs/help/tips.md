@@ -133,6 +133,16 @@ If it keeps doing it, the log is the thing I need. That screen tells you where t
 has a **Save log to Downloads** button so you can grab a copy without getting into the app first. More detail:
 [Settings](settings.md#diagnostics).
 
+### "A dialog says 'That didn't work'"
+
+Something you tapped didn't happen, so I stopped and said so rather than half doing it. A save, a delete, a
+rename, an import: whichever it was, the message names what I couldn't do. Everything you had on screen is still
+there, so your edits are still in their fields, your selection is still selected, and your batch is still built.
+
+You'll notice I don't tell you to try again. Tapping it a second time usually gets you the same message, so
+there's no point pretending otherwise. If it does keep happening, the log is the thing I need. See
+[Settings](settings.md#diagnostics).
+
 ### "A screen turned into 'Something went wrong'"
 
 That screen ran into a problem, so the app swapped it for a card that says so instead of sitting there frozen and

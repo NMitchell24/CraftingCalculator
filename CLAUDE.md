@@ -172,6 +172,48 @@ user.
 
 ---
 
+## Failures: what catches them, and what the user is told
+
+Nothing may freeze the renderer and nothing may fail silently. Three mechanisms cover it, and a new handler picks
+the one that fits what it is doing:
+
+- **A command goes through `ActionGuard`** (`UI/State`, scoped). Anything that saves, deletes, renames, imports
+  or exports runs as `Guard.RunAsync("Page.Operation", "words for the user", () => …)`, which logs the
+  exception, states the failure in a dialog, and returns false with the screen untouched — the user's unsaved
+  edits, their selection and their batch all still there. `ActionsBar` already wraps every `PageAction` in one,
+  because page actions are invoked outside `@Body` and so bypass the page error boundary; a page that wants
+  better copy than the bar's generic message nests a guard of its own inside the handler. The operation name is
+  a compile-time constant, never anything the user typed (L2), and it shows verbatim in the log viewer.
+  **The caller's message is one sentence in the first person — "I couldn't save your changes." — plus what
+  state the user's own work is in where the screen does not already show it, and it never closes by telling
+  them to try again.** Nothing these commands do is a network call, so a retry is rarely what fixes one, and
+  twenty dialogs saying it is a nag rather than advice. `ActionGuard` appends the single line that is
+  actionable, pointing at the log in Settings, so no caller repeats it; a screen where that line would be
+  nonsense passes its own through `help:` - the log viewer is the one that does, since it is already
+  showing the log.
+- **A load relies on the error boundary.** A throw on the way into a screen is deliberately not caught: the page
+  boundary in `MainLayout` replaces the screen with a card the user can leave from, which is the right outcome
+  when there is nothing left to keep. The exception is a screen that can state the failure in its own words and
+  stay usable — `Export`'s snapshot load, every `ImportState` step — which reports inline with a `MudAlert`.
+- **A discarded task goes through `FireAndForget.RunAsync`** (`UI/State`). A bare `_ = SomethingAsync()` leaves
+  an escaping exception to fault a task nobody observes, which only surfaces when the finalizer collects it.
+  `FireAndForget` hands it to a callback instead: `DispatchExceptionAsync` from a live component, a
+  `[LoggerMessage]` from a `Dispose` that has no renderer left to report to. Every `_ =` in
+  `CraftingCalculator.UI` is one of these or a discard of something that is not a `Task`.
+
+**Toast, dialog or inline alert** is one rule, and it decides every case:
+
+| The thing that happened | Where the user reads it |
+|---|---|
+| It worked, or here's a hint | a toast, `Severity.Success` or `Severity.Info` only |
+| It didn't happen, or you have to choose or fix something | a dialog — `ConfirmDialog`, or the one `ActionGuard` puts up |
+| It failed, and it belongs to this screen | an inline `MudAlert` on that screen |
+
+There is no central toast wrapper; a one-line `Snackbar.Add` call is already the whole thing.
+`grep -rnE "Snackbar\.Add\(.*Severity\.(Error|Warning)" src/` finds nothing, and that grep is the check.
+
+---
+
 ## Key commands
 
 ```bash
