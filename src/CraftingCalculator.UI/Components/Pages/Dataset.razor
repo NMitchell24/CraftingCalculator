@@ -87,7 +87,7 @@
                         Blueprints can make more than one item per craft, and the extra shows up as surplus.
                     </MudText>
                 </div>
-                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseYield"
+                <MudSwitch T="bool" @key="_switchGeneration" Value="SelectedDataset.Settings.UseYield"
                            ValueChanged="@(useYield => UpdateSettingsAsync(settings =>
                                                             settings with { UseYield = useYield }))"
                            Color="Color.Primary" AriaLabel="Calculate Yield" />
@@ -99,7 +99,7 @@
                         Components and blueprints take time to make, and the Craft screen adds it up.
                     </MudText>
                 </div>
-                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseCraftTime"
+                <MudSwitch T="bool" @key="_switchGeneration" Value="SelectedDataset.Settings.UseCraftTime"
                            ValueChanged="@(useCraftTime => UpdateSettingsAsync(settings =>
                                                                 settings with { UseCraftTime = useCraftTime }))"
                            Color="Color.Primary" AriaLabel="Calculate Craft Time" />
@@ -114,7 +114,7 @@
                         Components have a cost, and the Craft screen adds it up.
                     </MudText>
                 </div>
-                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseCosts"
+                <MudSwitch T="bool" @key="_switchGeneration" Value="SelectedDataset.Settings.UseCosts"
                            ValueChanged="@(useCosts => UpdateSettingsAsync(settings =>
                                                             settings with { UseCosts = useCosts }))"
                            Color="Color.Primary" AriaLabel="Calculate Costs" />
@@ -126,7 +126,7 @@
                         Blueprints have a value, and the Craft screen adds it up.
                     </MudText>
                 </div>
-                <MudSwitch T="bool" Value="SelectedDataset.Settings.UseValues"
+                <MudSwitch T="bool" @key="_switchGeneration" Value="SelectedDataset.Settings.UseValues"
                            ValueChanged="@(useValues => UpdateSettingsAsync(settings =>
                                                             settings with { UseValues = useValues }))"
                            Color="Color.Primary" AriaLabel="Calculate Values" />

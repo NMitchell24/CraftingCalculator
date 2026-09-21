@@ -93,7 +93,7 @@ public class FileLoggerProviderTests
         FileLoggerProvider provider = new(_logDirectory, new LogRedactor([root]));
         ILogger logger = provider.CreateLogger("test");
 
-        // Our own messages are constants (rule L3), so only the path rule is applied to them.
+        // Our own messages are app-authored constants, so only the path rule is applied to them.
         logger.LogError("Could not save 'the export' to {Path}", Path.Combine(root, "Exports", "Valheim.ccdata"));
 
         string content = File.ReadAllText(provider.FilePath);

@@ -119,8 +119,8 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
   to the previous migration by name, insert through the *old* names in raw SQL, migrate up, and read
   the rows back through the new model.
 - **Delete behavior is configured explicitly** (cascade / SetNull) per relationship in the entity
-  configurations — see the delete-behavior table in the migration plan history / PR description for
-  the full list. `Microsoft.Data.Sqlite` enables `PRAGMA foreign_keys` per connection so DB-side
+  configurations — `DeleteBehaviorTests` covers every one of them.
+  `Microsoft.Data.Sqlite` enables `PRAGMA foreign_keys` per connection so DB-side
   cascade actually fires; don't reintroduce hand-written cleanup loops in services.
 
 ## Export file format (`.ccdata`) — backward compatibility is mandatory
@@ -312,7 +312,7 @@ so the sink's tests exercise redaction in any configuration.
 - **Type names and stack traces are always kept in full.** When redacting, the formatter never calls
   `exception.ToString()` — it walks the chain (`InnerException`, `AggregateException.InnerExceptions`) itself.
 
-**The call-site rules (L1–L4) are in `CLAUDE.md`** and are the part that actually keeps the promise: the redactor
+**The call-site rules are in `CLAUDE.md`** and are the part that actually keeps the promise: the redactor
 only catches what the *framework* wrote into an exception message, never what a call site chose to log. Adding a
 log call means adding a `[LoggerMessage]` partial method to the class that logs, which makes the class `partial`
 and gives it an `ILogger<T>` (a primary-constructor parameter on a state class, an `[Inject]` property on a page).
@@ -399,7 +399,7 @@ screen, and replacing the screen throws away the work the user was in the middle
 component renders outside `@Body` - the bottom bar and the drawer, not the page - so a throw from a page action
 would skip the page boundary entirely and take the app down to `FatalError`. A page that wants better copy than
 the bar's generic message nests a guard of its own inside the handler; the bar's then sees nothing to catch. The
-operation name is a compile-time constant (L2) and it reads verbatim in the log viewer, so write it for whoever
+operation name is a compile-time constant and it reads verbatim in the log viewer, so write it for whoever
 is diagnosing the failure. `PageAction.Label` is the app's own words for the same reason: the bar logs it.
 
 **The copy is one sentence in the first person, and it never ends in "Try again."** "I couldn't save your

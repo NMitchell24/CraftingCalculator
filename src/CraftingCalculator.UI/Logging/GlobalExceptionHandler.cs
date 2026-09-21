@@ -21,7 +21,7 @@ internal static partial class GlobalExceptionHandler
         {
             // ExceptionObject is typed object because the CLR permits a non-Exception throw from other
             // languages. Only that payload's type name is logged - its ToString is arbitrary text this code
-            // did not author, which L2 keeps out of the file.
+            // did not author, and the log never carries a string the app did not write itself.
             if (args.ExceptionObject is Exception exception)
             {
                 LogAppDomainUnhandled(logger, exception, args.IsTerminating);
@@ -71,7 +71,7 @@ internal static partial class GlobalExceptionHandler
 #endif
     }
 
-    // Source-generated, per L1, and so the bool and enum arguments below stay unboxed.
+    // Source-generated, so the bool and enum arguments below stay unboxed.
     [LoggerMessage(Level = LogLevel.Critical,
         Message = "Unhandled exception reached the AppDomain (terminating: {IsTerminating})")]
     private static partial void LogAppDomainUnhandled(ILogger logger, Exception exception, bool isTerminating);

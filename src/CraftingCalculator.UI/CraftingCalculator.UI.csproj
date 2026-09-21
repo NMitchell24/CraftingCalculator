@@ -41,8 +41,8 @@
     <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
 
-  <!-- iOS Release: interpreter instead of NativeAOT - see docs/dev-environment.md and the plan's
-       "iOS Release settings" note. NativeAOT is not a supported combination with EF Core. -->
+  <!-- iOS Release: interpreter instead of NativeAOT - see docs/dev-environment.md.
+       NativeAOT is not a supported combination with EF Core. -->
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
     <UseInterpreter>true</UseInterpreter>
     <MtouchInterpreter>all</MtouchInterpreter>

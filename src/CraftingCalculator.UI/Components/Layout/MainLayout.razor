@@ -98,8 +98,8 @@
                    failed, so asking the provider that failed to render the report can fail in turn - and that
                    loops, because Recover resets the error count ErrorBoundaryBase would otherwise stop it with
                    (measured: ~90% CPU and the whole three-file log ring rewritten inside a minute). This is
-                   MainLayout's own markup, outside both boundaries, and it needs no provider at all. D10's
-                   third case: a failure that belongs to the screen it happened on. *@
+                   MainLayout's own markup, outside both boundaries, and it needs no provider at all. A failure that
+                   belongs to the screen it happened on is an inline alert, not a dialog. *@
                 <MudAlert Severity="Severity.Error" Class="dialog-error-alert" ShowCloseIcon="true"
                           CloseIconClicked="DismissDialogFailure" role="alert">
                     The dialog I was supposed to show ran into a problem so I closed it. The problem has been written to the log.

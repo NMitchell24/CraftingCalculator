@@ -154,15 +154,15 @@ deliberately writes exceptions raw so development logs stay readable, so a call 
 it on every machine the app is built on. The rules are what keep the promise; the redactor only catches what the
 framework puts in an exception message.
 
-- **L1 — all app logging is `[LoggerMessage]`.** Source-generated partial methods, declared in the class that
+- **All app logging is `[LoggerMessage]`.** Source-generated partial methods, declared in the class that
   logs. Never call `logger.LogError(...)` and friends directly:
   `grep -rnE "\.Log(Trace|Debug|Information|Warning|Error|Critical)\(" src/` finds nothing.
-- **L2 — parameters are only** an `Exception`, an enum, a `bool`, a count, or a string the app itself authored: a
+- **Log parameters are only** an `Exception`, an enum, a `bool`, a count, or a string the app itself authored: a
   compile-time operation name, a route, a control's own label, a `GetType().Name`, a session header field. Never a
   record, dataset or category name, never a file name, never a path the user chose.
-- **L3 — our own `throw` messages** follow the same rule: constants plus ids, enums and counts, never user-entered
+- **Our own `throw` messages** follow the same rule: constants plus ids, enums and counts, never user-entered
   text. A thrown message ends up in the log. `BlueprintProcessor.ThrowIfTooDeep` names the blueprint's **id**.
-- **L4 — EF sensitive logging stays DEBUG-only and never reaches the file.** `EnableSensitiveDataLogging` makes a
+- **EF sensitive logging stays DEBUG-only and never reaches the file.** `EnableSensitiveDataLogging` makes a
   failed command log its parameter values (`[Parameters=[@p0='Bronze'...]`) at Error, so `AddFileLogging` filters
   `Microsoft.EntityFrameworkCore` to `None` in **both** configurations. The debugger output window still gets it.
 
@@ -183,7 +183,7 @@ the one that fits what it is doing:
   edits, their selection and their batch all still there. `ActionsBar` already wraps every `PageAction` in one,
   because page actions are invoked outside `@Body` and so bypass the page error boundary; a page that wants
   better copy than the bar's generic message nests a guard of its own inside the handler. The operation name is
-  a compile-time constant, never anything the user typed (L2), and it shows verbatim in the log viewer.
+  a compile-time constant, never anything the user typed, and it shows verbatim in the log viewer.
   **The caller's message is one sentence in the first person — "I couldn't save your changes." — plus what
   state the user's own work is in where the screen does not already show it, and it never closes by telling
   them to try again.** Nothing these commands do is a network call, so a retry is rarely what fixes one, and
@@ -312,6 +312,25 @@ Use standard programming vocabulary — the terms from GoF, Fowler's *Refactorin
 condition, callback, dispatch. Never literary metaphors or coined phrases ("prologue", "dance",
 "journey", "saga"). Reference the actual method/class names involved rather than describing them
 indirectly. State cause and effect directly.
+
+**Never reference a working plan.** Plans live outside the repo, and they are deleted when the work
+is done, so a pointer into one is stale the day it merges and meaningless to anyone on another
+machine. That covers phase, decision, rule and fact labels (`P5`, `D10`, `L2`, "fact 1", "Fallback
+2"), "per the plan", "the plan's table", and anything that only makes sense next to it. It applies to
+code comments, `CLAUDE.md`, the skill, `docs/` and test names alike. State the rule or the reason
+itself, in place:
+
+```csharp
+// Source-generated, per L1, so the bool below stays unboxed.                  // before
+// Source-generated, so the bool below stays unboxed.                           // after
+
+// Not logged: the message is a string we did not author, which L2 keeps out.  // before
+// Not logged: the message is a string the app did not author, and the file    // after
+// never carries one - its quoted values would bypass the redactor.
+```
+
+A rule that has to be cited from somewhere else lives in `CLAUDE.md` or the skill under a name that
+says what it is, never under a number.
 
 Never remove or alter an existing authorship comment — `Created by <name> on <date>`, `@author`, or
 similar attribution. Preserve it verbatim (name, accents, emoji, date, punctuation) when editing or
