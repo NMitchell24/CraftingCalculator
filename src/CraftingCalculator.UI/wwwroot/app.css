@@ -605,7 +605,7 @@ html.keyboard-open .page-content-with-bottom-nav {
 }
 
 /* :not() above matters as much as the fill does - a muted text-secondary label left on the selected
-   pill reads as a disabled control, the same way PR 8b's dimmed Add Blueprints button did. */
+   pill reads as a disabled control. */
 
 /* The pill shares the surface token with the card it sits on, so the recessed track behind it is what
    makes it read as raised; the border and shadow keep its edges legible where pill and card meet. */

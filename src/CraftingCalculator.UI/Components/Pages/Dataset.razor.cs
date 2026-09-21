@@ -47,6 +47,7 @@ public partial class Dataset : ComponentBase, IDisposable
     private bool _busy;
     private DatasettingsView _datasettingsView = DatasettingsView.General;
     private MudTextField<string> _currencyNameField = null!;
+    private int _switchGeneration;
 
     private int SelectedDatasetId => SelectedDataset.Id;
 
@@ -299,17 +300,28 @@ public partial class Dataset : ComponentBase, IDisposable
     /// Applies <paramref name="change"/> to the selected dataset's settings and saves them. Every datasetting row's
     /// control saves through here.
     /// </summary>
-    private Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change) => Guard.RunAsync(
-        "Dataset.UpdateSettings",
-        SettingsFailedMessage,
-        async () =>
-        {
-            await Task.Run(() => DatasetService.UpdateSettingsAsync(change));
+    private async Task UpdateSettingsAsync(Func<Datasettings, Datasettings> change)
+    {
+        bool saved = await Guard.RunAsync(
+            "Dataset.UpdateSettings",
+            SettingsFailedMessage,
+            async () =>
+            {
+                await Task.Run(() => DatasetService.UpdateSettingsAsync(change));
 
-            // The batch was worked out under the old setting, and the Craft screen only reads what CraftState
-            // holds.
-            State.OnDatasettingsChanged();
-        });
+                // The batch was worked out under the old setting, and the Craft screen only reads what CraftState
+                // holds.
+                State.OnDatasettingsChanged();
+            });
+
+        // A MudSwitch keeps the value it was toggled to, and re-rendering it with the same unchanged Value does not
+        // put it back, so after a failed save it would show the setting that was never saved. A new @key rebuilds
+        // every switch from the stored settings.
+        if (!saved)
+        {
+            _switchGeneration++;
+        }
+    }
 
     private async Task UpdateCurrencyLabelAsync(string? text)
     {

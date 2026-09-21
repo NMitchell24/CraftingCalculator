@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CraftingCalculator.Infrastructure.UnitTests;
 
 /// <summary>
-/// One test per row of the plan's delete-behavior table: each cascade/SetNull configuration replaces
+/// Covers every cascade/SetNull relationship in the entity configurations: each one replaces
 /// a hand-written cleanup loop that used to walk LiteDB collections, so these are the direct
 /// regression net for that removed code.
 /// </summary>
