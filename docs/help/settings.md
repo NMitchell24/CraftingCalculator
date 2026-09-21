@@ -58,9 +58,11 @@ bottom, and that's where it opens. Tap ![Close](assets/close.svg) **Close** when
 
 - **The session header:** the app's version and build, your OS version, and your device's manufacturer, model and
   type (phone, tablet, desktop). One of these is written every time the app starts.
-- **Where you went:** every screen you open, every action you tap, every dialog you close, each step of an import,
-  and how many records went into an export. A screen is written the way the app names it, not the way you do, so editing your Bronze Axe
-  shows up as `/dataset/blueprint/{id}`. That's enough for me to retrace your steps without seeing your stuff.
+- **Where you went:** every screen you open, every dialog you close, and the bigger stuff you do: the buttons in the
+  actions bar, every save, delete and rename, each step of an import, and how many records went into an export.
+  Little things like expanding a tree or bumping a quantity aren't in there. A screen is written the way the app
+  names it, not the way you do, so editing your Bronze Axe shows up as `/dataset/blueprint/{id}`. That's enough
+  for me to retrace your steps without seeing your stuff.
 - **Errors:** anything that went wrong, what the app was trying to do at the time, and the developer-facing detail
   I need to find it in the code.
 
