@@ -52,6 +52,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     private const double NavLinkHeight = 40;
     private const double ActionsDividerHeight = 17;
 
+    // A dialog whose component never rendered, so there is no instance to name.
+    private const string UnknownDialogType = "(not rendered)";
+
     private MudThemeProvider _themeProvider = null!;
     private LoggingErrorBoundary _dialogBoundary = null!;
     // Null while _unwinding leaves the page out of the layout altogether.
@@ -146,6 +149,9 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
         DialogService.DialogInstanceAddedAsync += OnDialogOpenedAsync;
         Navigation.LocationChanged += OnLocationChanged;
 
+        // The screen the app opened on, which no LocationChanged will ever report.
+        LogNavigated(Logger, LogRouteProcessor.ToTemplate(CurrentRoute));
+
         // An absent or unrecognized stored value leaves the drawer expanded.
         bool.TryParse(PreferenceStore.Get(DrawerCollapsedKey), out _drawerCollapsed);
     }
@@ -215,8 +221,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
     // dialog on navigation, which completes Result without raising it, and back would then close nothing.
     private async Task ForgetWhenClosedAsync(IDialogReference dialog)
     {
-        await dialog.Result;
+        DialogResult? result = await dialog.Result;
         _openDialogs.Remove(dialog);
+
+        // By type, never by title: InfoDialog titles itself with the record's name.
+        LogDialogClosed(Logger, dialog.Dialog?.GetType().Name ?? UnknownDialogType, result?.Canceled ?? true);
 
         if (_openDialogs.Count == 0)
         {
@@ -431,7 +440,11 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
 
     // The router has not rendered the destination yet, so the document is still showing, and sized to, the page
     // being left. OnAfterRenderAsync restores once the new content is in place.
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _restoreScrollPending = true;
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _restoreScrollPending = true;
+        LogNavigated(Logger, LogRouteProcessor.ToTemplate(Navigation.ToBaseRelativePath(e.Location)));
+    }
 
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
 
@@ -467,6 +480,12 @@ public partial class MainLayout : IBrowserViewportObserver, IDisposable
                 return Task.CompletedTask;
             });
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Navigated to {Route}")]
+    private static partial void LogNavigated(ILogger logger, string route);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Dialog {DialogType} closed (canceled: {Canceled})")]
+    private static partial void LogDialogClosed(ILogger logger, string dialogType, bool canceled);
 
     [LoggerMessage(Level = LogLevel.Warning,
         Message = "The layout could not unsubscribe from viewport notifications while being disposed")]

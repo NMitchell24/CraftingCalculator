@@ -31,7 +31,20 @@ public sealed partial class ImportState(
     private DatasetSnapshot? _chosen;
     private int _targetDatasetId;
 
-    public ImportStep Step { get; private set; } = ImportStep.SelectFile;
+    public ImportStep Step
+    {
+        get;
+        private set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            LogImportStep(logger, value);
+        }
+    } = ImportStep.SelectFile;
 
     /// <summary>What went wrong with the last step that failed, in words for the user, or null.</summary>
     public string? Error { get; private set; }
@@ -425,6 +438,9 @@ public sealed partial class ImportState(
         Replace.Clear();
         CycleNames = [];
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Import step {Step}")]
+    private static partial void LogImportStep(ILogger logger, ImportStep step);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "The import file picker failed; no file was staged")]
     private static partial void LogFilePickerFailed(ILogger logger, Exception exception);

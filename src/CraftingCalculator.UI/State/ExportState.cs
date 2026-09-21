@@ -53,12 +53,15 @@ public sealed partial class ExportState(IDatasetTransferService transferService,
         LastError = null;
         Changed?.Invoke();
 
-        // Copied so the page can keep changing its selection while the export reads this one.
-        HashSet<RecordKey> frozen = [.. selected];
-        string appVersion = AppInfo.Current.VersionString;
-
         try
         {
+            // Copied so the page can keep changing its selection while the export reads this one. Inside the try
+            // with everything else after IsRunning is set: a throw that escaped here would leave it set, and the
+            // page's export actions disabled until the app restarts.
+            HashSet<RecordKey> frozen = [.. selected];
+            LogExportStarted(logger, frozen.Count);
+            string appVersion = AppInfo.Current.VersionString;
+
             await Task.Run(() => transferService.ExportAsync(snapshot, frozen, appVersion));
         }
         catch (Exception exception)
@@ -91,6 +94,9 @@ public sealed partial class ExportState(IDatasetTransferService transferService,
             Exports = [];
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Export started ({Count} records)")]
+    private static partial void LogExportStarted(ILogger logger, int count);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "The export could not be written; no file was saved")]
     private static partial void LogExportFailed(ILogger logger, Exception exception);
