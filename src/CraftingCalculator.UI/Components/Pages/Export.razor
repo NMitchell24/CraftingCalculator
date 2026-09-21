@@ -36,7 +36,7 @@
                                  SelectionChanged="ConfigureShell" />
 
         <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Class="transfer-action"
-                   StartIcon="@Icons.Material.Filled.Output" Disabled="@(!CanExport)" OnClick="@ExportAsync">
+                   StartIcon="@Icons.Material.Filled.Output" Disabled="@(!CanExport)" OnClick="@GuardedExportAsync">
             Export data
         </MudButton>
     }

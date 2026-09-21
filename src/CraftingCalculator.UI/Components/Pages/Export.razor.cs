@@ -136,8 +136,15 @@ public partial class Export : ComponentBase, IDisposable
         }),
         DispatchExceptionAsync);
 
+    // The actions bar runs its page actions through a guard of its own, so it takes this unguarded: a second guard
+    // inside would log every export twice.
     private Task ExportAsync() =>
         CanExport ? ExportState.StartAsync(_snapshot!, _selected) : Task.CompletedTask;
+
+    // The inline button is page markup, not a bar action, so nothing guards it but this. A failed write is
+    // ExportState's to report inline; this catches a throw before the export gets that far.
+    private Task GuardedExportAsync() =>
+        Guard.RunAsync("Export.Start", "I couldn't start your export.", ExportAsync);
 
     private static string DownloadLabel(ExportFileInfo export) => $"Download {export.FileName}";
 

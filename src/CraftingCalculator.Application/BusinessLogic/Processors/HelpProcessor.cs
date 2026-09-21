@@ -1,4 +1,5 @@
 using System.Net;
+using CraftingCalculator.Application.Common.Utils;
 using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Models;
 using Markdig;
@@ -22,8 +23,8 @@ public static class HelpProcessor
 
     private const string IconExtension = ".svg";
 
-    // The fill the icon files carry. It is a mid grey so the same file is legible on both of GitHub's
-    // themes, where it renders as an <img> and has no text colour to inherit; inlining swaps it for
+    // The fill the icon files carry. It is a mid gray so the same file is legible on both of GitHub's
+    // themes, where it renders as an <img> and has no text color to inherit; inlining swaps it for
     // currentColor, which is what makes the icon follow the app's own light/dark palette.
     private const string IconFileFill = "fill=\"#888888\"";
 
@@ -47,7 +48,7 @@ public static class HelpProcessor
     /// </param>
     public static HelpTopic ResolveTopic(string? route)
     {
-        string normalized = NormalizeRoute(route);
+        string normalized = RouteUtil.NormalizeRoute(route);
 
         HelpTopic? best = null;
         int bestLength = -1;
@@ -56,11 +57,13 @@ public static class HelpProcessor
         {
             foreach (string prefix in topic.RoutePrefixes)
             {
-                if (prefix.Length > bestLength && CoversRoute(prefix, normalized))
+                if (prefix.Length <= bestLength || !CoversRoute(prefix, normalized))
                 {
-                    best = topic;
-                    bestLength = prefix.Length;
+                    continue;
                 }
+
+                best = topic;
+                bestLength = prefix.Length;
             }
         }
 
@@ -76,7 +79,7 @@ public static class HelpProcessor
     /// <param name="route">
     /// An app route, with or without a leading slash and with or without a query string or fragment.
     /// </param>
-    public static bool IsHelpRoute(string? route) => CoversRoute(HelpTopics.HelpRoot, NormalizeRoute(route));
+    public static bool IsHelpRoute(string? route) => CoversRoute(HelpTopics.HelpRoot, RouteUtil.NormalizeRoute(route));
 
     /// <summary>
     /// Renders help Markdown to an HTML fragment: cross-page <c>.md</c> links become the in-app help
@@ -91,7 +94,7 @@ public static class HelpProcessor
     {
         MarkdownDocument document = Markdown.Parse(markdown, Pipeline);
 
-        // Materialised before anything is replaced: substituting an icon detaches its node from the
+        // Materialized before anything is replaced: substituting an icon detaches its node from the
         // tree, which would cut the walk short partway through the document.
         List<LinkInline> links = [.. document.Descendants<LinkInline>()];
 
@@ -122,17 +125,14 @@ public static class HelpProcessor
         string path = anchorStart < 0 ? url : url[..anchorStart];
         string anchor = anchorStart < 0 ? "" : url[anchorStart..];
 
-        if (!path.EndsWith(MarkdownExtension, StringComparison.OrdinalIgnoreCase))
-        {
-            return url;
-        }
-
-        return $"/{HelpTopics.HelpRoot}/{path[..^MarkdownExtension.Length]}{anchor}";
+        return path.EndsWith(MarkdownExtension, StringComparison.OrdinalIgnoreCase)
+            ? $"/{HelpTopics.HelpRoot}/{path[..^MarkdownExtension.Length]}{anchor}"
+            : url;
     }
 
     /// <summary>
     /// Swaps an <c>assets/&lt;name&gt;.svg</c> image for that icon's own markup, so the glyph is part of
-    /// the document rather than a file the WebView has to fetch, and takes its colour from the text
+    /// the document rather than a file the WebView has to fetch, and takes its color from the text
     /// around it. Anything else - including an icon with no file - becomes the image's alt text.
     /// </summary>
     private static void ReplaceIcon(LinkInline image, Func<string, string?> readIcon)
@@ -166,17 +166,4 @@ public static class HelpProcessor
     private static bool CoversRoute(string prefix, string route) => prefix.Length == 0
         ? route.Length == 0
         : route.Equals(prefix, StringComparison.Ordinal) || route.StartsWith($"{prefix}/", StringComparison.Ordinal);
-
-    private static string NormalizeRoute(string? route)
-    {
-        if (string.IsNullOrWhiteSpace(route))
-        {
-            return "";
-        }
-
-        int queryStart = route.IndexOfAny(['?', '#']);
-        string path = queryStart < 0 ? route : route[..queryStart];
-
-        return path.Trim('/').ToLowerInvariant();
-    }
 }

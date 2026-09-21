@@ -285,6 +285,8 @@ replace it. The one thing that must never appear in it is anything out of the us
 | Whole-app failure screen | `UI/Components/Layout/FatalError.razor`, the app boundary's error content |
 | Startup failure screen | `UI/StartupErrorPage.cs`, picked over `MainPage` by `App.CreateWindow` |
 | Wiring, log folder, session header | `UI/MauiProgram.cs` |
+| Breadcrumbs: screens, dialogs, import/export steps | `MainLayout` (navigation, by `LogRouteProcessor.ToTemplate`; dialogs by type name, never title), `ImportState.Step`, `ExportState.StartAsync` |
+| Route → log template (ids become `{id}`, unknown segments `{unknown}`) | `Application/BusinessLogic/Processors/LogRouteProcessor.cs`; a new screen's segments go in its allow-list |
 
 **How it behaves.** Every entry is one open-append-close inside a `Lock`, so nothing is buffered and a crash
 loses nothing. `crafting-calculator.log` rotates at `MaxFileSizeBytes` (128 KB) into `.1.log` and `.2.log`;
