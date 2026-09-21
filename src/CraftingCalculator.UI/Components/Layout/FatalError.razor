@@ -1,0 +1,19 @@
+@* The app boundary's error content, so this renders in place of the entire app - the router, the layout and
+   the MudThemeProvider with it. Plain HTML and pinned colors for that reason: with the theme provider gone
+   so are the --mud-palette variables every MudBlazor component draws itself from. app.css is a stylesheet
+   index.html loads, so it is still here, and .fatal-error in it pins what this needs. *@
+<div class="fatal-error">
+    <div class="fatal-error-panel">
+        <h1 class="fatal-error-title display-title">Crafting Calculator ran into a problem</h1>
+        <p class="fatal-error-body">
+            Your data is fine. Whatever the problem is, it's been written to the log file.
+        </p>
+        <p class="fatal-error-body fatal-error-hint">
+            Try again picks up where you left off. Restart reloads the app.
+        </p>
+        <div class="fatal-error-actions">
+            <button type="button" class="fatal-error-button" @onclick="TryAgain">Try again</button>
+            <button type="button" class="fatal-error-button fatal-error-button-quiet" @onclick="Restart">Restart</button>
+        </div>
+    </div>
+</div>

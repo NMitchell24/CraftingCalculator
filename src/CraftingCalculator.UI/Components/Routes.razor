@@ -1,6 +1,16 @@
-<Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+@* The boundary of last resort inside the app. Whatever the page and dialog boundaries in MainLayout do not
+   catch - a throw from the layout itself, or from the router - lands here, and FatalError takes the whole
+   app's place rather than leaving the WebView frozen on its last frame. *@
+<LoggingErrorBoundary @ref="_appBoundary" Scope="app">
+    <ChildContent>
+        <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+            <Found Context="routeData">
+                <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="routeData" Selector="h1" />
+            </Found>
+        </Router>
+    </ChildContent>
+    <ErrorContent>
+        <FatalError Boundary="_appBoundary" />
+    </ErrorContent>
+</LoggingErrorBoundary>

@@ -15,6 +15,12 @@ public static class AppTheme
     // that fills several slots (LightMuted, LightLines, ...) is one constant, with the slots it serves
     // noted inline. LightSlate, DarkSurface and LightPrimary are duplicated in
     // Platforms/Android/Resources/values/colors.xml, which cannot reference a C# constant: change both.
+    // Five of them - LightSlate, DarkInk, DarkMuted, DarkPrimary and DarkOnAccent - are duplicated again as
+    // the --forge-* custom properties at the top of wwwroot/app.css, which is what the startup cloak and the
+    // two screens that report a failure paint from: those render before MudThemeProvider has written its
+    // --mud-palette variables, or after it has been torn down, so they cannot read the theme. Change them
+    // there too. LightSlate is also the MauiSplashScreen Color in CraftingCalculator.UI.csproj, which puts
+    // that one value in four places.
     // Internal rather than private because StartupErrorPage paints native controls from the same palette -
     // it renders outside the WebView, where MudBlazor's theme does not reach.
     internal static class ForgeColors
@@ -52,7 +58,8 @@ public static class AppTheme
     // Inter is bundled locally (wwwroot/Fonts) and registered via @font-face in app.css. The display
     // face (Jersey 20) is deliberately absent here: MudBlazor's Typography has no display variant, so
     // adding it would mean claiming a text variant like H6 and dragging it onto every Typo.h6 in the
-    // app. It is applied through app.css's .display-title class instead.
+    // app. It is applied through app.css's .display-title class instead. This list is duplicated as
+    // --forge-body-font in app.css, for the same surfaces the --forge-* colors exist for.
     private static readonly string[] BodyFont =
         ["Inter", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"];
 
