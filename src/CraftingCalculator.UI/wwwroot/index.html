@@ -32,8 +32,10 @@
     <!-- Blazor's own error bar, shown by its script when an exception reaches the renderer past every
          boundary in the app. The script finds the reload and dismiss controls by their class names, so those
          stay as the template wrote them; the wording, and a real button where the template had a bare span,
-         are the app's own. Its appearance lives with the rest in app.css. -->
-    <div id="blazor-error-ui" data-nosnippet>
+         are the app's own. Its appearance lives with the rest in app.css.
+         The alert role is what announces it: the script reveals the bar by changing its display, which moves
+         no focus and is silent to a screen reader on its own. -->
+    <div id="blazor-error-ui" data-nosnippet role="alert">
         Something went wrong. It's not you. It's me.
         <a href="." class="reload">Reload</a>
         <button type="button" class="dismiss" aria-label="Dismiss this message">🗙</button>
