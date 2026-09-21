@@ -23,7 +23,7 @@ the Settings screen. If a setting should stay the same when the user switches ga
 | `ISelectedDatasetState.Settings` | `Application/Common/Interfaces` | The selected dataset's settings. `DatasetService` publishes them whenever the selection changes. |
 | `IDatasetService.UpdateSettingsAsync` | `Application/Common/Services/Impl/DatasetService.cs` | Applies one change to the selected dataset's saved settings, saves them and publishes them. |
 | `TransferDatasettings` | `Application/BusinessLogic/Transfer/Format/TransferDocument.cs` | The `datasettings` block in a `.ccdata` file. |
-| The Datasettings card | `UI/Components/Pages/Dataset.razor(.cs)` | One `.datasetting-row` per setting, all saving through `UpdateSettingsAsync`. |
+| The Datasettings card | `UI/Components/Pages/Dataset.razor(.cs)` | One `.setting-row` per setting, all saving through `UpdateSettingsAsync`. |
 
 The data flows like this:
 
@@ -142,7 +142,7 @@ Add the column to the `Dataset` entry in
 
 ### 6. The control on the Dataset screen
 
-One more `.datasetting-row` in the Datasettings card, under the last one of its tab. The card groups the settings into
+One more `.setting-row` in the Datasettings card, under the last one of its tab. The card groups the settings into
 tabs (`DatasettingsView` in `Dataset.razor.cs`): **General** holds Use Yield and Use Craft Time, **Economy** holds
 Use Costs, Use Values and Currency Name. Put the row in the tab it belongs to. A setting that fits neither gets a new
 `DatasettingsView` member, a `MudToggleItem` and its own branch in the markup; with more than three tabs, recheck the
@@ -155,23 +155,32 @@ while a save is still running both stick. A row that built the whole record from
 start from the settings before the first tap and undo it:
 
 ```razor
-<div class="datasetting-row">
-    <div class="datasetting-text">
+<div class="setting-row">
+    <div class="setting-text">
         <MudText Typo="Typo.body1">Calculate Production Time</MudText>
-        <MudText Typo="Typo.caption" Class="datasetting-caption">One sentence on what it does.</MudText>
+        <MudText Typo="Typo.caption" Class="setting-caption">One sentence on what it does.</MudText>
     </div>
-    <MudSwitch T="bool" Value="SelectedDataset.Settings.UseProductionTime"
+    <MudSwitch T="bool" @key="_switchGeneration" Value="SelectedDataset.Settings.UseProductionTime"
                ValueChanged="@(value => UpdateSettingsAsync(settings => settings with { UseProductionTime = value }))"
                Color="Color.Primary" AriaLabel="Calculate Production Time" />
 </div>
 ```
+
+**Every switch takes `@key="_switchGeneration"`.** `UpdateSettingsAsync` runs the save through `ActionGuard`, so a
+failed save shows a dialog and leaves the stored settings alone. But a `MudSwitch` keeps the value it was toggled to,
+and re-rendering it with the same unchanged `Value` doesn't put it back, so without the key the switch would go on
+showing a setting that was never saved, right under a dialog saying it wasn't. `UpdateSettingsAsync` bumps
+`_switchGeneration` when the guard returns false, and the new key rebuilds every switch from the stored settings. A
+free-text field is the exception: Currency Name isn't keyed, because keeping what the user typed after a failed save
+is the point. No other control type has been measured yet: a `MudSelect` or `MudNumericField` row needs the same
+failed-save check on a device (step 11), and takes the key if it holds on to the rejected value.
 
 The label the player reads starts with **Calculate**, not **Use**: `UseYield` is labeled Calculate Yield. The property
 keeps the shorter name; only the `MudText` and the `AriaLabel` say Calculate.
 
 A setting that isn't a bool takes whichever control fits (a `MudSelect` for an enum, a `MudNumericField` for a
 number) in the same row, bound the same way. A control too wide to sit beside the text, like Currency Name's
-`MudTextField`, goes in a `datasetting-row datasetting-row-stacked` row, which puts it full width under the text.
+`MudTextField`, goes in a `setting-row setting-row-stacked` row, which puts it full width under the text.
 Normalize free text in one place before it's saved (Currency Name's is `CurrencyProcessor.ToLabel`), and run an
 imported file's value through the same method in `TransferDocumentReader.ToSnapshot`.
 
@@ -260,3 +269,7 @@ With `font_scale` 2.0 and `wm density` 672 on the emulator (the `craftingcalcula
 the rules), check that the new row wraps between words, the control stays on the row, and nothing runs off the right
 edge. Then flip the setting with a real tap and check that every place the feature touches follows it, that it
 survives an app restart, and that switching to another dataset shows that dataset's own value.
+
+Last, make the save fail once: a throwaway `throw` at the top of `DatasetService.UpdateSettingsAsync`, reverted
+afterwards. Flip the control, close the **That didn't work** dialog, and check that the control is showing the stored
+value again rather than the one you tapped to.

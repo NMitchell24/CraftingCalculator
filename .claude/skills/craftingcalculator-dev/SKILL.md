@@ -286,6 +286,7 @@ replace it. The one thing that must never appear in it is anything out of the us
 | Startup failure screen | `UI/StartupErrorPage.cs`, picked over `MainPage` by `App.CreateWindow` |
 | Wiring, log folder, session header | `UI/MauiProgram.cs` |
 | Breadcrumbs: screens, dialogs, import/export steps | `MainLayout` (navigation, by `LogRouteProcessor.ToTemplate`; dialogs by type name, never title), `ImportState.Step`, `ExportState.StartAsync` |
+| Trace on/off (Settings → Diagnostics → Enable Trace Logging) | `IDiagnosticSettings` / `DiagnosticSettings` in Application persists it and sets `IDiagnosticLog.TraceEnabled`; `FileLogger.IsEnabled` applies it |
 | Route → log template (ids become `{id}`, unknown segments `{unknown}`) | `Application/BusinessLogic/Processors/LogRouteProcessor.cs`; a new screen's segments go in its allow-list |
 
 **How it behaves.** Every entry is one open-append-close inside a `Lock`, so nothing is buffered and a crash
@@ -293,6 +294,22 @@ loses nothing. `crafting-calculator.log` rotates at `MaxFileSizeBytes` (128 KB) 
 `RetainedArchives` is 2, so the device holds at most 3 files / ~384 KB forever, with no retention sweep and no
 dates in the file names. `Write` and `ReadAll` swallow every exception: diagnostics must never crash the app.
 `ReadAll()` concatenates the retained files oldest first.
+
+**Two tiers, and the level is the switch.** Information and above is always written: the session header, diagnostic
+entries, warnings and errors. Trace is the breadcrumb trail - `Action started`, `Navigated to`, `Dialog ... closed`,
+`Import step`, `Export started` - and is written only while the user has **Enable Trace Logging** on, so a default log
+is short and mostly failures, and a fuller one is something we ask for: turn it on, reproduce, send. Deciding whether an
+entry belongs in the trail is setting its `[LoggerMessage]` `Level`; nothing else changes. The mechanism is the sink's
+own floor, not the framework's filters: `AddFileLogging` opens the provider to Trace for the app's own categories
+(`AddFilter<FileLoggerProvider>("CraftingCalculator", LogLevel.Trace)`), and `FileLogger.IsEnabled` compares against
+`FileLoggerProvider.MinimumLevel`, which `TraceEnabled` moves at runtime. The framework caches its filter result per
+logger, so doing it there would need the options reloaded. Every other category keeps the framework's default of
+Information (`Microsoft` is Warning, `Microsoft.EntityFrameworkCore` None): the rule is scoped to the app because
+MudBlazor alone writes dozens of Trace lines per screen, measured on device, and EF would write the user's data.
+`FileLoggingRegistrationTests` pins all three. The stored choice is applied when `MauiProgram`
+resolves `IDiagnosticSettings` for the session header's `Trace logging: on/off` line, before any screen can log, and
+Settings writes an Information entry whenever the switch changes. Its `MudSwitch` is `@key`ed and bumped on a failed
+save, like the Datasettings switches.
 
 **Debug and Release differ on purpose.** `MauiProgram` picks: Debug registers the sink with no redactor and
 writes `exception.ToString()` raw so development logs stay readable, and the session header says

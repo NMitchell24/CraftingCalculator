@@ -162,6 +162,13 @@ framework puts in an exception message.
   record, dataset or category name, never a file name, never a path the user chose.
 - **Our own `throw` messages** follow the same rule: constants plus ids, enums and counts, never user-entered
   text. A thrown message ends up in the log. `BlueprintProcessor.ThrowIfTooDeep` names the blueprint's **id**.
+- **The level decides whether an entry is written by default.** Information and above always reaches the file: the
+  session header, anything diagnostic, warnings and errors. Trace is the breadcrumb trail (screens, dialogs, commands
+  started, import/export steps), written only while the user has **Enable Trace Logging** on in Settings, which is
+  what we ask for when a default log isn't enough. Moving an entry in or out of that trail is a change to its
+  `[LoggerMessage]` `Level` and nothing else. The switch lowers the sink's own floor (`IDiagnosticLog.TraceEnabled`)
+  for the app's own `CraftingCalculator.*` categories only, so third-party libraries and the EF filter below hold
+  whichever way it is set.
 - **EF sensitive logging stays DEBUG-only and never reaches the file.** `EnableSensitiveDataLogging` makes a
   failed command log its parameter values (`[Parameters=[@p0='Bronze'...]`) at Error, so `AddFileLogging` filters
   `Microsoft.EntityFrameworkCore` to `None` in **both** configurations. The debugger output window still gets it.

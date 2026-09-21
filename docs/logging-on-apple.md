@@ -53,6 +53,7 @@ Launch the app once, then read the file. The first entry is the session header, 
 App: Crafting Calculator 2.0 (build 1)
 OS: iOS 26.0
 Device: Apple iPhone17,3 (Phone)
+Trace logging: off
 Redaction: on
 ```
 

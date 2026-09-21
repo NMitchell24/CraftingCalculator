@@ -45,6 +45,43 @@ public class FileLoggerProviderTests
     }
 
     [Test]
+    public void Log_BelowInformation_IsDroppedWhileTraceIsOff()
+    {
+        ILogger logger = _provider.CreateLogger("test");
+
+        logger.LogTrace("a breadcrumb");
+        logger.LogDebug("a detail");
+
+        File.Exists(_provider.FilePath).Should().BeFalse();
+    }
+
+    [Test]
+    public void Log_BelowInformation_IsWrittenOnceTraceIsOn()
+    {
+        ILogger logger = _provider.CreateLogger("test");
+
+        _provider.TraceEnabled = true;
+        logger.LogTrace("a breadcrumb");
+
+        File.ReadAllText(_provider.FilePath).Should().Contain("[Trace]").And.Contain("a breadcrumb");
+    }
+
+    [Test]
+    public void Log_TraceTurnedOff_AppliesToALoggerAlreadyCreated()
+    {
+        ILogger logger = _provider.CreateLogger("test");
+        _provider.TraceEnabled = true;
+
+        _provider.TraceEnabled = false;
+        logger.LogTrace("a breadcrumb");
+        logger.LogInformation("still here");
+
+        string content = File.ReadAllText(_provider.FilePath);
+        content.Should().NotContain("a breadcrumb");
+        content.Should().Contain("still here");
+    }
+
+    [Test]
     public void Log_WithException_WritesStackTraceAndInnerException()
     {
         ILogger logger = _provider.CreateLogger("test");

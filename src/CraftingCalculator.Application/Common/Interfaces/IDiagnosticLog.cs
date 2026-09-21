@@ -10,4 +10,10 @@ public interface IDiagnosticLog
     /// All retained log text, oldest entry first. Empty when nothing has been logged or the log cannot be read.
     /// </summary>
     string ReadAll();
+
+    /// <summary>
+    /// Whether Trace and Debug entries are written as well. Off by default, when the log holds Information and
+    /// above only.
+    /// </summary>
+    bool TraceEnabled { get; set; }
 }
