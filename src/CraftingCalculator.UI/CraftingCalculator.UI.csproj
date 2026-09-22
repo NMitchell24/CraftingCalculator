@@ -67,6 +67,16 @@
     <CodesignProvision></CodesignProvision>
   </PropertyGroup>
 
+  <!-- Android Release: AOT-compile every assembly, not just the SDK's startup profile. Profiled AOT leaves
+       most of MudBlazor and every page handler to the JIT, which compiles each method on first use on the UI
+       thread. Measured on the Pixel 9 AVD: cold start 5.7 s -> 3.0 s, first open of the blueprint picker
+       642 ms -> 395 ms. It costs about 11 MB of download and 40 MB installed on arm64.
+       Not Debug: AOT there disables the interpreter Hot Reload needs (XA0119) and turns every embedded
+       Debug build into a ~5.5 minute one, so a Debug run shows JIT latency a Release build does not have. -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2E3440" />
