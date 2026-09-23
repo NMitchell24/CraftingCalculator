@@ -27,6 +27,12 @@ public class CategoryDAO(DatasetScopedContextFactory contextFactory) : ICategory
         return entity != null ? ToModel(entity) : null;
     }
 
+    public async Task<int> CountAsync()
+    {
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        return await context.Categories.CountAsync();
+    }
+
     public async Task<CategoryModel> SaveAsync(CategoryModel category)
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
@@ -54,8 +60,8 @@ public class CategoryDAO(DatasetScopedContextFactory contextFactory) : ICategory
         await context.Categories.Where(categoryEntity => categoryEntity.Id == id).ExecuteDeleteAsync();
     }
 
-    /// <summary>The model for a loaded category entity. Shared with <see cref="ComponentDAO"/>, which
-    /// resolves a component's category as part of its load.</summary>
+    /// <summary>The model for a loaded category entity. Shared with <see cref="ComponentDAO"/> and
+    /// <see cref="BlueprintDAO"/>, which resolve a record's category as part of their loads.</summary>
     internal static CategoryModel ToModel(Category entity) => new()
     {
         Id = entity.Id,

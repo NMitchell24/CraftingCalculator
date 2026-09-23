@@ -289,4 +289,91 @@ public class BlueprintDAOTests
             nestedScrew.Components.ComponentList.Should().ContainSingle();
         }
     }
+
+    [Test]
+    public async Task GetByIdAsync_ReadsOnlyTheBlueprintsTree_AndKeepsThePartsInTheOrderTheyWereWritten()
+    {
+        ComponentModel iron = await _componentDAO.SaveAsync(new ComponentModel { Name = "Iron" });
+        ComponentModel wood = await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood" });
+        ComponentModel stone = await _componentDAO.SaveAsync(new ComponentModel { Name = "Stone" });
+
+        BlueprintModel nail = new() { Name = "Nail" };
+        nail.Components.Add(iron, 1);
+        nail = await _blueprintDAO.SaveAsync(nail);
+
+        BlueprintModel plank = new() { Name = "Plank" };
+        plank.Components.Add(wood, 1);
+        plank.ChildBlueprints.Add(nail, 2);
+        plank = await _blueprintDAO.SaveAsync(plank);
+
+        BlueprintModel crate = new() { Name = "Crate" };
+        crate.Components.Add(wood, 3);
+        crate.Components.Add(iron, 1);
+        crate.ChildBlueprints.Add(plank, 4);
+        crate = await _blueprintDAO.SaveAsync(crate);
+
+        BlueprintModel wall = new() { Name = "Wall" };
+        wall.Components.Add(stone, 10);
+        wall.ChildBlueprints.Add(crate, 1);
+        await _blueprintDAO.SaveAsync(wall);
+
+        BlueprintModel reloaded = (await _blueprintDAO.GetByIdAsync(crate.Id))!;
+
+        reloaded.Components.ComponentList.Select(part => (part.Component.Name, part.Quantity))
+            .Should().Equal(("Wood", 3L), ("Iron", 1L));
+        BlueprintModel nestedPlank = reloaded.ChildBlueprints.BlueprintList.Single().Blueprint;
+        nestedPlank.Name.Should().Be("Plank");
+        nestedPlank.ChildBlueprints.BlueprintList.Single().Blueprint.Components.ComponentList.Single().Component.Name
+            .Should().Be("Iron");
+    }
+
+    [Test]
+    public async Task GetByIdAsync_ABlueprintNestingItsOwnAncestor_LoadsWithTheLoopBroken()
+    {
+        BlueprintModel bracket = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" });
+
+        BlueprintModel frame = new() { Name = "Frame" };
+        frame.ChildBlueprints.Add(bracket, 2);
+        frame = await _blueprintDAO.SaveAsync(frame);
+
+        BlueprintModel cyclic = (await _blueprintDAO.GetByIdAsync(bracket.Id))!;
+        cyclic.ChildBlueprints.Add(frame, 1);
+        await _blueprintDAO.SaveAsync(cyclic);
+
+        BlueprintModel loadedFrame = (await _blueprintDAO.GetByIdAsync(frame.Id))!;
+
+        BlueprintModel nestedBracket = loadedFrame.ChildBlueprints.BlueprintList.Single().Blueprint;
+        nestedBracket.Name.Should().Be("Bracket");
+        nestedBracket.ChildBlueprints.BlueprintList.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task GetSummariesAsync_ListsEveryBlueprintByName_WithItsCategory_AndNoParts()
+    {
+        CategoryModel tools = await new CategoryDAO(_fixture.DatasetFactory).SaveAsync(new CategoryModel { Name = "Tools" });
+        ComponentModel wood = await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood" });
+
+        BlueprintModel axe = new() { Name = "Axe", Description = "Chops", Category = tools };
+        axe.Components.Add(wood, 2);
+        await _blueprintDAO.SaveAsync(axe);
+        await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Club" });
+        await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Adze" });
+
+        List<BlueprintSummary> summaries = await _blueprintDAO.GetSummariesAsync();
+
+        summaries.Select(summary => summary.Name).Should().Equal("Adze", "Axe", "Club");
+        BlueprintSummary loadedAxe = summaries[1];
+        loadedAxe.Description.Should().Be("Chops");
+        loadedAxe.Category!.Name.Should().Be("Tools");
+        summaries[2].Category.Should().BeNull();
+    }
+
+    [Test]
+    public async Task CountAsync_CountsEveryBlueprint()
+    {
+        await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Axe" });
+        await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Club" });
+
+        (await _blueprintDAO.CountAsync()).Should().Be(2);
+    }
 }

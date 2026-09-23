@@ -8,13 +8,18 @@ public interface IBlueprintService
 
     Task<List<BlueprintModel>> GetAllBlueprintsAsync();
 
+    /// <summary>Every blueprint without its parts, ordered by name.</summary>
+    Task<List<BlueprintSummary>> GetBlueprintSummariesAsync();
+
+    Task<int> CountBlueprintsAsync();
+
     /// <summary>
     /// Saves or adds the blueprint. If <see cref="BlueprintModel.Id"/> is 0 a new one is added, otherwise the
     /// existing record (including its components) is updated.
     /// </summary>
     Task SaveBlueprintAsync(BlueprintModel? blueprint);
 
-    Task DeleteBlueprintAsync(BlueprintModel? blueprint);
+    Task DeleteBlueprintAsync(int id);
 
     /// <summary>
     /// Builds the blueprint's component breakdown as a <see cref="BlueprintNode"/> tree, scaled by

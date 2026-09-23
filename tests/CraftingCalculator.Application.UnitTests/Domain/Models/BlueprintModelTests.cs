@@ -22,14 +22,4 @@ public class BlueprintModelTests
 
         blueprint.Yield.Should().Be(1);
     }
-
-    [Test]
-    public void Clone_CarriesTheYield()
-    {
-        BlueprintModel blueprint = new BlueprintModel { Id = 1, Name = "Bracket", Yield = 4 };
-
-        BlueprintModel clone = (BlueprintModel)blueprint.Clone();
-
-        clone.Yield.Should().Be(4);
-    }
 }

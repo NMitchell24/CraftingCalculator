@@ -7,20 +7,6 @@ public class BlueprintMap
     private readonly List<BlueprintQuantity> _internalList = [];
     public ReadOnlyCollection<BlueprintQuantity> BlueprintList => _internalList.AsReadOnly();
 
-    private BlueprintMap(BlueprintMap map)
-    {
-        _internalList = [];
-        foreach (BlueprintQuantity blueprintQuantity in map.BlueprintList)
-        {
-            _internalList.Add(blueprintQuantity.Clone());
-        }
-    }
-
-    public BlueprintMap()
-    {
-        //nothing
-    }
-
     /// <summary>
     /// Adds the Blueprint and quantity to the list if no entry has its id.
     /// If one does then it will just increase the quantity of the existing record
@@ -69,10 +55,5 @@ public class BlueprintMap
     public void Reset()
     {
         _internalList.Clear();
-    }
-
-    public BlueprintMap Clone()
-    {
-        return new BlueprintMap(this);
     }
 }

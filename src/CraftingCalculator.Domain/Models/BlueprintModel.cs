@@ -7,8 +7,8 @@ namespace CraftingCalculator.Domain.Models;
 /// </summary>
 public class BlueprintModel : ICategorizedRecord
 {
-    public ComponentMap Components { get; private init; }
-    public BlueprintMap ChildBlueprints { get; private init; }
+    public ComponentMap Components { get; } = new();
+    public BlueprintMap ChildBlueprints { get; } = new();
     public string? Name { get; set; }
     public int Id { get; set; }
     public string? Description { get; set; }
@@ -51,41 +51,5 @@ public class BlueprintModel : ICategorizedRecord
             //Don't allow this to be changed as it should remain static.
             _ = value;
         }
-    }
-
-    /// <summary>
-    /// Default constructor.  ensures maps are initialized.
-    /// </summary>
-    public BlueprintModel()
-    {
-        Components = new ComponentMap();
-        ChildBlueprints = new BlueprintMap();
-    }
-
-    public IBaseDataRecord Clone()
-    {
-        BlueprintModel clone = new()
-        {
-            Id = Id,
-            Name = Name,
-            Description = Description,
-            Category = Category,
-            Value = Value,
-            Yield = Yield,
-            ProductionTime = ProductionTime,
-            Components = Components.Clone(),
-            ChildBlueprints = ChildBlueprints.Clone()
-        };
-
-        return clone;
-    }
-
-    public IBaseDataRecord CopyForSave()
-    {
-        BlueprintModel ret = (BlueprintModel)Clone();
-        ret.Name += " - Copy";
-        ret.Id = 0;
-
-        return ret;
     }
 }

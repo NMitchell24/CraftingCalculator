@@ -12,9 +12,10 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
 {
     public async Task<BlueprintModel?> GetByIdAsync(int id)
     {
-        DatasetRecords records = await LoadAsync();
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        DatasetRecords? records = await DatasetRecordsReader.ReadBlueprintTreeAsync(context, id);
 
-        return records.Blueprints.Any(blueprint => blueprint.Id == id) ? SnapshotModelProcessor.ToBlueprintModel(records, id) : null;
+        return records is not null ? SnapshotModelProcessor.ToBlueprintModel(records, id) : null;
     }
 
     public async Task<List<BlueprintModel>> GetAllAsync()
@@ -22,6 +23,33 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
         DatasetRecords records = await LoadAsync();
 
         return [.. SnapshotModelProcessor.ToBlueprintModels(records).OrderBy(blueprint => blueprint.Name)];
+    }
+
+    public async Task<List<BlueprintSummary>> GetSummariesAsync()
+    {
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        List<Blueprint> entities = await context.Blueprints
+            .AsNoTracking()
+            .Include(blueprintEntity => blueprintEntity.Category)
+            .ToListAsync();
+
+        // Ordered here rather than in SQL, so the list sorts the way GetAllAsync does.
+        return
+        [
+            .. entities.Select(entity => new BlueprintSummary
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                Category = entity.Category is { } categoryEntity ? CategoryDAO.ToModel(categoryEntity) : null
+            }).OrderBy(blueprint => blueprint.Name)
+        ];
+    }
+
+    public async Task<int> CountAsync()
+    {
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        return await context.Blueprints.CountAsync();
     }
 
     public async Task<BlueprintModel> SaveAsync(BlueprintModel blueprint)

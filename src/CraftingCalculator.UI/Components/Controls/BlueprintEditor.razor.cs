@@ -1,6 +1,5 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
-using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
@@ -19,7 +18,8 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
     [CascadingParameter] private Breakpoint Breakpoint { get; set; }
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
-    [Inject] private IRecordService RecordService { get; set; } = null!;
+    [Inject] private IComponentService ComponentService { get; set; } = null!;
+    [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
     [Inject] private ActionGuard Guard { get; set; } = null!;
 
@@ -32,13 +32,13 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
 
     private async Task ShowAddPartsAsync()
     {
-        List<IBaseDataRecord> components = await RecordService.GetRecordsAsync(DataType.Component);
+        List<ComponentModel> components = await Task.Run(ComponentService.GetAllComponentsAsync);
 
         // Leaving out this blueprint and every blueprint that already nests it is the whole cycle
         // guard: a loop the crafting tree has no bottom to can only be written by picking one of
-        // those, so the list never offers one.
-        IEnumerable<IBaseDataRecord> blueprints = (await RecordService.GetRecordsAsync(DataType.Blueprint))
-            .OfType<BlueprintModel>()
+        // those, so the list never offers one. Full blueprints rather than summaries: the cycle check
+        // walks each candidate's tree, and a picked one goes into Model with its parts.
+        IEnumerable<BlueprintModel> blueprints = (await Task.Run(BlueprintService.GetAllBlueprintsAsync))
             .Where(candidate => !BlueprintProcessor.WouldCreateCycle(Model, candidate));
 
         DialogOptions options = new()
@@ -53,7 +53,7 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
         DialogParameters<RecordPickerDialog> parameters = new()
         {
             { dialog => dialog.Title, "Add requirements" },
-            { dialog => dialog.Records, [.. components.Concat(blueprints).OrderBy(record => record.Name, StringComparer.CurrentCultureIgnoreCase)] },
+            { dialog => dialog.Records, [.. components.Concat<IBaseDataRecord>(blueprints).OrderBy(record => record.Name, StringComparer.CurrentCultureIgnoreCase)] },
             { dialog => dialog.Target, this },
             { dialog => dialog.FilterList, FilterList.RequirementsPicker }
         };

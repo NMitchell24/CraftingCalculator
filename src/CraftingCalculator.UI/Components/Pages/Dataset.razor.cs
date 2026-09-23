@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
@@ -123,9 +124,6 @@ public partial class Dataset : ComponentBase, IDisposable
         }
     }
 
-    // Counting means loading each type in full, since IRecordService exposes no count. That is the same
-    // work the list pages already do and the data is local SQLite, so it is not worth a service method
-    // until one of these lists is large enough to notice.
     private async Task ReloadAsync()
     {
         (List<DatasetModel> datasets, List<DatasetSection> sections) = await Task.Run(async () =>
@@ -135,7 +133,7 @@ public partial class Dataset : ComponentBase, IDisposable
 
             foreach ((DataType type, string title, string icon, string singular, string plural) in SectionSpecs)
             {
-                int count = (await RecordService.GetRecordsAsync(type)).Count;
+                int count = await RecordService.CountRecordsAsync(type);
                 built.Add(new DatasetSection(type, title, icon, $"{count} {(count == 1 ? singular : plural)}"));
             }
 
@@ -214,11 +212,8 @@ public partial class Dataset : ComponentBase, IDisposable
             return;
         }
 
-        // The suffix IBaseDataRecord.CopyForSave gives a duplicated record, so copying a dataset and
-        // copying one record in it name their copy the same way. It also sorts the copy next to the
-        // dataset it came from in the switcher, which is ordered by name.
         string? name = await DatasetPrompts.PromptForDatasetNameAsync(
-            DialogService, DatasetService, "Copy dataset", "Copy", $"{current.Name} - Copy");
+            DialogService, DatasetService, "Copy dataset", "Copy", current.Name + DatasetConstants.CopySuffix);
 
         if (name is null)
         {

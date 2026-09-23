@@ -54,13 +54,4 @@ public class BlueprintQuantity : IBaseQuantityRecord
         Blueprint = blueprint;
         Quantity = quantity;
     }
-
-    /// <summary>
-    /// Clone this quantity object
-    /// </summary>
-    /// <returns></returns>
-    public BlueprintQuantity Clone()
-    {
-        return new BlueprintQuantity(Blueprint, Quantity);
-    }
 }

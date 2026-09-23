@@ -23,25 +23,4 @@ public class CategoryModel : IBaseDataRecord
             _ = value;
         }
     }
-
-    public IBaseDataRecord Clone()
-    {
-        CategoryModel clone = new()
-        {
-            Id = Id,
-            Name = Name,
-            Description = Description
-        };
-
-        return clone;
-    }
-
-    public IBaseDataRecord CopyForSave()
-    {
-        CategoryModel ret = (CategoryModel)Clone();
-        ret.Name += " - Copy";
-        ret.Id = 0;
-
-        return ret;
-    }
 }

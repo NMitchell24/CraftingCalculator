@@ -1,3 +1,4 @@
+using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
@@ -34,11 +35,30 @@ public partial class RecordCard : ComponentBase
     [Parameter] public RenderFragment? Actions { get; set; }
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
 
     private bool HasInfo => Record is not null || OnInfo.HasDelegate;
 
     private string InfoLabel => $"Info for {Name}";
 
-    private Task ShowInfoAsync() =>
-        OnInfo.HasDelegate ? OnInfo.InvokeAsync() : InfoDialog.ShowAsync(DialogService, Record!);
+    private async Task ShowInfoAsync()
+    {
+        if (OnInfo.HasDelegate)
+        {
+            await OnInfo.InvokeAsync();
+            return;
+        }
+
+        // A list row carries a summary; the dialog lists the blueprint's parts, so it is handed the full one. The
+        // summary stands in only when the blueprint was deleted after the list was read.
+        IBaseDataRecord record = Record!;
+
+        if (record is BlueprintSummary summary
+            && await Task.Run(() => BlueprintService.GetBlueprintByIdAsync(summary.Id)) is { } blueprint)
+        {
+            record = blueprint;
+        }
+
+        await InfoDialog.ShowAsync(DialogService, record);
+    }
 }

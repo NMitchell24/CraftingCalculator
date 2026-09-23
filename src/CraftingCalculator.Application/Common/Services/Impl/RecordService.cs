@@ -1,4 +1,5 @@
 using CraftingCalculator.Application.Common.Interfaces;
+using CraftingCalculator.Domain.Constants;
 using CraftingCalculator.Domain.Enums;
 using CraftingCalculator.Domain.Models;
 
@@ -13,7 +14,15 @@ public class RecordService(
     {
         DataType.Component => [.. await componentService.GetAllComponentsAsync()],
         DataType.Category => [.. await categoryService.GetCategoriesAsync()],
-        DataType.Blueprint => [.. await blueprintService.GetAllBlueprintsAsync()],
+        DataType.Blueprint => [.. await blueprintService.GetBlueprintSummariesAsync()],
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+    };
+
+    public Task<int> CountRecordsAsync(DataType type) => type switch
+    {
+        DataType.Component => componentService.CountComponentsAsync(),
+        DataType.Category => categoryService.CountCategoriesAsync(),
+        DataType.Blueprint => blueprintService.CountBlueprintsAsync(),
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
@@ -24,6 +33,21 @@ public class RecordService(
         DataType.Blueprint => await blueprintService.GetBlueprintByIdAsync(id),
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
+
+    public async Task<IBaseDataRecord?> GetCopyAsync(DataType type, int id)
+    {
+        // The record is read fresh for this call and nothing else holds it, so it becomes the copy in place.
+        // Its parts keep their ids: a copied blueprint uses the same components and blueprints as the original.
+        if (await GetRecordAsync(type, id) is not { } copy)
+        {
+            return null;
+        }
+
+        copy.Id = 0;
+        copy.Name += DatasetConstants.CopySuffix;
+
+        return copy;
+    }
 
     public Task SaveRecordAsync(IBaseDataRecord? record) => record switch
     {
@@ -37,7 +61,8 @@ public class RecordService(
     {
         ComponentModel component => componentService.DeleteComponentAsync(component),
         CategoryModel category => categoryService.DeleteCategoryAsync(category),
-        BlueprintModel blueprint => blueprintService.DeleteBlueprintAsync(blueprint),
+        // By type rather than by class: a list hands over a BlueprintSummary, the editor a BlueprintModel.
+        { Type: DataType.Blueprint, Id: var id } => blueprintService.DeleteBlueprintAsync(id),
         _ => Task.CompletedTask
     };
 

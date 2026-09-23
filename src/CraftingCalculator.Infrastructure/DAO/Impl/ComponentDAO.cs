@@ -29,6 +29,12 @@ public class ComponentDAO(DatasetScopedContextFactory contextFactory) : ICompone
         return entity != null ? ToModel(entity) : null;
     }
 
+    public async Task<int> CountAsync()
+    {
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        return await context.Components.CountAsync();
+    }
+
     public async Task<ComponentModel> SaveAsync(ComponentModel component)
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
