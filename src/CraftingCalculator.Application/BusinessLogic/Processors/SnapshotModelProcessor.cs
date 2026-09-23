@@ -5,8 +5,8 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 
 /// <summary>
 /// Builds the models the app displays from the flat records of a dataset, whether they were read from the
-/// database or staged from an import file, so a record shows the same either way. A component, category or
-/// blueprint reached more than once in one call is one shared instance wherever it appears.
+/// database or staged from an import file, so a record shows the same either way. A component or category reached
+/// more than once in one call is one shared instance, and so is a blueprint, unless it is part of a loop.
 /// </summary>
 public static class SnapshotModelProcessor
 {

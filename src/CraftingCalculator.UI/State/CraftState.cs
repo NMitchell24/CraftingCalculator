@@ -154,7 +154,7 @@ public sealed partial class CraftState(
             return;
         }
 
-        List<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
+        HashSet<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
         Dictionary<int, BlueprintModel> reloaded;
 
         try
