@@ -8,6 +8,8 @@ public interface ICategoryService
 
     Task<CategoryModel?> GetCategoryByIdAsync(int id);
 
+    Task<int> CountCategoriesAsync();
+
     /// <summary>
     /// Saves or adds the category. If <see cref="CategoryModel.Id"/> is 0 a new one is added,
     /// otherwise the existing record is updated.

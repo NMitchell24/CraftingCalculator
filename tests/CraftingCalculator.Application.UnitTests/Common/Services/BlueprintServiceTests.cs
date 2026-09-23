@@ -52,9 +52,7 @@ public class BlueprintServiceTests
     [Test]
     public async Task DeleteBlueprintAsync_DeletesById()
     {
-        BlueprintModel blueprint = new BlueprintModel { Id = 7, Name = "Widget" };
-
-        await _service.DeleteBlueprintAsync(blueprint);
+        await _service.DeleteBlueprintAsync(7);
 
         _dao.Verify(d => d.DeleteAsync(7), Times.Once);
     }

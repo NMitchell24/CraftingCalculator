@@ -8,7 +8,4 @@ public interface IBaseDataRecord
     string? Name { get; set; }
     string? Description { get; set; }
     DataType Type { get; set; }
-
-    IBaseDataRecord Clone();
-    IBaseDataRecord CopyForSave();
 }

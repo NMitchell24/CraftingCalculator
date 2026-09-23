@@ -9,6 +9,9 @@ public interface ICategoryDAO
 
     Task<CategoryModel?> GetByIdAsync(int id);
 
+    /// <summary>Returns how many categories there are.</summary>
+    Task<int> CountAsync();
+
     /// <summary>
     /// Adds the category if <see cref="CategoryModel.Id"/> is 0, otherwise updates the existing record.
     /// Returns the saved category with its assigned <see cref="CategoryModel.Id"/>.

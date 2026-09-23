@@ -8,6 +8,8 @@ public interface IComponentService
 
     Task<ComponentModel?> GetComponentByIdAsync(int id);
 
+    Task<int> CountComponentsAsync();
+
     /// <summary>
     /// Saves or adds the component. If <see cref="ComponentModel.Id"/> is 0 a new one is added,
     /// otherwise the existing record is updated.

@@ -10,6 +10,8 @@ public class CategoryService(ICategoryDAO dao) : ICategoryService
 
     public Task<CategoryModel?> GetCategoryByIdAsync(int id) => dao.GetByIdAsync(id);
 
+    public Task<int> CountCategoriesAsync() => dao.CountAsync();
+
     public Task SaveCategoryAsync(CategoryModel? category)
         => category != null ? dao.SaveAsync(category) : Task.CompletedTask;
 

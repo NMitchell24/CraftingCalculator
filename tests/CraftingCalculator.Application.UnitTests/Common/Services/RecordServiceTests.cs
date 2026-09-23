@@ -37,14 +37,27 @@ public class RecordServiceTests
     }
 
     [Test]
-    public async Task GetRecordsAsync_Blueprint_ReturnsBlueprints()
+    public async Task GetRecordsAsync_Blueprint_ReturnsSummaries()
     {
-        _blueprintService.Setup(s => s.GetAllBlueprintsAsync())
-            .ReturnsAsync([new BlueprintModel { Id = 1, Name = "Widget" }]);
+        _blueprintService.Setup(s => s.GetBlueprintSummariesAsync())
+            .ReturnsAsync([new BlueprintSummary { Id = 1, Name = "Widget" }]);
 
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Blueprint);
 
         records.Should().ContainSingle().Which.Name.Should().Be("Widget");
+        _blueprintService.Verify(s => s.GetAllBlueprintsAsync(), Times.Never);
+    }
+
+    [Test]
+    public async Task CountRecordsAsync_RoutesToTheServiceMatchingTheType()
+    {
+        _componentService.Setup(s => s.CountComponentsAsync()).ReturnsAsync(12);
+        _categoryService.Setup(s => s.CountCategoriesAsync()).ReturnsAsync(3);
+        _blueprintService.Setup(s => s.CountBlueprintsAsync()).ReturnsAsync(7);
+
+        (await _service.CountRecordsAsync(DataType.Component)).Should().Be(12);
+        (await _service.CountRecordsAsync(DataType.Category)).Should().Be(3);
+        (await _service.CountRecordsAsync(DataType.Blueprint)).Should().Be(7);
     }
 
     [Test]
@@ -109,8 +122,16 @@ public class RecordServiceTests
 
         await _service.DeleteRecordAsync(blueprint);
 
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(blueprint), Times.Once);
+        _blueprintService.Verify(s => s.DeleteBlueprintAsync(4), Times.Once);
         _componentService.Verify(s => s.DeleteComponentAsync(It.IsAny<ComponentModel>()), Times.Never);
+    }
+
+    [Test]
+    public async Task DeleteRecordAsync_BlueprintSummary_DeletesThroughTheBlueprintService()
+    {
+        await _service.DeleteRecordAsync(new BlueprintSummary { Id = 4, Name = "Widget" });
+
+        _blueprintService.Verify(s => s.DeleteBlueprintAsync(4), Times.Once);
     }
 
     [Test]
@@ -124,7 +145,7 @@ public class RecordServiceTests
 
         _componentService.Verify(s => s.DeleteComponentAsync(component), Times.Once);
         _categoryService.Verify(s => s.DeleteCategoryAsync(category), Times.Once);
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(blueprint), Times.Once);
+        _blueprintService.Verify(s => s.DeleteBlueprintAsync(3), Times.Once);
     }
 
     [Test]
@@ -161,6 +182,28 @@ public class RecordServiceTests
 
         _categoryService.Verify(s => s.DeleteCategoryAsync(building), Times.Once);
         _categoryService.Verify(s => s.DeleteCategoryAsync(tools), Times.Once);
+    }
+
+    [Test]
+    public async Task GetCopyAsync_ReturnsTheRecordUnsaved_WithItsPartsAndTheCopySuffix()
+    {
+        ComponentModel copper = new() { Id = 9, Name = "Copper" };
+        BlueprintModel bronze = new() { Id = 5, Name = "Bronze", Yield = 3 };
+        bronze.Components.Add(copper, 2);
+        _blueprintService.Setup(s => s.GetBlueprintByIdAsync(5)).ReturnsAsync(bronze);
+
+        BlueprintModel copy = (BlueprintModel)(await _service.GetCopyAsync(DataType.Blueprint, 5))!;
+
+        copy.Id.Should().Be(0);
+        copy.Name.Should().Be("Bronze - Copy");
+        copy.Yield.Should().Be(3);
+        copy.Components.ComponentList.Should().ContainSingle(part => part.Component.Id == 9 && part.Quantity == 2);
+    }
+
+    [Test]
+    public async Task GetCopyAsync_NoRecordWithThatId_ReturnsNull()
+    {
+        (await _service.GetCopyAsync(DataType.Component, 404)).Should().BeNull();
     }
 
     [Test]

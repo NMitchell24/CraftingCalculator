@@ -33,28 +33,4 @@ public class ComponentModel : ICategorizedRecord
             _ = value;
         }
     }
-
-    public IBaseDataRecord Clone()
-    {
-        ComponentModel clone = new()
-        {
-            Id = Id,
-            Name = Name,
-            Description = Description,
-            Category = Category,
-            Cost = Cost,
-            ProductionTime = ProductionTime
-        };
-
-        return clone;
-    }
-
-    public IBaseDataRecord CopyForSave()
-    {
-        ComponentModel ret = (ComponentModel)Clone();
-        ret.Name += " - Copy";
-        ret.Id = 0;
-
-        return ret;
-    }
 }

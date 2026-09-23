@@ -109,7 +109,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     private async Task ShowPickerAsync()
     {
-        List<BlueprintModel> blueprints = await BlueprintService.GetAllBlueprintsAsync();
+        List<BlueprintSummary> blueprints = await Task.Run(BlueprintService.GetBlueprintSummariesAsync);
 
         DialogOptions options = new()
         {
@@ -130,14 +130,18 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
         await DialogService.ShowAsync<RecordPickerDialog>("Add blueprints", parameters, options);
     }
 
-    // The picker lists only blueprints and is only handed entries Find returned, so the casts below cannot fail.
+    // The picker is only handed entries Find returned, so the casts below cannot fail.
     public IBaseQuantityRecord? Find(IBaseDataRecord record) =>
         State.BlueprintQuantities.FirstOrDefault(entry => entry.Blueprint.Id == record.Id);
 
-    public Task AddAsync(IBaseDataRecord record)
+    public async Task AddAsync(IBaseDataRecord record)
     {
-        State.Add((BlueprintModel)record);
-        return Task.CompletedTask;
+        // The picker lists summaries; the batch needs the blueprint's whole tree to work anything out.
+        // Null only when the blueprint was deleted after the picker opened, which leaves nothing to add.
+        if (await Task.Run(() => BlueprintService.GetBlueprintByIdAsync(record.Id)) is { } blueprint)
+        {
+            State.Add(blueprint);
+        }
     }
 
     public Task StepAsync(IBaseQuantityRecord entry, long step)

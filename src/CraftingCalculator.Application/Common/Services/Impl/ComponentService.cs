@@ -10,6 +10,8 @@ public class ComponentService(IComponentDAO dao) : IComponentService
 
     public Task<ComponentModel?> GetComponentByIdAsync(int id) => dao.GetByIdAsync(id);
 
+    public Task<int> CountComponentsAsync() => dao.CountAsync();
+
     public Task SaveComponentAsync(ComponentModel? component)
         => component != null ? dao.SaveAsync(component) : Task.CompletedTask;
 

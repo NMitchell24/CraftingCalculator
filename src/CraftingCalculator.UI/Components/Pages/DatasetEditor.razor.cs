@@ -56,7 +56,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
         _record = Id > 0
             ? await RecordService.GetRecordAsync(_type, Id)
             : CopyFrom > 0
-                ? (await RecordService.GetRecordAsync(_type, CopyFrom))?.CopyForSave()
+                ? await RecordService.GetCopyAsync(_type, CopyFrom)
                 : _type.GetDataRecord();
 
         if (_record is null)

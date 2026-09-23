@@ -130,7 +130,7 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private async Task ReloadAsync()
     {
-        _records = await RecordService.GetRecordsAsync(_type);
+        _records = await Task.Run(() => RecordService.GetRecordsAsync(_type));
 
         // The actions carry both the mode and whether there is anything left to act on, so they are
         // re-declared on every reload rather than only when the mode changes.

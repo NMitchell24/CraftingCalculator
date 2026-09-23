@@ -11,9 +11,13 @@ public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
 
     public Task<List<BlueprintModel>> GetAllBlueprintsAsync() => dao.GetAllAsync();
 
+    public Task<List<BlueprintSummary>> GetBlueprintSummariesAsync() => dao.GetSummariesAsync();
+
+    public Task<int> CountBlueprintsAsync() => dao.CountAsync();
+
     public Task SaveBlueprintAsync(BlueprintModel? blueprint) => blueprint != null ? dao.SaveAsync(blueprint) : Task.CompletedTask;
 
-    public Task DeleteBlueprintAsync(BlueprintModel? blueprint) => blueprint != null ? dao.DeleteAsync(blueprint.Id) : Task.CompletedTask;
+    public Task DeleteBlueprintAsync(int id) => dao.DeleteAsync(id);
 
     public BlueprintNode GetBlueprintNode(BlueprintModel blueprint, long quantity, Datasettings settings) =>
         BlueprintProcessor.BuildNode(blueprint, quantity, settings);

@@ -52,7 +52,27 @@ public class DatasetScopingTests
         (await _categoryDAO.GetAllAsync()).Should().BeEmpty();
         (await _componentDAO.GetAllAsync()).Should().BeEmpty();
         (await _blueprintDAO.GetAllAsync()).Should().BeEmpty();
+        (await _blueprintDAO.GetSummariesAsync()).Should().BeEmpty();
         (await _favoritesDAO.GetAllAsync()).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task CountsSeeOnlyTheSelectedDataset()
+    {
+        await _categoryDAO.SaveAsync(new CategoryModel { Name = "Ores" });
+        await _componentDAO.SaveAsync(new ComponentModel { Name = "Copper" });
+        BlueprintModel bronze = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
+
+        (await _categoryDAO.CountAsync()).Should().Be(1);
+        (await _componentDAO.CountAsync()).Should().Be(1);
+        (await _blueprintDAO.CountAsync()).Should().Be(1);
+
+        _fixture.SelectDataset(_secondDatasetId);
+
+        (await _categoryDAO.CountAsync()).Should().Be(0);
+        (await _componentDAO.CountAsync()).Should().Be(0);
+        (await _blueprintDAO.CountAsync()).Should().Be(0);
+        (await _blueprintDAO.GetByIdAsync(bronze.Id)).Should().BeNull();
     }
 
     [Test]

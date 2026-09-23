@@ -8,6 +8,9 @@ public interface IComponentDAO
 
     Task<ComponentModel?> GetByIdAsync(int id);
 
+    /// <summary>Returns how many components there are.</summary>
+    Task<int> CountAsync();
+
     /// <summary>
     /// Adds the component if <see cref="ComponentModel.Id"/> is 0, otherwise updates the existing record.
     /// Returns the saved component with its assigned <see cref="ComponentModel.Id"/>.

@@ -15,6 +15,12 @@ public interface IBlueprintDAO
     /// </summary>
     Task<List<BlueprintModel>> GetAllAsync();
 
+    /// <summary>Returns every blueprint without its parts, ordered by name.</summary>
+    Task<List<BlueprintSummary>> GetSummariesAsync();
+
+    /// <summary>Returns how many blueprints there are.</summary>
+    Task<int> CountAsync();
+
     /// <summary>
     /// Adds the blueprint if <see cref="BlueprintModel.Id"/> is 0, otherwise updates the existing record
     /// (including its component and child-blueprint components). Returns the saved blueprint with its
