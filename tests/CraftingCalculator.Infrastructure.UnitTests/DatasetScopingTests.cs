@@ -87,6 +87,60 @@ public class DatasetScopingTests
         stored.DatasetId.Should().Be(_secondDatasetId);
     }
 
+    /// <summary>
+    /// Nothing in the schema stops a link row from naming a record in another dataset, and a blueprint read resolves
+    /// every link it loads. A link like that is dropped on read, the way a cyclic one is, rather than failing every
+    /// screen that reads the blueprint.
+    /// </summary>
+    [Test]
+    public async Task ALinkToAnotherDatasetsRecord_IsDroppedOnRead()
+    {
+        _fixture.SelectDataset(_secondDatasetId);
+        ComponentModel sulfur = await _componentDAO.SaveAsync(new ComponentModel { Name = "Sulfur" });
+        BlueprintModel gunpowder = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Gunpowder" });
+
+        _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
+        ComponentModel copper = await _componentDAO.SaveAsync(new ComponentModel { Name = "Copper" });
+        BlueprintModel bronze = new() { Name = "Bronze" };
+        bronze.Components.Add(copper, 2);
+        bronze.Components.Add(sulfur, 1);
+        bronze.ChildBlueprints.Add(gunpowder, 3);
+        bronze = await _blueprintDAO.SaveAsync(bronze);
+
+        BlueprintModel byId = (await _blueprintDAO.GetByIdAsync(bronze.Id))!;
+        BlueprintModel fromAll = (await _blueprintDAO.GetAllAsync()).Single();
+
+        foreach (BlueprintModel loaded in new[] { byId, fromAll })
+        {
+            loaded.Components.ComponentList.Should().ContainSingle().Which.Component.Name.Should().Be("Copper");
+            loaded.ChildBlueprints.BlueprintList.Should().BeEmpty();
+        }
+    }
+
+    /// <summary>
+    /// A path that leaves the dataset and comes back in is not part of the blueprint: the other dataset's rows are
+    /// not this blueprint's parts, whatever they point at.
+    /// </summary>
+    [Test]
+    public async Task APathThroughAnotherDataset_IsDroppedOnATreeRead()
+    {
+        BlueprintModel ingot = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Ingot" });
+
+        _fixture.SelectDataset(_secondDatasetId);
+        BlueprintModel foreign = new() { Name = "Foreign" };
+        foreign.ChildBlueprints.Add(ingot, 1);
+        foreign = await _blueprintDAO.SaveAsync(foreign);
+
+        _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
+        BlueprintModel sword = new() { Name = "Sword" };
+        sword.ChildBlueprints.Add(foreign, 1);
+        sword = await _blueprintDAO.SaveAsync(sword);
+
+        BlueprintModel loaded = (await _blueprintDAO.GetByIdAsync(sword.Id))!;
+
+        loaded.ChildBlueprints.BlueprintList.Should().BeEmpty();
+    }
+
     [Test]
     public async Task TwoDatasetsCanHoldRecordsOfTheSameName()
     {

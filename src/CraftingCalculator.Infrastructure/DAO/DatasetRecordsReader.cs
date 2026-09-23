@@ -29,7 +29,8 @@ internal static class DatasetRecordsReader
     public static async Task<DatasetRecords?> ReadBlueprintTreeAsync(CraftingDataContext context, int blueprintId)
     {
         // One recursive query for the whole tree, whatever its depth. UNION rather than UNION ALL is what ends the
-        // recursion on a cyclic row set. The SQL opens with SELECT so EF can compose over it, which is how the
+        // recursion on a cyclic row set, and the join on both ends' DatasetId keeps the walk from following a link
+        // out of the dataset and back in. The SQL opens with SELECT so EF can compose over it, which is how the
         // dataset's query filter still applies to the rows it returns.
         List<LinkRow> childLinks = await ReadChildLinksAsync(context.BlueprintChildren.FromSql(
             $"""
@@ -37,7 +38,11 @@ internal static class DatasetRecordsReader
                  WITH RECURSIVE Tree(Id) AS (
                      SELECT {blueprintId}
                      UNION
-                     SELECT link.ChildBlueprintId FROM BlueprintChildren AS link JOIN Tree ON link.ParentBlueprintId = Tree.Id)
+                     SELECT link.ChildBlueprintId
+                     FROM BlueprintChildren AS link
+                     JOIN Tree ON link.ParentBlueprintId = Tree.Id
+                     JOIN Blueprints AS parent ON parent.Id = link.ParentBlueprintId
+                     JOIN Blueprints AS child ON child.Id = link.ChildBlueprintId AND child.DatasetId = parent.DatasetId)
                  SELECT Id FROM Tree)
              """));
 
@@ -58,13 +63,18 @@ internal static class DatasetRecordsReader
         return records.Blueprints.Any(blueprint => blueprint.Id == blueprintId) ? records : null;
     }
 
+    // Nothing in the schema stops a link from naming a record in another dataset, which the dataset's own record
+    // queries would then leave out and the model builder would fail to resolve. Such a link is dropped here, the
+    // way the builder drops a cyclic one, so one bad row cannot fail every screen that reads a blueprint.
     private static Task<List<LinkRow>> ReadChildLinksAsync(IQueryable<BlueprintChild> links) =>
         links.AsNoTracking()
+            .Where(link => link.Child.DatasetId == link.ParentBlueprint.DatasetId)
             .Select(link => new LinkRow(link.Id, link.ParentBlueprintId, link.ChildBlueprintId, link.Quantity))
             .ToListAsync();
 
     private static Task<List<LinkRow>> ReadComponentLinksAsync(IQueryable<BlueprintComponent> links) =>
         links.AsNoTracking()
+            .Where(link => link.Component.DatasetId == link.Blueprint.DatasetId)
             .Select(link => new LinkRow(link.Id, link.BlueprintId, link.ComponentId, link.Quantity))
             .ToListAsync();
 
