@@ -142,6 +142,22 @@ public class DatasetScopingTests
     }
 
     [Test]
+    public async Task AFavoriteRowNamingAnotherDatasetsBlueprint_IsDroppedOnRead()
+    {
+        _fixture.SelectDataset(_secondDatasetId);
+        BlueprintModel foreign = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Foreign" });
+
+        _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
+        BlueprintModel bronze = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
+        BlueprintFavorite favorite = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Mixed" },
+            [new BlueprintQuantity(bronze, 2), new BlueprintQuantity(foreign, 1)]);
+
+        List<BlueprintQuantity> quantities = await _favoritesDAO.GetBlueprintQuantitiesAsync(favorite.Id);
+
+        quantities.Should().ContainSingle().Which.Blueprint.Name.Should().Be("Bronze");
+    }
+
+    [Test]
     public async Task TwoDatasetsCanHoldRecordsOfTheSameName()
     {
         await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood", Cost = 1 });

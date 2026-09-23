@@ -6,6 +6,12 @@ public interface IBlueprintService
 {
     Task<BlueprintModel?> GetBlueprintByIdAsync(int id);
 
+    /// <summary>
+    /// The blueprints with the given <paramref name="ids"/>, by id, each built out in full. An id with no blueprint
+    /// has no entry.
+    /// </summary>
+    Task<Dictionary<int, BlueprintModel>> GetBlueprintsByIdsAsync(IReadOnlyCollection<int> ids);
+
     Task<List<BlueprintModel>> GetAllBlueprintsAsync();
 
     /// <summary>Every blueprint without its parts, ordered by name.</summary>

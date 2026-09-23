@@ -348,6 +348,34 @@ public class BlueprintDAOTests
     }
 
     [Test]
+    public async Task GetByIdsAsync_ReadsEveryAskedForTree_AndLeavesOutAnIdWithNoBlueprint()
+    {
+        ComponentModel copper = await _componentDAO.SaveAsync(new ComponentModel { Name = "Copper" });
+        ComponentModel wood = await _componentDAO.SaveAsync(new ComponentModel { Name = "Wood" });
+
+        BlueprintModel bronze = new() { Name = "Bronze" };
+        bronze.Components.Add(copper, 2);
+        bronze = await _blueprintDAO.SaveAsync(bronze);
+
+        BlueprintModel axe = new() { Name = "Bronze Axe" };
+        axe.Components.Add(wood, 4);
+        axe.ChildBlueprints.Add(bronze, 8);
+        axe = await _blueprintDAO.SaveAsync(axe);
+
+        BlueprintModel nails = new() { Name = "Bronze Nails" };
+        nails.ChildBlueprints.Add(bronze, 1);
+        nails = await _blueprintDAO.SaveAsync(nails);
+
+        Dictionary<int, BlueprintModel> loaded = await _blueprintDAO.GetByIdsAsync([axe.Id, nails.Id, 999]);
+
+        loaded.Keys.Should().BeEquivalentTo([axe.Id, nails.Id]);
+        loaded[axe.Id].Components.ComponentList.Single().Component.Name.Should().Be("Wood");
+        loaded[axe.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Components.ComponentList.Single().Quantity
+            .Should().Be(2);
+        loaded[nails.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Name.Should().Be("Bronze");
+    }
+
+    [Test]
     public async Task GetSummariesAsync_ListsEveryBlueprintByName_WithItsCategory_AndNoParts()
     {
         CategoryModel tools = await new CategoryDAO(_fixture.DatasetFactory).SaveAsync(new CategoryModel { Name = "Tools" });

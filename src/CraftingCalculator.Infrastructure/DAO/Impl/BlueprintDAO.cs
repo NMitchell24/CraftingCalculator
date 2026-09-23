@@ -10,12 +10,14 @@ namespace CraftingCalculator.Infrastructure.DAO.Impl;
 
 public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBlueprintDAO
 {
-    public async Task<BlueprintModel?> GetByIdAsync(int id)
+    public async Task<BlueprintModel?> GetByIdAsync(int id) => (await GetByIdsAsync([id])).GetValueOrDefault(id);
+
+    public async Task<Dictionary<int, BlueprintModel>> GetByIdsAsync(IReadOnlyCollection<int> ids)
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
-        DatasetRecords? records = await DatasetRecordsReader.ReadBlueprintTreeAsync(context, id);
+        DatasetRecords records = await DatasetRecordsReader.ReadBlueprintTreesAsync(context, ids);
 
-        return records is not null ? SnapshotModelProcessor.ToBlueprintModel(records, id) : null;
+        return SnapshotModelProcessor.ToBlueprintModels(records, ids);
     }
 
     public async Task<List<BlueprintModel>> GetAllAsync()

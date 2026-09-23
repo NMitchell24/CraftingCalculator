@@ -5,7 +5,8 @@ namespace CraftingCalculator.Application.BusinessLogic.Processors;
 
 /// <summary>
 /// Builds the models the app displays from the flat records of a dataset, whether they were read from the
-/// database or staged from an import file, so a record shows the same either way.
+/// database or staged from an import file, so a record shows the same either way. A component or category reached
+/// more than once in one call is one shared instance, and so is a blueprint, unless it is part of a loop.
 /// </summary>
 public static class SnapshotModelProcessor
 {
@@ -14,27 +15,15 @@ public static class SnapshotModelProcessor
         ToCategoryModel(snapshot.Categories.First(category => category.Id == id));
 
     /// <summary>The component with <paramref name="id"/>, with its category.</summary>
-    public static ComponentModel ToComponentModel(DatasetSnapshot snapshot, int id)
-    {
-        SnapshotIndex index = new(Records(snapshot));
-        return ToComponentModel(index.Components[id], index);
-    }
+    public static ComponentModel ToComponentModel(DatasetSnapshot snapshot, int id) =>
+        new ModelBuilder(Records(snapshot)).Component(id);
 
     /// <summary>
     /// The blueprint with <paramref name="id"/>, its components and nested blueprints built out at every depth.
     /// A nested blueprint that is already one of its own ancestors is left out, so the model is always acyclic.
     /// </summary>
-    public static BlueprintModel ToBlueprintModel(DatasetSnapshot snapshot, int id) => ToBlueprintModel(Records(snapshot), id);
-
-    /// <summary>
-    /// The blueprint with <paramref name="id"/>, built out the way
-    /// <see cref="ToBlueprintModel(DatasetSnapshot, int)"/> builds one.
-    /// </summary>
-    public static BlueprintModel ToBlueprintModel(DatasetRecords records, int id)
-    {
-        SnapshotIndex index = new(records);
-        return ToBlueprintModel(index.Blueprints[id], index, []);
-    }
+    public static BlueprintModel ToBlueprintModel(DatasetSnapshot snapshot, int id) =>
+        new ModelBuilder(Records(snapshot)).Blueprint(id);
 
     /// <summary>
     /// Every blueprint in <paramref name="records"/>, in the order the records list them, each built out the way
@@ -42,8 +31,19 @@ public static class SnapshotModelProcessor
     /// </summary>
     public static List<BlueprintModel> ToBlueprintModels(DatasetRecords records)
     {
-        SnapshotIndex index = new(records);
-        return [.. records.Blueprints.Select(record => ToBlueprintModel(record, index, []))];
+        ModelBuilder builder = new(records);
+        return [.. records.Blueprints.Select(record => builder.Blueprint(record.Id))];
+    }
+
+    /// <summary>
+    /// The blueprints in <paramref name="records"/> with the given <paramref name="ids"/>, by id, each built out the
+    /// way <see cref="ToBlueprintModel(DatasetSnapshot, int)"/> builds one. An id the records do not hold has no
+    /// entry.
+    /// </summary>
+    public static Dictionary<int, BlueprintModel> ToBlueprintModels(DatasetRecords records, IEnumerable<int> ids)
+    {
+        ModelBuilder builder = new(records);
+        return ids.Distinct().Where(builder.HasBlueprint).ToDictionary(id => id, builder.Blueprint);
     }
 
     /// <summary>
@@ -52,12 +52,12 @@ public static class SnapshotModelProcessor
     /// </summary>
     public static List<BlueprintQuantity> ToFavoriteBlueprints(DatasetSnapshot snapshot, int id)
     {
-        SnapshotIndex index = new(Records(snapshot));
+        ModelBuilder builder = new(Records(snapshot));
 
         return
         [
             .. snapshot.Favorites.First(favorite => favorite.Id == id).Blueprints.Select(link =>
-                new BlueprintQuantity(ToBlueprintModel(index.Blueprints[link.TargetId], index, []), link.Quantity))
+                new BlueprintQuantity(builder.Blueprint(link.TargetId), link.Quantity))
         ];
     }
 
@@ -71,60 +71,116 @@ public static class SnapshotModelProcessor
         Description = record.Description
     };
 
-    private static ComponentModel ToComponentModel(SnapshotComponent record, SnapshotIndex index) => new()
+    private sealed class ModelBuilder(DatasetRecords records)
     {
-        Id = record.Id,
-        Name = record.Name,
-        Description = record.Description,
-        Cost = record.Cost,
-        ProductionTime = record.ProductionTime,
-        Category = CategoryOf(record.CategoryId, index)
-    };
+        private readonly Dictionary<int, SnapshotCategory> _categoryRecords = records.Categories.ToDictionary(record => record.Id);
+        private readonly Dictionary<int, SnapshotComponent> _componentRecords = records.Components.ToDictionary(record => record.Id);
+        private readonly Dictionary<int, SnapshotBlueprint> _blueprintRecords = records.Blueprints.ToDictionary(record => record.Id);
 
-    private static BlueprintModel ToBlueprintModel(SnapshotBlueprint record, SnapshotIndex index, HashSet<int> ancestors)
-    {
-        BlueprintModel model = new()
-        {
-            Id = record.Id,
-            Name = record.Name,
-            Description = record.Description,
-            Value = record.Value,
-            Yield = record.Yield,
-            ProductionTime = record.ProductionTime,
-            Category = CategoryOf(record.CategoryId, index)
-        };
+        private readonly Dictionary<int, CategoryModel> _categories = [];
+        private readonly Dictionary<int, ComponentModel> _components = [];
+        private readonly Dictionary<int, BlueprintModel> _blueprints = [];
+        private readonly HashSet<int> _ancestors = [];
 
-        foreach (QuantityLink link in record.Components)
+        public bool HasBlueprint(int id) => _blueprintRecords.ContainsKey(id);
+
+        public BlueprintModel Blueprint(int id) => Blueprint(_blueprintRecords[id]).Model;
+
+        public ComponentModel Component(int id)
         {
-            model.Components.Add(ToComponentModel(index.Components[link.TargetId], index), link.Quantity);
+            if (_components.TryGetValue(id, out ComponentModel? model))
+            {
+                return model;
+            }
+
+            SnapshotComponent record = _componentRecords[id];
+            model = new ComponentModel
+            {
+                Id = record.Id,
+                Name = record.Name,
+                Description = record.Description,
+                Cost = record.Cost,
+                ProductionTime = record.ProductionTime,
+                Category = CategoryOf(record.CategoryId)
+            };
+            _components[id] = model;
+
+            return model;
         }
 
-        ancestors.Add(record.Id);
-
-        // Dropping a child that is already an ancestor is what keeps a cyclic row set loadable. The parts picker
-        // never offers an ancestor as a child, so nothing can write one now, but a database filled in before that
-        // could, and so can an import file. Recursing into it threw out of every screen that reads a blueprint,
-        // which left the whole app unusable; the export screen shows such a blueprint so it can say so.
-        foreach (QuantityLink link in record.Blueprints.Where(link => !ancestors.Contains(link.TargetId)))
+        // Acyclic is true when nothing in the subtree was dropped as a loop. Only then is the model the same wherever
+        // the blueprint is nested, and so safe to hand out again: a subtree that dropped a link to one of its
+        // ancestors would, under a different path, have kept it.
+        private (BlueprintModel Model, bool Acyclic) Blueprint(SnapshotBlueprint record)
         {
-            model.ChildBlueprints.Add(ToBlueprintModel(index.Blueprints[link.TargetId], index, ancestors), link.Quantity);
+            if (_blueprints.TryGetValue(record.Id, out BlueprintModel? built))
+            {
+                return (built, true);
+            }
+
+            BlueprintModel model = new()
+            {
+                Id = record.Id,
+                Name = record.Name,
+                Description = record.Description,
+                Value = record.Value,
+                Yield = record.Yield,
+                ProductionTime = record.ProductionTime,
+                Category = CategoryOf(record.CategoryId)
+            };
+
+            foreach (QuantityLink link in record.Components)
+            {
+                model.Components.Add(Component(link.TargetId), link.Quantity);
+            }
+
+            _ancestors.Add(record.Id);
+            bool acyclic = true;
+
+            // Dropping a child that is already an ancestor is what keeps a cyclic row set loadable. The parts picker
+            // never offers an ancestor as a child, so nothing can write one now, but a database filled in before that
+            // could, and so can an import file. Recursing into it threw out of every screen that reads a blueprint,
+            // which left the whole app unusable; the export screen shows such a blueprint so it can say so.
+            foreach (QuantityLink link in record.Blueprints)
+            {
+                if (_ancestors.Contains(link.TargetId))
+                {
+                    acyclic = false;
+                    continue;
+                }
+
+                (BlueprintModel child, bool childAcyclic) = Blueprint(_blueprintRecords[link.TargetId]);
+                model.ChildBlueprints.Add(child, link.Quantity);
+                acyclic &= childAcyclic;
+            }
+
+            // Popped rather than left set, so a blueprint nested by two branches of the same tree builds under both.
+            _ancestors.Remove(record.Id);
+
+            if (acyclic)
+            {
+                _blueprints[record.Id] = model;
+            }
+
+            return (model, acyclic);
         }
 
-        // Popped rather than left set, so a blueprint nested by two branches of the same tree builds under both.
-        ancestors.Remove(record.Id);
+        private CategoryModel? CategoryOf(int? categoryId)
+        {
+            if (categoryId is not { } id)
+            {
+                return null;
+            }
 
-        return model;
-    }
+            if (_categories.TryGetValue(id, out CategoryModel? model))
+            {
+                return model;
+            }
 
-    private static CategoryModel? CategoryOf(int? categoryId, SnapshotIndex index) =>
-        categoryId is { } id ? ToCategoryModel(index.Categories[id]) : null;
+            model = ToCategoryModel(_categoryRecords[id]);
+            _categories[id] = model;
 
-    private sealed class SnapshotIndex(DatasetRecords records)
-    {
-        public Dictionary<int, SnapshotCategory> Categories { get; } = records.Categories.ToDictionary(record => record.Id);
-
-        public Dictionary<int, SnapshotComponent> Components { get; } = records.Components.ToDictionary(record => record.Id);
-
-        public Dictionary<int, SnapshotBlueprint> Blueprints { get; } = records.Blueprints.ToDictionary(record => record.Id);
+            return model;
+        }
     }
 }

@@ -154,23 +154,13 @@ public sealed partial class CraftState(
             return;
         }
 
-        List<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
-        Dictionary<int, BlueprintModel?> reloaded;
+        HashSet<int> ids = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint.Id)];
+        Dictionary<int, BlueprintModel> reloaded;
 
         try
         {
-            // SQLite blocks the thread it runs on, so the reads go to the background and only the batch changes here.
-            reloaded = await Task.Run(async () =>
-            {
-                Dictionary<int, BlueprintModel?> blueprints = [];
-
-                foreach (int id in ids)
-                {
-                    blueprints[id] = await blueprintService.GetBlueprintByIdAsync(id);
-                }
-
-                return blueprints;
-            });
+            // SQLite blocks the thread it runs on, so the read goes to the background and only the batch changes here.
+            reloaded = await Task.Run(() => blueprintService.GetBlueprintsByIdsAsync(ids));
         }
         catch (Exception exception)
         {
@@ -180,23 +170,18 @@ public sealed partial class CraftState(
             return;
         }
 
-        // The user can change the batch while the reads run, so the blueprints are swapped into the batch as it is
-        // now. Rebuilding it from the ids read above would undo those changes, and an entry added during the reads
-        // has no result here and is left alone.
+        // The user can change the batch while the read runs, so the blueprints are swapped into the batch as it is
+        // now. Rebuilding it from the ids read above would undo those changes, and an entry added during the read
+        // was not asked for and is left alone.
         foreach (BlueprintQuantity entry in _blueprintMap.BlueprintList.ToList())
         {
-            if (!reloaded.TryGetValue(entry.Blueprint.Id, out BlueprintModel? blueprint))
-            {
-                continue;
-            }
-
-            if (blueprint is null)
-            {
-                _blueprintMap.Remove(entry);
-            }
-            else
+            if (reloaded.TryGetValue(entry.Blueprint.Id, out BlueprintModel? blueprint))
             {
                 entry.Blueprint = blueprint;
+            }
+            else if (ids.Contains(entry.Blueprint.Id))
+            {
+                _blueprintMap.Remove(entry);
             }
         }
 
