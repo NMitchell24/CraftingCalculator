@@ -2,7 +2,6 @@ using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
-using CraftingCalculator.Domain.Models.Transfer;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftingCalculator.Infrastructure.DAO.Impl;
@@ -107,10 +106,18 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
             return [];
         }
 
-        // One read of the dataset serves every row, rather than one per blueprint.
-        DatasetRecords records = await DatasetRecordsReader.ReadAsync(context);
+        // One read of the rows' trees serves every row, rather than one per blueprint.
+        List<int> ids = [.. rows.Select(row => row.BlueprintId)];
+        Dictionary<int, BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(
+            await DatasetRecordsReader.ReadBlueprintTreesAsync(context, ids), ids);
 
-        return [.. rows.Select(row => new BlueprintQuantity(SnapshotModelProcessor.ToBlueprintModel(records, row.BlueprintId), row.Quantity))];
+        // A row naming another dataset's blueprint has nothing to build, and is dropped the way a cross-dataset
+        // part is.
+        return
+        [
+            .. rows.Where(row => blueprints.ContainsKey(row.BlueprintId))
+                .Select(row => new BlueprintQuantity(blueprints[row.BlueprintId], row.Quantity))
+        ];
     }
 
     private static BlueprintFavorite ToModel(Favorite entity) => new()

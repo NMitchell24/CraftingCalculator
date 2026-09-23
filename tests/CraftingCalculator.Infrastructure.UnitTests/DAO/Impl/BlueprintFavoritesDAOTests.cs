@@ -40,6 +40,28 @@ public class BlueprintFavoritesDAOTests
     }
 
     [Test]
+    public async Task GetBlueprintQuantitiesAsync_BuildsEachBlueprintOut_InTheOrderTheyWereSaved()
+    {
+        BlueprintModel bronze = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
+
+        BlueprintModel nails = new() { Name = "Bronze Nails" };
+        nails.ChildBlueprints.Add(bronze, 1);
+        nails = await _blueprintDAO.SaveAsync(nails);
+
+        BlueprintModel axe = new() { Name = "Bronze Axe" };
+        axe.ChildBlueprints.Add(bronze, 8);
+        axe = await _blueprintDAO.SaveAsync(axe);
+
+        BlueprintFavorite prep = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Karve prep" },
+            [new BlueprintQuantity(nails, 10), new BlueprintQuantity(axe, 1)]);
+
+        List<BlueprintQuantity> quantities = await _favoritesDAO.GetBlueprintQuantitiesAsync(prep.Id);
+
+        quantities.Select(q => (q.Blueprint.Name, q.Quantity)).Should().Equal(("Bronze Nails", 10L), ("Bronze Axe", 1L));
+        quantities.Should().AllSatisfy(q => q.Blueprint.ChildBlueprints.BlueprintList.Single().Name.Should().Be("Bronze"));
+    }
+
+    [Test]
     public async Task RenameAsync_ChangesTheNameAndLeavesTheSavedQuantitiesIntact()
     {
         BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models.Transfer;
 using Microsoft.EntityFrameworkCore;
@@ -23,20 +24,22 @@ internal static class DatasetRecordsReader
     }
 
     /// <summary>
-    /// The blueprint with <paramref name="blueprintId"/> and every record it reaches through its parts at any depth,
-    /// each list in id order, or null when the context's dataset has no blueprint with that id.
+    /// The blueprints with the given <paramref name="blueprintIds"/> and every record they reach through their parts at
+    /// any depth, each list in id order. An id the context's dataset has no blueprint for is left out.
     /// </summary>
-    public static async Task<DatasetRecords?> ReadBlueprintTreeAsync(CraftingDataContext context, int blueprintId)
+    public static async Task<DatasetRecords> ReadBlueprintTreesAsync(CraftingDataContext context, IReadOnlyCollection<int> blueprintIds)
     {
-        // One recursive query for the whole tree, whatever its depth. UNION rather than UNION ALL is what ends the
-        // recursion on a cyclic row set, and the join on both ends' DatasetId keeps the walk from following a link
-        // out of the dataset and back in. The SQL opens with SELECT so EF can compose over it, which is how the
-        // dataset's query filter still applies to the rows it returns.
+        // One recursive query for every tree, whatever their depth, seeded with the roots through json_each so the
+        // ids go in as one parameter. UNION rather than UNION ALL is what ends the recursion on a cyclic row set, and
+        // the join on both ends' DatasetId keeps the walk from following a link out of the dataset and back in. The
+        // SQL opens with SELECT so EF can compose over it, which is how the dataset's query filter still applies to
+        // the rows it returns.
+        string roots = JsonSerializer.Serialize(blueprintIds);
         List<LinkRow> childLinks = await ReadChildLinksAsync(context.BlueprintChildren.FromSql(
             $"""
              SELECT * FROM BlueprintChildren WHERE ParentBlueprintId IN (
                  WITH RECURSIVE Tree(Id) AS (
-                     SELECT {blueprintId}
+                     SELECT value FROM json_each({roots})
                      UNION
                      SELECT link.ChildBlueprintId
                      FROM BlueprintChildren AS link
@@ -46,21 +49,19 @@ internal static class DatasetRecordsReader
                  SELECT Id FROM Tree)
              """));
 
-        HashSet<int> reached = [blueprintId, .. childLinks.Select(link => link.TargetId)];
+        HashSet<int> reached = [.. blueprintIds, .. childLinks.Select(link => link.TargetId)];
 
         List<LinkRow> componentLinks = await ReadComponentLinksAsync(
             context.BlueprintComponents.Where(link => reached.Contains(link.BlueprintId)));
 
         List<int> componentIds = [.. componentLinks.Select(link => link.TargetId).Distinct()];
 
-        DatasetRecords records = await AssembleAsync(
+        return await AssembleAsync(
             context.Categories,
             context.Components.Where(component => componentIds.Contains(component.Id)),
             context.Blueprints.Where(blueprint => reached.Contains(blueprint.Id)),
             componentLinks,
             childLinks);
-
-        return records.Blueprints.Any(blueprint => blueprint.Id == blueprintId) ? records : null;
     }
 
     // Nothing in the schema stops a link from naming a record in another dataset, which the dataset's own record

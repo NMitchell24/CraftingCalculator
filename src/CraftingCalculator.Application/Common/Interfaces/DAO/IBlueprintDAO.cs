@@ -11,6 +11,12 @@ public interface IBlueprintDAO
     Task<BlueprintModel?> GetByIdAsync(int id);
 
     /// <summary>
+    /// Returns the blueprints with the given <paramref name="ids"/>, by id, each with its full component graph
+    /// populated. An id with no blueprint has no entry.
+    /// </summary>
+    Task<Dictionary<int, BlueprintModel>> GetByIdsAsync(IReadOnlyCollection<int> ids);
+
+    /// <summary>
     /// Returns every blueprint, each with its full component graph populated.
     /// </summary>
     Task<List<BlueprintModel>> GetAllAsync();

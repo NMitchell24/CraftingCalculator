@@ -9,6 +9,8 @@ public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
 {
     public Task<BlueprintModel?> GetBlueprintByIdAsync(int id) => dao.GetByIdAsync(id);
 
+    public Task<Dictionary<int, BlueprintModel>> GetBlueprintsByIdsAsync(IReadOnlyCollection<int> ids) => dao.GetByIdsAsync(ids);
+
     public Task<List<BlueprintModel>> GetAllBlueprintsAsync() => dao.GetAllAsync();
 
     public Task<List<BlueprintSummary>> GetBlueprintSummariesAsync() => dao.GetSummariesAsync();

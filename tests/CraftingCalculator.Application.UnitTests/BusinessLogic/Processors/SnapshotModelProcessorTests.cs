@@ -84,6 +84,53 @@ public class SnapshotModelProcessorTests
     }
 
     [Test]
+    public void ToBlueprintModels_ABlueprintReachedTwice_IsBuiltOnce()
+    {
+        DatasetRecords records = new(Snapshot.Categories, Snapshot.Components, Snapshot.Blueprints);
+
+        List<BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(records);
+
+        BlueprintModel bronze = blueprints.Single(blueprint => blueprint.Id == Bronze.Id);
+        blueprints.Single(blueprint => blueprint.Id == BronzeAxe.Id).ChildBlueprints.BlueprintList.Single().Blueprint
+            .Should().BeSameAs(bronze);
+        blueprints.Single(blueprint => blueprint.Id == BronzeNails.Id).ChildBlueprints.BlueprintList.Single().Blueprint
+            .Should().BeSameAs(bronze);
+    }
+
+    /// <summary>
+    /// Which link of a loop is dropped depends on where the walk started, so a blueprint in a loop is built again for
+    /// every root rather than shared: read as a root, Bronze Nails keeps the Bronze Plate it holds.
+    /// </summary>
+    [Test]
+    public void ToBlueprintModels_ABlueprintInALoop_IsBuiltForEachRoot()
+    {
+        DatasetRecords cyclic = new([], [],
+        [
+            new SnapshotBlueprint(1, "Bronze Plate", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(2, 1)]),
+            new SnapshotBlueprint(2, "Bronze Nails", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(1, 1)])
+        ]);
+
+        List<BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(cyclic);
+
+        BlueprintModel nestedNails = blueprints[0].ChildBlueprints.BlueprintList.Single().Blueprint;
+        nestedNails.ChildBlueprints.BlueprintList.Should().BeEmpty();
+        blueprints[1].Should().NotBeSameAs(nestedNails);
+        blueprints[1].ChildBlueprints.BlueprintList.Single().Blueprint.Name.Should().Be("Bronze Plate");
+    }
+
+    [Test]
+    public void ToBlueprintModels_ById_BuildsEachAskedForId_AndSkipsOnesTheRecordsDoNotHold()
+    {
+        DatasetRecords records = new(Snapshot.Categories, Snapshot.Components, Snapshot.Blueprints);
+
+        Dictionary<int, BlueprintModel> blueprints =
+            SnapshotModelProcessor.ToBlueprintModels(records, [BronzeAxe.Id, Bronze.Id, 999]);
+
+        blueprints.Keys.Should().BeEquivalentTo([BronzeAxe.Id, Bronze.Id]);
+        blueprints[BronzeAxe.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Should().BeSameAs(blueprints[Bronze.Id]);
+    }
+
+    [Test]
     public void ToFavoriteBlueprints_ReturnsEachBlueprintBuiltOutWithItsQuantity()
     {
         List<BlueprintQuantity> blueprints = SnapshotModelProcessor.ToFavoriteBlueprints(Snapshot, KarvePrep.Id);

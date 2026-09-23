@@ -32,6 +32,18 @@ public class BlueprintServiceTests
     }
 
     [Test]
+    public async Task GetBlueprintsByIdsAsync_DelegatesToDAO()
+    {
+        int[] ids = [5, 6];
+        Dictionary<int, BlueprintModel> blueprints = new() { [5] = new BlueprintModel { Id = 5, Name = "Widget" } };
+        _dao.Setup(d => d.GetByIdsAsync(ids)).ReturnsAsync(blueprints);
+
+        Dictionary<int, BlueprintModel> result = await _service.GetBlueprintsByIdsAsync(ids);
+
+        result.Should().BeSameAs(blueprints);
+    }
+
+    [Test]
     public async Task SaveBlueprintAsync_NullBlueprint_DoesNotCallDAO()
     {
         await _service.SaveBlueprintAsync(null);
