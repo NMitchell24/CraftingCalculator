@@ -10,10 +10,12 @@ public partial class StepsTree : ComponentBase, IDisposable
     protected override void OnInitialized()
     {
         State.Changed += StateHasChanged;
+        State.ExpansionChanged += StateHasChanged;
     }
 
     public void Dispose()
     {
         State.Changed -= StateHasChanged;
+        State.ExpansionChanged -= StateHasChanged;
     }
 }

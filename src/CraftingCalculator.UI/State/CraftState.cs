@@ -30,6 +30,15 @@ public sealed partial class CraftState(
 
     public event Action? Changed;
 
+    /// <summary>
+    /// Raised when <see cref="ExpandAll"/> or <see cref="CollapseAll"/> changes every row of the Crafting Steps tree at
+    /// once. <see cref="ToggleExpanded"/> doesn't raise it: the row that was toggled already shows its new state.
+    /// </summary>
+    public event Action? ExpansionChanged;
+
+    /// <summary>Raised when <see cref="HasVisibleCraftCountedStep"/> changes, whatever changed it.</summary>
+    public event Action? HasVisibleCraftCountedStepChanged;
+
     public IReadOnlyList<BlueprintQuantity> BlueprintQuantities => _blueprintMap.BlueprintList;
     public IReadOnlyList<ComponentQuantity> TotalComponents { get; private set; } = [];
     public IReadOnlyList<BlueprintNode> TreeRoots { get; private set; } = [];
@@ -268,9 +277,7 @@ public sealed partial class CraftState(
     /// Whether a step currently visible in the tree counts crafts rather than items - what the
     /// asterisk legend under the Crafting Steps tree explains.
     /// </summary>
-    // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
-    // is not on screen.
-    public bool HasVisibleCraftCountedStep => AnyCountsByCraft(TreeRoots, "");
+    public bool HasVisibleCraftCountedStep { get; private set; }
 
     /// <summary>
     /// The position of <paramref name="node"/> in the Crafting Steps tree, below the node at <paramref name="parentPath"/>
@@ -288,19 +295,36 @@ public sealed partial class CraftState(
             _expandedPaths.Remove(path);
         }
 
-        Changed?.Invoke();
+        UpdateHasVisibleCraftCountedStep();
     }
 
     public void ExpandAll()
     {
         CollectPaths(TreeRoots, "", _expandedPaths);
-        Changed?.Invoke();
+        UpdateHasVisibleCraftCountedStep();
+        ExpansionChanged?.Invoke();
     }
 
     public void CollapseAll()
     {
         _expandedPaths.Clear();
-        Changed?.Invoke();
+        UpdateHasVisibleCraftCountedStep();
+        ExpansionChanged?.Invoke();
+    }
+
+    private void UpdateHasVisibleCraftCountedStep()
+    {
+        // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
+        // is not on screen.
+        bool visible = AnyCountsByCraft(TreeRoots, "");
+
+        if (visible == HasVisibleCraftCountedStep)
+        {
+            return;
+        }
+
+        HasVisibleCraftCountedStep = visible;
+        HasVisibleCraftCountedStepChanged?.Invoke();
     }
 
     private bool AnyCountsByCraft(IReadOnlyList<BlueprintNode> nodes, string parentPath)
@@ -350,6 +374,7 @@ public sealed partial class CraftState(
         TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
         SurplusCount = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.Quantity);
 
+        UpdateHasVisibleCraftCountedStep();
         Changed?.Invoke();
     }
 
