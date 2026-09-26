@@ -81,10 +81,15 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
     {
         // Entries() and SaveChanges each run DetectChanges over every tracked entity, which on an import is tens of
         // thousands of them. One explicit pass serves both: the stamp goes through the entry's property rather than
-        // the entity, so EF records it without another scan.
-        ChangeTracker.DetectChanges();
+        // the entity, so EF records it without another scan. A caller that turned automatic detection off gets no
+        // pass at all, as it would from EF.
         bool autoDetectChanges = ChangeTracker.AutoDetectChangesEnabled;
-        ChangeTracker.AutoDetectChangesEnabled = false;
+
+        if (autoDetectChanges)
+        {
+            ChangeTracker.DetectChanges();
+            ChangeTracker.AutoDetectChangesEnabled = false;
+        }
 
         // An entity that already names a dataset is left alone: the only writer of a non-zero value
         // is a caller filing a record into a dataset other than the current one, which is what an

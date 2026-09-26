@@ -115,6 +115,27 @@ public class DatasetScopingTests
     }
 
     /// <summary>
+    /// A caller that turned automatic change detection off still has its added records filed, and finds detection
+    /// still off after the save.
+    /// </summary>
+    [Test]
+    public async Task SavingWithChangeDetectionOff_FilesTheRecordAndLeavesDetectionOff()
+    {
+        _fixture.SelectDataset(_secondDatasetId);
+        await using CraftingDataContext context = await _fixture.DatasetFactory.CreateAsync();
+        context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+        context.Components.Add(new Component { Name = "Stone", Description = "" });
+        await context.SaveChangesAsync();
+
+        context.ChangeTracker.AutoDetectChangesEnabled.Should().BeFalse();
+
+        await using CraftingDataContext raw = await _fixture.RawFactory.CreateDbContextAsync();
+        Component stored = await raw.Components.IgnoreQueryFilters().SingleAsync(c => c.Name == "Stone");
+        stored.DatasetId.Should().Be(_secondDatasetId);
+    }
+
+    /// <summary>
     /// Nothing in the schema stops a link row from naming a record in another dataset, and a blueprint read resolves
     /// every link it loads. A link like that is dropped on read, the way a cyclic one is, rather than failing every
     /// screen that reads the blueprint.
