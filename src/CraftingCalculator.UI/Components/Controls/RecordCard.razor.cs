@@ -12,6 +12,12 @@ namespace CraftingCalculator.UI.Components.Controls;
 /// </summary>
 public partial class RecordCard : ComponentBase
 {
+    /// <summary>
+    /// How many cards a virtualized list renders beyond each edge of its scroll container: enough that a fling on a
+    /// phone doesn't outrun them before the next batch arrives, which Virtualize's default of 3 does.
+    /// </summary>
+    public const int OverscanCount = 10;
+
     /// <summary>The record's name, shown as the card's first line.</summary>
     [Parameter, EditorRequired] public string Name { get; set; } = "";
 

@@ -37,6 +37,11 @@ public partial class Favorites : ComponentBase, IDisposable
     // list behind the dialog still shows them either way.
     private const string DeleteFailedMessage = "I couldn't finish that delete.";
 
+    // The pitch of a row at 100% text: the card's 128 px, with its one-line blueprint count, plus the 6 px
+    // margin-bottom app.css gives every card in a list. Virtualize starts from this and re-measures from the rows it
+    // has rendered, so names that wrap only make the scrollbar approximate.
+    private const float RowHeight = 134;
+
     private List<BlueprintFavorite> _favorites = [];
 
     // False until the first read returns, so the empty state is not shown for a list that has not arrived yet.

@@ -8,13 +8,13 @@
     else
     {
         <MudList T="ComponentQuantity" ReadOnly="true">
-            @foreach (ComponentQuantity componentQuantity in Materials)
-            {
+            <Virtualize Items="Materials" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                        Context="componentQuantity">
                 <MudListItem T="ComponentQuantity" @key="componentQuantity.Component.Id">
                     <RecordCard Name="@componentQuantity.Name" Record="@componentQuantity.Component"
                                 Details="@DetailsFor(componentQuantity)" />
                 </MudListItem>
-            }
+            </Virtualize>
         </MudList>
     }
 </div>

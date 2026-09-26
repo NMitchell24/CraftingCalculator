@@ -7,7 +7,7 @@
        the bar would keep the previous type's search text and selection. *@
     <RecordSearchBar @key="_type" Records="_records" FilterList="FilterListFor(_type)" FilterChanged="OnFilterChanged" />
 
-    @if (_loaded && FilteredRecords.Count == 0)
+    @if (_loaded && _filtered.Count == 0)
     {
         <div class="pane-empty-state">
             @if (_records.Count == 0)
@@ -28,9 +28,10 @@
            option role or tab stop. ReadOnly still invokes MudListItem.OnClick on a tap, which is why
            ToggleSelection keeps its own mode check. *@
         <MudList T="IBaseDataRecord" ReadOnly="@(_mode != ListMode.Delete)">
-            @foreach (IBaseDataRecord record in FilteredRecords)
-            {
-                <MudListItem T="IBaseDataRecord" Class="@RowClass(record)" OnClick="@(() => ToggleSelection(record))">
+            <Virtualize Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                        Context="record">
+                <MudListItem @key="record.Id" T="IBaseDataRecord" Class="@RowClass(record)"
+                             OnClick="@(() => ToggleSelection(record))">
                     @* A category has no Info button: its dialog would repeat the name and description the card
                        already shows. *@
                     <RecordCard Name="@(record.Name ?? "")" Record="@(_type == DataType.Category ? null : record)"
@@ -48,7 +49,7 @@
                         </Actions>
                     </RecordCard>
                 </MudListItem>
-            }
+            </Virtualize>
         </MudList>
     }
 </div>

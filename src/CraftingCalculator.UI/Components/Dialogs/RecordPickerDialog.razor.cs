@@ -27,6 +27,11 @@ public partial class RecordPickerDialog : ComponentBase
     /// <summary>The list whose category filter the dialog restores and remembers.</summary>
     [Parameter, EditorRequired] public FilterList FilterList { get; set; }
 
+    // The pitch of a row at 100% text: the card's 103 px plus the 6 px margin-bottom app.css gives every card in a
+    // list. Virtualize starts from this and re-measures from the rows it has rendered, so names that wrap (up to
+    // ~161 px a row at font_scale 2.0) only make the scrollbar approximate.
+    private const float RowHeight = 109;
+
     private readonly Random _random = new();
 
     private readonly List<string> _noMatchPhrases =
@@ -49,13 +54,34 @@ public partial class RecordPickerDialog : ComponentBase
     private string GetNoMatchPhrase => _noMatchPhrases[_random.Next(_noMatchPhrases.Count)];
 
     private RecordFilter _filter = RecordFilter.Empty;
+    private List<IBaseDataRecord> _filtered = [];
+
+    // The Records instance _filtered was built from. The dialog's parameters are set again whenever it re-renders,
+    // and refiltering every record for a list that has not changed is the cost this avoids.
+    private IReadOnlyList<IBaseDataRecord>? _filteredFrom;
 
     // Navigating here dismisses the dialog on its own: MudDialogProvider closes every dialog whose route changes.
     private static string GettingStartedHref => $"/{HelpTopics.HelpRoot}/{HelpTopics.GettingStartedTopicId}";
 
-    private List<IBaseDataRecord> FilteredRecords => RecordFilterProcessor.Apply(Records, _filter);
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(Records, _filteredFrom))
+        {
+            ApplyFilter();
+        }
+    }
 
-    private void OnFilterChanged(RecordFilter filter) => _filter = filter;
+    private void OnFilterChanged(RecordFilter filter)
+    {
+        _filter = filter;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        _filtered = RecordFilterProcessor.Apply(Records, _filter);
+        _filteredFrom = Records;
+    }
 
     private static string RemoveLabel(IBaseDataRecord record) => $"Remove {record.Name}";
 

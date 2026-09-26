@@ -22,16 +22,20 @@
                            StartIcon="@Icons.Material.Filled.HelpOutline" Class="mt-2">Getting Started</MudButton>
             </div>
         }
-        else if (FilteredRecords.Count == 0)
+        else if (_filtered.Count == 0)
         {
             <MudText Class="pa-4" Align="Align.Center">@GetNoMatchPhrase</MudText>
         }
         else
         {
+            @* The dialog content is the scroll container Virtualize finds, full screen or not: app.css gives the
+               non-full-screen dialog a fixed height. *@
             <MudList T="IBaseDataRecord">
-                @foreach (IBaseDataRecord record in FilteredRecords)
-                {
-                    <MudListItem T="IBaseDataRecord" Ripple="false">
+                <Virtualize Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                            Context="record">
+                    @* Keyed on the type as well: the requirements picker lists components and blueprints together,
+                       and the two are numbered separately. *@
+                    <MudListItem @key="(record.Type, record.Id)" T="IBaseDataRecord" Ripple="false">
                         @* js/keyboard.js stops a tap on the buttons in a card's stepper and actions zones from taking focus
                            off the search field, so the keyboard stays up between searches. *@
                         @if (Target.Find(record) is { } entry)
@@ -58,7 +62,7 @@
                             </RecordCard>
                         }
                     </MudListItem>
-                }
+                </Virtualize>
             </MudList>
         }
     </DialogContent>

@@ -40,8 +40,15 @@ public partial class DatasetList : ComponentBase, IDisposable
     // list behind the dialog still shows them either way.
     private const string DeleteFailedMessage = "I couldn't finish that delete.";
 
+    // The pitch of a row whose card has a one-line description at 100% text: the card's 128 px plus the 6 px
+    // margin-bottom app.css gives every card in a list. Virtualize starts from this and re-measures from the rows it
+    // has rendered, so names and descriptions that wrap (up to ~265 px a row at font_scale 2.0) only make the
+    // scrollbar approximate.
+    private const float RowHeight = 134;
+
     private DataType _type;
     private List<IBaseDataRecord> _records = [];
+    private List<IBaseDataRecord> _filtered = [];
 
     // False until the read for the current type returns, so the empty state is not shown for a list that has not
     // arrived yet.
@@ -57,8 +64,6 @@ public partial class DatasetList : ComponentBase, IDisposable
     // reloading for that would discard a Delete Mode selection and clear the filter out from under a search bar
     // still showing it.
     private string? _listedType;
-
-    private List<IBaseDataRecord> FilteredRecords => RecordFilterProcessor.Apply(_records, _filter);
 
     protected override async Task OnParametersSetAsync()
     {
@@ -79,6 +84,7 @@ public partial class DatasetList : ComponentBase, IDisposable
         // selection and mode would stay on screen for the length of the load below. SetMode clears
         // them and re-declares the shell against the new type before anything is awaited.
         _records = [];
+        _filtered = [];
         _loaded = false;
         _filter = RecordFilter.Empty;
         SetMode(ListMode.Normal);
@@ -86,7 +92,13 @@ public partial class DatasetList : ComponentBase, IDisposable
         await ReloadAsync();
     }
 
-    private void OnFilterChanged(RecordFilter filter) => _filter = filter;
+    private void OnFilterChanged(RecordFilter filter)
+    {
+        _filter = filter;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter() => _filtered = RecordFilterProcessor.Apply(_records, _filter);
 
     private static FilterList FilterListFor(DataType type) => type switch
     {
@@ -136,6 +148,7 @@ public partial class DatasetList : ComponentBase, IDisposable
     private async Task ReloadAsync()
     {
         _records = await Task.Run(() => RecordService.GetRecordsAsync(_type));
+        ApplyFilter();
         _loaded = true;
 
         // The actions carry both the mode and whether there is anything left to act on, so they are

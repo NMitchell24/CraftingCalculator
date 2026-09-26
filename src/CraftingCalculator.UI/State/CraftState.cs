@@ -1,5 +1,6 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
+using System.Collections.ObjectModel;
 using CraftingCalculator.Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +41,8 @@ public sealed partial class CraftState(
     public event Action? HasVisibleCraftCountedStepChanged;
 
     public IReadOnlyList<BlueprintQuantity> BlueprintQuantities => _blueprintMap.BlueprintList;
-    public IReadOnlyList<ComponentQuantity> TotalComponents { get; private set; } = [];
+    public ReadOnlyCollection<ComponentQuantity> TotalComponents { get; private set; } =
+        ReadOnlyCollection<ComponentQuantity>.Empty;
     public IReadOnlyList<BlueprintNode> TreeRoots { get; private set; } = [];
     public double TotalCost { get; private set; }
     public double TotalValue { get; private set; }
@@ -62,7 +64,8 @@ public sealed partial class CraftState(
     /// three of something that yields two runs two crafts and leaves one spare. Merged across the whole
     /// batch and every depth of the tree.
     /// </summary>
-    public IReadOnlyList<BlueprintQuantity> SurplusStock { get; private set; } = [];
+    public ReadOnlyCollection<BlueprintQuantity> SurplusStock { get; private set; } =
+        ReadOnlyCollection<BlueprintQuantity>.Empty;
 
     /// <summary>Total surplus items, summed across every distinct blueprint.</summary>
     public long SurplusCount { get; private set; }
@@ -393,8 +396,10 @@ public sealed partial class CraftState(
         TotalValue = totals.TotalValue;
         SurplusValue = totals.SurplusValue;
         TotalProductionTime = totals.TotalProductionTime;
-        TotalComponents = [.. totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
-        SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
+        TotalComponents =
+            totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name).ToList().AsReadOnly();
+        SurplusStock =
+            totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name).ToList().AsReadOnly();
         TreeRoots = totals.Roots;
         CraftingStepCount = totals.Crafts;
         PruneExpandedPaths();
