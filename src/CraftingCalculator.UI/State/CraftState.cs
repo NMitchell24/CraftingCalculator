@@ -129,7 +129,8 @@ public sealed partial class CraftState(
         // Read before the batch is touched. Resetting first empties the user's batch and then leaves it empty
         // if the read throws, and the Craft screen's failure dialog promises the opposite - it tells them the
         // batch is as they left it.
-        List<BlueprintQuantity> quantities = await favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite);
+        List<BlueprintQuantity> quantities =
+            await Task.Run(() => favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
 
         _blueprintMap.Reset();
 
@@ -188,22 +189,28 @@ public sealed partial class CraftState(
         Recalculate();
     }
 
-    public Task<bool> FavoriteExistsAsync(string? name) => favoriteService.DoesFavoriteExistAsync(name);
+    public Task<bool> FavoriteExistsAsync(string? name) => Task.Run(() => favoriteService.DoesFavoriteExistAsync(name));
 
     /// <summary>
     /// Saves the batch as the favorite named <paramref name="name"/>, replacing a favorite that already has the name,
     /// and makes it <see cref="LoadedFavorite"/>.
     /// </summary>
-    public async Task SaveAsFavoriteAsync(string name) =>
-        LoadedFavorite = await favoriteService.SaveFavoriteAsync(new BlueprintFavorite { Name = name }, [.. _blueprintMap.BlueprintList]);
+    public Task SaveAsFavoriteAsync(string name) => SaveBatchAsAsync(new BlueprintFavorite { Name = name });
 
     /// <summary>Saves the batch over <see cref="LoadedFavorite"/>. Does nothing when no favorite is loaded.</summary>
     public async Task UpdateLoadedFavoriteAsync()
     {
         if (LoadedFavorite is { } loaded)
         {
-            LoadedFavorite = await favoriteService.SaveFavoriteAsync(loaded, [.. _blueprintMap.BlueprintList]);
+            await SaveBatchAsAsync(loaded);
         }
+    }
+
+    private async Task SaveBatchAsAsync(BlueprintFavorite favorite)
+    {
+        // Copied here, on the UI thread, so the save never enumerates the batch while a tap is changing it.
+        List<BlueprintQuantity> batch = [.. _blueprintMap.BlueprintList];
+        LoadedFavorite = await Task.Run(() => favoriteService.SaveFavoriteAsync(favorite, batch));
     }
 
     /// <summary>Works the batch out again under the selected dataset's settings, after they have changed.</summary>

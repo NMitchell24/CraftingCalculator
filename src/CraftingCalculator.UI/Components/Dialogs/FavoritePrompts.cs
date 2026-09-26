@@ -109,7 +109,7 @@ public static class FavoritePrompts
                 return null;
             }
 
-            if (!await favorites.DoesFavoriteExistAsync(name))
+            if (!await Task.Run(() => favorites.DoesFavoriteExistAsync(name)))
             {
                 return name;
             }
