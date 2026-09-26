@@ -38,6 +38,9 @@ public partial class Favorites : ComponentBase, IDisposable
     private const string DeleteFailedMessage = "I couldn't finish that delete.";
 
     private List<BlueprintFavorite> _favorites = [];
+
+    // False until the first read returns, so the empty state is not shown for a list that has not arrived yet.
+    private bool _loaded;
     private ListMode _mode = ListMode.Normal;
 
     // Ids rather than favorites: ReloadAsync replaces every instance, and these models have no value
@@ -79,7 +82,8 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private async Task ReloadAsync()
     {
-        _favorites = await FavoriteService.GetAllFavoritesAsync();
+        _favorites = await Task.Run(FavoriteService.GetAllFavoritesAsync);
+        _loaded = true;
 
         // The actions carry both the mode and whether there is anything left to act on, so they are
         // re-declared on every reload rather than only when the mode changes.
@@ -141,7 +145,8 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private async Task ShowInfoAsync(BlueprintFavorite favorite) =>
         await InfoDialog.ShowAsync(
-            DialogService, favorite, await FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
+            DialogService, favorite,
+            await Task.Run(() => FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite)));
 
     private async Task RenameAsync(BlueprintFavorite favorite)
     {
@@ -155,7 +160,7 @@ public partial class Favorites : ComponentBase, IDisposable
             "I couldn't rename that favorite. It still has its old name.",
             async () =>
             {
-                await FavoriteService.RenameFavoriteAsync(favorite, name);
+                await Task.Run(() => FavoriteService.RenameFavoriteAsync(favorite, name));
                 State.OnFavoriteRenamed(favorite.Id, name);
             });
 

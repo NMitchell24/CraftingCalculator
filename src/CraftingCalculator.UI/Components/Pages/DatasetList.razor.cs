@@ -42,6 +42,10 @@ public partial class DatasetList : ComponentBase, IDisposable
 
     private DataType _type;
     private List<IBaseDataRecord> _records = [];
+
+    // False until the read for the current type returns, so the empty state is not shown for a list that has not
+    // arrived yet.
+    private bool _loaded;
     private RecordFilter _filter = RecordFilter.Empty;
     private ListMode _mode = ListMode.Normal;
 
@@ -75,6 +79,7 @@ public partial class DatasetList : ComponentBase, IDisposable
         // selection and mode would stay on screen for the length of the load below. SetMode clears
         // them and re-declares the shell against the new type before anything is awaited.
         _records = [];
+        _loaded = false;
         _filter = RecordFilter.Empty;
         SetMode(ListMode.Normal);
 
@@ -131,6 +136,7 @@ public partial class DatasetList : ComponentBase, IDisposable
     private async Task ReloadAsync()
     {
         _records = await Task.Run(() => RecordService.GetRecordsAsync(_type));
+        _loaded = true;
 
         // The actions carry both the mode and whether there is anything left to act on, so they are
         // re-declared on every reload rather than only when the mode changes.

@@ -53,23 +53,24 @@ public partial class DatasetEditor : ComponentBase, IDisposable
             return;
         }
 
-        _record = Id > 0
-            ? await RecordService.GetRecordAsync(_type, Id)
-            : CopyFrom > 0
-                ? await RecordService.GetCopyAsync(_type, CopyFrom)
-                : _type.GetDataRecord();
-
-        if (_record is null)
-        {
-            Navigation.NavigateTo("/dataset");
-            return;
-        }
-
+        // Declared before the read: until the record arrives the shell would otherwise still carry the list's
+        // title and actions, whose callbacks belong to that component.
         PageShellState.Configure(this, new PageShellConfig(Title())
         {
             ShowBack = true,
             ConfirmLeaveAsync = ConfirmLeaveAsync
         });
+
+        _record = Id > 0
+            ? await Task.Run(() => RecordService.GetRecordAsync(_type, Id))
+            : CopyFrom > 0
+                ? await Task.Run(() => RecordService.GetCopyAsync(_type, CopyFrom))
+                : _type.GetDataRecord();
+
+        if (_record is null)
+        {
+            Navigation.NavigateTo("/dataset");
+        }
     }
 
     // Never the record's own name: the app bar carries only the app's own words, and the Name field below
@@ -97,7 +98,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
             "I couldn't save your changes. Your edits are still here.",
             async () =>
             {
-                await RecordService.SaveRecordAsync(record);
+                await Task.Run(() => RecordService.SaveRecordAsync(record));
                 await CraftState.ReloadBlueprintsAsync();
             });
 

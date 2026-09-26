@@ -80,7 +80,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     private async Task ReloadFavoritesAsync()
     {
-        _favorites = await FavoriteService.GetAllFavoritesAsync();
+        _favorites = await Task.Run(FavoriteService.GetAllFavoritesAsync);
 
         // Rendered here rather than left to the caller: ActionsBar owns the Save action's click, so its
         // EventCallback renders that component and never this page.

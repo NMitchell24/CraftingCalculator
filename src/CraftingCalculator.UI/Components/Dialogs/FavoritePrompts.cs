@@ -36,8 +36,10 @@ public static class FavoritePrompts
             }
         }
 
-        await state.LoadFavoriteAsync(favorite);
-        snackbar.Add($"Loaded '{favorite.Name}'", Severity.Success);
+        if (await state.LoadFavoriteAsync(favorite))
+        {
+            snackbar.Add($"Loaded '{favorite.Name}'", Severity.Success);
+        }
     }
 
     /// <summary>
@@ -109,7 +111,7 @@ public static class FavoritePrompts
                 return null;
             }
 
-            if (!await favorites.DoesFavoriteExistAsync(name))
+            if (!await Task.Run(() => favorites.DoesFavoriteExistAsync(name)))
             {
                 return name;
             }

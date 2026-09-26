@@ -24,8 +24,10 @@ public partial class CategorySelect : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        _categories = [.. (await Task.Run(() => RecordService.GetRecordsAsync(DataType.Category))).Cast<CategoryModel>()];
+
+        // Set only once the items exist: a value with no item to match renders as the bare id.
         _categoryId = Model.Category?.Id;
-        _categories = [.. (await RecordService.GetRecordsAsync(DataType.Category)).Cast<CategoryModel>()];
     }
 
     private async Task OnCategoryChangedAsync(int? categoryId)

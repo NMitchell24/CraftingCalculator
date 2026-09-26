@@ -3,7 +3,7 @@
 <PageTitle>Favorites</PageTitle>
 
 <div class="favorites-page">
-    @if (_favorites.Count == 0)
+    @if (_loaded && _favorites.Count == 0)
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No saved selections</MudText>

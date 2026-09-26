@@ -24,6 +24,10 @@ public sealed partial class CraftState(
     // batch and nested inside another batch blueprint), and each position remembers its own expansion state.
     private readonly HashSet<string> _expandedPaths = [];
 
+    // Bumped by Clear: the user clearing the batch, and every dataset switch, dataset delete and delete-all. A background
+    // read captures it first and drops its result if it changed, so a read begun for the old batch never lands in the new one.
+    private int _clearCount;
+
     public event Action? Changed;
 
     public IReadOnlyList<BlueprintQuantity> BlueprintQuantities => _blueprintMap.BlueprintList;
@@ -119,17 +123,29 @@ public sealed partial class CraftState(
 
     public void Clear()
     {
+        _clearCount++;
         _blueprintMap.Reset();
         LoadedFavorite = null;
         Recalculate();
     }
 
-    public async Task LoadFavoriteAsync(BlueprintFavorite favorite)
+    /// <summary>
+    /// Replaces the batch with <paramref name="favorite"/>'s blueprints and makes it <see cref="LoadedFavorite"/>. Returns
+    /// false, with nothing loaded, when the batch was cleared while the favorite was being read.
+    /// </summary>
+    public async Task<bool> LoadFavoriteAsync(BlueprintFavorite favorite)
     {
         // Read before the batch is touched. Resetting first empties the user's batch and then leaves it empty
         // if the read throws, and the Craft screen's failure dialog promises the opposite - it tells them the
         // batch is as they left it.
-        List<BlueprintQuantity> quantities = await favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite);
+        int clearCount = _clearCount;
+        List<BlueprintQuantity> quantities =
+            await Task.Run(() => favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
+
+        if (clearCount != _clearCount)
+        {
+            return false;
+        }
 
         _blueprintMap.Reset();
 
@@ -140,6 +156,8 @@ public sealed partial class CraftState(
 
         LoadedFavorite = favorite;
         Recalculate();
+
+        return true;
     }
 
     /// <summary>
@@ -188,21 +206,34 @@ public sealed partial class CraftState(
         Recalculate();
     }
 
-    public Task<bool> FavoriteExistsAsync(string? name) => favoriteService.DoesFavoriteExistAsync(name);
+    public Task<bool> FavoriteExistsAsync(string? name) => Task.Run(() => favoriteService.DoesFavoriteExistAsync(name));
 
     /// <summary>
     /// Saves the batch as the favorite named <paramref name="name"/>, replacing a favorite that already has the name,
     /// and makes it <see cref="LoadedFavorite"/>.
     /// </summary>
-    public async Task SaveAsFavoriteAsync(string name) =>
-        LoadedFavorite = await favoriteService.SaveFavoriteAsync(new BlueprintFavorite { Name = name }, [.. _blueprintMap.BlueprintList]);
+    public Task SaveAsFavoriteAsync(string name) => SaveBatchAsAsync(new BlueprintFavorite { Name = name });
 
     /// <summary>Saves the batch over <see cref="LoadedFavorite"/>. Does nothing when no favorite is loaded.</summary>
     public async Task UpdateLoadedFavoriteAsync()
     {
         if (LoadedFavorite is { } loaded)
         {
-            LoadedFavorite = await favoriteService.SaveFavoriteAsync(loaded, [.. _blueprintMap.BlueprintList]);
+            await SaveBatchAsAsync(loaded);
+        }
+    }
+
+    private async Task SaveBatchAsAsync(BlueprintFavorite favorite)
+    {
+        // Copied here, on the UI thread, so the save never enumerates the batch while a tap is changing it.
+        List<BlueprintQuantity> batch = [.. _blueprintMap.BlueprintList];
+        int clearCount = _clearCount;
+        BlueprintFavorite saved = await Task.Run(() => favoriteService.SaveFavoriteAsync(favorite, batch));
+
+        // The favorite is saved either way; only a batch that is still the one saved gets to call it loaded.
+        if (clearCount == _clearCount)
+        {
+            LoadedFavorite = saved;
         }
     }
 

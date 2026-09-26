@@ -45,7 +45,7 @@ public static class DatasetPrompts
                 return null;
             }
 
-            if (!await datasets.NameExistsAsync(name, exceptId))
+            if (!await Task.Run(() => datasets.NameExistsAsync(name, exceptId)))
             {
                 return name;
             }
