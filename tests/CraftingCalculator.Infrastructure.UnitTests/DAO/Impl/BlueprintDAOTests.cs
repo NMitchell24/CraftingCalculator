@@ -186,7 +186,7 @@ public class BlueprintDAOTests
         BlueprintModel saved = await _blueprintDAO.SaveAsync(table);
 
         BlueprintModel reloaded = (await _blueprintDAO.GetByIdAsync(saved.Id))!;
-        reloaded.Components.Remove(wood, reloaded.Components.ComponentList[0].Quantity);
+        reloaded.Components.RemoveAll(wood);
 
         await _blueprintDAO.SaveAsync(reloaded);
 

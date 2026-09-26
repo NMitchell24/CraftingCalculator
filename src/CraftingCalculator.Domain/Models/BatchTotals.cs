@@ -7,6 +7,8 @@ namespace CraftingCalculator.Domain.Models;
 /// <see cref="TotalValue"/>.
 /// <see cref="TotalProductionTime"/> covers both the blueprint crafts and the components they consume,
 /// summed as though the batch were made one step at a time.
+/// <see cref="Roots"/> is each batch entry's breakdown tree, in batch order, and <see cref="Crafts"/> is the
+/// craft count summed over every node of every tree.
 /// </summary>
 public sealed record BatchTotals(
     double TotalCost,
@@ -14,4 +16,6 @@ public sealed record BatchTotals(
     ComponentMap Materials,
     BlueprintMap Surplus,
     double SurplusValue,
-    TimeSpan TotalProductionTime);
+    TimeSpan TotalProductionTime,
+    IReadOnlyList<BlueprintNode> Roots,
+    long Crafts);
