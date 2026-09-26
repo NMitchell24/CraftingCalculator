@@ -1,20 +1,16 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
-using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
-public partial class MaterialsList : ComponentBase, IDisposable
+public partial class MaterialsList : ComponentBase
 {
-    [Inject] private CraftState State { get; set; } = null!;
-    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
+    /// <summary>The raw materials the whole batch needs, one entry per component.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<ComponentQuantity> Materials { get; set; } = [];
 
-    protected override void OnInitialized()
-    {
-        State.Changed += StateHasChanged;
-    }
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     private List<string> DetailsFor(ComponentQuantity componentQuantity)
     {
@@ -26,10 +22,5 @@ public partial class MaterialsList : ComponentBase, IDisposable
         }
 
         return details;
-    }
-
-    public void Dispose()
-    {
-        State.Changed -= StateHasChanged;
     }
 }

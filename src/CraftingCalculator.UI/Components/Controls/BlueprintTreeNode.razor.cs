@@ -45,5 +45,21 @@ public partial class BlueprintTreeNode : ComponentBase
         ? DurationProcessor.Format(Node.ProductionTime)
         : null;
 
+    // Set only by this row's own arrow closing it, so the children stay for MudCollapse's slide. Every render its
+    // parent drives - a batch change, Collapse all, the parent itself opening or closing - clears it, and a hidden
+    // subtree goes with the next one of those.
+    private bool _keepChildren;
+
+    protected override void OnParametersSet()
+    {
+        _keepChildren = false;
+    }
+
+    private void OnExpandedChanged(bool expanded)
+    {
+        _keepChildren = !expanded;
+        State.ToggleExpanded(Path);
+    }
+
     private Task OpenDetailAsync() => InfoDialog.ShowAsync(DialogService, Node);
 }

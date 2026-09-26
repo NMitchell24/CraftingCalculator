@@ -2,18 +2,29 @@
    render fragment produces any elements - a zero-iteration @foreach still counts. Leaf nodes (no
    Children) render a second, ChildContent-free tag so the arrow is correctly hidden for them.
 
+   A collapsed node's children are left out of its ChildContent rather than rendered and hidden:
+   MudCollapse keeps whatever it is given in the DOM, so a collapsed row would otherwise pay for its
+   whole subtree on every render. The one exception is a row just closed by its own arrow, which keeps
+   them until its parent next renders it (see _keepChildren), so MudCollapse has something to slide shut.
+
    OnClick is free for the detail dialog because MudTreeView leaves ExpandOnClick false: the arrow owns
    expansion, so tapping the row itself never toggles it. *@
 @if (Node.Children.Count > 0)
 {
+    string path = Path;
+    bool expanded = State.IsExpanded(path);
+
     <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Label" TextClass="@LabelClass" EndText="@EndText"
                      EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
                      Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
-                     Expanded="@State.IsExpanded(Path)" ExpandedChanged="@(_ => State.ToggleExpanded(Path))"
+                     Expanded="@expanded" ExpandedChanged="OnExpandedChanged"
                      OnClick="OpenDetailAsync">
-        @foreach (BlueprintNode child in Node.Children)
+        @if (expanded || _keepChildren)
         {
-            <BlueprintTreeNode Node="child" ParentPath="@Path" />
+            @foreach (BlueprintNode child in Node.Children)
+            {
+                <BlueprintTreeNode @key="CraftState.PathOf(path, child)" Node="child" ParentPath="@path" />
+            }
         }
     </MudTreeViewItem>
 }

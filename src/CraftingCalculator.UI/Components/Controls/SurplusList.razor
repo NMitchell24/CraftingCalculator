@@ -1,5 +1,5 @@
 <div class="materials-list">
-    @if (State.SurplusStock.Count == 0)
+    @if (Surplus.Count == 0)
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No surplus</MudText>
@@ -8,9 +8,9 @@
     else
     {
         <MudList T="BlueprintQuantity" ReadOnly="true">
-            @foreach (BlueprintQuantity blueprintQuantity in State.SurplusStock)
+            @foreach (BlueprintQuantity blueprintQuantity in Surplus)
             {
-                <MudListItem T="BlueprintQuantity">
+                <MudListItem T="BlueprintQuantity" @key="blueprintQuantity.Blueprint.Id">
                     <RecordCard Name="@blueprintQuantity.Name" Record="@blueprintQuantity.Blueprint"
                                 Details="@DetailsFor(blueprintQuantity)" />
                 </MudListItem>

@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Components;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
-public partial class SummaryCard : ComponentBase, IDisposable
+public partial class SummaryCard : ComponentBase
 {
-    [Inject] private CraftState State { get; set; } = null!;
+    /// <summary>The batch whose totals are summarized.</summary>
+    [Parameter, EditorRequired] public CraftState State { get; set; } = null!;
+
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     private bool UseCosts => SelectedDataset.Settings.UseCosts;
@@ -20,14 +22,4 @@ public partial class SummaryCard : ComponentBase, IDisposable
         < 0 => "summary-profit-negative",
         _ => "summary-profit"
     };
-
-    protected override void OnInitialized()
-    {
-        State.Changed += StateHasChanged;
-    }
-
-    public void Dispose()
-    {
-        State.Changed -= StateHasChanged;
-    }
 }
