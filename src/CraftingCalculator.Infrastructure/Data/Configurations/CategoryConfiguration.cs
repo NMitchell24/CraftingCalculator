@@ -12,7 +12,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.HasKey(category => category.Id);
         builder.Property(category => category.Name).IsRequired();
         builder.Property(category => category.Description).IsRequired();
-        builder.HasIndex(category => category.Name);
 
         builder.HasIndex(category => category.DatasetId);
 

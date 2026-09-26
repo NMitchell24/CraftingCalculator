@@ -2,6 +2,7 @@
 using CraftingCalculator.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraftingCalculator.Infrastructure.Migrations
 {
     [DbContext(typeof(CraftingDataContext))]
-    partial class CraftingDataContextModelSnapshot : ModelSnapshot
+    [Migration("20260926173138_AddDatasetNameIndexes")]
+    partial class AddDatasetNameIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.10");
@@ -52,6 +55,8 @@ namespace CraftingCalculator.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("DatasetId");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("Blueprints", (string)null);
                 });
@@ -125,6 +130,8 @@ namespace CraftingCalculator.Infrastructure.Migrations
 
                     b.HasIndex("DatasetId");
 
+                    b.HasIndex("Name");
+
                     b.ToTable("Categories", (string)null);
                 });
 
@@ -157,6 +164,8 @@ namespace CraftingCalculator.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("Name");
 
                     b.HasIndex("DatasetId", "Name");
 
@@ -209,6 +218,8 @@ namespace CraftingCalculator.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.HasIndex("DatasetId", "Name");
 

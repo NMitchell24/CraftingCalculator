@@ -24,14 +24,30 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
 
     public override int SaveChanges()
     {
-        StampDataset();
-        return base.SaveChanges();
+        bool autoDetectChanges = StampDataset();
+
+        try
+        {
+            return base.SaveChanges();
+        }
+        finally
+        {
+            ChangeTracker.AutoDetectChangesEnabled = autoDetectChanges;
+        }
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        StampDataset();
-        return base.SaveChangesAsync(cancellationToken);
+        bool autoDetectChanges = StampDataset();
+
+        try
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            ChangeTracker.AutoDetectChangesEnabled = autoDetectChanges;
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,16 +73,33 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
         modelBuilder.Entity<FavoriteBlueprint>().HasQueryFilter(link => link.Favorite.DatasetId == DatasetId);
     }
 
-    /// <summary>Files new records under this context's dataset, so no DAO has to set it.</summary>
-    private void StampDataset()
+    /// <summary>
+    /// Files new records under this context's dataset, so no DAO has to set it. Leaves automatic change detection
+    /// off for the save that follows; the caller restores it to the returned value.
+    /// </summary>
+    private bool StampDataset()
     {
+        // Entries() and SaveChanges each run DetectChanges over every tracked entity, which on an import is tens of
+        // thousands of them. One explicit pass serves both: the stamp goes through the entry's property rather than
+        // the entity, so EF records it without another scan. A caller that turned automatic detection off gets no
+        // pass at all, as it would from EF.
+        bool autoDetectChanges = ChangeTracker.AutoDetectChangesEnabled;
+
+        if (autoDetectChanges)
+        {
+            ChangeTracker.DetectChanges();
+            ChangeTracker.AutoDetectChangesEnabled = false;
+        }
+
         // An entity that already names a dataset is left alone: the only writer of a non-zero value
         // is a caller filing a record into a dataset other than the current one, which is what an
         // import will do.
         foreach (EntityEntry<IDatasetScoped> entry in ChangeTracker.Entries<IDatasetScoped>()
                      .Where(entry => entry is { State: EntityState.Added, Entity.DatasetId: 0 }))
         {
-            entry.Entity.DatasetId = DatasetId;
+            entry.Property(scoped => scoped.DatasetId).CurrentValue = DatasetId;
         }
+
+        return autoDetectChanges;
     }
 }

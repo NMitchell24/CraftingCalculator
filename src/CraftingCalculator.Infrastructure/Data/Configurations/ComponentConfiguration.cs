@@ -14,10 +14,11 @@ public class ComponentConfiguration : IEntityTypeConfiguration<Component>
         builder.Property(component => component.Description).IsRequired();
         //Ticks, for the reason given in BlueprintConfiguration.
         builder.Property(component => component.ProductionTime).HasConversion<long>();
-        builder.HasIndex(component => component.Name);
         builder.HasIndex(component => component.CategoryId);
 
-        builder.HasIndex(component => component.DatasetId);
+        //DatasetId first: every read is filtered to one dataset, and the list is ordered by name, so the index
+        //serves both and SQLite skips the sort. It also serves as the Dataset foreign key's index.
+        builder.HasIndex(component => new { component.DatasetId, component.Name });
 
         //Cascade: a dataset is the container for its records, so deleting one takes its
         //contents with it.
