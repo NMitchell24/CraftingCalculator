@@ -23,7 +23,7 @@ public class BlueprintServiceTests
     [Test]
     public async Task GetBlueprintByIdAsync_DelegatesToDAO()
     {
-        BlueprintModel blueprint = new BlueprintModel { Id = 5, Name = "Widget" };
+        BlueprintModel blueprint = new() { Id = 5, Name = "Widget" };
         _dao.Setup(d => d.GetByIdAsync(5)).ReturnsAsync(blueprint);
 
         BlueprintModel? result = await _service.GetBlueprintByIdAsync(5);
@@ -84,7 +84,7 @@ public class BlueprintServiceTests
     [Test]
     public async Task SaveBlueprintAsync_SavesThroughDAO()
     {
-        BlueprintModel blueprint = new BlueprintModel { Name = "Widget" };
+        BlueprintModel blueprint = new() { Name = "Widget" };
 
         await _service.SaveBlueprintAsync(blueprint);
 
@@ -107,19 +107,5 @@ public class BlueprintServiceTests
         await _service.DeleteAllBlueprintsAsync();
 
         _dao.Verify(d => d.DeleteAllAsync(), Times.Once);
-    }
-
-    [Test]
-    public void GetBlueprintNode_BuildsNodePerComponent()
-    {
-        BlueprintModel blueprint = new BlueprintModel { Name = "Widget" };
-        blueprint.Components.Add(new ComponentModel { Name = "Screw" }, 1);
-
-        BlueprintNode tree = _service.GetBlueprintNode(blueprint, 3, Datasettings.Default);
-
-        tree.Name.Should().Be("Widget");
-        tree.Quantity.Should().Be(3);
-        tree.Crafts.Should().Be(3);
-        tree.Children.Should().ContainSingle();
     }
 }

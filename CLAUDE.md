@@ -381,7 +381,7 @@ duplication *today* — not that it might someday.
   each piece named for what it does.
 - **Large Class / junk drawers.** The smell is a class accumulating *unrelated* members that changes
   for many reasons; split it along the reasons it changes. A cohesive, stateless, well-named static
-  helper (`ComponentProcessor`, `Domain/Constants`) is fine — a single known home beats scattering.
+  helper (`BlueprintProcessor`, `Domain/Constants`) is fine — a single known home beats scattering.
   Don't overcorrect: a file created to hold a single static method is a Lazy Element; fold it into the
   nearest cohesive home.
 - **Long Parameter List / flag arguments.** A boolean or mode parameter that forks a method's whole

@@ -322,9 +322,6 @@ public sealed partial class CraftState(
         return false;
     }
 
-    private static long CountCrafts(IReadOnlyList<BlueprintNode> nodes) =>
-        nodes.Sum(node => node.Crafts + CountCrafts(node.Children));
-
     private static void CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
     {
         foreach (BlueprintNode node in nodes)
@@ -337,8 +334,7 @@ public sealed partial class CraftState(
 
     private void Recalculate()
     {
-        Datasettings settings = selectedDataset.Settings;
-        BatchTotals totals = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList, settings);
+        BatchTotals totals = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList, selectedDataset.Settings);
 
         TotalCost = totals.TotalCost;
         TotalValue = totals.TotalValue;
@@ -346,12 +342,12 @@ public sealed partial class CraftState(
         TotalProductionTime = totals.TotalProductionTime;
         TotalComponents = [.. totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name)];
         SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
-        TreeRoots = [.. _blueprintMap.BlueprintList.Select(blueprintQuantity => blueprintService.GetBlueprintNode(blueprintQuantity.Blueprint, blueprintQuantity.Quantity, settings))];
+        TreeRoots = totals.Roots;
+        CraftingStepCount = totals.Crafts;
 
         // Computed here rather than as expression-bodied properties: each walks the whole batch, and the
         // summary card reads them on every render.
         TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
-        CraftingStepCount = CountCrafts(TreeRoots);
         SurplusCount = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.Quantity);
 
         Changed?.Invoke();

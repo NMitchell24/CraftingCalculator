@@ -1,4 +1,3 @@
-using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Models;
@@ -29,7 +28,4 @@ public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
     public Task DeleteBlueprintsAsync(IEnumerable<int> ids) => dao.DeleteAsync(ids);
 
     public Task DeleteAllBlueprintsAsync() => dao.DeleteAllAsync();
-
-    public BlueprintNode GetBlueprintNode(BlueprintModel blueprint, long quantity, Datasettings settings) =>
-        BlueprintProcessor.BuildNode(blueprint, quantity, settings);
 }

@@ -47,9 +47,4 @@ public class ComponentQuantity(ComponentModel component, long quantity) : IBaseQ
     public TimeSpan TotalProductionTime => DurationMath.Scale(Component.ProductionTime, Quantity);
 
     public string DisplayName => Name + " x" + Quantity;
-
-    public ComponentQuantity Clone()
-    {
-        return new ComponentQuantity(Component, Quantity);
-    }
 }

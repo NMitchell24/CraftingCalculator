@@ -56,4 +56,42 @@ public class BlueprintMapTests
 
         map.BlueprintList.Should().ContainSingle().Which.Blueprint.Id.Should().Be(1);
     }
+
+    [Test]
+    public void Add_ABlueprintRemovedEarlier_AddsAFreshEntryAtTheEnd()
+    {
+        BlueprintMap map = new();
+        map.Add(new BlueprintModel { Id = 1, Name = "Bronze" }, 1);
+        map.Add(new BlueprintModel { Id = 2, Name = "Iron" }, 3);
+        map.Remove(map.BlueprintList[0]);
+
+        map.Add(new BlueprintModel { Id = 1, Name = "Bronze" }, 4);
+
+        map.BlueprintList.Select(entry => (entry.Blueprint.Id, entry.Quantity)).Should().Equal((2, 3L), (1, 4L));
+    }
+
+    [Test]
+    public void Remove_AnEntryFromAnotherMap_LeavesThisMapsEntryForTheSameBlueprint()
+    {
+        BlueprintMap map = new();
+        map.Add(new BlueprintModel { Id = 1, Name = "Bronze" }, 1);
+        BlueprintQuantity elsewhere = new(new BlueprintModel { Id = 1, Name = "Bronze" }, 1);
+
+        map.Remove(elsewhere);
+        map.Add(new BlueprintModel { Id = 1, Name = "Bronze" }, 2);
+
+        map.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(3);
+    }
+
+    [Test]
+    public void Add_AfterReset_StartsFromNothing()
+    {
+        BlueprintMap map = new();
+        map.Add(new BlueprintModel { Id = 1, Name = "Bronze" }, 1);
+        map.Reset();
+
+        map.Add(new BlueprintModel { Id = 1, Name = "Bronze" }, 3);
+
+        map.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(3);
+    }
 }

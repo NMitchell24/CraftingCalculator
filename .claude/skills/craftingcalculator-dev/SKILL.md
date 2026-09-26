@@ -40,7 +40,7 @@ trailing GUID). Mixed GUIDs make VS/Rider treat the project oddly and rewrite th
 - **Layered call flow:** Razor page (`@inject IXxxService`) → Service (`Application/Common/Services/Impl`)
   → DAO (`Infrastructure/DAO/Impl`) → `CraftingDataContext`. Services orchestrate; DAOs do data access
   only; pure transformation logic goes in `Application/BusinessLogic/Processors` (e.g.
-  `ComponentProcessor`, static methods).
+  `BatchProcessor`, static methods).
 - **DI registration is manual** and split:
   - Services: `src/CraftingCalculator.Application/DependencyInjection.cs` → `AddApplicationServices()`
     (all `AddScoped`).
