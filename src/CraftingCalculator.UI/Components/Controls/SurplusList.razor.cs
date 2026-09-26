@@ -1,20 +1,16 @@
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
-using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
 
 namespace CraftingCalculator.UI.Components.Controls;
 
-public partial class SurplusList : ComponentBase, IDisposable
+public partial class SurplusList : ComponentBase
 {
-    [Inject] private CraftState State { get; set; } = null!;
-    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
+    /// <summary>The blueprints the batch overproduces, with how many are left over.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<BlueprintQuantity> Surplus { get; set; } = [];
 
-    protected override void OnInitialized()
-    {
-        State.Changed += StateHasChanged;
-    }
+    [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
 
     private List<string> DetailsFor(BlueprintQuantity blueprintQuantity)
     {
@@ -26,10 +22,5 @@ public partial class SurplusList : ComponentBase, IDisposable
         }
 
         return details;
-    }
-
-    public void Dispose()
-    {
-        State.Changed -= StateHasChanged;
     }
 }

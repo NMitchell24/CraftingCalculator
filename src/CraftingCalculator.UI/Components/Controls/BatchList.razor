@@ -12,7 +12,7 @@
         <MudList T="BlueprintQuantity">
             @foreach (BlueprintQuantity selected in State.BlueprintQuantities)
             {
-                <MudListItem T="BlueprintQuantity" Ripple="false">
+                <MudListItem T="BlueprintQuantity" Ripple="false" @key="selected">
                     <RecordCard Name="@selected.Name" Record="@selected.Blueprint">
                         <Stepper>
                             <QuantityStepper Quantity="@selected.Quantity" OnStep="@(step => State.Step(selected, step))"

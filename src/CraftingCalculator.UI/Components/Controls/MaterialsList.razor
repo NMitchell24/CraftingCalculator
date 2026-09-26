@@ -1,5 +1,5 @@
 <div class="materials-list">
-    @if (State.TotalComponents.Count == 0)
+    @if (Materials.Count == 0)
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">No components yet</MudText>
@@ -8,9 +8,9 @@
     else
     {
         <MudList T="ComponentQuantity" ReadOnly="true">
-            @foreach (ComponentQuantity componentQuantity in State.TotalComponents)
+            @foreach (ComponentQuantity componentQuantity in Materials)
             {
-                <MudListItem T="ComponentQuantity">
+                <MudListItem T="ComponentQuantity" @key="componentQuantity.Component.Id">
                     <RecordCard Name="@componentQuantity.Name" Record="@componentQuantity.Component"
                                 Details="@DetailsFor(componentQuantity)" />
                 </MudListItem>

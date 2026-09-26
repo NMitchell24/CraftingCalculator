@@ -1,5 +1,5 @@
 <div class="steps-tree">
-    @if (State.TreeRoots.Count == 0)
+    @if (Roots.Count == 0)
     {
         <div class="pane-empty-state">
             <MudText Typo="Typo.body1">Nothing to break down yet</MudText>
@@ -11,9 +11,9 @@
            are equal by value and MudTreeView's default comparer would select every one of them at once.
            Selection is per row, so it compares by identity instead. *@
         <MudTreeView T="BlueprintNode" Class="steps-tree-view" Comparer="ReferenceEqualityComparer.Instance">
-            @foreach (BlueprintNode root in State.TreeRoots)
+            @foreach (BlueprintNode root in Roots)
             {
-                <BlueprintTreeNode Node="root" />
+                <BlueprintTreeNode @key="CraftState.PathOf(string.Empty, root)" Node="root" />
             }
         </MudTreeView>
 

@@ -632,14 +632,6 @@ html.keyboard-open .page-content-with-bottom-nav {
     min-height: 44px;
 }
 
-.craft-pane {
-    display: none;
-}
-
-.craft-pane-active {
-    display: block;
-}
-
 /* Wider than the 720px single-column screens because it has two columns at expanded sizes; past 1200px a
    row's name and its figures sit so far apart they stop reading as one line. */
 .craft-page {
