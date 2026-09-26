@@ -16,9 +16,10 @@
            option role or tab stop. ReadOnly still invokes MudListItem.OnClick on a tap, which is why
            ToggleSelection keeps its own mode check. *@
         <MudList T="BlueprintFavorite" ReadOnly="@(_mode != ListMode.Delete)">
-            @foreach (BlueprintFavorite favorite in _favorites)
-            {
-                <MudListItem T="BlueprintFavorite" Class="@RowClass(favorite)" OnClick="@(() => ToggleSelection(favorite))">
+            <Virtualize Items="_favorites" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                        Context="favorite">
+                <MudListItem @key="favorite.Id" T="BlueprintFavorite" Class="@RowClass(favorite)"
+                             OnClick="@(() => ToggleSelection(favorite))">
                     <RecordCard Name="@(favorite.Name ?? "")" Details="@DetailsFor(favorite)"
                                 OnInfo="@(() => ShowInfoAsync(favorite))">
                         <Actions>
@@ -31,7 +32,7 @@
                         </Actions>
                     </RecordCard>
                 </MudListItem>
-            }
+            </Virtualize>
         </MudList>
     }
 </div>

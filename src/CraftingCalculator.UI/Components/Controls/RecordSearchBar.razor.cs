@@ -42,8 +42,18 @@ public partial class RecordSearchBar : ComponentBase
     private List<(int Id, string Label)> _options = [];
     private bool _showFilter;
 
+    // The Records instance _options was built from. The host re-renders on every keystroke, which sets Records
+    // again, and rescanning every record for a list that has not changed is the cost this avoids.
+    private IReadOnlyList<IBaseDataRecord>? _optionsFrom;
+
     protected override async Task OnParametersSetAsync()
     {
+        if (ReferenceEquals(Records, _optionsFrom))
+        {
+            return;
+        }
+
+        _optionsFrom = Records;
         List<CategoryModel> categoriesInUse = RecordFilterProcessor.CategoriesInUse(Records);
 
         _options = [];

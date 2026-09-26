@@ -43,7 +43,9 @@ else
     <MudList T="IBaseQuantityRecord">
         @foreach (IBaseQuantityRecord part in Parts)
         {
-            <MudListItem T="IBaseQuantityRecord" Ripple="false">
+            @* Keyed on the type as well: components and blueprints are numbered separately, so a part of each can
+               share an id. *@
+            <MudListItem @key="(part.Type, part.Record.Id)" T="IBaseQuantityRecord" Ripple="false">
                 <RecordCard Name="@part.Name" Record="@part.Record">
                     <Stepper>
                         <QuantityStepper Quantity="@part.Quantity" OnStep="@(step => StepAsync(part, step))"
