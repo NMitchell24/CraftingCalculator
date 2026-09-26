@@ -15,6 +15,7 @@ public class CategoryService(ICategoryDAO dao) : ICategoryService
     public Task SaveCategoryAsync(CategoryModel? category)
         => category != null ? dao.SaveAsync(category) : Task.CompletedTask;
 
-    public Task DeleteCategoryAsync(CategoryModel? category)
-        => category != null ? dao.DeleteAsync(category.Id) : Task.CompletedTask;
+    public Task DeleteCategoriesAsync(IEnumerable<int> ids) => dao.DeleteAsync(ids);
+
+    public Task DeleteAllCategoriesAsync() => dao.DeleteAllAsync();
 }

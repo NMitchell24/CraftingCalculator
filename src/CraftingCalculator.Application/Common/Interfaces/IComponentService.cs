@@ -16,5 +16,9 @@ public interface IComponentService
     /// </summary>
     Task SaveComponentAsync(ComponentModel? component);
 
-    Task DeleteComponentAsync(ComponentModel? component);
+    /// <summary>Deletes every component in <paramref name="ids"/>.</summary>
+    Task DeleteComponentsAsync(IEnumerable<int> ids);
+
+    /// <summary>Deletes every component in the selected dataset.</summary>
+    Task DeleteAllComponentsAsync();
 }

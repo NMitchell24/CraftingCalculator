@@ -127,9 +127,19 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
         return blueprint;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(IEnumerable<int> ids)
+    {
+        // Materialized first so the translated IN clause gets a stable collection rather than a query
+        // that would be enumerated inside the expression tree.
+        List<int> idList = [.. ids];
+
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        await context.Blueprints.Where(blueprintEntity => idList.Contains(blueprintEntity.Id)).ExecuteDeleteAsync();
+    }
+
+    public async Task DeleteAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
-        await context.Blueprints.Where(blueprintEntity => blueprintEntity.Id == id).ExecuteDeleteAsync();
+        await context.Blueprints.ExecuteDeleteAsync();
     }
 }

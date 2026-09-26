@@ -17,5 +17,12 @@ public interface IComponentDAO
     /// </summary>
     Task<ComponentModel> SaveAsync(ComponentModel component);
 
-    Task DeleteAsync(int id);
+    /// <summary>
+    /// Deletes every component in <paramref name="ids"/>. Blueprint parts that name them are removed by the
+    /// database's cascade delete rather than by the caller.
+    /// </summary>
+    Task DeleteAsync(IEnumerable<int> ids);
+
+    /// <summary>Deletes every component in the selected dataset, the same way as <see cref="DeleteAsync"/>.</summary>
+    Task DeleteAllAsync();
 }

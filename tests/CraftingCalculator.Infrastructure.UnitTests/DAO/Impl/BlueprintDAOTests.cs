@@ -212,13 +212,31 @@ public class BlueprintDAOTests
     }
 
     [Test]
-    public async Task DeleteAsync_RemovesTheBlueprint()
+    public async Task DeleteAsync_RemovesTheListedBlueprints_AndTheirPlacesInOthers()
     {
-        BlueprintModel saved = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Table" });
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+        BlueprintModel stick = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Stick" });
+        BlueprintModel table = new() { Name = "Table" };
+        table.ChildBlueprints.Add(plank, 4);
+        table = await _blueprintDAO.SaveAsync(table);
 
-        await _blueprintDAO.DeleteAsync(saved.Id);
+        await _blueprintDAO.DeleteAsync([plank.Id, stick.Id]);
 
-        (await _blueprintDAO.GetByIdAsync(saved.Id)).Should().BeNull();
+        (await _blueprintDAO.GetSummariesAsync()).Should().ContainSingle().Which.Name.Should().Be("Table");
+        (await _blueprintDAO.GetByIdAsync(table.Id))!.ChildBlueprints.BlueprintList.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task DeleteAllAsync_RemovesEveryBlueprint()
+    {
+        BlueprintModel plank = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Plank" });
+        BlueprintModel table = new() { Name = "Table" };
+        table.ChildBlueprints.Add(plank, 4);
+        await _blueprintDAO.SaveAsync(table);
+
+        await _blueprintDAO.DeleteAllAsync();
+
+        (await _blueprintDAO.CountAsync()).Should().Be(0);
     }
 
     /// <summary>

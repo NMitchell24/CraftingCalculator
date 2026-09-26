@@ -213,7 +213,7 @@ public partial class DatasetList : ComponentBase, IDisposable
         }
 
         bool deleted = await Guard.RunAsync(
-            "DatasetList.Delete", DeleteFailedMessage, () => RecordService.DeleteRecordAsync(record));
+            "DatasetList.Delete", DeleteFailedMessage, () => Task.Run(() => RecordService.DeleteRecordAsync(record)));
 
         // Outside the guard and unconditional, which is the rule this repo writes down: the delete is the
         // command, the reload is a load. Inside it, a delete that committed and then failed on the way back
@@ -239,12 +239,14 @@ public partial class DatasetList : ComponentBase, IDisposable
             return;
         }
 
+        List<int> ids = [.. selected.Select(record => record.Id)];
         bool deleted = await Guard.RunAsync(
-            "DatasetList.DeleteSelected", DeleteFailedMessage, () => RecordService.DeleteRecordsAsync(selected));
+            "DatasetList.DeleteSelected",
+            DeleteFailedMessage,
+            () => Task.Run(() => RecordService.DeleteRecordsAsync(_type, ids)));
 
-        // Always, and outside the guard: RecordService.DeleteRecordsAsync walks the selection one record at a
-        // time, so a failure part way through has already deleted some of them. Reloading here is what keeps
-        // the list honest about which ones survived.
+        // See DeleteAsync: the reload is a load, and it runs whether or not the delete was reported as having
+        // worked.
         await ReloadAfterDeleteAsync();
 
         if (!deleted)
@@ -266,9 +268,9 @@ public partial class DatasetList : ComponentBase, IDisposable
         }
 
         bool deleted = await Guard.RunAsync(
-            "DatasetList.DeleteAll", DeleteFailedMessage, () => RecordService.DeleteAllOfTypeAsync(_type));
+            "DatasetList.DeleteAll", DeleteFailedMessage, () => Task.Run(() => RecordService.DeleteAllOfTypeAsync(_type)));
 
-        // See DeleteSelectedAsync: this walks the records one at a time too.
+        // See DeleteAsync.
         await ReloadAfterDeleteAsync();
 
         if (!deleted)

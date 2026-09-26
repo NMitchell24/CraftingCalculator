@@ -87,7 +87,7 @@ public class RecordServiceTests
     [Test]
     public async Task SaveRecordAsync_Component_SavesThroughTheComponentService()
     {
-        ComponentModel component = new ComponentModel { Id = 3, Name = "Screw" };
+        ComponentModel component = new() { Id = 3, Name = "Screw" };
 
         await _service.SaveRecordAsync(component);
 
@@ -97,7 +97,7 @@ public class RecordServiceTests
     [Test]
     public async Task SaveRecordAsync_Category_SavesThroughTheCategoryService()
     {
-        CategoryModel category = new CategoryModel { Id = 2, Name = "Tools" };
+        CategoryModel category = new() { Id = 2, Name = "Tools" };
 
         await _service.SaveRecordAsync(category);
 
@@ -107,7 +107,7 @@ public class RecordServiceTests
     [Test]
     public async Task SaveRecordAsync_Blueprint_SavesThroughTheBlueprintService()
     {
-        BlueprintModel blueprint = new BlueprintModel { Id = 4, Name = "Widget" };
+        BlueprintModel blueprint = new() { Id = 4, Name = "Widget" };
 
         await _service.SaveRecordAsync(blueprint);
 
@@ -117,12 +117,20 @@ public class RecordServiceTests
     [Test]
     public async Task DeleteRecordAsync_Blueprint_DeletesThroughTheBlueprintService()
     {
-        BlueprintModel blueprint = new BlueprintModel { Id = 4, Name = "Widget" };
+        BlueprintModel blueprint = new() { Id = 4, Name = "Widget" };
 
         await _service.DeleteRecordAsync(blueprint);
 
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(4), Times.Once);
-        _componentService.Verify(s => s.DeleteComponentAsync(It.IsAny<ComponentModel>()), Times.Never);
+        _blueprintService.Verify(s => s.DeleteBlueprintsAsync(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 4 }))), Times.Once);
+        _componentService.VerifyNoOtherCalls();
+    }
+
+    [Test]
+    public async Task DeleteRecordAsync_Component_DeletesThroughTheComponentService()
+    {
+        await _service.DeleteRecordAsync(new ComponentModel { Id = 1, Name = "Screw" });
+
+        _componentService.Verify(s => s.DeleteComponentsAsync(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 1 }))), Times.Once);
     }
 
     [Test]
@@ -130,57 +138,63 @@ public class RecordServiceTests
     {
         await _service.DeleteRecordAsync(new BlueprintSummary { Id = 4, Name = "Widget" });
 
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(4), Times.Once);
+        _blueprintService.Verify(s => s.DeleteBlueprintsAsync(It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(new[] { 4 }))), Times.Once);
     }
 
-    [Test]
-    public async Task DeleteRecordsAsync_DeletesEachRecordThroughItsOwnService()
+    [TestCase(DataType.Component)]
+    [TestCase(DataType.Category)]
+    [TestCase(DataType.Blueprint)]
+    public async Task DeleteRecordsAsync_HandsTheIdsToThatTypesServiceInOneCall(DataType type)
     {
-        ComponentModel component = new ComponentModel { Id = 1, Name = "Screw" };
-        CategoryModel category = new CategoryModel { Id = 2, Name = "Tools" };
-        BlueprintModel blueprint = new BlueprintModel { Id = 3, Name = "Widget" };
+        int[] ids = [2, 3];
 
-        await _service.DeleteRecordsAsync([component, category, blueprint]);
+        await _service.DeleteRecordsAsync(type, ids);
 
-        _componentService.Verify(s => s.DeleteComponentAsync(component), Times.Once);
-        _categoryService.Verify(s => s.DeleteCategoryAsync(category), Times.Once);
-        _blueprintService.Verify(s => s.DeleteBlueprintAsync(3), Times.Once);
-    }
-
-    [Test]
-    public async Task DeleteRecordsAsync_Empty_DoesNothing()
-    {
-        await _service.DeleteRecordsAsync([]);
+        switch (type)
+        {
+            case DataType.Component:
+                _componentService.Verify(s => s.DeleteComponentsAsync(ids), Times.Once);
+                break;
+            case DataType.Category:
+                _categoryService.Verify(s => s.DeleteCategoriesAsync(ids), Times.Once);
+                break;
+            case DataType.Blueprint:
+                _blueprintService.Verify(s => s.DeleteBlueprintsAsync(ids), Times.Once);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
 
         _componentService.VerifyNoOtherCalls();
         _categoryService.VerifyNoOtherCalls();
         _blueprintService.VerifyNoOtherCalls();
     }
 
-    [Test]
-    public async Task DeleteAllOfTypeAsync_Component_DeletesEveryComponent()
+    [TestCase(DataType.Component)]
+    [TestCase(DataType.Category)]
+    [TestCase(DataType.Blueprint)]
+    public async Task DeleteAllOfTypeAsync_DeletesThroughThatTypesServiceWithoutReadingTheRecords(DataType type)
     {
-        ComponentModel screw = new ComponentModel { Id = 1, Name = "Screw" };
-        ComponentModel bolt = new ComponentModel { Id = 2, Name = "Bolt" };
-        _componentService.Setup(s => s.GetAllComponentsAsync()).ReturnsAsync([screw, bolt]);
+        await _service.DeleteAllOfTypeAsync(type);
 
-        await _service.DeleteAllOfTypeAsync(DataType.Component);
+        switch (type)
+        {
+            case DataType.Component:
+                _componentService.Verify(s => s.DeleteAllComponentsAsync(), Times.Once);
+                break;
+            case DataType.Category:
+                _categoryService.Verify(s => s.DeleteAllCategoriesAsync(), Times.Once);
+                break;
+            case DataType.Blueprint:
+                _blueprintService.Verify(s => s.DeleteAllBlueprintsAsync(), Times.Once);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
 
-        _componentService.Verify(s => s.DeleteComponentAsync(screw), Times.Once);
-        _componentService.Verify(s => s.DeleteComponentAsync(bolt), Times.Once);
-    }
-
-    [Test]
-    public async Task DeleteAllOfTypeAsync_Category_DeletesEveryCategory()
-    {
-        CategoryModel building = new() { Id = 1, Name = "Building" };
-        CategoryModel tools = new() { Id = 2, Name = "Tools" };
-        _categoryService.Setup(s => s.GetCategoriesAsync()).ReturnsAsync([building, tools]);
-
-        await _service.DeleteAllOfTypeAsync(DataType.Category);
-
-        _categoryService.Verify(s => s.DeleteCategoryAsync(building), Times.Once);
-        _categoryService.Verify(s => s.DeleteCategoryAsync(tools), Times.Once);
+        _componentService.VerifyNoOtherCalls();
+        _categoryService.VerifyNoOtherCalls();
+        _blueprintService.VerifyNoOtherCalls();
     }
 
     [Test]

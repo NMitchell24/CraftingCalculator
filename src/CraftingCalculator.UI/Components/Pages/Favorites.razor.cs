@@ -187,7 +187,7 @@ public partial class Favorites : ComponentBase, IDisposable
             DeleteFailedMessage,
             async () =>
             {
-                await FavoriteService.DeleteFavoriteAsync(favorite);
+                await Task.Run(() => FavoriteService.DeleteFavoriteAsync(favorite));
                 State.OnFavoriteDeleted(favorite.Id);
             });
 
@@ -257,7 +257,7 @@ public partial class Favorites : ComponentBase, IDisposable
     /// <summary>Deletes the favorites, keeping <see cref="CraftState"/> in step.</summary>
     private async Task DeleteManyAsync(IReadOnlyList<BlueprintFavorite> favorites)
     {
-        await FavoriteService.DeleteFavoritesAsync(favorites);
+        await Task.Run(() => FavoriteService.DeleteFavoritesAsync(favorites));
 
         foreach (BlueprintFavorite favorite in favorites)
         {
