@@ -36,9 +36,12 @@ public interface IBlueprintDAO
     Task<BlueprintModel> SaveAsync(BlueprintModel blueprint);
 
     /// <summary>
-    /// Deletes the blueprint. Its components, any blueprints that use it as a child, and any favorite
-    /// entries referencing it are removed by the database's cascade delete rather than by the
+    /// Deletes every blueprint in <paramref name="ids"/>. Their parts, their places as a part of other blueprints,
+    /// and any favorite entries referencing them are removed by the database's cascade delete rather than by the
     /// caller.
     /// </summary>
-    Task DeleteAsync(int id);
+    Task DeleteAsync(IEnumerable<int> ids);
+
+    /// <summary>Deletes every blueprint in the selected dataset, the same way as <see cref="DeleteAsync"/>.</summary>
+    Task DeleteAllAsync();
 }

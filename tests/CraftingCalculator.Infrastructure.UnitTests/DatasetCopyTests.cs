@@ -187,7 +187,7 @@ public class DatasetCopyTests
         ComponentModel copper = (await _componentDAO.GetAllAsync()).First(component => component.Name == "Copper");
         copper.Cost = 99;
         await _componentDAO.SaveAsync(copper);
-        await _componentDAO.DeleteAsync((await _componentDAO.GetAllAsync()).First(component => component.Name == "Wood").Id);
+        await _componentDAO.DeleteAsync([(await _componentDAO.GetAllAsync()).First(component => component.Name == "Wood").Id]);
 
         // The reason to copy a dataset rather than edit the one you trust: the modded prices and the
         // records they were derived from are separate rows from here on.

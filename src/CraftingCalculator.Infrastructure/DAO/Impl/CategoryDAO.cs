@@ -54,10 +54,20 @@ public class CategoryDAO(DatasetScopedContextFactory contextFactory) : ICategory
         return ToModel(entity);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(IEnumerable<int> ids)
+    {
+        // Materialized first so the translated IN clause gets a stable collection rather than a query
+        // that would be enumerated inside the expression tree.
+        List<int> idList = [.. ids];
+
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        await context.Categories.Where(categoryEntity => idList.Contains(categoryEntity.Id)).ExecuteDeleteAsync();
+    }
+
+    public async Task DeleteAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
-        await context.Categories.Where(categoryEntity => categoryEntity.Id == id).ExecuteDeleteAsync();
+        await context.Categories.ExecuteDeleteAsync();
     }
 
     /// <summary>The model for a loaded category entity. Shared with <see cref="ComponentDAO"/> and

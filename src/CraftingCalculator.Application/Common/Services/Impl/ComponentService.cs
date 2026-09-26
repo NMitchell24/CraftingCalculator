@@ -15,6 +15,7 @@ public class ComponentService(IComponentDAO dao) : IComponentService
     public Task SaveComponentAsync(ComponentModel? component)
         => component != null ? dao.SaveAsync(component) : Task.CompletedTask;
 
-    public Task DeleteComponentAsync(ComponentModel? component)
-        => component != null ? dao.DeleteAsync(component.Id) : Task.CompletedTask;
+    public Task DeleteComponentsAsync(IEnumerable<int> ids) => dao.DeleteAsync(ids);
+
+    public Task DeleteAllComponentsAsync() => dao.DeleteAllAsync();
 }

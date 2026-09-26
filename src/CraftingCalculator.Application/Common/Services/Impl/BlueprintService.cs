@@ -26,7 +26,9 @@ public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
 
     public Task SaveBlueprintAsync(BlueprintModel? blueprint) => blueprint != null ? dao.SaveAsync(blueprint) : Task.CompletedTask;
 
-    public Task DeleteBlueprintAsync(int id) => dao.DeleteAsync(id);
+    public Task DeleteBlueprintsAsync(IEnumerable<int> ids) => dao.DeleteAsync(ids);
+
+    public Task DeleteAllBlueprintsAsync() => dao.DeleteAllAsync();
 
     public BlueprintNode GetBlueprintNode(BlueprintModel blueprint, long quantity, Datasettings settings) =>
         BlueprintProcessor.BuildNode(blueprint, quantity, settings);

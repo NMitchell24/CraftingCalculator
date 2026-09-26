@@ -16,5 +16,9 @@ public interface ICategoryService
     /// </summary>
     Task SaveCategoryAsync(CategoryModel? category);
 
-    Task DeleteCategoryAsync(CategoryModel? category);
+    /// <summary>Deletes every category in <paramref name="ids"/>.</summary>
+    Task DeleteCategoriesAsync(IEnumerable<int> ids);
+
+    /// <summary>Deletes every category in the selected dataset.</summary>
+    Task DeleteAllCategoriesAsync();
 }

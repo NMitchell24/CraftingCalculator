@@ -220,4 +220,35 @@ public class DatasetScopingTests
         _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
         (await _componentDAO.GetAllAsync()).Should().ContainSingle().Which.Name.Should().Be("Copper");
     }
+
+    [Test]
+    public async Task DeletingRecordsByIdOrAll_LeavesTheOtherDatasetIntact()
+    {
+        CategoryModel ores = await _categoryDAO.SaveAsync(new CategoryModel { Name = "Ores" });
+        ComponentModel copper = await _componentDAO.SaveAsync(new ComponentModel { Name = "Copper" });
+        BlueprintModel bronze = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
+
+        _fixture.SelectDataset(_secondDatasetId);
+        await _categoryDAO.SaveAsync(new CategoryModel { Name = "Weapons" });
+        await _componentDAO.SaveAsync(new ComponentModel { Name = "Sulfur" });
+        await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Arrow" });
+
+        // Ids from the other dataset are ignored rather than deleted.
+        await _categoryDAO.DeleteAsync([ores.Id]);
+        await _componentDAO.DeleteAsync([copper.Id]);
+        await _blueprintDAO.DeleteAsync([bronze.Id]);
+
+        (await _categoryDAO.CountAsync()).Should().Be(1);
+        (await _componentDAO.CountAsync()).Should().Be(1);
+        (await _blueprintDAO.CountAsync()).Should().Be(1);
+
+        await _categoryDAO.DeleteAllAsync();
+        await _componentDAO.DeleteAllAsync();
+        await _blueprintDAO.DeleteAllAsync();
+
+        _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
+        (await _categoryDAO.GetAllAsync()).Should().ContainSingle().Which.Name.Should().Be("Ores");
+        (await _componentDAO.GetAllAsync()).Should().ContainSingle().Which.Name.Should().Be("Copper");
+        (await _blueprintDAO.GetSummariesAsync()).Should().ContainSingle().Which.Name.Should().Be("Bronze");
+    }
 }

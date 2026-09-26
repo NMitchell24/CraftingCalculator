@@ -19,8 +19,11 @@ public interface ICategoryDAO
     Task<CategoryModel> SaveAsync(CategoryModel category);
 
     /// <summary>
-    /// Deletes the category. Blueprints referencing it have their category reference cleared by the
-    /// database's SetNull cascade rather than by the caller.
+    /// Deletes every category in <paramref name="ids"/>. Records referencing them have their category reference
+    /// cleared by the database's SetNull cascade rather than by the caller.
     /// </summary>
-    Task DeleteAsync(int id);
+    Task DeleteAsync(IEnumerable<int> ids);
+
+    /// <summary>Deletes every category in the selected dataset, the same way as <see cref="DeleteAsync"/>.</summary>
+    Task DeleteAllAsync();
 }

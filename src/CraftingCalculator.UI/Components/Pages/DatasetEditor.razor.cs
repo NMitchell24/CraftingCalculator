@@ -123,7 +123,7 @@ public partial class DatasetEditor : ComponentBase, IDisposable
             "I couldn't delete that record.",
             async () =>
             {
-                await RecordService.DeleteRecordAsync(record);
+                await Task.Run(() => RecordService.DeleteRecordAsync(record));
                 await CraftState.ReloadBlueprintsAsync();
             });
 

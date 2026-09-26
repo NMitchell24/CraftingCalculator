@@ -64,10 +64,20 @@ public class ComponentDAO(DatasetScopedContextFactory contextFactory) : ICompone
         return component;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(IEnumerable<int> ids)
+    {
+        // Materialized first so the translated IN clause gets a stable collection rather than a query
+        // that would be enumerated inside the expression tree.
+        List<int> idList = [.. ids];
+
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+        await context.Components.Where(componentEntity => idList.Contains(componentEntity.Id)).ExecuteDeleteAsync();
+    }
+
+    public async Task DeleteAllAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
-        await context.Components.Where(componentEntity => componentEntity.Id == id).ExecuteDeleteAsync();
+        await context.Components.ExecuteDeleteAsync();
     }
 
     private static ComponentModel ToModel(Component entity) => new()

@@ -36,9 +36,9 @@ public interface IRecordService
 
     Task DeleteRecordAsync(IBaseDataRecord? record);
 
-    /// <summary>Deletes every record in <paramref name="records"/>, of any mix of types.</summary>
-    Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records);
+    /// <summary>Deletes every record of <paramref name="type"/> whose id is in <paramref name="ids"/>, all or none.</summary>
+    Task DeleteRecordsAsync(DataType type, IEnumerable<int> ids);
 
-    /// <summary>Deletes every record of <paramref name="type"/>.</summary>
+    /// <summary>Deletes every record of <paramref name="type"/>, all or none.</summary>
     Task DeleteAllOfTypeAsync(DataType type);
 }

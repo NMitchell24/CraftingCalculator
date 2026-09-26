@@ -92,11 +92,21 @@ public class BlueprintServiceTests
     }
 
     [Test]
-    public async Task DeleteBlueprintAsync_DeletesById()
+    public async Task DeleteBlueprintsAsync_DeletesByIdThroughDAO()
     {
-        await _service.DeleteBlueprintAsync(7);
+        int[] ids = [7, 9];
 
-        _dao.Verify(d => d.DeleteAsync(7), Times.Once);
+        await _service.DeleteBlueprintsAsync(ids);
+
+        _dao.Verify(d => d.DeleteAsync(ids), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteAllBlueprintsAsync_DeletesThroughDAO()
+    {
+        await _service.DeleteAllBlueprintsAsync();
+
+        _dao.Verify(d => d.DeleteAllAsync(), Times.Once);
     }
 
     [Test]

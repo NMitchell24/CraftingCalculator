@@ -30,7 +30,11 @@ public interface IBlueprintService
     /// </summary>
     Task SaveBlueprintAsync(BlueprintModel? blueprint);
 
-    Task DeleteBlueprintAsync(int id);
+    /// <summary>Deletes every blueprint in <paramref name="ids"/>.</summary>
+    Task DeleteBlueprintsAsync(IEnumerable<int> ids);
+
+    /// <summary>Deletes every blueprint in the selected dataset.</summary>
+    Task DeleteAllBlueprintsAsync();
 
     /// <summary>
     /// Builds the blueprint's component breakdown as a <see cref="BlueprintNode"/> tree, scaled by

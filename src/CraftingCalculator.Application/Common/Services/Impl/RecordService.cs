@@ -57,25 +57,22 @@ public class RecordService(
         _ => Task.CompletedTask
     };
 
-    public Task DeleteRecordAsync(IBaseDataRecord? record) => record switch
+    public Task DeleteRecordAsync(IBaseDataRecord? record) =>
+        record is null ? Task.CompletedTask : DeleteRecordsAsync(record.Type, [record.Id]);
+
+    public Task DeleteRecordsAsync(DataType type, IEnumerable<int> ids) => type switch
     {
-        ComponentModel component => componentService.DeleteComponentAsync(component),
-        CategoryModel category => categoryService.DeleteCategoryAsync(category),
-        // By type rather than by class: a list hands over a BlueprintSummary, the editor a BlueprintModel.
-        { Type: DataType.Blueprint, Id: var id } => blueprintService.DeleteBlueprintAsync(id),
-        _ => Task.CompletedTask
+        DataType.Component => componentService.DeleteComponentsAsync(ids),
+        DataType.Category => categoryService.DeleteCategoriesAsync(ids),
+        DataType.Blueprint => blueprintService.DeleteBlueprintsAsync(ids),
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
 
-    public async Task DeleteRecordsAsync(IEnumerable<IBaseDataRecord> records)
+    public Task DeleteAllOfTypeAsync(DataType type) => type switch
     {
-        // Sequential rather than Task.WhenAll: the per-type services share one DbContext factory and a
-        // delete cascades, so overlapping deletes would race each other's cascade.
-        foreach (IBaseDataRecord record in records)
-        {
-            await DeleteRecordAsync(record);
-        }
-    }
-
-    public async Task DeleteAllOfTypeAsync(DataType type) =>
-        await DeleteRecordsAsync(await GetRecordsAsync(type));
+        DataType.Component => componentService.DeleteAllComponentsAsync(),
+        DataType.Category => categoryService.DeleteAllCategoriesAsync(),
+        DataType.Blueprint => blueprintService.DeleteAllBlueprintsAsync(),
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+    };
 }
