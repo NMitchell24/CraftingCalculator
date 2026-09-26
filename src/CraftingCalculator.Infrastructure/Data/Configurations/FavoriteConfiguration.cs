@@ -11,7 +11,6 @@ public class FavoriteConfiguration : IEntityTypeConfiguration<Favorite>
         builder.ToTable("Favorites");
         builder.HasKey(f => f.Id);
         builder.Property(f => f.Name).IsRequired();
-        builder.HasIndex(f => f.Name);
 
         //See the same index in ComponentConfiguration.
         builder.HasIndex(f => new { f.DatasetId, f.Name });

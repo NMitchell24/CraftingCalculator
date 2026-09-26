@@ -14,7 +14,6 @@ public class ComponentConfiguration : IEntityTypeConfiguration<Component>
         builder.Property(component => component.Description).IsRequired();
         //Ticks, for the reason given in BlueprintConfiguration.
         builder.Property(component => component.ProductionTime).HasConversion<long>();
-        builder.HasIndex(component => component.Name);
         builder.HasIndex(component => component.CategoryId);
 
         //DatasetId first: every read is filtered to one dataset, and the list is ordered by name, so the index
