@@ -3,6 +3,7 @@ using CraftingCalculator.Domain.Models;
 using CraftingCalculator.UI.Components.Dialogs;
 using CraftingCalculator.UI.State;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 
 namespace CraftingCalculator.UI.Components.Pages;
@@ -57,6 +58,11 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     // favorite, clearing the batch; the nonce covers the case the id cannot, where backing out of the
     // replace confirm leaves SelectedFavoriteId exactly where it already was.
     private (int Nonce, int? FavoriteId) FavoriteSelectKey => (_favoriteSelectNonce, SelectedFavoriteId);
+
+    // CraftState is the receiver, not this page, so the click doesn't re-render Craft and the batch list with it.
+    // Only the steps tree changes, and it re-renders itself on CraftState.ExpansionChanged.
+    private EventCallback<MouseEventArgs> ExpandAllClicked => EventCallback.Factory.Create<MouseEventArgs>(State, State.ExpandAll);
+    private EventCallback<MouseEventArgs> CollapseAllClicked => EventCallback.Factory.Create<MouseEventArgs>(State, State.CollapseAll);
 
     protected override async Task OnInitializedAsync()
     {

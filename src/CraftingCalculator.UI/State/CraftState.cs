@@ -30,6 +30,15 @@ public sealed partial class CraftState(
 
     public event Action? Changed;
 
+    /// <summary>
+    /// Raised when <see cref="ExpandAll"/> or <see cref="CollapseAll"/> changes every row of the Crafting Steps tree at
+    /// once. <see cref="ToggleExpanded"/> doesn't raise it: the row that was toggled already shows its new state.
+    /// </summary>
+    public event Action? ExpansionChanged;
+
+    /// <summary>Raised when <see cref="HasVisibleCraftCountedStep"/> changes, whatever changed it.</summary>
+    public event Action? HasVisibleCraftCountedStepChanged;
+
     public IReadOnlyList<BlueprintQuantity> BlueprintQuantities => _blueprintMap.BlueprintList;
     public IReadOnlyList<ComponentQuantity> TotalComponents { get; private set; } = [];
     public IReadOnlyList<BlueprintNode> TreeRoots { get; private set; } = [];
@@ -268,9 +277,7 @@ public sealed partial class CraftState(
     /// Whether a step currently visible in the tree counts crafts rather than items - what the
     /// asterisk legend under the Crafting Steps tree explains.
     /// </summary>
-    // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
-    // is not on screen.
-    public bool HasVisibleCraftCountedStep => AnyCountsByCraft(TreeRoots, "");
+    public bool HasVisibleCraftCountedStep { get; private set; }
 
     /// <summary>
     /// The position of <paramref name="node"/> in the Crafting Steps tree, below the node at <paramref name="parentPath"/>
@@ -288,19 +295,45 @@ public sealed partial class CraftState(
             _expandedPaths.Remove(path);
         }
 
-        Changed?.Invoke();
+        UpdateHasVisibleCraftCountedStep();
     }
 
     public void ExpandAll()
     {
-        CollectPaths(TreeRoots, "", _expandedPaths);
-        Changed?.Invoke();
+        if (!CollectPaths(TreeRoots, "", _expandedPaths))
+        {
+            return;
+        }
+
+        UpdateHasVisibleCraftCountedStep();
+        ExpansionChanged?.Invoke();
     }
 
     public void CollapseAll()
     {
+        if (_expandedPaths.Count == 0)
+        {
+            return;
+        }
+
         _expandedPaths.Clear();
-        Changed?.Invoke();
+        UpdateHasVisibleCraftCountedStep();
+        ExpansionChanged?.Invoke();
+    }
+
+    private void UpdateHasVisibleCraftCountedStep()
+    {
+        // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
+        // is not on screen.
+        bool visible = AnyCountsByCraft(TreeRoots, "");
+
+        if (visible == HasVisibleCraftCountedStep)
+        {
+            return;
+        }
+
+        HasVisibleCraftCountedStep = visible;
+        HasVisibleCraftCountedStepChanged?.Invoke();
     }
 
     private bool AnyCountsByCraft(IReadOnlyList<BlueprintNode> nodes, string parentPath)
@@ -322,14 +355,34 @@ public sealed partial class CraftState(
         return false;
     }
 
-    private static void CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
+    // Returns whether any path was added, which is false when the tree was already fully expanded.
+    private static bool CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
     {
+        bool added = false;
+
         foreach (BlueprintNode node in nodes)
         {
             string path = PathOf(parentPath, node);
-            into.Add(path);
-            CollectPaths(node.Children, path, into);
+            added |= into.Add(path);
+            added |= CollectPaths(node.Children, path, into);
         }
+
+        return added;
+    }
+
+    // Drops the paths of rows that are no longer in the tree - a removed or cleared batch entry, a replaced batch, a part
+    // taken out of a blueprint - so the set only ever describes the tree on screen. A path under a collapsed row stays:
+    // that row opens with its children as they were.
+    private void PruneExpandedPaths()
+    {
+        if (_expandedPaths.Count == 0)
+        {
+            return;
+        }
+
+        HashSet<string> present = [];
+        CollectPaths(TreeRoots, "", present);
+        _expandedPaths.IntersectWith(present);
     }
 
     private void Recalculate()
@@ -344,12 +397,14 @@ public sealed partial class CraftState(
         SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
         TreeRoots = totals.Roots;
         CraftingStepCount = totals.Crafts;
+        PruneExpandedPaths();
 
         // Computed here rather than as expression-bodied properties: each walks the whole batch, and the
         // summary card reads them on every render.
         TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
         SurplusCount = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.Quantity);
 
+        UpdateHasVisibleCraftCountedStep();
         Changed?.Invoke();
     }
 
