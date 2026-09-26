@@ -300,13 +300,22 @@ public sealed partial class CraftState(
 
     public void ExpandAll()
     {
-        CollectPaths(TreeRoots, "", _expandedPaths);
+        if (!CollectPaths(TreeRoots, "", _expandedPaths))
+        {
+            return;
+        }
+
         UpdateHasVisibleCraftCountedStep();
         ExpansionChanged?.Invoke();
     }
 
     public void CollapseAll()
     {
+        if (_expandedPaths.Count == 0)
+        {
+            return;
+        }
+
         _expandedPaths.Clear();
         UpdateHasVisibleCraftCountedStep();
         ExpansionChanged?.Invoke();
@@ -346,14 +355,34 @@ public sealed partial class CraftState(
         return false;
     }
 
-    private static void CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
+    // Returns whether any path was added, which is false when the tree was already fully expanded.
+    private static bool CollectPaths(IReadOnlyList<BlueprintNode> nodes, string parentPath, HashSet<string> into)
     {
+        bool added = false;
+
         foreach (BlueprintNode node in nodes)
         {
             string path = PathOf(parentPath, node);
-            into.Add(path);
-            CollectPaths(node.Children, path, into);
+            added |= into.Add(path);
+            added |= CollectPaths(node.Children, path, into);
         }
+
+        return added;
+    }
+
+    // Drops the paths of rows that are no longer in the tree - a removed or cleared batch entry, a replaced batch, a part
+    // taken out of a blueprint - so the set only ever describes the tree on screen. A path under a collapsed row stays:
+    // that row opens with its children as they were.
+    private void PruneExpandedPaths()
+    {
+        if (_expandedPaths.Count == 0)
+        {
+            return;
+        }
+
+        HashSet<string> present = [];
+        CollectPaths(TreeRoots, "", present);
+        _expandedPaths.IntersectWith(present);
     }
 
     private void Recalculate()
@@ -368,6 +397,7 @@ public sealed partial class CraftState(
         SurplusStock = [.. totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name)];
         TreeRoots = totals.Roots;
         CraftingStepCount = totals.Crafts;
+        PruneExpandedPaths();
 
         // Computed here rather than as expression-bodied properties: each walks the whole batch, and the
         // summary card reads them on every render.
