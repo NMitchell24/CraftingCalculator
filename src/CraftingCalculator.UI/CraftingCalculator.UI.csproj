@@ -77,6 +77,15 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
 
+  <!-- Android: Mono's non-concurrent major collector (MONO_GC_PARAMS=major=marksweep) instead of the SDK's
+       default concurrent one. The concurrent collector corrupts the heap under a large working set on .NET 10
+       (dotnet/runtime#123537, no fix planned for Mono): with a 5,000-blueprint dataset the app aborted within a
+       minute on every run, at sgen-los.c:381 or in an SGen worker thread. With this off, the same runs finish
+       and tap latency is unchanged. Revisit when the app moves to .NET 11, where Android runs on CoreCLR. -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+    <AndroidEnableSGenConcurrent>false</AndroidEnableSGenConcurrent>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2E3440" />
