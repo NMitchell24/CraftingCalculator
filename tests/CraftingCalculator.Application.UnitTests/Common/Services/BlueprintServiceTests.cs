@@ -44,6 +44,36 @@ public class BlueprintServiceTests
     }
 
     [Test]
+    public async Task GetNestableBlueprintSummariesAsync_LeavesOutTheBlueprintAndEveryAncestor_InNameOrder()
+    {
+        _dao.Setup(d => d.GetAncestorIdsAsync(1)).ReturnsAsync([2, 3]);
+        _dao.Setup(d => d.GetSummariesAsync()).ReturnsAsync(
+        [
+            new BlueprintSummary { Id = 1, Name = "Bracket" },
+            new BlueprintSummary { Id = 2, Name = "Frame" },
+            new BlueprintSummary { Id = 3, Name = "Hull" },
+            new BlueprintSummary { Id = 5, Name = "Rivet" },
+            new BlueprintSummary { Id = 4, Name = "Rope" }
+        ]);
+
+        List<BlueprintSummary> result = await _service.GetNestableBlueprintSummariesAsync(1);
+
+        result.Select(summary => summary.Name).Should().Equal("Rivet", "Rope");
+    }
+
+    [Test]
+    public async Task GetNestableBlueprintSummariesAsync_AnUnsavedBlueprint_OffersEveryBlueprint()
+    {
+        _dao.Setup(d => d.GetAncestorIdsAsync(0)).ReturnsAsync([]);
+        _dao.Setup(d => d.GetSummariesAsync()).ReturnsAsync(
+            [new BlueprintSummary { Id = 1, Name = "Bracket" }, new BlueprintSummary { Id = 2, Name = "Frame" }]);
+
+        List<BlueprintSummary> result = await _service.GetNestableBlueprintSummariesAsync(0);
+
+        result.Select(summary => summary.Id).Should().Equal(1, 2);
+    }
+
+    [Test]
     public async Task SaveBlueprintAsync_NullBlueprint_DoesNotCallDAO()
     {
         await _service.SaveBlueprintAsync(null);

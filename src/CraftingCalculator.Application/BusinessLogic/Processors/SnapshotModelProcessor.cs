@@ -26,16 +26,6 @@ public static class SnapshotModelProcessor
         new ModelBuilder(Records(snapshot)).Blueprint(id);
 
     /// <summary>
-    /// Every blueprint in <paramref name="records"/>, in the order the records list them, each built out the way
-    /// <see cref="ToBlueprintModel(DatasetSnapshot, int)"/> builds one.
-    /// </summary>
-    public static List<BlueprintModel> ToBlueprintModels(DatasetRecords records)
-    {
-        ModelBuilder builder = new(records);
-        return [.. records.Blueprints.Select(record => builder.Blueprint(record.Id))];
-    }
-
-    /// <summary>
     /// The blueprints in <paramref name="records"/> with the given <paramref name="ids"/>, by id, each built out the
     /// way <see cref="ToBlueprintModel(DatasetSnapshot, int)"/> builds one. An id the records do not hold has no
     /// entry.

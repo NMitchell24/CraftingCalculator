@@ -63,6 +63,13 @@ public class DatasetCopyTests
             new BlueprintFavorite { Name = "Starter kit" }, [new BlueprintQuantity(axe, 2)]);
     }
 
+    /// <summary>The selected dataset's blueprint named <paramref name="name"/>, built out in full.</summary>
+    private async Task<BlueprintModel> ReadBlueprintAsync(string name)
+    {
+        BlueprintSummary summary = (await _blueprintDAO.GetSummariesAsync()).First(blueprint => blueprint.Name == name);
+        return (await _blueprintDAO.GetByIdAsync(summary.Id))!;
+    }
+
     [Test]
     public async Task CopyAsync_ReproducesEveryRecord()
     {
@@ -74,7 +81,7 @@ public class DatasetCopyTests
 
         (await _categoryDAO.GetAllAsync()).Select(category => category.Name).Should().Equal("Metals");
         (await _componentDAO.GetAllAsync()).Select(component => component.Name).Should().Equal("Copper", "Tin", "Wood");
-        (await _blueprintDAO.GetAllAsync()).Select(blueprint => blueprint.Name).Should().Equal("Bronze", "Bronze Axe");
+        (await _blueprintDAO.GetSummariesAsync()).Select(blueprint => blueprint.Name).Should().Equal("Bronze", "Bronze Axe");
         (await _favoritesDAO.GetAllAsync()).Select(favorite => favorite.Name).Should().Equal("Starter kit");
     }
 
@@ -120,7 +127,7 @@ public class DatasetCopyTests
 
         _fixture.SelectDataset(copy.Id);
         List<int> componentIds = [.. (await _componentDAO.GetAllAsync()).Select(component => component.Id)];
-        BlueprintModel bronze = (await _blueprintDAO.GetAllAsync()).First(blueprint => blueprint.Name == "Bronze");
+        BlueprintModel bronze = await ReadBlueprintAsync("Bronze");
 
         bronze.Components.ComponentList.Select(quantity => (quantity.Name, quantity.Quantity))
             .Should().Equal(("Copper", 2L), ("Tin", 1L));
@@ -138,9 +145,8 @@ public class DatasetCopyTests
         DatasetModel copy = await _datasetDAO.CopyAsync(SqliteTestFixture.DefaultDatasetId, "Valheim - Modded");
 
         _fixture.SelectDataset(copy.Id);
-        List<BlueprintModel> blueprints = await _blueprintDAO.GetAllAsync();
-        BlueprintModel axe = blueprints.First(blueprint => blueprint.Name == "Bronze Axe");
-        BlueprintModel bronze = blueprints.First(blueprint => blueprint.Name == "Bronze");
+        BlueprintModel axe = await ReadBlueprintAsync("Bronze Axe");
+        BlueprintModel bronze = await ReadBlueprintAsync("Bronze");
 
         BlueprintQuantity child = axe.ChildBlueprints.BlueprintList.Should().ContainSingle().Subject;
 
@@ -167,7 +173,7 @@ public class DatasetCopyTests
 
         saved.Quantity.Should().Be(2);
         saved.Blueprint.Id.Should().Be(
-            (await _blueprintDAO.GetAllAsync()).First(blueprint => blueprint.Name == "Bronze Axe").Id);
+            (await _blueprintDAO.GetSummariesAsync()).First(blueprint => blueprint.Name == "Bronze Axe").Id);
     }
 
     [Test]

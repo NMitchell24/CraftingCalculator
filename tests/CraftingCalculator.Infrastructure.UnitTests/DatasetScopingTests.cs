@@ -51,7 +51,6 @@ public class DatasetScopingTests
 
         (await _categoryDAO.GetAllAsync()).Should().BeEmpty();
         (await _componentDAO.GetAllAsync()).Should().BeEmpty();
-        (await _blueprintDAO.GetAllAsync()).Should().BeEmpty();
         (await _blueprintDAO.GetSummariesAsync()).Should().BeEmpty();
         (await _favoritesDAO.GetAllAsync()).Should().BeEmpty();
     }
@@ -107,14 +106,10 @@ public class DatasetScopingTests
         bronze.ChildBlueprints.Add(gunpowder, 3);
         bronze = await _blueprintDAO.SaveAsync(bronze);
 
-        BlueprintModel byId = (await _blueprintDAO.GetByIdAsync(bronze.Id))!;
-        BlueprintModel fromAll = (await _blueprintDAO.GetAllAsync()).Single();
+        BlueprintModel loaded = (await _blueprintDAO.GetByIdAsync(bronze.Id))!;
 
-        foreach (BlueprintModel loaded in new[] { byId, fromAll })
-        {
-            loaded.Components.ComponentList.Should().ContainSingle().Which.Component.Name.Should().Be("Copper");
-            loaded.ChildBlueprints.BlueprintList.Should().BeEmpty();
-        }
+        loaded.Components.ComponentList.Should().ContainSingle().Which.Component.Name.Should().Be("Copper");
+        loaded.ChildBlueprints.BlueprintList.Should().BeEmpty();
     }
 
     /// <summary>
@@ -139,6 +134,24 @@ public class DatasetScopingTests
         BlueprintModel loaded = (await _blueprintDAO.GetByIdAsync(sword.Id))!;
 
         loaded.ChildBlueprints.BlueprintList.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task APathThroughAnotherDataset_IsDroppedOnAnAncestorRead()
+    {
+        BlueprintModel ingot = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Ingot" });
+
+        _fixture.SelectDataset(_secondDatasetId);
+        BlueprintModel foreign = new() { Name = "Foreign" };
+        foreign.ChildBlueprints.Add(ingot, 1);
+        foreign = await _blueprintDAO.SaveAsync(foreign);
+
+        _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
+        BlueprintModel sword = new() { Name = "Sword" };
+        sword.ChildBlueprints.Add(foreign, 1);
+        await _blueprintDAO.SaveAsync(sword);
+
+        (await _blueprintDAO.GetAncestorIdsAsync(ingot.Id)).Should().BeEmpty();
     }
 
     [Test]
@@ -187,7 +200,8 @@ public class DatasetScopingTests
         BlueprintModel sameName = new() { Name = "Copper Bar" };
         await _blueprintDAO.SaveAsync(sameName);
 
-        BlueprintModel loaded = (await _blueprintDAO.GetAllAsync()).Should().ContainSingle().Subject;
+        BlueprintSummary summary = (await _blueprintDAO.GetSummariesAsync()).Should().ContainSingle().Subject;
+        BlueprintModel loaded = (await _blueprintDAO.GetByIdAsync(summary.Id))!;
         loaded.Components.ComponentList.Should().BeEmpty();
     }
 

@@ -11,9 +11,16 @@ public class BlueprintService(IBlueprintDAO dao) : IBlueprintService
 
     public Task<Dictionary<int, BlueprintModel>> GetBlueprintsByIdsAsync(IReadOnlyCollection<int> ids) => dao.GetByIdsAsync(ids);
 
-    public Task<List<BlueprintModel>> GetAllBlueprintsAsync() => dao.GetAllAsync();
-
     public Task<List<BlueprintSummary>> GetBlueprintSummariesAsync() => dao.GetSummariesAsync();
+
+    public async Task<List<BlueprintSummary>> GetNestableBlueprintSummariesAsync(int blueprintId)
+    {
+        // A loop can only be closed by nesting the blueprint in itself or in something it already sits under.
+        HashSet<int> ancestorIds = await dao.GetAncestorIdsAsync(blueprintId);
+        List<BlueprintSummary> summaries = await dao.GetSummariesAsync();
+
+        return [.. summaries.Where(summary => summary.Id != blueprintId && !ancestorIds.Contains(summary.Id))];
+    }
 
     public Task<int> CountBlueprintsAsync() => dao.CountAsync();
 

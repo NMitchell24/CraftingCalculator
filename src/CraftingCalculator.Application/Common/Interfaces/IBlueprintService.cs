@@ -12,10 +12,15 @@ public interface IBlueprintService
     /// </summary>
     Task<Dictionary<int, BlueprintModel>> GetBlueprintsByIdsAsync(IReadOnlyCollection<int> ids);
 
-    Task<List<BlueprintModel>> GetAllBlueprintsAsync();
-
     /// <summary>Every blueprint without its parts, ordered by name.</summary>
     Task<List<BlueprintSummary>> GetBlueprintSummariesAsync();
+
+    /// <summary>
+    /// Every blueprint that can be nested inside the blueprint with <paramref name="blueprintId"/> without closing a
+    /// loop, without its parts, ordered by name: all of them except that blueprint and every blueprint that already
+    /// nests it at any depth. An unsaved blueprint's id is 0, which leaves every blueprint in.
+    /// </summary>
+    Task<List<BlueprintSummary>> GetNestableBlueprintSummariesAsync(int blueprintId);
 
     Task<int> CountBlueprintsAsync();
 

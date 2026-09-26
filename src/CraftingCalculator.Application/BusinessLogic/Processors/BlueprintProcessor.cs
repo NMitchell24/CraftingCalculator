@@ -20,36 +20,6 @@ public static class BlueprintProcessor
     internal const int MaxBlueprintDepth = 64;
 
     /// <summary>
-    /// Whether nesting <paramref name="child"/> inside <paramref name="parent"/> would close a loop,
-    /// which is the case when <paramref name="child"/> is <paramref name="parent"/> itself or already
-    /// nests <paramref name="parent"/> somewhere below it. Both blueprints are read as they stand, so
-    /// the answer describes the graph before the nesting is made.
-    /// </summary>
-    public static bool WouldCreateCycle(BlueprintModel parent, BlueprintModel child) =>
-        Reaches(child, parent.Id, []);
-
-    /// <summary>
-    /// Whether <paramref name="blueprint"/> is, or nests at any depth, the blueprint with
-    /// <paramref name="id"/>.
-    /// </summary>
-    private static bool Reaches(BlueprintModel blueprint, int id, HashSet<int> visited)
-    {
-        if (blueprint.Id == id)
-        {
-            return true;
-        }
-
-        //Collapses a diamond - one blueprint nested by two others in the same tree - to a single
-        //visit, and keeps the walk terminating on a graph that is already cyclic.
-        if (!visited.Add(blueprint.Id))
-        {
-            return false;
-        }
-
-        return blueprint.ChildBlueprints.BlueprintList.Any(nested => Reaches(nested.Blueprint, id, visited));
-    }
-
-    /// <summary>
     /// Whole crafts needed to produce <paramref name="quantity"/> items, rounded up: a craft is
     /// indivisible, so producing 3 of something that yields 2 takes 2 crafts and leaves 1 spare.
     /// A <paramref name="quantity"/> of 0 or less needs no crafts.
