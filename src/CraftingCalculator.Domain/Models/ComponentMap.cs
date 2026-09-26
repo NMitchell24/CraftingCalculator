@@ -7,7 +7,8 @@ public class ComponentMap
     private readonly List<ComponentQuantity> _internalList = [];
 
     // The same entries as _internalList, by component id, so Add is a lookup rather than a scan. The list
-    // stays the source of order, which is user-visible.
+    // stays the source of order, which is user-visible. Keyed by the id an entry was added with: a component's
+    // id only changes when it is first saved (0 to its row id), and an unsaved component is never a part in a map.
     private readonly Dictionary<int, ComponentQuantity> _byId = [];
 
     public ReadOnlyCollection<ComponentQuantity> ComponentList => _internalList.AsReadOnly();

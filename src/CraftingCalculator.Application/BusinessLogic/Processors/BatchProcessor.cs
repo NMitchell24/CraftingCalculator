@@ -89,7 +89,8 @@ public static class BatchProcessor
 
             TimeSpan productionTime = DurationMath.Scale(blueprint.ProductionTime, crafts);
             BlueprintTime = DurationMath.Add(BlueprintTime, productionTime);
-            Crafts += crafts;
+            // Checked, so a batch whose step count passes long.MaxValue throws rather than showing a negative count.
+            Crafts = checked(Crafts + crafts);
 
             List<BlueprintNode> children =
                 new(blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count);

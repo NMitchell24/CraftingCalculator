@@ -36,9 +36,9 @@ Dataset.razor toggle ──▶ Dataset.UpdateSettingsAsync ──▶ IDatasetSer
                                └──▶ CraftState.OnDatasettingsChanged (the batch is recalculated)
 ```
 
-The calculation processors (`BlueprintProcessor.Flatten`, `BlueprintProcessor.BuildNode`,
-`BatchProcessor.CalculateTotals`, `IBlueprintService.GetBlueprintNode`) already take a `Datasettings`. A setting that
-changes the math only has to read its own member where it applies. No signature changes.
+The calculation (`BatchProcessor.CalculateTotals`, which builds the totals and the Crafting Steps tree in one walk)
+already takes a `Datasettings`. A setting that changes the math only has to read its own member where it applies. No
+signature changes.
 
 What happens to the settings in each operation:
 

@@ -562,6 +562,22 @@ public class BatchProcessorTests
         static long SumOfCrafts(BlueprintNode node) => node.Crafts + node.Children.Sum(SumOfCrafts);
     }
 
+    /// <summary>
+    /// The batch quantity field has no upper bound, so two entries at the largest quantity it takes need more crafts
+    /// than a long can count. The step count throws rather than wrapping to a negative number of steps.
+    /// </summary>
+    [Test]
+    public void CalculateTotals_CraftsPastLongMaxValue_ThrowsRatherThanWrapping()
+    {
+        BlueprintModel left = NewBlueprint("Left");
+        BlueprintModel right = NewBlueprint("Right");
+
+        Action act = () => BatchProcessor.CalculateTotals(
+            [new BlueprintQuantity(left, long.MaxValue), new BlueprintQuantity(right, 1)], Datasettings.Default);
+
+        act.Should().Throw<OverflowException>();
+    }
+
     [Test]
     public void CalculateTotals_Tree_NamesEachNodeAfterItsSourceRecord()
     {

@@ -9,7 +9,8 @@ public class BlueprintMap
     // The same entries as _internalList, by blueprint id, so Add is a lookup rather than a scan. The list
     // stays the source of order, which is user-visible. Keyed by the id an entry was added with:
     // BlueprintQuantity.Blueprint can be reassigned (CraftState.ReloadBlueprintsAsync does), but only ever to a
-    // newer copy of the same blueprint, so the id and therefore the key never change.
+    // newer copy of the same blueprint, and a blueprint's own id only changes when it is first saved, before it
+    // can be a part in any map. So the key never goes stale.
     private readonly Dictionary<int, BlueprintQuantity> _byId = [];
 
     public ReadOnlyCollection<BlueprintQuantity> BlueprintList => _internalList.AsReadOnly();
