@@ -16,13 +16,14 @@ public interface IBlueprintDAO
     /// </summary>
     Task<Dictionary<int, BlueprintModel>> GetByIdsAsync(IReadOnlyCollection<int> ids);
 
-    /// <summary>
-    /// Returns every blueprint, each with its full component graph populated.
-    /// </summary>
-    Task<List<BlueprintModel>> GetAllAsync();
-
     /// <summary>Returns every blueprint without its parts, ordered by name.</summary>
     Task<List<BlueprintSummary>> GetSummariesAsync();
+
+    /// <summary>
+    /// Returns the ids of every blueprint that nests the blueprint with <paramref name="id"/> at any depth, not counting
+    /// that blueprint itself. Empty when nothing nests it or no blueprint has the id.
+    /// </summary>
+    Task<HashSet<int>> GetAncestorIdsAsync(int id);
 
     /// <summary>Returns how many blueprints there are.</summary>
     Task<int> CountAsync();

@@ -34,12 +34,9 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
     {
         List<ComponentModel> components = await Task.Run(ComponentService.GetAllComponentsAsync);
 
-        // Leaving out this blueprint and every blueprint that already nests it is the whole cycle
-        // guard: a loop the crafting tree has no bottom to can only be written by picking one of
-        // those, so the list never offers one. Full blueprints rather than summaries: the cycle check
-        // walks each candidate's tree, and a picked one goes into Model with its parts.
-        IEnumerable<BlueprintModel> blueprints = (await Task.Run(BlueprintService.GetAllBlueprintsAsync))
-            .Where(candidate => !BlueprintProcessor.WouldCreateCycle(Model, candidate));
+        // The only cycle guard: the list never offers a blueprint that would close a loop, so none can be picked.
+        List<BlueprintSummary> blueprints =
+            await Task.Run(() => BlueprintService.GetNestableBlueprintSummariesAsync(Model.Id));
 
         DialogOptions options = new()
         {
@@ -65,8 +62,17 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
 
     public async Task AddAsync(IBaseDataRecord record)
     {
-        BlueprintPartProcessor.Add(Model, record, 1);
-        await NotifyChangedAsync();
+        // Blueprints are listed as summaries, and a part holds the full blueprint, as one read back from the database
+        // does. Null only when the blueprint was deleted after the picker opened, which leaves nothing to add.
+        IBaseDataRecord? part = record is BlueprintSummary
+            ? await Task.Run(() => BlueprintService.GetBlueprintByIdAsync(record.Id))
+            : record;
+
+        if (part is not null)
+        {
+            BlueprintPartProcessor.Add(Model, part, 1);
+            await NotifyChangedAsync();
+        }
     }
 
     public async Task StepAsync(IBaseQuantityRecord entry, long step)

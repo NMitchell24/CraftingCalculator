@@ -228,7 +228,7 @@ public class BlueprintDAOTests
     /// the data. The back edge is dropped instead.
     /// </summary>
     [Test]
-    public async Task GetAllAsync_ABlueprintNestingItsOwnAncestor_LoadsWithTheLoopBrokenRatherThanThrowing()
+    public async Task GetByIdsAsync_ABlueprintNestingItsOwnAncestor_LoadsWithTheLoopBrokenRatherThanThrowing()
     {
         BlueprintModel bracket = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" });
 
@@ -240,16 +240,16 @@ public class BlueprintDAOTests
         cyclic.ChildBlueprints.Add(frame, 1);
         await _blueprintDAO.SaveAsync(cyclic);
 
-        List<BlueprintModel> all = await _blueprintDAO.GetAllAsync();
+        Dictionary<int, BlueprintModel> loaded = await _blueprintDAO.GetByIdsAsync([frame.Id, bracket.Id]);
 
-        BlueprintModel loadedFrame = all.Single(blueprint => blueprint.Name == "Frame");
+        BlueprintModel loadedFrame = loaded[frame.Id];
         BlueprintModel nestedBracket = loadedFrame.ChildBlueprints.BlueprintList.Single().Blueprint;
         nestedBracket.Name.Should().Be("Bracket");
         nestedBracket.ChildBlueprints.BlueprintList.Should().BeEmpty();
 
         // Read from the other end of the loop the nesting is the one that survives, because Frame is
         // then the ancestor being skipped rather than the root.
-        BlueprintModel loadedBracket = all.Single(blueprint => blueprint.Name == "Bracket");
+        BlueprintModel loadedBracket = loaded[bracket.Id];
         loadedBracket.ChildBlueprints.BlueprintList.Single().Blueprint.Name.Should().Be("Frame");
     }
 
@@ -397,11 +397,88 @@ public class BlueprintDAOTests
     }
 
     [Test]
+    public async Task GetAncestorIdsAsync_ReturnsEveryBlueprintNestingIt_AtAnyDepth()
+    {
+        BlueprintModel bracket = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" });
+        BlueprintModel frame = await SaveNestingAsync("Frame", bracket);
+        BlueprintModel hull = await SaveNestingAsync("Hull", frame);
+        await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Rope" });
+
+        HashSet<int> ancestors = await _blueprintDAO.GetAncestorIdsAsync(bracket.Id);
+
+        ancestors.Should().BeEquivalentTo([frame.Id, hull.Id]);
+    }
+
+    /// <summary>
+    /// The walk only climbs: what a blueprint already nests sits below it, so nesting it again cannot close a loop.
+    /// </summary>
+    [Test]
+    public async Task GetAncestorIdsAsync_LeavesOutTheBlueprintItself_AndWhatItNests()
+    {
+        BlueprintModel bracket = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" });
+        BlueprintModel frame = await SaveNestingAsync("Frame", bracket);
+
+        (await _blueprintDAO.GetAncestorIdsAsync(frame.Id)).Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// A blueprint nested down two branches is a diamond, not a loop: both branches lead up to the same root, and
+    /// every blueprint on either one is returned.
+    /// </summary>
+    [Test]
+    public async Task GetAncestorIdsAsync_ADiamond_ReturnsBothBranches()
+    {
+        BlueprintModel screw = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Screw" });
+        BlueprintModel bracket = await SaveNestingAsync("Bracket", screw);
+        BlueprintModel plate = await SaveNestingAsync("Plate", screw);
+        BlueprintModel hull = await SaveNestingAsync("Hull", bracket, plate);
+
+        HashSet<int> ancestors = await _blueprintDAO.GetAncestorIdsAsync(screw.Id);
+
+        ancestors.Should().BeEquivalentTo([bracket.Id, plate.Id, hull.Id]);
+    }
+
+    /// <summary>
+    /// A database written by an older build can already hold a loop, and the read still has to end.
+    /// </summary>
+    [Test]
+    public async Task GetAncestorIdsAsync_ALoopAlreadyInTheData_Terminates()
+    {
+        BlueprintModel bracket = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" });
+        BlueprintModel frame = await SaveNestingAsync("Frame", bracket);
+
+        BlueprintModel cyclic = (await _blueprintDAO.GetByIdAsync(bracket.Id))!;
+        cyclic.ChildBlueprints.Add(frame, 1);
+        await _blueprintDAO.SaveAsync(cyclic);
+
+        (await _blueprintDAO.GetAncestorIdsAsync(bracket.Id)).Should().BeEquivalentTo([frame.Id]);
+    }
+
+    [Test]
+    public async Task GetAncestorIdsAsync_AnUnsavedBlueprint_HasNone()
+    {
+        await SaveNestingAsync("Frame", await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bracket" }));
+
+        (await _blueprintDAO.GetAncestorIdsAsync(0)).Should().BeEmpty();
+    }
+
+    [Test]
     public async Task CountAsync_CountsEveryBlueprint()
     {
         await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Axe" });
         await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Club" });
 
         (await _blueprintDAO.CountAsync()).Should().Be(2);
+    }
+
+    private async Task<BlueprintModel> SaveNestingAsync(string name, params BlueprintModel[] children)
+    {
+        BlueprintModel blueprint = new() { Name = name };
+        foreach (BlueprintModel child in children)
+        {
+            blueprint.ChildBlueprints.Add(child, 1);
+        }
+
+        return await _blueprintDAO.SaveAsync(blueprint);
     }
 }

@@ -45,7 +45,6 @@ public class RecordServiceTests
         List<IBaseDataRecord> records = await _service.GetRecordsAsync(DataType.Blueprint);
 
         records.Should().ContainSingle().Which.Name.Should().Be("Widget");
-        _blueprintService.Verify(s => s.GetAllBlueprintsAsync(), Times.Never);
     }
 
     [Test]

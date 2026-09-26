@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces.DAO;
 using CraftingCalculator.Domain.Entities;
@@ -20,13 +21,6 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
         return SnapshotModelProcessor.ToBlueprintModels(records, ids);
     }
 
-    public async Task<List<BlueprintModel>> GetAllAsync()
-    {
-        DatasetRecords records = await LoadAsync();
-
-        return [.. SnapshotModelProcessor.ToBlueprintModels(records).OrderBy(blueprint => blueprint.Name)];
-    }
-
     public async Task<List<BlueprintSummary>> GetSummariesAsync()
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
@@ -35,7 +29,7 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
             .Include(blueprintEntity => blueprintEntity.Category)
             .ToListAsync();
 
-        // Ordered here rather than in SQL, so the list sorts the way GetAllAsync does.
+        // Ordered here rather than in SQL, so names sort by .NET's culture-aware comparison, not SQLite's binary one.
         return
         [
             .. entities.Select(entity => new BlueprintSummary
@@ -46,6 +40,37 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
                 Category = entity.Category is { } categoryEntity ? CategoryDAO.ToModel(categoryEntity) : null
             }).OrderBy(blueprint => blueprint.Name)
         ];
+    }
+
+    public async Task<HashSet<int>> GetAncestorIdsAsync(int id)
+    {
+        await using CraftingDataContext context = await contextFactory.CreateAsync();
+
+        // One recursive query climbing from child to parent, whatever the depth. UNION rather than UNION ALL is what
+        // ends the recursion on a cyclic row set, and the join on both ends' DatasetId keeps the walk from following a
+        // link out of the dataset and back in. The SQL opens with SELECT so EF can compose over it, which is how the
+        // dataset's query filter still applies to the rows it returns. The id goes in as JSON, like the tree read's
+        // roots, because FromSql takes its arguments as object and an int argument would be boxed.
+        string seed = JsonSerializer.Serialize<int[]>([id]);
+        List<int> ids = await context.Blueprints.FromSql(
+                $"""
+                 SELECT * FROM Blueprints WHERE Id IN (
+                     WITH RECURSIVE Ancestors(Id) AS (
+                         SELECT value FROM json_each({seed})
+                         UNION
+                         SELECT link.ParentBlueprintId
+                         FROM BlueprintChildren AS link
+                         JOIN Ancestors ON link.ChildBlueprintId = Ancestors.Id
+                         JOIN Blueprints AS parent ON parent.Id = link.ParentBlueprintId
+                         JOIN Blueprints AS child ON child.Id = link.ChildBlueprintId AND child.DatasetId = parent.DatasetId)
+                     SELECT Id FROM Ancestors)
+                 """)
+            .AsNoTracking()
+            .Where(blueprintEntity => blueprintEntity.Id != id)
+            .Select(blueprintEntity => blueprintEntity.Id)
+            .ToListAsync();
+
+        return [.. ids];
     }
 
     public async Task<int> CountAsync()
@@ -106,11 +131,5 @@ public class BlueprintDAO(DatasetScopedContextFactory contextFactory) : IBluepri
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
         await context.Blueprints.Where(blueprintEntity => blueprintEntity.Id == id).ExecuteDeleteAsync();
-    }
-
-    private async Task<DatasetRecords> LoadAsync()
-    {
-        await using CraftingDataContext context = await contextFactory.CreateAsync();
-        return await DatasetRecordsReader.ReadAsync(context);
     }
 }

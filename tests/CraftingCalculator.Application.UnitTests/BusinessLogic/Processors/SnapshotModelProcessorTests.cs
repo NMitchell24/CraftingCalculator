@@ -71,30 +71,16 @@ public class SnapshotModelProcessorTests
     }
 
     [Test]
-    public void ToBlueprintModels_BuildsEveryBlueprintOutInRecordOrder()
-    {
-        DatasetRecords records = new(Snapshot.Categories, Snapshot.Components, Snapshot.Blueprints);
-
-        List<BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(records);
-
-        blueprints.Select(blueprint => blueprint.Id).Should().Equal(Snapshot.Blueprints.Select(record => record.Id));
-        blueprints.Single(blueprint => blueprint.Id == BronzeAxe.Id)
-            .ChildBlueprints.BlueprintList.Single().Blueprint.Components.ComponentList.Select(part => (part.Name, part.Quantity))
-            .Should().Equal(("Copper", 2L), ("Tin", 1L));
-    }
-
-    [Test]
     public void ToBlueprintModels_ABlueprintReachedTwice_IsBuiltOnce()
     {
         DatasetRecords records = new(Snapshot.Categories, Snapshot.Components, Snapshot.Blueprints);
 
-        List<BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(records);
+        Dictionary<int, BlueprintModel> blueprints =
+            SnapshotModelProcessor.ToBlueprintModels(records, [BronzeAxe.Id, BronzeNails.Id, Bronze.Id]);
 
-        BlueprintModel bronze = blueprints.Single(blueprint => blueprint.Id == Bronze.Id);
-        blueprints.Single(blueprint => blueprint.Id == BronzeAxe.Id).ChildBlueprints.BlueprintList.Single().Blueprint
-            .Should().BeSameAs(bronze);
-        blueprints.Single(blueprint => blueprint.Id == BronzeNails.Id).ChildBlueprints.BlueprintList.Single().Blueprint
-            .Should().BeSameAs(bronze);
+        BlueprintModel bronze = blueprints[Bronze.Id];
+        blueprints[BronzeAxe.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Should().BeSameAs(bronze);
+        blueprints[BronzeNails.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Should().BeSameAs(bronze);
     }
 
     /// <summary>
@@ -110,12 +96,12 @@ public class SnapshotModelProcessorTests
             new SnapshotBlueprint(2, "Bronze Nails", "", 0, 1, TimeSpan.Zero, null, [], [new QuantityLink(1, 1)])
         ]);
 
-        List<BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(cyclic);
+        Dictionary<int, BlueprintModel> blueprints = SnapshotModelProcessor.ToBlueprintModels(cyclic, [1, 2]);
 
-        BlueprintModel nestedNails = blueprints[0].ChildBlueprints.BlueprintList.Single().Blueprint;
+        BlueprintModel nestedNails = blueprints[1].ChildBlueprints.BlueprintList.Single().Blueprint;
         nestedNails.ChildBlueprints.BlueprintList.Should().BeEmpty();
-        blueprints[1].Should().NotBeSameAs(nestedNails);
-        blueprints[1].ChildBlueprints.BlueprintList.Single().Blueprint.Name.Should().Be("Bronze Plate");
+        blueprints[2].Should().NotBeSameAs(nestedNails);
+        blueprints[2].ChildBlueprints.BlueprintList.Single().Blueprint.Name.Should().Be("Bronze Plate");
     }
 
     [Test]
@@ -127,6 +113,8 @@ public class SnapshotModelProcessorTests
             SnapshotModelProcessor.ToBlueprintModels(records, [BronzeAxe.Id, Bronze.Id, 999]);
 
         blueprints.Keys.Should().BeEquivalentTo([BronzeAxe.Id, Bronze.Id]);
+        blueprints[BronzeAxe.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Components.ComponentList
+            .Select(part => (part.Name, part.Quantity)).Should().Equal(("Copper", 2L), ("Tin", 1L));
         blueprints[BronzeAxe.Id].ChildBlueprints.BlueprintList.Single().Blueprint.Should().BeSameAs(blueprints[Bronze.Id]);
     }
 
