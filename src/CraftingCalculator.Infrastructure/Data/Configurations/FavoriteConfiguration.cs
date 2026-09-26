@@ -13,7 +13,8 @@ public class FavoriteConfiguration : IEntityTypeConfiguration<Favorite>
         builder.Property(f => f.Name).IsRequired();
         builder.HasIndex(f => f.Name);
 
-        builder.HasIndex(f => f.DatasetId);
+        //See the same index in ComponentConfiguration.
+        builder.HasIndex(f => new { f.DatasetId, f.Name });
 
         //Cascade: a dataset is the container for its records, so deleting one takes its
         //contents with it.
