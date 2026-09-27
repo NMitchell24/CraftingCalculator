@@ -80,19 +80,21 @@ public partial class BlueprintTreeNode : ComponentBase
         return true;
     }
 
-    // Node by reference: a recalculated batch builds new nodes, and an unchanged one keeps its instance.
+    // Node by reference: a recalculated batch builds new nodes, and an unchanged one keeps its instance. The
+    // setting stands in for EndText, which is otherwise a function of the node alone, so a skipped render formats
+    // no duration.
     private RenderedState CurrentState() =>
-        new(Node, ParentPath, State.IsExpanded(Path), _keepChildren, EndText);
+        new(Node, ParentPath, State.IsExpanded(Path), _keepChildren, SelectedDataset.Settings.UseCraftTime);
 
     private readonly record struct RenderedState(
-        BlueprintNode Node, string ParentPath, bool Expanded, bool KeepChildren, string? EndText)
+        BlueprintNode Node, string ParentPath, bool Expanded, bool KeepChildren, bool UseCraftTime)
     {
         public bool Equals(RenderedState other) =>
             ReferenceEquals(Node, other.Node) && ParentPath == other.ParentPath && Expanded == other.Expanded
-            && KeepChildren == other.KeepChildren && EndText == other.EndText;
+            && KeepChildren == other.KeepChildren && UseCraftTime == other.UseCraftTime;
 
         public override int GetHashCode() =>
-            HashCode.Combine(RuntimeHelpers.GetHashCode(Node), ParentPath, Expanded, KeepChildren, EndText);
+            HashCode.Combine(RuntimeHelpers.GetHashCode(Node), ParentPath, Expanded, KeepChildren, UseCraftTime);
     }
 
     private void OnExpandedChanged(bool expanded)
