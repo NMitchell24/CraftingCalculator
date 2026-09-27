@@ -27,7 +27,7 @@
             </TitleContent>
             <ChildContent>
                 <div class="transfer-rows">
-                    <Virtualize Items="rows" ItemSize="RowHeight" Context="conflict">
+                    <VirtualList Items="rows" ItemSize="RowHeight" Context="conflict">
                         <div @key="KeyOf(conflict)" class="@RowClass(conflict)">
                             <button type="button" class="transfer-row-select"
                                     aria-pressed="@(IsPicked(conflict) ? "true" : "false")"
@@ -35,7 +35,7 @@
                                 <span class="transfer-row-name">@conflict.Name</span>
                             </button>
                         </div>
-                    </Virtualize>
+                    </VirtualList>
                 </div>
             </ChildContent>
         </MudExpansionPanel>

@@ -34,7 +34,7 @@
                option role or tab stop. ReadOnly still invokes MudListItem.OnClick on a tap, which is why
                ToggleSelection keeps its own mode check. *@
             <MudList T="IBaseDataRecord" ReadOnly="@(_mode != ListMode.Delete)">
-                <Virtualize Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                <VirtualList Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
                             Context="record">
                     <MudListItem @key="record.Id" T="IBaseDataRecord" Class="@RowClass(record)"
                                  OnClick="@(() => ToggleSelection(record))">
@@ -55,7 +55,7 @@
                             </Actions>
                         </RecordCard>
                     </MudListItem>
-                </Virtualize>
+                </VirtualList>
             </MudList>
         }
     }
