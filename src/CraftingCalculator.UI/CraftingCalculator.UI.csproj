@@ -77,14 +77,17 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
 
-  <!-- Android: Mono's non-concurrent major collector (MONO_GC_PARAMS=major=marksweep) instead of the SDK's
-       default concurrent one. The concurrent collector corrupts the heap under a large working set on .NET 10
-       (dotnet/runtime#123537, no fix planned for Mono): with a 5,000-blueprint dataset the app aborted within a
-       minute on every run, at sgen-los.c:381 or in an SGen worker thread. With this off, the same runs finish
-       and tap latency is unchanged. Revisit when the app moves to .NET 11, where Android runs on CoreCLR. -->
+  <!-- Android: Mono's garbage collector settings live in Platforms/Android/environment.txt; see its comments.
+       Its MONO_GC_PARAMS line replaces the value the SDK derives from AndroidEnableSGenConcurrent, except in a
+       fast-deployment Debug build: there the SDK copies the file to the device at deploy time instead of building
+       it into the APK, so the APK itself falls back to the property. Keeping it false makes that fallback the
+       non-concurrent collector too, the setting that stops the heap corruption the file describes. -->
   <PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
     <AndroidEnableSGenConcurrent>false</AndroidEnableSGenConcurrent>
   </PropertyGroup>
+  <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+    <AndroidEnvironment Include="Platforms\Android\environment.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- App Icon -->

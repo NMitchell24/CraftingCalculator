@@ -1,0 +1,17 @@
+# Environment variables for the Android app's runtime, read once at process start.
+#
+# MONO_GC_PARAMS replaces the value the SDK would derive from AndroidEnableSGenConcurrent, so every GC setting
+# has to be on this one line. Dropping major=marksweep brings back the concurrent collector and the crash below.
+#
+# major=marksweep: Mono's non-concurrent major collector instead of the SDK's default concurrent one. The
+# concurrent collector corrupts the heap under a large working set on .NET 10 (dotnet/runtime#123537, no fix
+# planned for Mono): with a 5,000-blueprint dataset the app aborted within a minute on every run, at
+# sgen-los.c:381 or in an SGen worker thread. With it off, the same runs finish and tap latency is unchanged.
+#
+# nursery-size=32m: eight times the default 4 MB nursery. After a render as large as Expand all on that dataset, the Mono
+# heap holds about 1 GB, and each nursery collection then costs 250-300 ms instead of a few; the default size
+# ran 24-33 of them back to back, freezing Collapse all or a +10 for 8-9 s. At 32 MB those taps take about
+# half a second. It costs about 25 MB of resident memory on an ordinary dataset and changes no tap time there.
+#
+# Revisit both when the app moves to .NET 11, where Android runs on CoreCLR and this file no longer applies.
+MONO_GC_PARAMS=major=marksweep,nursery-size=32m

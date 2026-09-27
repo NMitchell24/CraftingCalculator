@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.Common.Interfaces;
 using CraftingCalculator.Domain.Models;
@@ -50,9 +51,50 @@ public partial class BlueprintTreeNode : ComponentBase
     // subtree goes with the next one of those.
     private bool _keepChildren;
 
+    // What the last render drew from. Node is a record, so Blazor treats every parent render as a parameter change
+    // and re-renders the row; MudCollapse re-renders its content when it first renders open and again when its
+    // slide ends, which without this check re-renders the whole subtree once per open ancestor. On Expand all
+    // that was thousands of subtree renders queued behind the click, seconds of work after the tree looked done.
+    private RenderedState _rendered;
+
+    // The first render never consults ShouldRender, and draws from exactly this state.
+    protected override void OnInitialized()
+    {
+        _rendered = CurrentState();
+    }
+
     protected override void OnParametersSet()
     {
         _keepChildren = false;
+    }
+
+    protected override bool ShouldRender()
+    {
+        RenderedState current = CurrentState();
+        if (current == _rendered)
+        {
+            return false;
+        }
+
+        _rendered = current;
+        return true;
+    }
+
+    // Node by reference: a recalculated batch builds new nodes, and an unchanged one keeps its instance. The
+    // setting stands in for EndText, which is otherwise a function of the node alone, so a skipped render formats
+    // no duration.
+    private RenderedState CurrentState() =>
+        new(Node, ParentPath, State.IsExpanded(Path), _keepChildren, SelectedDataset.Settings.UseCraftTime);
+
+    private readonly record struct RenderedState(
+        BlueprintNode Node, string ParentPath, bool Expanded, bool KeepChildren, bool UseCraftTime)
+    {
+        public bool Equals(RenderedState other) =>
+            ReferenceEquals(Node, other.Node) && ParentPath == other.ParentPath && Expanded == other.Expanded
+            && KeepChildren == other.KeepChildren && UseCraftTime == other.UseCraftTime;
+
+        public override int GetHashCode() =>
+            HashCode.Combine(RuntimeHelpers.GetHashCode(Node), ParentPath, Expanded, KeepChildren, UseCraftTime);
     }
 
     private void OnExpandedChanged(bool expanded)
