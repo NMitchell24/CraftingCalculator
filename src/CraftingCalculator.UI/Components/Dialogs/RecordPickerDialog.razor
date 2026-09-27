@@ -38,7 +38,7 @@
             @* The dialog content is the scroll container Virtualize finds, full screen or not: app.css gives the
                non-full-screen dialog a fixed height. *@
             <MudList T="IBaseDataRecord">
-                <Virtualize Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                <VirtualList Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
                             Context="record">
                     @* Keyed on the type as well: the requirements picker lists components and blueprints together,
                        and the two are numbered separately. *@
@@ -69,7 +69,7 @@
                             </RecordCard>
                         }
                     </MudListItem>
-                </Virtualize>
+                </VirtualList>
             </MudList>
         }
     </DialogContent>

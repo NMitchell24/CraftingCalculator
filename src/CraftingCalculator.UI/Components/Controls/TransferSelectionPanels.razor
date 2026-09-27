@@ -19,7 +19,7 @@
             </TitleContent>
             <ChildContent>
                 <div class="transfer-rows">
-                    <Virtualize Items="rows" ItemSize="RowHeight" Context="row">
+                    <VirtualList Items="rows" ItemSize="RowHeight" Context="row">
                         @* Select and Info are sibling native buttons: a button cannot hold another interactive
                            control, and the native element brings focus and Enter/Space activation without the
                            page scrolling on Space. *@
@@ -33,7 +33,7 @@
                                            title="@($"About {row.Name}")" aria-label="@($"About {row.Name}")"
                                            OnClick="@(() => ShowInfoAsync(row))" />
                         </div>
-                    </Virtualize>
+                    </VirtualList>
                 </div>
             </ChildContent>
         </MudExpansionPanel>

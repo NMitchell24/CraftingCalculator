@@ -8,13 +8,13 @@
     else
     {
         <MudList T="ComponentQuantity" ReadOnly="true">
-            <Virtualize Items="Materials" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+            <VirtualList Items="Materials" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
                         Context="componentQuantity">
                 <MudListItem T="ComponentQuantity" @key="componentQuantity.Component.Id">
                     <RecordCard Name="@componentQuantity.Name" Record="@componentQuantity.Component"
                                 Details="@DetailsFor(componentQuantity)" />
                 </MudListItem>
-            </Virtualize>
+            </VirtualList>
         </MudList>
     }
 </div>
