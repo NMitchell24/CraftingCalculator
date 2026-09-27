@@ -50,8 +50,7 @@ public partial class DatasetList : ComponentBase, IDisposable
     private List<IBaseDataRecord> _records = [];
     private List<IBaseDataRecord> _filtered = [];
 
-    // False until the read for the current type returns, so the empty state is not shown for a list that has not
-    // arrived yet.
+    // False until the read for the current type returns: until then the screen shows it loading, not the empty state.
     private bool _loaded;
     private RecordFilter _filter = RecordFilter.Empty;
     private ListMode _mode = ListMode.Normal;

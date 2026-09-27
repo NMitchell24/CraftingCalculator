@@ -4,9 +4,9 @@
            labels the name, and a row of its own would push the figures below the fold on a phone. *@
         <div class="info-dialog-title">
             <MudText Typo="Typo.h6" Class="info-dialog-title-name">@Name</MudText>
-            @if (Record is not null)
+            @if (_record is not null)
             {
-                <CategoryChip Record="@Record" Class="info-dialog-category" />
+                <CategoryChip Record="@_record" Class="info-dialog-category" />
             }
         </div>
         @if (Kind is not null)
@@ -15,142 +15,149 @@
         }
     </TitleContent>
     <DialogContent>
-        @if (!string.IsNullOrWhiteSpace(Record?.Description))
+        @if (!_loaded)
         {
-            <MudText Typo="Typo.body2" Class="info-dialog-description">@Record.Description</MudText>
+            <LoadingIndicator />
         }
-
-        @if (Blueprint is not null || Component is not null)
+        else
         {
-            @* Same label/value list as the Crafting Summary card - this is the same kind of read-only
-               figure list, so it reuses those classes rather than cloning them under a dialog- prefix. *@
-            <dl class="summary-list">
-                @if (Blueprint is { } blueprint)
-                {
-                    @if (SelectedDataset.Settings.UseValues)
-                    {
-                        <div class="summary-row">
-                            <dt>Value per Item</dt>
-                            <dd>@CurrencyProcessor.Format(blueprint.Value, SelectedDataset.Settings)</dd>
-                        </div>
-                    }
+            @if (!string.IsNullOrWhiteSpace(_record?.Description))
+            {
+                <MudText Typo="Typo.body2" Class="info-dialog-description">@_record.Description</MudText>
+            }
 
-                    @if (SelectedDataset.Settings.UseYield)
+            @if (Blueprint is not null || Component is not null)
+            {
+                @* Same label/value list as the Crafting Summary card - this is the same kind of read-only
+                   figure list, so it reuses those classes rather than cloning them under a dialog- prefix. *@
+                <dl class="summary-list">
+                    @if (Blueprint is { } blueprint)
                     {
-                        <div class="summary-row">
-                            <dt>Yield per Craft</dt>
-                            <dd>@blueprint.Yield</dd>
-                        </div>
-                    }
+                        @if (SelectedDataset.Settings.UseValues)
+                        {
+                            <div class="summary-row">
+                                <dt>Value per Item</dt>
+                                <dd>@CurrencyProcessor.Format(blueprint.Value, SelectedDataset.Settings)</dd>
+                            </div>
+                        }
 
-                    @if (SelectedDataset.Settings.UseCraftTime)
-                    {
-                        <div class="summary-row">
-                            <dt>Production Time per Craft</dt>
-                            <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
-                        </div>
-                    }
-                }
-                else if (Component is { } component)
-                {
-                    @if (SelectedDataset.Settings.UseCosts)
-                    {
-                        <div class="summary-row">
-                            <dt>Cost per Item</dt>
-                            <dd>@CurrencyProcessor.Format(component.Cost, SelectedDataset.Settings)</dd>
-                        </div>
-                    }
+                        @if (SelectedDataset.Settings.UseYield)
+                        {
+                            <div class="summary-row">
+                                <dt>Yield per Craft</dt>
+                                <dd>@blueprint.Yield</dd>
+                            </div>
+                        }
 
-                    @if (SelectedDataset.Settings.UseCraftTime)
-                    {
-                        <div class="summary-row">
-                            <dt>Production Time per Item</dt>
-                            <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
-                        </div>
+                        @if (SelectedDataset.Settings.UseCraftTime)
+                        {
+                            <div class="summary-row">
+                                <dt>Production Time per Craft</dt>
+                                <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
+                            </div>
+                        }
                     }
-                }
-            </dl>
-        }
+                    else if (Component is { } component)
+                    {
+                        @if (SelectedDataset.Settings.UseCosts)
+                        {
+                            <div class="summary-row">
+                                <dt>Cost per Item</dt>
+                                <dd>@CurrencyProcessor.Format(component.Cost, SelectedDataset.Settings)</dd>
+                            </div>
+                        }
 
-        @if (Blueprint is not null || Favorite is not null)
-        {
-            @* Direct requirements only, collapsed by default: the dialog then opens at the same height
-               whatever the blueprint's size, and the full nested breakdown is what the Crafting Steps
-               view is for. The caret is drawn beside the count (HideIcon) rather than by MudExpansionPanel:
-               MudBlazor's own is a sibling of the title content, centered against it, so once the count
-               dropped under the label at large text sizes the caret floated between the two lines. *@
-            <MudExpansionPanels Elevation="0" Outlined="false" Gutters="false" Class="info-dialog-parts">
-                <MudExpansionPanel Gutters="false" Dense="true" HideIcon="true" Disabled="@(_parts.Count == 0)"
-                                   @bind-Expanded="_partsExpanded">
-                    <TitleContent>
-                        <div class="info-dialog-parts-summary">
-                            <span class="info-dialog-parts-label">@PartsLabel</span>
-                            <span class="info-dialog-parts-count">
-                                @_parts.Count
-                                @if (_parts.Count > 0)
+                        @if (SelectedDataset.Settings.UseCraftTime)
+                        {
+                            <div class="summary-row">
+                                <dt>Production Time per Item</dt>
+                                <dd>@DurationProcessor.Format(component.ProductionTime)</dd>
+                            </div>
+                        }
+                    }
+                </dl>
+            }
+
+            @if (Blueprint is not null || Favorite is not null)
+            {
+                @* Direct requirements only, collapsed by default: the dialog then opens at the same height
+                   whatever the blueprint's size, and the full nested breakdown is what the Crafting Steps
+                   view is for. The caret is drawn beside the count (HideIcon) rather than by MudExpansionPanel:
+                   MudBlazor's own is a sibling of the title content, centered against it, so once the count
+                   dropped under the label at large text sizes the caret floated between the two lines. *@
+                <MudExpansionPanels Elevation="0" Outlined="false" Gutters="false" Class="info-dialog-parts">
+                    <MudExpansionPanel Gutters="false" Dense="true" HideIcon="true" Disabled="@(_parts.Count == 0)"
+                                       @bind-Expanded="_partsExpanded">
+                        <TitleContent>
+                            <div class="info-dialog-parts-summary">
+                                <span class="info-dialog-parts-label">@PartsLabel</span>
+                                <span class="info-dialog-parts-count">
+                                    @_parts.Count
+                                    @if (_parts.Count > 0)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.ExpandMore" Class="@PartsCaretClass" />
+                                    }
+                                </span>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            <dl class="summary-list">
+                                @foreach (IBaseQuantityRecord part in _parts)
                                 {
-                                    <MudIcon Icon="@Icons.Material.Filled.ExpandMore" Class="@PartsCaretClass" />
+                                    <div class="summary-row">
+                                        <dt>@part.Name</dt>
+                                        <dd>x@(part.Quantity)</dd>
+                                    </div>
                                 }
-                            </span>
-                        </div>
-                    </TitleContent>
-                    <ChildContent>
-                        <dl class="summary-list">
-                            @foreach (IBaseQuantityRecord part in _parts)
-                            {
-                                <div class="summary-row">
-                                    <dt>@part.Name</dt>
-                                    <dd>x@(part.Quantity)</dd>
-                                </div>
-                            }
-                        </dl>
-                    </ChildContent>
-                </MudExpansionPanel>
-            </MudExpansionPanels>
-        }
+                            </dl>
+                        </ChildContent>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
+            }
 
-        @if (Step is { } step)
-        {
-            <MudDivider Class="info-dialog-divider" />
+            @if (Step is { } step)
+            {
+                <MudDivider Class="info-dialog-divider" />
 
-            <MudText Typo="Typo.subtitle2" Class="info-dialog-step-title">Crafting Step Details</MudText>
+                <MudText Typo="Typo.subtitle2" Class="info-dialog-step-title">Crafting Step Details</MudText>
 
-            <dl class="summary-list">
-                <div class="summary-row">
-                    <dt>Quantity</dt>
-                    <dd>@step.Quantity</dd>
-                </div>
-
-                @if (!step.IsComponent)
-                {
-                    @* Crafts and surplus only mean something for a blueprint. A component is gathered,
-                       so it has no craft count and cannot be overproduced. The surplus is only ever the
-                       remainder of rounding the quantity up to a whole number of crafts of the size the
-                       Yield per Craft row above gives. *@
+                <dl class="summary-list">
                     <div class="summary-row">
-                        <dt>Crafts</dt>
-                        <dd>@step.Crafts</dd>
+                        <dt>Quantity</dt>
+                        <dd>@step.Quantity</dd>
                     </div>
 
-                    @if (SelectedDataset.Settings.UseYield)
+                    @if (!step.IsComponent)
+                    {
+                        @* Crafts and surplus only mean something for a blueprint. A component is gathered,
+                           so it has no craft count and cannot be overproduced. The surplus is only ever the
+                           remainder of rounding the quantity up to a whole number of crafts of the size the
+                           Yield per Craft row above gives. *@
+                        <div class="summary-row">
+                            <dt>Crafts</dt>
+                            <dd>@step.Crafts</dd>
+                        </div>
+
+                        @if (SelectedDataset.Settings.UseYield)
+                        {
+                            <div class="summary-row">
+                                <dt>Surplus</dt>
+                                <dd>@step.Surplus</dd>
+                            </div>
+                        }
+                    }
+
+                    @if (SelectedDataset.Settings.UseCraftTime)
                     {
                         <div class="summary-row">
-                            <dt>Surplus</dt>
-                            <dd>@step.Surplus</dd>
+                            <dt>Total Production Time</dt>
+                            <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
                         </div>
                     }
-                }
+                </dl>
 
-                @if (SelectedDataset.Settings.UseCraftTime)
-                {
-                    <div class="summary-row">
-                        <dt>Total Production Time</dt>
-                        <dd>@DurationProcessor.Format(step.ProductionTime)</dd>
-                    </div>
-                }
-            </dl>
-
-            <MudText Typo="Typo.caption" Class="info-dialog-step-note">Crafting Step Details apply to this step only.</MudText>
+                <MudText Typo="Typo.caption" Class="info-dialog-step-note">Crafting Step Details apply to this step only.</MudText>
+            }
         }
     </DialogContent>
     <DialogActions>

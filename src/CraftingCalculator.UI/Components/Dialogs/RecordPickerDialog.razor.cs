@@ -8,8 +8,8 @@ using MudBlazor;
 namespace CraftingCalculator.UI.Components.Dialogs;
 
 /// <summary>
-/// Searches <see cref="Records" /> and adds them to <see cref="Target" /> or changes their quantity there in place.
-/// Each change applies to <see cref="Target" /> immediately, so the dialog has no result.
+/// Searches the records <see cref="Load" /> reads and adds them to <see cref="Target" /> or changes their quantity
+/// there in place. Each change applies to <see cref="Target" /> immediately, so the dialog has no result.
 /// </summary>
 public partial class RecordPickerDialog : ComponentBase
 {
@@ -18,8 +18,11 @@ public partial class RecordPickerDialog : ComponentBase
     /// <summary>The dialog's title.</summary>
     [Parameter, EditorRequired] public string Title { get; set; } = "";
 
-    /// <summary>Every record the user can pick, in the order they are listed.</summary>
-    [Parameter, EditorRequired] public IReadOnlyList<IBaseDataRecord> Records { get; set; } = [];
+    /// <summary>
+    /// Reads every record the user can pick, in the order they are listed. Called once, as the dialog opens; the
+    /// dialog shows it loading until the read returns.
+    /// </summary>
+    [Parameter, EditorRequired] public Func<Task<IReadOnlyList<IBaseDataRecord>>> Load { get; set; } = null!;
 
     /// <summary>Where picked records go.</summary>
     [Parameter, EditorRequired] public IRecordPickerTarget Target { get; set; } = null!;
@@ -53,22 +56,19 @@ public partial class RecordPickerDialog : ComponentBase
 
     private string GetNoMatchPhrase => _noMatchPhrases[_random.Next(_noMatchPhrases.Count)];
 
+    private IReadOnlyList<IBaseDataRecord> _records = [];
+    private bool _loaded;
     private RecordFilter _filter = RecordFilter.Empty;
     private List<IBaseDataRecord> _filtered = [];
-
-    // The Records instance _filtered was built from. The dialog's parameters are set again whenever it re-renders,
-    // and refiltering every record for a list that has not changed is the cost this avoids.
-    private IReadOnlyList<IBaseDataRecord>? _filteredFrom;
 
     // Navigating here dismisses the dialog on its own: MudDialogProvider closes every dialog whose route changes.
     private static string GettingStartedHref => $"/{HelpTopics.HelpRoot}/{HelpTopics.GettingStartedTopicId}";
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
     {
-        if (!ReferenceEquals(Records, _filteredFrom))
-        {
-            ApplyFilter();
-        }
+        _records = await Load();
+        ApplyFilter();
+        _loaded = true;
     }
 
     private void OnFilterChanged(RecordFilter filter)
@@ -77,11 +77,7 @@ public partial class RecordPickerDialog : ComponentBase
         ApplyFilter();
     }
 
-    private void ApplyFilter()
-    {
-        _filtered = RecordFilterProcessor.Apply(Records, _filter);
-        _filteredFrom = Records;
-    }
+    private void ApplyFilter() => _filtered = RecordFilterProcessor.Apply(_records, _filter);
 
     private static string RemoveLabel(IBaseDataRecord record) => $"Remove {record.Name}";
 

@@ -2,7 +2,11 @@
 
 <PageTitle>Dataset</PageTitle>
 
-@if (_record is not null)
+@if (_record is null)
+{
+    <LoadingIndicator />
+}
+else
 {
     <div class="dataset-editor">
         @* The one place this screen branches on the record type. Every data operation goes through

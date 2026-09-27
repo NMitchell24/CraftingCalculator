@@ -39,6 +39,9 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     private bool UseYield => SelectedDataset.Settings.UseYield;
     private List<BlueprintFavorite> _favorites = [];
 
+    // False until the first read returns, so the select doesn't claim there are no favorites before it knows.
+    private bool _favoritesLoaded;
+
     private int _favoriteSelectNonce;
 
     // Drives the blueprint picker's FullScreen choice. The pane layout itself is a pure CSS media query
@@ -50,7 +53,12 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     private int? SelectedFavoriteId =>
         _favorites.FirstOrDefault(favorite => favorite.Id == State.LoadedFavorite?.Id)?.Id;
 
-    private string FavoriteSelectLabel => _favorites.Count == 0 ? "No Favorites" : "Load Favorite";
+    private string FavoriteSelectLabel => (_favoritesLoaded, _favorites.Count) switch
+    {
+        (false, _) => "Loading...",
+        (true, 0) => "No Favorites",
+        _ => "Load Favorite"
+    };
 
     // The Load Favorite select is rebuilt rather than updated: MudSelect holds the value it set itself
     // and does not reliably take a new one back from its Value parameter, which showed up as the field
@@ -87,6 +95,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
     private async Task ReloadFavoritesAsync()
     {
         _favorites = await Task.Run(FavoriteService.GetAllFavoritesAsync);
+        _favoritesLoaded = true;
 
         // Rendered here rather than left to the caller: ActionsBar owns the Save action's click, so its
         // EventCallback renders that component and never this page.
@@ -115,8 +124,6 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     private async Task ShowPickerAsync()
     {
-        List<BlueprintSummary> blueprints = await Task.Run(BlueprintService.GetBlueprintSummariesAsync);
-
         DialogOptions options = new()
         {
             FullScreen = IsCompact,
@@ -128,13 +135,16 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
         DialogParameters<RecordPickerDialog> parameters = new()
         {
             { dialog => dialog.Title, "Add blueprints" },
-            { dialog => dialog.Records, blueprints },
+            { dialog => dialog.Load, ReadBlueprintsAsync },
             { dialog => dialog.Target, this },
             { dialog => dialog.FilterList, FilterList.CraftPicker }
         };
 
         await DialogService.ShowAsync<RecordPickerDialog>("Add blueprints", parameters, options);
     }
+
+    private async Task<IReadOnlyList<IBaseDataRecord>> ReadBlueprintsAsync() =>
+        await Task.Run(BlueprintService.GetBlueprintSummariesAsync);
 
     // The picker is only handed entries Find returned, so the casts below cannot fail.
     public IBaseQuantityRecord? Find(IBaseDataRecord record) =>

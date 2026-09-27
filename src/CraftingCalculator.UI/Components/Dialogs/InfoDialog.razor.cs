@@ -14,21 +14,32 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 /// </summary>
 public partial class InfoDialog
 {
+    // Record, or the full blueprint read in its place when Record is a summary.
+    private IBaseDataRecord? _record;
     private List<IBaseQuantityRecord> _parts = [];
+    private bool _loaded;
     private bool _partsExpanded;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Inject] private ISelectedDatasetState SelectedDataset { get; set; } = null!;
+    [Inject] private IBlueprintService BlueprintService { get; set; } = null!;
+    [Inject] private IFavoriteService FavoriteService { get; set; } = null!;
 
-    /// <summary>The category, component or blueprint the dialog describes, or null when it describes a <see cref="Favorite"/>.</summary>
+    /// <summary>
+    /// The category, component or blueprint the dialog describes, or null when it describes a <see cref="Favorite"/>.
+    /// A <see cref="BlueprintSummary"/> is read in full as the dialog opens.
+    /// </summary>
     [Parameter] public IBaseDataRecord? Record { get; set; }
 
     /// <summary>The favorite the dialog describes, or null when it describes a <see cref="Record"/>.</summary>
     [Parameter] public BlueprintFavorite? Favorite { get; set; }
 
-    /// <summary>The blueprints <see cref="Favorite"/> holds, and how many of each.</summary>
-    [Parameter] public IReadOnlyList<BlueprintQuantity> FavoriteBlueprints { get; set; } = [];
+    /// <summary>
+    /// The blueprints <see cref="Favorite"/> holds, and how many of each, or null to read them from the saved favorite
+    /// as the dialog opens.
+    /// </summary>
+    [Parameter] public IReadOnlyList<BlueprintQuantity>? FavoriteBlueprints { get; set; }
 
     /// <summary>
     /// The Crafting Steps row the dialog was opened from, which adds the figures that apply to that
@@ -36,15 +47,15 @@ public partial class InfoDialog
     /// </summary>
     [Parameter] public BlueprintNode? Step { get; set; }
 
-    private BlueprintModel? Blueprint => Record as BlueprintModel;
+    private BlueprintModel? Blueprint => _record as BlueprintModel;
 
-    private ComponentModel? Component => Record as ComponentModel;
+    private ComponentModel? Component => _record as ComponentModel;
 
     private string? Name => Record is not null ? Record.Name : Favorite?.Name;
 
     // Only a blueprint and a component name their kind. A category or a favorite is opened from a list that is
-    // already labeled with it.
-    private string? Kind => Record is BlueprintModel or ComponentModel ? Record.Type.GetDescription() : null;
+    // already labeled with it. Read off the type rather than the model, so a summary names it while it loads.
+    private string? Kind => Record?.Type is DataType.Blueprint or DataType.Component ? Record.Type.GetDescription() : null;
 
     private string PartsLabel => Favorite is null ? "Components" : "Blueprints";
 
@@ -62,6 +73,10 @@ public partial class InfoDialog
             { dialog => dialog.Step, step }
         });
 
+    /// <summary>Opens the dialog for a saved favorite, reading the blueprints it holds.</summary>
+    public static Task<IDialogReference> ShowAsync(IDialogService dialogs, BlueprintFavorite favorite) =>
+        ShowAsync(dialogs, favorite.Name, new DialogParameters<InfoDialog> { { dialog => dialog.Favorite, favorite } });
+
     /// <summary>Opens the dialog for a favorite and the blueprints it holds.</summary>
     public static Task<IDialogReference> ShowAsync(
         IDialogService dialogs, BlueprintFavorite favorite, IReadOnlyList<BlueprintQuantity> blueprints) =>
@@ -71,12 +86,33 @@ public partial class InfoDialog
             { dialog => dialog.FavoriteBlueprints, blueprints }
         });
 
-    protected override void OnParametersSet() =>
+    protected override async Task OnInitializedAsync()
+    {
+        _record = Record;
+        IReadOnlyList<BlueprintQuantity> favoriteBlueprints = FavoriteBlueprints ?? [];
+
+        // A list row carries a summary, and the parts below need the whole blueprint. The summary stands in only when
+        // the blueprint was deleted after the list was read.
+        if (Record is BlueprintSummary summary)
+        {
+            if (await Task.Run(() => BlueprintService.GetBlueprintByIdAsync(summary.Id)) is { } blueprint)
+            {
+                _record = blueprint;
+            }
+        }
+        else if (Favorite is { } favorite && FavoriteBlueprints is null)
+        {
+            favoriteBlueprints = await Task.Run(() => FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
+        }
+
         // Held in a field rather than read from a property in the markup: the panel's header renders
         // the count and its body the rows, so a property would rebuild the list twice per render.
         _parts = Blueprint is not null
             ? BlueprintPartProcessor.GetParts(Blueprint)
-            : [.. FavoriteBlueprints.OrderBy(quantity => quantity.Name)];
+            : [.. favoriteBlueprints.OrderBy(quantity => quantity.Name)];
+
+        _loaded = true;
+    }
 
     private static Task<IDialogReference> ShowAsync(IDialogService dialogs, string? title, DialogParameters<InfoDialog> parameters)
     {

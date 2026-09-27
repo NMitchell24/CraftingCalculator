@@ -32,12 +32,6 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
 
     private async Task ShowAddPartsAsync()
     {
-        List<ComponentModel> components = await Task.Run(ComponentService.GetAllComponentsAsync);
-
-        // The only cycle guard: the list never offers a blueprint that would close a loop, so none can be picked.
-        List<BlueprintSummary> blueprints =
-            await Task.Run(() => BlueprintService.GetNestableBlueprintSummariesAsync(Model.Id));
-
         DialogOptions options = new()
         {
             FullScreen = Breakpoint == Breakpoint.Xs,
@@ -50,12 +44,23 @@ public partial class BlueprintEditor : ComponentBase, IRecordPickerTarget
         DialogParameters<RecordPickerDialog> parameters = new()
         {
             { dialog => dialog.Title, "Add requirements" },
-            { dialog => dialog.Records, [.. components.Concat<IBaseDataRecord>(blueprints).OrderBy(record => record.Name, StringComparer.CurrentCultureIgnoreCase)] },
+            { dialog => dialog.Load, ReadPartCandidatesAsync },
             { dialog => dialog.Target, this },
             { dialog => dialog.FilterList, FilterList.RequirementsPicker }
         };
 
         await DialogService.ShowAsync<RecordPickerDialog>("Add requirements", parameters, options);
+    }
+
+    private async Task<IReadOnlyList<IBaseDataRecord>> ReadPartCandidatesAsync()
+    {
+        List<ComponentModel> components = await Task.Run(ComponentService.GetAllComponentsAsync);
+
+        // The only cycle guard: the list never offers a blueprint that would close a loop, so none can be picked.
+        List<BlueprintSummary> blueprints =
+            await Task.Run(() => BlueprintService.GetNestableBlueprintSummariesAsync(Model.Id));
+
+        return [.. components.Concat<IBaseDataRecord>(blueprints).OrderBy(record => record.Name, StringComparer.CurrentCultureIgnoreCase)];
     }
 
     public IBaseQuantityRecord? Find(IBaseDataRecord record) => BlueprintPartProcessor.FindPart(Model, record);
