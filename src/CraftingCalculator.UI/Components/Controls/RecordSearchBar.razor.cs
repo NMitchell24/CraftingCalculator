@@ -73,9 +73,8 @@ public partial class RecordSearchBar : ComponentBase
         // Records change as the user edits, so a selected category can stop being offered - the last
         // record in it is recategorized, or the category itself is deleted. The stale id would go on
         // filtering with no chip left to explain why, so it is dropped and the host re-notified.
-        // The remembered selection is pruned rather than _filter: DatasetList renders this bar with no
-        // Records while it loads, and pruning _filter against that would lose the selection before the
-        // records arrive.
+        // The remembered selection is pruned rather than _filter: _filter starts out empty, so this is also
+        // what restores the remembered selection when the bar is created.
         RecordFilter pruned = RecordFilterProcessor.Prune(
             _filter with { CategoryIds = CategoryFilterState.Get(FilterList) }, Records);
 

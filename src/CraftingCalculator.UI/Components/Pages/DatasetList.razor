@@ -3,53 +3,60 @@
 <PageTitle>Dataset</PageTitle>
 
 <div class="dataset-page">
-    @* Keyed on the type: the router reuses this page instance when only {Type} changes, so without it
-       the bar would keep the previous type's search text and selection. *@
-    <RecordSearchBar @key="_type" Records="_records" FilterList="FilterListFor(_type)" FilterChanged="OnFilterChanged" />
-
-    @if (_loaded && _filtered.Count == 0)
+    @if (!_loaded)
     {
-        <div class="pane-empty-state">
-            @if (_records.Count == 0)
-            {
-                <MudText Typo="Typo.body1">Nothing here yet</MudText>
-                <MudText Typo="Typo.caption">Use the + action to create one.</MudText>
-            }
-            else
-            {
-                <MudText Typo="Typo.body1">No matches</MudText>
-                <MudText Typo="Typo.caption">Nothing here matches the current filter.</MudText>
-            }
-        </div>
+        <LoadingIndicator />
     }
     else
     {
-        @* Outside Delete mode the list is ReadOnly, so a card is a plain list item: no clickable styling, ripple,
-           option role or tab stop. ReadOnly still invokes MudListItem.OnClick on a tap, which is why
-           ToggleSelection keeps its own mode check. *@
-        <MudList T="IBaseDataRecord" ReadOnly="@(_mode != ListMode.Delete)">
-            <Virtualize Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
-                        Context="record">
-                <MudListItem @key="record.Id" T="IBaseDataRecord" Class="@RowClass(record)"
-                             OnClick="@(() => ToggleSelection(record))">
-                    @* A category has no Info button: its dialog would repeat the name and description the card
-                       already shows. *@
-                    <RecordCard Name="@(record.Name ?? "")" Record="@(_type == DataType.Category ? null : record)"
-                                Details="@DetailsFor(record)">
-                        <Actions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-                                           title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
-                                           OnClick="@(() => Edit(record))" />
-                            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary"
-                                           title="@($"Copy {record.Name}")" aria-label="@($"Copy {record.Name}")"
-                                           OnClick="@(() => Copy(record))" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
-                                           title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
-                                           OnClick="@(() => DeleteAsync(record))" />
-                        </Actions>
-                    </RecordCard>
-                </MudListItem>
-            </Virtualize>
-        </MudList>
+        @* Keyed on the type: the router reuses this page instance when only {Type} changes, so without it
+           the bar would keep the previous type's search text and selection. *@
+        <RecordSearchBar @key="_type" Records="_records" FilterList="FilterListFor(_type)" FilterChanged="OnFilterChanged" />
+
+        @if (_filtered.Count == 0)
+        {
+            <div class="pane-empty-state">
+                @if (_records.Count == 0)
+                {
+                    <MudText Typo="Typo.body1">Nothing here yet</MudText>
+                    <MudText Typo="Typo.caption">Use the + action to create one.</MudText>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body1">No matches</MudText>
+                    <MudText Typo="Typo.caption">Nothing here matches the current filter.</MudText>
+                }
+            </div>
+        }
+        else
+        {
+            @* Outside Delete mode the list is ReadOnly, so a card is a plain list item: no clickable styling, ripple,
+               option role or tab stop. ReadOnly still invokes MudListItem.OnClick on a tap, which is why
+               ToggleSelection keeps its own mode check. *@
+            <MudList T="IBaseDataRecord" ReadOnly="@(_mode != ListMode.Delete)">
+                <Virtualize Items="_filtered" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
+                            Context="record">
+                    <MudListItem @key="record.Id" T="IBaseDataRecord" Class="@RowClass(record)"
+                                 OnClick="@(() => ToggleSelection(record))">
+                        @* A category has no Info button: its dialog would repeat the name and description the card
+                           already shows. *@
+                        <RecordCard Name="@(record.Name ?? "")" Record="@(_type == DataType.Category ? null : record)"
+                                    Details="@DetailsFor(record)">
+                            <Actions>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                               title="@($"Edit {record.Name}")" aria-label="@($"Edit {record.Name}")"
+                                               OnClick="@(() => Edit(record))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary"
+                                               title="@($"Copy {record.Name}")" aria-label="@($"Copy {record.Name}")"
+                                               OnClick="@(() => Copy(record))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                               title="@($"Delete {record.Name}")" aria-label="@($"Delete {record.Name}")"
+                                               OnClick="@(() => DeleteAsync(record))" />
+                            </Actions>
+                        </RecordCard>
+                    </MudListItem>
+                </Virtualize>
+            </MudList>
+        }
     }
 </div>

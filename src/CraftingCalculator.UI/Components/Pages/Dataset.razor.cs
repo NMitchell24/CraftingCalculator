@@ -45,6 +45,9 @@ public partial class Dataset : ComponentBase, IDisposable
 
     private List<DatasetSection> Sections { get; set; } = [];
     private List<DatasetModel> _datasets = [];
+
+    // False until the first read returns: until then the screen shows it loading, not an empty switcher.
+    private bool _loaded;
     private bool _busy;
     private DatasettingsView _datasettingsView = DatasettingsView.General;
     private MudTextField<string> _currencyNameField = null!;
@@ -142,6 +145,7 @@ public partial class Dataset : ComponentBase, IDisposable
 
         _datasets = datasets;
         Sections = sections;
+        _loaded = true;
     }
 
     // Returns a Task only because PageAction.OnClick is a Func<Task> - the navigation is synchronous,

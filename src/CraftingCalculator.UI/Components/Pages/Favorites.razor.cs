@@ -44,7 +44,7 @@ public partial class Favorites : ComponentBase, IDisposable
 
     private List<BlueprintFavorite> _favorites = [];
 
-    // False until the first read returns, so the empty state is not shown for a list that has not arrived yet.
+    // False until the first read returns: until then the screen shows it loading, not the empty state.
     private bool _loaded;
     private ListMode _mode = ListMode.Normal;
 
@@ -148,10 +148,7 @@ public partial class Favorites : ComponentBase, IDisposable
     private static IReadOnlyList<string> DetailsFor(BlueprintFavorite favorite) =>
         [$"{favorite.BlueprintCount} blueprint{(favorite.BlueprintCount == 1 ? "" : "s")}"];
 
-    private async Task ShowInfoAsync(BlueprintFavorite favorite) =>
-        await InfoDialog.ShowAsync(
-            DialogService, favorite,
-            await Task.Run(() => FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite)));
+    private Task ShowInfoAsync(BlueprintFavorite favorite) => InfoDialog.ShowAsync(DialogService, favorite);
 
     private async Task RenameAsync(BlueprintFavorite favorite)
     {

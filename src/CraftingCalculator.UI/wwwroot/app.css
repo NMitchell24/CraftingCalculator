@@ -244,22 +244,25 @@ html, body {
     box-sizing: content-box;
 }
 
+/* The bottom offset is a custom property rather than the padding itself so the rules below only restate the
+   offset, and so .loading-indicator can size itself to the content area from the same value. */
 .page-content {
+    --page-content-bottom: calc(16px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
     padding: 16px;
-    padding-bottom: calc(16px + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    padding-bottom: var(--page-content-bottom);
     padding-left: calc(16px + var(--edge-inset-left));
     padding-right: calc(16px + var(--edge-inset-right));
 }
 
 .page-content-with-bottom-nav {
-    padding-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    --page-content-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
 /* Always applied alongside .page-content-with-bottom-nav (MainLayout.razor), never on its own: it
    restates the whole offset rather than adding to it, because two one-class rules setting the same
    property are decided by source order, and this one has to come after the rule above. */
 .page-content-with-actions-bar {
-    padding-bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
+    --page-content-bottom: calc(var(--bottom-nav-height) + var(--actions-bar-height) + max(env(safe-area-inset-bottom), var(--safe-area-inset-bottom)));
 }
 
 /* While the on-screen keyboard is up (.keyboard-open, see js/keyboard.js) it covers the bottom bars rather than
@@ -273,7 +276,7 @@ html.keyboard-open .editor-action-bar {
 
 /* Out-specifies both offsets above, which are always applied together. */
 html.keyboard-open .page-content-with-bottom-nav {
-    padding-bottom: 16px;
+    --page-content-bottom: 16px;
 }
 
 /* MainLayout.razor wraps each destination link in the side rail and the bottom nav to take over its click.
@@ -669,6 +672,63 @@ html.keyboard-open .page-content-with-bottom-nav {
    call-to-action reading as disabled. */
 .pane-empty-state .mud-typography {
     opacity: 0.7;
+}
+
+/* Components/Controls/LoadingIndicator.razor. Hidden for its first 200ms: most reads return well inside that, and
+   a spinner shown for a frame or two reads as a glitch rather than as progress. Then it fades in, so a read that
+   ends just after the delay (a first-use read, like the first editor open after a cold start) leaves a faint
+   flicker rather than a flash. visibility as well as opacity, so a screen reader doesn't announce it early. */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 32px 16px;
+    text-align: center;
+    animation: loading-indicator-reveal 200ms ease-in 200ms both;
+}
+
+@keyframes loading-indicator-reveal {
+    from {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    to {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* The fade is decoration; the delay is not, so it stays. */
+@media (prefers-reduced-motion: reduce) {
+    .loading-indicator {
+        animation-duration: 0ms;
+    }
+}
+
+/* On a screen it fills the content area, which centers it between the app bar and the bars below: the viewport
+   less what .page-content pads around it, the app bar and its 16px gap above and --page-content-bottom below.
+   Declared through @supports for the reason .transfer-hub's viewport is. */
+.mud-main-content .loading-indicator {
+    min-height: calc(100vh - var(--app-bar-bottom) - 16px - var(--page-content-bottom));
+}
+
+@supports (height: 100dvh) {
+    .mud-main-content .loading-indicator {
+        min-height: calc(100dvh - var(--app-bar-bottom) - 16px - var(--page-content-bottom));
+    }
+}
+
+/* In a picker it is the dialog content's only child, and fills it the same way. */
+.picker-dialog-content:has(> .loading-indicator) {
+    display: flex;
+    flex-direction: column;
+}
+
+.picker-dialog-content > .loading-indicator {
+    flex: 1 1 auto;
 }
 
 /* Surface separation for every list in the app, applied to MudListItem rather than to .record-card so
