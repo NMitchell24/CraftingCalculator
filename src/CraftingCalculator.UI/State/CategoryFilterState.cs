@@ -16,7 +16,10 @@ public enum FilterList
     RequirementsPicker,
 
     /// <summary>The picker the Craft screen adds blueprints to the batch from.</summary>
-    CraftPicker
+    CraftPicker,
+
+    /// <summary>The Craft screen's list of blueprints the batch can take as already crafted.</summary>
+    AlreadyCrafted
 }
 
 /// <summary>

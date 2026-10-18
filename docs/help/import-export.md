@@ -59,7 +59,7 @@ Bronze and 2 Leather Scraps, and you've saved a favorite called `Bronze Axe run`
 
 - **Selecting a blueprint:** selects everything it's made from, all the way down. If you select the Bronze Axe and Wood,
   then Bronze, Copper, Tin, Leather Scraps and the categories they're filed under come with it. No questions asked.
-- **Selecting a favorite:** does the same for every blueprint in it.
+- **Selecting a favorite:** does the same for every blueprint in it, and every one it marks as already crafted.
 - **Selecting a component:** selects its category too.
 - **Deselecting anything else:** deselects everything that needs it, all the way up. If you deselect Copper then 
   Bronze has to go, which means the Bronze Axe goes, which means `Bronze Axe run` goes. That's more than you tapped,

@@ -1,9 +1,16 @@
-@* Resolves the asterisk BlueprintTreeNode puts on those rows. Rendered once for the whole tree, and only
-   while a row carrying one is on screen. *@
+@* Resolves the asterisk BlueprintTreeNode puts on those rows, and the tinted icon on an already crafted one. Rendered
+   once for the whole tree, each line only while a row it explains is on screen. *@
 @if (State.HasVisibleCraftCountedStep)
 {
     <MudText Typo="Typo.caption" Class="steps-tree-legend">
         * This crafting step makes items in batches, or uses surplus from a step above it. The number
         shown is how many crafts this step needs.
+    </MudText>
+}
+@if (State.HasVisibleAlreadyCraftedStep)
+{
+    <MudText Typo="Typo.caption" Class="steps-tree-legend">
+        Tinted <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Tertiary" Class="steps-tree-legend-icon" />
+        rows are blueprints you marked as already crafted, so they aren't crafted in this batch.
     </MudText>
 }

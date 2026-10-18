@@ -18,19 +18,23 @@ public interface IBlueprintFavoritesDAO
 
     /// <summary>
     /// Replaces any existing favorite with the same name (if <paramref name="favorite"/>.Id is 0) or
-    /// updates the existing record by id, then replaces its saved blueprint quantities with
-    /// <paramref name="quantities"/>. Returns the saved favorite with its assigned Id.
+    /// updates the existing record by id, then replaces its saved blueprint quantities and already crafted
+    /// blueprints with <paramref name="batch"/>'s. Returns the saved favorite with its assigned Id.
     /// </summary>
-    Task<BlueprintFavorite> SaveAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities);
+    Task<BlueprintFavorite> SaveAsync(BlueprintFavorite favorite, Batch batch);
 
     /// <summary>Changes the favorite's name. Its saved blueprint quantities are left as they are.</summary>
     Task RenameAsync(int id, string name);
 
     /// <summary>
-    /// Deletes every favorite in <paramref name="ids"/>. Their saved blueprint quantities are removed
-    /// by the database's cascade delete rather than by the caller.
+    /// Deletes every favorite in <paramref name="ids"/>. Their saved blueprint quantities and already crafted
+    /// blueprints are removed by the database's cascade delete rather than by the caller.
     /// </summary>
     Task DeleteAsync(IEnumerable<int> ids);
 
-    Task<List<BlueprintQuantity>> GetBlueprintQuantitiesAsync(int favoriteId);
+    /// <summary>
+    /// The batch saved as the favorite with <paramref name="favoriteId"/>, each blueprint built out with its parts. A
+    /// saved quantity or already crafted mark naming a blueprint outside the current dataset is left out.
+    /// </summary>
+    Task<Batch> GetBatchAsync(int favoriteId);
 }

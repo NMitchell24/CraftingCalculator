@@ -60,7 +60,7 @@ public class DatasetCopyTests
         await _blueprintDAO.SaveAsync(axe);
 
         await _favoritesDAO.SaveAsync(
-            new BlueprintFavorite { Name = "Starter kit" }, [new BlueprintQuantity(axe, 2)]);
+            new BlueprintFavorite { Name = "Starter kit" }, new Batch([new BlueprintQuantity(axe, 2)], new HashSet<int>()));
     }
 
     /// <summary>The selected dataset's blueprint named <paramref name="name"/>, built out in full.</summary>
@@ -168,7 +168,7 @@ public class DatasetCopyTests
 
         _fixture.SelectDataset(copy.Id);
         BlueprintFavorite favorite = (await _favoritesDAO.GetAllAsync()).Single();
-        List<BlueprintQuantity> quantities = await _favoritesDAO.GetBlueprintQuantitiesAsync(favorite.Id);
+        IReadOnlyList<BlueprintQuantity> quantities = (await _favoritesDAO.GetBatchAsync(favorite.Id)).Blueprints;
 
         BlueprintQuantity saved = quantities.Should().ContainSingle().Subject;
 

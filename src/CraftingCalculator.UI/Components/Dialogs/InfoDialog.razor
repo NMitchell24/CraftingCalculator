@@ -56,6 +56,14 @@
                                 <dd>@DurationProcessor.Format(blueprint.ProductionTime)</dd>
                             </div>
                         }
+
+                        @if (AlreadyCrafted && SelectedDataset.Settings.UseCosts)
+                        {
+                            <div class="summary-row">
+                                <dt>Cost per Item</dt>
+                                <dd>@CurrencyProcessor.Format(BatchProcessor.CostOf(new BlueprintQuantity(blueprint, 1), SelectedDataset.Settings), SelectedDataset.Settings)</dd>
+                            </div>
+                        }
                     }
                     else if (Component is { } component)
                     {
@@ -76,6 +84,11 @@
                         }
                     }
                 </dl>
+            }
+
+            @if (AlreadyCrafted)
+            {
+                <MudText Typo="Typo.caption" Class="info-dialog-step-note">@AlreadyCraftedCaption</MudText>
             }
 
             @if (Blueprint is not null || Favorite is not null)
@@ -120,6 +133,11 @@
                 <MudDivider Class="info-dialog-divider" />
 
                 <MudText Typo="Typo.subtitle2" Class="info-dialog-step-title">Crafting Step Details</MudText>
+
+                @if (step.AlreadyCrafted)
+                {
+                    <MudText Typo="Typo.caption" Class="info-dialog-step-note">@AlreadyCraftedCaption</MudText>
+                }
 
                 <dl class="summary-list">
                     <div class="summary-row">

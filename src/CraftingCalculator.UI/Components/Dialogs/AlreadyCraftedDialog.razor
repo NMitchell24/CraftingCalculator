@@ -1,0 +1,38 @@
+@* No DialogActions: each switch applies to the batch as it flips, like a tap in RecordPickerDialog, so Close is the
+   only way out. picker-dialog-content gives it the picker's fixed height and sticky search bar (app.css). *@
+<MudDialog ContentClass="picker-dialog-content">
+    <TitleContent>
+        <div class="closable-dialog-title">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" OnClick="Close" aria-label="Close" />
+            <MudText Typo="Typo.h6" Class="closable-dialog-title-text">Already Crafted</MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <RecordSearchBar Records="_candidates" FilterList="FilterList.AlreadyCrafted" FilterChanged="OnFilterChanged" />
+
+        @if (_filtered.Count == 0)
+        {
+            <MudText Class="pa-4" Align="Align.Center">Nothing in this batch matches that search.</MudText>
+        }
+        else
+        {
+            <VirtualList Items="_filtered" ItemSize="RowHeight" Context="blueprint">
+                @* A row inside a marked blueprint stays listed and is disabled rather than hidden, so marking one
+                   never moves the rows under the user's thumb. *@
+                <div class="setting-row" @key="blueprint.Id">
+                    <div class="setting-text">
+                        <MudText Typo="Typo.body1">@blueprint.Name</MudText>
+                        @if (State.IsInsideAlreadyCrafted(blueprint.Id))
+                        {
+                            <MudText Typo="Typo.caption" Class="setting-caption">Inside a blueprint you marked as already crafted.</MudText>
+                        }
+                    </div>
+                    <MudSwitch T="bool" Value="@State.IsAlreadyCrafted(blueprint.Id)"
+                               ValueChanged="@(alreadyCrafted => State.SetAlreadyCrafted(blueprint.Id, alreadyCrafted))"
+                               Disabled="@State.IsInsideAlreadyCrafted(blueprint.Id)"
+                               Color="Color.Primary" AriaLabel="@blueprint.Name" />
+                </div>
+            </VirtualList>
+        }
+    </DialogContent>
+</MudDialog>

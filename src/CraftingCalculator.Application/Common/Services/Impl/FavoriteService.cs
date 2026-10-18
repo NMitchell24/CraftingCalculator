@@ -8,8 +8,8 @@ public class FavoriteService(IBlueprintFavoritesDAO dao) : IFavoriteService
 {
     public Task<List<BlueprintFavorite>> GetAllFavoritesAsync() => dao.GetAllAsync();
 
-    public Task<BlueprintFavorite> SaveFavoriteAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities)
-        => dao.SaveAsync(favorite, quantities);
+    public Task<BlueprintFavorite> SaveFavoriteAsync(BlueprintFavorite favorite, Batch batch)
+        => dao.SaveAsync(favorite, batch);
 
     public Task RenameFavoriteAsync(BlueprintFavorite favorite, string newName) => dao.RenameAsync(favorite.Id, newName);
 
@@ -20,6 +20,6 @@ public class FavoriteService(IBlueprintFavoritesDAO dao) : IFavoriteService
 
     public async Task<bool> DoesFavoriteExistAsync(string? name) => await dao.GetByNameAsync(name) != null;
 
-    public Task<List<BlueprintQuantity>> GetBlueprintQuantitiesForFavoriteAsync(BlueprintFavorite? favorite)
-        => favorite != null ? dao.GetBlueprintQuantitiesAsync(favorite.Id) : Task.FromResult(new List<BlueprintQuantity>());
+    public Task<Batch> GetBatchForFavoriteAsync(BlueprintFavorite? favorite)
+        => favorite != null ? dao.GetBatchAsync(favorite.Id) : Task.FromResult(Batch.Empty);
 }

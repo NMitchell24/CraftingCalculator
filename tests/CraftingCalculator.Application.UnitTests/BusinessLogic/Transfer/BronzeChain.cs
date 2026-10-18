@@ -8,7 +8,8 @@ namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer;
 /// Valheim's bronze chain as a snapshot, the one dataset every transfer test reads. Bronze is 2 Copper and
 /// 1 Tin; a Bronze Axe is 4 Wood and 8 Bronze; one Bronze craft makes 20 Bronze Nails. Bronze is reached
 /// through both the Axe and the Nails, and the Karve prep favorite holds both, so the chain has a shared
-/// sub-recipe. Food is a category nothing is filed under, and Wood is uncategorized.
+/// sub-recipe; Karve prep takes that Bronze as already crafted. Food is a category nothing is filed under, and Wood is
+/// uncategorized.
 /// </summary>
 internal static class BronzeChain
 {
@@ -48,9 +49,25 @@ internal static class BronzeChain
                 [], [new QuantityLink(Bronze.Id, 1)])
         ],
         [
-            new SnapshotFavorite(AxeRun.Id, "Bronze Axe run", [new QuantityLink(BronzeAxe.Id, 5)]),
+            new SnapshotFavorite(AxeRun.Id, "Bronze Axe run", [new QuantityLink(BronzeAxe.Id, 5)], []),
             new SnapshotFavorite(KarvePrep.Id, "Karve prep",
-                [new QuantityLink(BronzeNails.Id, 10), new QuantityLink(BronzeAxe.Id, 1)])
+                [new QuantityLink(BronzeNails.Id, 10), new QuantityLink(BronzeAxe.Id, 1)], [Bronze.Id])
         ],
         Datasettings.Default);
+
+    /// <summary>
+    /// <see cref="Snapshot"/> after a recipe edit left a stale mark: the Bronze Axe run was saved with Bronze already
+    /// crafted, and the Bronze Axe was then changed to need no Bronze, so nothing in the favorite nests Bronze any more.
+    /// </summary>
+    public static DatasetSnapshot WithAStaleMark { get; } = Snapshot with
+    {
+        Blueprints =
+        [
+            .. Snapshot.Blueprints.Select(blueprint => blueprint.Id == BronzeAxe.Id ? blueprint with { Blueprints = [] } : blueprint)
+        ],
+        Favorites =
+        [
+            .. Snapshot.Favorites.Select(favorite => favorite.Id == AxeRun.Id ? favorite with { AlreadyCrafted = [Bronze.Id] } : favorite)
+        ]
+    };
 }

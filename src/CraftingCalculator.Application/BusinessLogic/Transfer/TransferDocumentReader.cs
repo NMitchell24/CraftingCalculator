@@ -217,7 +217,10 @@ public static class TransferDocumentReader
                 blueprint.Ref, blueprint.Name, blueprint.Description, blueprint.Value, blueprint.Yield,
                 blueprint.ProductionTime, blueprint.Category, Links(blueprint.Components), Links(blueprint.Blueprints)))
         ],
-        [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))],
+        [
+            .. document.Favorites.Select(favorite => new SnapshotFavorite(
+                favorite.Ref, favorite.Name, Links(favorite.Blueprints), [.. favorite.AlreadyCrafted ?? []]))
+        ],
         document.Datasettings is { } settings
             ? new Datasettings(UseYield: settings.UseYield, UseCosts: settings.UseCosts, UseValues: settings.UseValues,
                 UseCraftTime: settings.UseCraftTime, CurrencyLabel: CurrencyProcessor.ToLabel(settings.CurrencyLabel),
@@ -311,6 +314,7 @@ public static class TransferDocumentReader
                 CheckName(Favorite, favorite.Ref, favorite.Name);
                 CheckLength($"The name of {subject}", favorite.Name, MaxNameLength);
                 CheckLinks(subject, Blueprint, favorite.Blueprints, blueprints);
+                CheckAlreadyCrafted(subject, favorite.AlreadyCrafted ?? [], blueprints);
             }
 
             return _unlisted == 0 ? _errors : [.. _errors, $"…and {_unlisted} more problems."];
@@ -402,6 +406,25 @@ public static class TransferDocumentReader
             if (category is { } reference && !categories.Contains(reference))
             {
                 Add($"{subject} is filed under a category that isn't in the file (ref {reference}).");
+            }
+        }
+
+        // A mark isn't checked against the favorite's own blueprints: a recipe edited after the favorite was saved can
+        // leave one that the favorite no longer nests, and loading the favorite drops it.
+        private void CheckAlreadyCrafted(string subject, IEnumerable<int> alreadyCrafted, HashSet<int> blueprints)
+        {
+            HashSet<int> seen = [];
+
+            foreach (int reference in alreadyCrafted)
+            {
+                if (!blueprints.Contains(reference))
+                {
+                    Add($"{subject} marks a {Blueprint} as already crafted that isn't in the file (ref {reference}).");
+                }
+                else if (!seen.Add(reference))
+                {
+                    Add($"{subject} marks the same {Blueprint} as already crafted more than once (ref {reference}).");
+                }
             }
         }
 

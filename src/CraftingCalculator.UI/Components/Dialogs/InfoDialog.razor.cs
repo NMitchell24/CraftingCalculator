@@ -14,6 +14,8 @@ namespace CraftingCalculator.UI.Components.Dialogs;
 /// </summary>
 public partial class InfoDialog
 {
+    private const string AlreadyCraftedCaption = "You marked this as already crafted for this batch.";
+
     // Record, or the full blueprint read in its place when Record is a summary.
     private IBaseDataRecord? _record;
     private List<IBaseQuantityRecord> _parts = [];
@@ -47,6 +49,12 @@ public partial class InfoDialog
     /// </summary>
     [Parameter] public BlueprintNode? Step { get; set; }
 
+    /// <summary>
+    /// Whether <see cref="Record"/> is a blueprint the Craft screen's batch takes as already crafted, opened from the
+    /// Components list rather than from a step. Adds what the batch pays for one of it.
+    /// </summary>
+    [Parameter] public bool AlreadyCrafted { get; set; }
+
     private BlueprintModel? Blueprint => _record as BlueprintModel;
 
     private ComponentModel? Component => _record as ComponentModel;
@@ -71,6 +79,17 @@ public partial class InfoDialog
         {
             { dialog => dialog.Record, step.Source },
             { dialog => dialog.Step, step }
+        });
+
+    /// <summary>
+    /// Opens the dialog for a blueprint the Craft screen's batch takes as already crafted, picked from the Components
+    /// list.
+    /// </summary>
+    public static Task<IDialogReference> ShowAlreadyCraftedAsync(IDialogService dialogs, BlueprintModel blueprint) =>
+        ShowAsync(dialogs, blueprint.Name, new DialogParameters<InfoDialog>
+        {
+            { dialog => dialog.Record, blueprint },
+            { dialog => dialog.AlreadyCrafted, true }
         });
 
     /// <summary>Opens the dialog for a saved favorite, reading the blueprints it holds.</summary>
@@ -102,7 +121,7 @@ public partial class InfoDialog
         }
         else if (Favorite is { } favorite && FavoriteBlueprints is null)
         {
-            favoriteBlueprints = await Task.Run(() => FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
+            favoriteBlueprints = (await Task.Run(() => FavoriteService.GetBatchForFavoriteAsync(favorite))).Blueprints;
         }
 
         // Held in a field rather than read from a property in the markup: the panel's header renders

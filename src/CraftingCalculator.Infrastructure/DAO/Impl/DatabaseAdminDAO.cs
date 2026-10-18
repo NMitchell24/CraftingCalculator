@@ -9,8 +9,8 @@ public class DatabaseAdminDAO(DatasetScopedContextFactory contextFactory) : IDat
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
 
-        // Cascade delete removes BlueprintComponents/BlueprintChildren/FavoriteBlueprints as their parent
-        // Blueprints, Components, and Favorites are removed. Each of these reaches only the selected
+        // Cascade delete removes BlueprintComponents/BlueprintChildren/FavoriteBlueprints/FavoriteAlreadyCrafted as
+        // their parent Blueprints, Components, and Favorites are removed. Each of these reaches only the selected
         // dataset's rows: the query filter applies to ExecuteDelete the same way it does to a read.
         await context.Blueprints.ExecuteDeleteAsync();
         await context.Components.ExecuteDeleteAsync();

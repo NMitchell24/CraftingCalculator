@@ -27,6 +27,10 @@ You **don't** have to model every recipe as a [blueprint](blueprints.md). If you
 Bronze a [component](components.md) with a cost and stop there. The app doesn't know the difference and doesn't care.
 It's your data. Create it in the way that's most useful to you.
 
+Only *sometimes* have a stack of Bronze lying around? Keep it a blueprint, and mark it as
+[already crafted](calculations.md#already-crafted) for the batches where you've got it. It's the same trick, one batch
+at a time.
+
 The point of modeling something as a blueprint is that you want the app to count its components, count its crafting 
 steps, track its production time, apply its yield rounding, and report its surplus. If none of that matters for a 
 given item, a component is a quarter of the work.

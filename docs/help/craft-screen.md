@@ -75,16 +75,16 @@ blueprint quantity. Some of them go away when a [Datasetting](dataset.md#dataset
   Profit is renamed **Cost** and shows what the batch costs as a negative number, in place of the usual Cost line.
 - **Calculate Costs and Calculate Values both off:** no Profit either.
 
-| Line                  | What it means                                                                         |
-|-----------------------|---------------------------------------------------------------------------------------|
-| **Components Needed** | Total raw items to gather. Every component in the batch, added up.                    |
-| **Crafting Steps**    | How many individual crafts you will perform, at every branch of every tree.           |
-| **Crafting Time**     | How long all of that takes, every step's total time summed up and formatted readably. |
-| **Cost**              | What the raw components cost, using the Cost you gave each one.                       |
-| **Value**             | What the finished items are worth, using the Value you gave each blueprint.           |
-| **Surplus Stock**     | Leftover items the crafts produce, beyond what you asked for.                         |
-| **Surplus Value**     | What all those leftovers are worth.                                                   |
-| **Profit**            | Value minus Cost. Green if you're up, red if you're down.                             |
+| Line                  | What it means                                                                                                |
+|-----------------------|--------------------------------------------------------------------------------------------------------------|
+| **Components Needed** | Total raw items to gather. Every component in the batch, plus anything already crafted, added up.            |
+| **Crafting Steps**    | How many individual crafts you will perform, at every branch of every tree.                                  |
+| **Crafting Time**     | How long all of that takes, every step's total time summed up and formatted readably.                        |
+| **Cost**              | What the raw components cost, using the Cost you gave each one. Already crafted blueprints cost their Value. |
+| **Value**             | What the finished items are worth, using the Value you gave each blueprint.                                  |
+| **Surplus Stock**     | Leftover items the crafts produce, beyond what you asked for.                                                |
+| **Surplus Value**     | What all those leftovers are worth.                                                                          |
+| **Profit**            | Value minus Cost. Green if you're up, red if you're down.                                                    |
 
 > **Note:** Surplus is deliberately *not* added into Profit. It is considered extra stock that you may want to use for 
 > another craft. But the value of the surplus is listed separately so that you can always fold it into profit if 
@@ -109,6 +109,12 @@ standing in a mine or purchasing ore from a trader.
 Each card shows the component's name and two lines of figures: **Quantity** (`Quantity: x48`) and the
 **Cost** of that many. With [Calculate Costs](dataset.md#calculate-costs) off, it's just the quantity.
 
+Blueprints you've marked as [already crafted](calculations.md#already-crafted) show up here too, right in with the
+components. That's where they belong now: you're pulling them out of a chest, not crafting them. Their card gets a
+third line that says **Already crafted**, and their cost is what they're worth, using the blueprint's Value.
+![Info](assets/info.svg) on one of those shows the blueprint, with a **Cost per Item** line and a reminder that you
+marked it.
+
 > **Tip:** Tap ![Info](assets/info.svg) on a card to show a detailed breakdown of that component with its Name,
 > Description, Category and cost. 
 > 
@@ -131,6 +137,10 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
   **Collapse all** do what they say.
 - ![Blueprint](assets/handyman.svg) is a blueprint, something you craft.
   ![Component](assets/inventory-2.svg) is a component, something you gather or buy.
+- A blueprint you've marked as [already crafted](calculations.md#already-crafted) gets the
+  ![Component](assets/inventory-2.svg) icon too, in a different color. It has no arrow and no time, because you're not
+  crafting it: there's nothing beneath it and nothing to wait for. A second line in the legend under the tree explains
+  the color whenever one of those rows is on screen. Unmark it and its branch comes back, folded up.
 
 > **Note:** Some rows carry an **asterisk**. The number on that row is *how many crafts you need*, not how many items
 > you get. Either the blueprint makes items in batches, or some of what the step needs comes from
@@ -160,11 +170,31 @@ telling you that you get some extra junk you'll need to either store, sell, or u
 
 These are the [actions](actions-bar.md) available from the craft screen. 
 
-| Action                                                    | What it does                                                                                         |
-|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| ![Add blueprints](assets/add.svg) **Add blueprints**      | Opens the blueprint picker to add items into your batch.                                             |
-| ![Clear selection](assets/clear.svg) **Clear selection**  | Clears all selected blueprints from the current batch.                                               |
-| ![Save as favorite](assets/save.svg) **Save as favorite** | Stores the current batch under a name for you to easily recall later. See [Favorites](favorites.md). |
+| Action                                                         | What it does                                                                                         |
+|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| ![Add blueprints](assets/add.svg) **Add blueprints**           | Opens the blueprint picker to add items into your batch.                                             |
+| ![Clear selection](assets/clear.svg) **Clear selection**       | Clears all selected blueprints from the current batch.                                               |
+| ![Already crafted](assets/inventory-2.svg) **Already crafted** | Marks the parts you've already got, so the batch stops crafting them. See below.                     |
+| ![Save as favorite](assets/save.svg) **Save as favorite**      | Stores the current batch under a name for you to easily recall later. See [Favorites](favorites.md). |
+
+### Marking blueprints as already crafted
+
+Got a chest full of Bronze from last week's smelting marathon? Tap ![Already crafted](assets/inventory-2.svg)
+**Already crafted** and you get a list of every blueprint nested inside your batch, each with a switch. Flip it on
+for anything you've already got, and the batch stops crafting it. The switch takes effect the moment you flip it, so
+there's nothing to confirm. Search and filter the list the same way you would the blueprint picker, and tap
+![Close](assets/close.svg) **Close** when you're done.
+
+- **Grayed out rows:** a blueprint that's only used inside something you've marked can't be switched, and its row
+  says so. Mark the Bronze Nails for a Valheim Karve and the Bronze inside them grays out, since nothing's crafting it
+  anymore. If a Bronze Axe in the same batch still needs Bronze, its switch stays live.
+- **The blueprints in your batch aren't listed:** if you're asking the app to make it, it can't already be in
+  your chest.
+- **The action itself:** it lights up while anything is marked, and it's grayed out when none of the blueprints in
+  your batch use another blueprint.
+
+Marks belong to this batch. They're saved with a [favorite](favorites.md), and **Clear selection** clears them. The
+math is all in [Already crafted](calculations.md#already-crafted).
 
 ## Nothing shows up when I tap ![Add](assets/add.svg)
 

@@ -27,7 +27,8 @@ public class TransferSchemaTripwireTests
         (typeof(Favorite), ["Id", "Name", "DatasetId"]),
         (typeof(BlueprintComponent), ["Id", "BlueprintId", "ComponentId", "Quantity"]),
         (typeof(BlueprintChild), ["Id", "ParentBlueprintId", "ChildBlueprintId", "Quantity"]),
-        (typeof(FavoriteBlueprint), ["Id", "FavoriteId", "BlueprintId", "Quantity"])
+        (typeof(FavoriteBlueprint), ["Id", "FavoriteId", "BlueprintId", "Quantity"]),
+        (typeof(FavoriteAlreadyCrafted), ["Id", "FavoriteId", "BlueprintId"])
     ];
 
     private static IEnumerable<TestCaseData> Entities() =>

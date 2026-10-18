@@ -218,6 +218,28 @@ namespace CraftingCalculator.Infrastructure.Migrations
                     b.ToTable("Favorites", (string)null);
                 });
 
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteAlreadyCrafted", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FavoriteId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlueprintId");
+
+                    b.HasIndex("FavoriteId", "BlueprintId")
+                        .IsUnique();
+
+                    b.ToTable("FavoriteAlreadyCrafted", (string)null);
+                });
+
             modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteBlueprint", b =>
                 {
                     b.Property<int>("Id")
@@ -338,6 +360,25 @@ namespace CraftingCalculator.Infrastructure.Migrations
                     b.Navigation("Dataset");
                 });
 
+            modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteAlreadyCrafted", b =>
+                {
+                    b.HasOne("CraftingCalculator.Domain.Entities.Blueprint", "Blueprint")
+                        .WithMany("FavoriteAlreadyCrafted")
+                        .HasForeignKey("BlueprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CraftingCalculator.Domain.Entities.Favorite", "Favorite")
+                        .WithMany("AlreadyCrafted")
+                        .HasForeignKey("FavoriteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blueprint");
+
+                    b.Navigation("Favorite");
+                });
+
             modelBuilder.Entity("CraftingCalculator.Domain.Entities.FavoriteBlueprint", b =>
                 {
                     b.HasOne("CraftingCalculator.Domain.Entities.Blueprint", "Blueprint")
@@ -362,6 +403,8 @@ namespace CraftingCalculator.Infrastructure.Migrations
                     b.Navigation("Children");
 
                     b.Navigation("Components");
+
+                    b.Navigation("FavoriteAlreadyCrafted");
 
                     b.Navigation("FavoriteBlueprints");
 
@@ -393,6 +436,8 @@ namespace CraftingCalculator.Infrastructure.Migrations
 
             modelBuilder.Entity("CraftingCalculator.Domain.Entities.Favorite", b =>
                 {
+                    b.Navigation("AlreadyCrafted");
+
                     b.Navigation("FavoriteBlueprints");
                 });
 #pragma warning restore 612, 618

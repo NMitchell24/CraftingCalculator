@@ -217,6 +217,41 @@ public class TransferDocumentReaderTests
             "The favorite 'Bronze Axe run' uses a blueprint that isn't in the file (ref 42)");
 
     [Test]
+    public void Read_AFavoriteMarkingAMissingBlueprint_IsReported() =>
+        ShouldBeRejectedWith(
+            ReadEdited(root => Record(root, "favorites", 1)["alreadyCrafted"]![0] = 42),
+            "The favorite 'Karve prep' marks a blueprint as already crafted that isn't in the file (ref 42)");
+
+    [Test]
+    public void Read_AFavoriteMarkingTheSameBlueprintTwice_IsReported() =>
+        ShouldBeRejectedWith(
+            ReadEdited(root => Record(root, "favorites", 1)["alreadyCrafted"] = new JsonArray(1, 1)),
+            "The favorite 'Karve prep' marks the same blueprint as already crafted more than once (ref 1)");
+
+    [Test]
+    public void Read_AFavoriteMarkingABlueprintItDoesNotNest_IsAllowed()
+    {
+        // A recipe edited after the favorite was saved leaves exactly this, and loading the favorite drops it.
+        ImportValidationResult result = ReadEdited(root => Record(root, "favorites", 0)["alreadyCrafted"] = new JsonArray(3));
+
+        result.Errors.Should().BeEmpty();
+        result.File!.Snapshot.Favorites[0].AlreadyCrafted.Should().Equal(3);
+    }
+
+    [Test]
+    public void Read_AFileWithNoAlreadyCrafted_ReadsAsNothingMarked()
+    {
+        ImportValidationResult result = ReadEdited(root =>
+        {
+            Record(root, "favorites", 0).Remove("alreadyCrafted");
+            Record(root, "favorites", 1).Remove("alreadyCrafted");
+        });
+
+        result.Errors.Should().BeEmpty();
+        result.File!.Snapshot.Favorites.Should().AllSatisfy(favorite => favorite.AlreadyCrafted.Should().BeEmpty());
+    }
+
+    [Test]
     public void Read_ARecordWithABlankName_IsReported() =>
         ShouldBeRejectedWith(ReadEdited(root => Record(root, "blueprints", 2)["name"] = "   "), "A blueprint has no name (ref 3)");
 

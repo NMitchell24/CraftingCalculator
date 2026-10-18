@@ -3,8 +3,8 @@ using CraftingCalculator.Domain.Models;
 namespace CraftingCalculator.Application.BusinessLogic.Processors;
 
 /// <summary>
-/// The crafting rules for one blueprint: how many crafts a quantity takes under its yield, and how deep a
-/// blueprint graph may nest before it is treated as a cycle.
+/// The crafting rules for one blueprint: how many crafts a quantity takes under its yield, which blueprints it nests,
+/// and how deep a blueprint graph may nest before it is treated as a cycle.
 /// </summary>
 public static class BlueprintProcessor
 {
@@ -44,6 +44,45 @@ public static class BlueprintProcessor
     /// the two counts equal.
     /// </summary>
     public static bool CountsByCraft(BlueprintNode node) => !node.IsComponent && node.Crafts != node.Quantity;
+
+    /// <summary>
+    /// Every distinct blueprint nested anywhere below <paramref name="roots"/>, by id, not descending into any blueprint
+    /// in <paramref name="stopAt"/> (which is itself included). A root is included only where it is also nested.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">A blueprint graph nests too deeply.</exception>
+    public static Dictionary<int, BlueprintModel> NestedBlueprints(
+        IEnumerable<BlueprintModel> roots, IReadOnlySet<int> stopAt)
+    {
+        Dictionary<int, BlueprintModel> nested = [];
+        // By id rather than by instance: separately loaded entries can each carry their own copy of a blueprint, and
+        // walking every copy would walk a shared sub-recipe once per position instead of once.
+        HashSet<int> walked = [];
+
+        foreach (BlueprintModel root in roots)
+        {
+            Walk(root, 0);
+        }
+
+        return nested;
+
+        void Walk(BlueprintModel blueprint, int depth)
+        {
+            ThrowIfTooDeep(blueprint, depth);
+            if (!walked.Add(blueprint.Id))
+            {
+                return;
+            }
+
+            foreach (BlueprintModel child in blueprint.ChildBlueprints.BlueprintList.Select(child => child.Blueprint))
+            {
+                nested.TryAdd(child.Id, child);
+                if (!stopAt.Contains(child.Id))
+                {
+                    Walk(child, depth + 1);
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// How many items one craft of <paramref name="blueprint"/> makes under <paramref name="settings"/>: its

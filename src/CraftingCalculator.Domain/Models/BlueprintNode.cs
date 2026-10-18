@@ -15,6 +15,8 @@ namespace CraftingCalculator.Domain.Models;
 /// <see cref="ProductionTime"/> is this row's own time - the blueprint's time across its
 /// <see cref="Crafts"/>, or the component's across its <see cref="Quantity"/> - and excludes the
 /// children beneath it, so summing the whole tree counts every step exactly once.
+/// <see cref="AlreadyCrafted"/> marks a nested blueprint the batch takes as already crafted: like a component leaf, it
+/// has no crafts, yield, surplus, time or children.
 /// </summary>
 public sealed record BlueprintNode(
     IBaseDataRecord Source,
@@ -24,11 +26,12 @@ public sealed record BlueprintNode(
     long Surplus,
     long FromSurplus,
     TimeSpan ProductionTime,
-    IReadOnlyList<BlueprintNode> Children)
+    IReadOnlyList<BlueprintNode> Children,
+    bool AlreadyCrafted = false)
 {
     /// <summary>The name of the blueprint or component this node stands for.</summary>
     public string Name => Source.Name ?? "";
 
-    /// <summary>Whether this node is a gathered component rather than a crafted blueprint.</summary>
-    public bool IsComponent => Source is ComponentModel;
+    /// <summary>Whether this node is gathered rather than crafted: a component, or a blueprint marked already crafted.</summary>
+    public bool IsComponent => Source is ComponentModel || AlreadyCrafted;
 }

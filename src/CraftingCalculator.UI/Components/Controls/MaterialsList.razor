@@ -7,12 +7,14 @@
     }
     else
     {
-        <MudList T="ComponentQuantity" ReadOnly="true">
+        <MudList T="IBaseQuantityRecord" ReadOnly="true">
             <VirtualList Items="Materials" ItemSize="RowHeight" OverscanCount="RecordCard.OverscanCount"
-                        Context="componentQuantity">
-                <MudListItem T="ComponentQuantity" @key="componentQuantity.Component.Id">
-                    <RecordCard Name="@componentQuantity.Name" Record="@componentQuantity.Component"
-                                Details="@DetailsFor(componentQuantity)" />
+                        Context="quantity">
+                @* Keyed on the type as well: already crafted blueprints are listed with the components, and the two
+                   are numbered separately. *@
+                <MudListItem T="IBaseQuantityRecord" @key="(quantity.Type, quantity.Record.Id)">
+                    <RecordCard Name="@quantity.Name" Record="@quantity.Record" Details="@DetailsFor(quantity)"
+                                OnInfo="@InfoFor(quantity)" />
                 </MudListItem>
             </VirtualList>
         </MudList>

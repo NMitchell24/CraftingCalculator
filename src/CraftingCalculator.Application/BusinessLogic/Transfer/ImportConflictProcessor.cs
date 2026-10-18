@@ -134,7 +134,8 @@ public static class ImportConflictProcessor
                     .Select(record => record with
                     {
                         Id = Target(RecordKind.Favorite, record.Id),
-                        Blueprints = TargetLinks(RecordKind.Blueprint, record.Blueprints)
+                        Blueprints = TargetLinks(RecordKind.Blueprint, record.Blueprints),
+                        AlreadyCrafted = [.. record.AlreadyCrafted.Select(id => Target(RecordKind.Blueprint, id))]
                     })
             ],
             current.Settings);
