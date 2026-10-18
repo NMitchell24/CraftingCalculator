@@ -390,7 +390,8 @@ public sealed partial class CraftState(
 
     private void Recalculate()
     {
-        BatchTotals totals = BatchProcessor.CalculateTotals(_blueprintMap.BlueprintList, selectedDataset.Settings);
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            new Batch(_blueprintMap.BlueprintList, new HashSet<int>()), selectedDataset.Settings);
 
         TotalCost = totals.TotalCost;
         TotalValue = totals.TotalValue;

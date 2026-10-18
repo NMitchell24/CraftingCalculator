@@ -16,17 +16,20 @@ public static class BatchProcessor
     /// total value and the surplus value are 0. With <see cref="Datasettings.UseSharedSurplus"/>, a step uses what
     /// the steps before it overproduced before crafting any of its own, so the batch takes the fewest crafts it
     /// can and the surplus is only what is left at the end.
+    /// A blueprint in <see cref="Batch.AlreadyCraftedIds"/> stops its branch wherever it's nested: it takes no crafts
+    /// and no time, its parts aren't needed, and it costs its value per item, as <see cref="CostOf"/> says. No entry's
+    /// own blueprint may be in <see cref="Batch.AlreadyCraftedIds"/>.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// A blueprint graph nests deeper than the app can work out, which a cycle does.
     /// </exception>
-    public static BatchTotals CalculateTotals(IReadOnlyCollection<BlueprintQuantity> batch, Datasettings settings)
+    public static BatchTotals CalculateTotals(Batch batch, Datasettings settings)
     {
-        BatchWalk walk = new(settings);
-        List<BlueprintNode> roots = new(batch.Count);
+        BatchWalk walk = new(settings, batch.AlreadyCraftedIds);
+        List<BlueprintNode> roots = new(batch.Blueprints.Count);
         double totalValue = 0;
 
-        foreach (BlueprintQuantity blueprintQuantity in batch)
+        foreach (BlueprintQuantity blueprintQuantity in batch.Blueprints)
         {
             roots.Add(walk.Visit(blueprintQuantity.Blueprint, blueprintQuantity.Quantity, 0));
 
@@ -39,9 +42,8 @@ public static class BatchProcessor
         }
 
         ComponentMap materials = walk.Materials;
-        double totalCost = settings.UseCosts
-            ? materials.ComponentList.Sum(componentQuantity => componentQuantity.TotalCost)
-            : 0;
+        double totalCost = materials.ComponentList.Sum(componentQuantity => CostOf(componentQuantity, settings))
+            + walk.AlreadyCrafted.BlueprintList.Sum(blueprintQuantity => CostOf(blueprintQuantity, settings));
         //Component time is read off the merged materials instead of being accumulated during the walk:
         //it follows how many of each component the batch ends up needing, which is what that map already
         //holds. Components have no yield, so the multiplier is quantity rather than a craft count.
@@ -53,22 +55,36 @@ public static class BatchProcessor
             : 0;
 
         return new BatchTotals(
-            totalCost, totalValue, materials, walk.Surplus, surplusValue,
+            totalCost, totalValue, materials, walk.AlreadyCrafted, walk.Surplus, surplusValue,
             DurationMath.Add(walk.BlueprintTime, componentTime), roots, walk.Crafts);
     }
+
+    /// <summary>
+    /// What the batch pays for <paramref name="quantity"/> under <paramref name="settings"/>: a component's cost, or an
+    /// already crafted blueprint at its value. 0 without <see cref="Datasettings.UseCosts"/>, and 0 for a blueprint
+    /// without <see cref="Datasettings.UseValues"/>.
+    /// </summary>
+    public static double CostOf(IBaseQuantityRecord quantity, Datasettings settings) => quantity switch
+    {
+        _ when !settings.UseCosts => 0,
+        ComponentQuantity componentQuantity => componentQuantity.TotalCost,
+        BlueprintQuantity blueprintQuantity => settings.UseValues ? blueprintQuantity.TotalValue : 0,
+        _ => throw new ArgumentOutOfRangeException(nameof(quantity), quantity.GetType().Name, "Not a component or blueprint quantity.")
+    };
 
     /// <summary>
     /// One pass over every tree in a batch, building each node and adding what it needs, overproduces and
     /// takes into totals shared by the whole batch. Trees are visited in batch order and each node's children in
     /// the order the Steps tree lists them, so a step only ever draws on surplus made by a step listed above it.
     /// </summary>
-    private sealed class BatchWalk(Datasettings settings)
+    private sealed class BatchWalk(Datasettings settings, IReadOnlySet<int> alreadyCraftedIds)
     {
         // The walk adds into maps of its own and never into blueprint.Components or blueprint.ChildBlueprints:
         // SnapshotModelProcessor shares one BlueprintModel across every tree it appears in, so writing into one
         // would change every other tree that blueprint is part of.
         public ComponentMap Materials { get; } = new();
         public BlueprintMap Surplus { get; } = new();
+        public BlueprintMap AlreadyCrafted { get; } = new();
         public TimeSpan BlueprintTime { get; private set; }
         public long Crafts { get; private set; }
 
@@ -76,11 +92,22 @@ public static class BatchProcessor
         /// Builds <paramref name="blueprint"/>'s breakdown tree for <paramref name="quantity"/> of it: one child
         /// node per component and per nested child blueprint, recursively. Children are scaled by the crafts
         /// this step takes, not by <paramref name="quantity"/> itself, so a yield above 1, or surplus an earlier
-        /// step made, reduces everything below it.
+        /// step made, reduces everything below it. A blueprint the batch takes as already crafted is a leaf.
         /// </summary>
         public BlueprintNode Visit(BlueprintModel blueprint, long quantity, int depth)
         {
             BlueprintProcessor.ThrowIfTooDeep(blueprint, depth);
+
+            // Never a batch root (CraftState drops those marks), so never crafted in this batch and never in Surplus.
+            if (alreadyCraftedIds.Contains(blueprint.Id))
+            {
+                AlreadyCrafted.Add(blueprint, quantity);
+                return new BlueprintNode(
+                    blueprint,
+                    Quantity: quantity, Crafts: 0, Yield: 0, Surplus: 0, FromSurplus: 0,
+                    ProductionTime: TimeSpan.Zero,
+                    Children: [], AlreadyCrafted: true);
+            }
 
             long yield = BlueprintProcessor.YieldOf(blueprint, settings);
             // Drawing from the surplus first is what keeps every blueprint's crafts at the minimum: a step only

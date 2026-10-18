@@ -33,8 +33,11 @@ public class BatchProcessorTests
     private static BlueprintModel NewBlueprint(string name, double value = 0, long yield = 1) =>
         new() { Id = IdOf(name), Name = name, Value = value, Yield = yield };
 
+    private static Batch BatchOf(IReadOnlyList<BlueprintQuantity> entries, params BlueprintModel[] alreadyCrafted) =>
+        new(entries, alreadyCrafted.Select(blueprint => blueprint.Id).ToHashSet());
+
     private static BatchTotals TotalsOf(BlueprintModel blueprint, long quantity, Datasettings? settings = null) =>
-        BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, quantity)], settings ?? Datasettings.Default);
+        BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, quantity)]), settings ?? Datasettings.Default);
 
     private static BlueprintNode TreeOf(BlueprintModel blueprint, long quantity, Datasettings? settings = null) =>
         TotalsOf(blueprint, quantity, settings).Roots.Should().ContainSingle().Subject;
@@ -47,7 +50,7 @@ public class BatchProcessorTests
 
         BlueprintQuantity batchEntry = new(blueprint, 3);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([batchEntry]), Datasettings.Default);
 
         totals.TotalCost.Should().Be(3.0); // 0.5 x2 Screws x3 Widgets
         totals.TotalValue.Should().Be(30); // 10 x3 Widgets
@@ -67,7 +70,7 @@ public class BatchProcessorTests
 
         BlueprintQuantity batchEntry = new(parent, 2);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([batchEntry]), Datasettings.Default);
 
         totals.TotalCost.Should().Be(12); // 1 x3 Screws x2 Brackets x2 Frames
         totals.Materials.ComponentList.Should().ContainSingle();
@@ -86,7 +89,7 @@ public class BatchProcessorTests
         BlueprintQuantity leftEntry = new(left, 1);
         BlueprintQuantity rightEntry = new(right, 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([leftEntry, rightEntry], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([leftEntry, rightEntry]), Datasettings.Default);
 
         totals.TotalCost.Should().Be(2);
         totals.TotalValue.Should().Be(12);
@@ -101,7 +104,7 @@ public class BatchProcessorTests
         blueprint.Components.Add(new ComponentModel { Id = 100, Name = "Metal Fragments", Cost = 1 }, 75);
         blueprint.Components.Add(new ComponentModel { Id = 101, Name = "Metal Fragments", Cost = 2 }, 25);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 1)], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 1)]), Datasettings.Default);
 
         totals.Materials.ComponentList.Should().HaveCount(2);
         totals.TotalCost.Should().Be(125);
@@ -115,7 +118,7 @@ public class BatchProcessorTests
 
         BlueprintQuantity batchEntry = new(blueprint, 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([batchEntry]), Datasettings.Default);
 
         totals.TotalCost.Should().Be(0);
         totals.Materials.ComponentList.Should().ContainSingle();
@@ -130,7 +133,7 @@ public class BatchProcessorTests
 
         BlueprintQuantity batchEntry = new(blueprint, 4);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([batchEntry]), Datasettings.Default);
 
         totals.TotalCost.Should().Be(6); // 3 Screws x2 crafts, not x4 Brackets
         totals.Materials.ComponentList[0].Quantity.Should().Be(6);
@@ -143,7 +146,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Bracket", 5, yield: 2);
         blueprint.Components.Add(NewComponent("Screw", 1), 3);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 3)], new Datasettings(UseYield: false));
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 3)]), new Datasettings(UseYield: false));
 
         totals.TotalCost.Should().Be(9); // 3 Screws x3 crafts, one per Bracket
         totals.TotalValue.Should().Be(15);
@@ -157,7 +160,7 @@ public class BatchProcessorTests
         blueprint.Components.Add(NewComponent("Copper", 2), 2);
         blueprint.Components.Add(NewComponent("Tin", 3), 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 5)], new Datasettings(UseCosts: false));
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 5)]), new Datasettings(UseCosts: false));
 
         totals.TotalCost.Should().Be(0);
         totals.TotalValue.Should().Be(50);
@@ -171,7 +174,7 @@ public class BatchProcessorTests
         blueprint.Components.Add(NewComponent("Copper", 2), 2);
         blueprint.Components.Add(NewComponent("Tin", 3), 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 5)], new Datasettings(UseValues: false));
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 5)]), new Datasettings(UseValues: false));
 
         totals.TotalCost.Should().Be(35); // 10 Copper x2 + 5 Tin x3
         totals.TotalValue.Should().Be(0);
@@ -184,7 +187,7 @@ public class BatchProcessorTests
         blueprint.Components.Add(NewComponent("Copper", 2), 2);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(blueprint, 5)], new Datasettings(UseCosts: false, UseValues: false));
+            BatchOf([new BlueprintQuantity(blueprint, 5)]), new Datasettings(UseCosts: false, UseValues: false));
 
         totals.TotalCost.Should().Be(0);
         totals.TotalValue.Should().Be(0);
@@ -206,7 +209,7 @@ public class BatchProcessorTests
         handle.ChildBlueprints.Add(bracket, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)], NotShared);
+            BatchOf([new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)]), NotShared);
 
         totals.TotalCost.Should().Be(6); // two Bracket crafts, 3 Screws each
         BlueprintQuantity spare = totals.Surplus.BlueprintList.Should().ContainSingle().Subject;
@@ -229,7 +232,7 @@ public class BatchProcessorTests
         handle.ChildBlueprints.Add(bracket, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)]), Datasettings.Default);
 
         totals.TotalCost.Should().Be(3); // one Bracket craft makes both Brackets
         totals.Crafts.Should().Be(3); // Frame, Handle, and one Bracket
@@ -292,8 +295,8 @@ public class BatchProcessorTests
 
         BlueprintQuantity[] batch = [new(pickaxe, 1), new(sword, 1)];
 
-        BatchTotals shared = BatchProcessor.CalculateTotals(batch, Datasettings.Default);
-        BatchTotals notShared = BatchProcessor.CalculateTotals(batch, NotShared);
+        BatchTotals shared = BatchProcessor.CalculateTotals(BatchOf(batch), Datasettings.Default);
+        BatchTotals notShared = BatchProcessor.CalculateTotals(BatchOf(batch), NotShared);
 
         // 7 planks in two crafts and 3 sticks in one, rather than four Planks crafts and two Stick crafts.
         shared.Crafts.Should().Be(5);
@@ -320,7 +323,7 @@ public class BatchProcessorTests
         axe.ChildBlueprints.Add(bronze, 3);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(nails, 1), new BlueprintQuantity(axe, 1)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(nails, 1), new BlueprintQuantity(axe, 1)]), Datasettings.Default);
 
         // The nails leave 2 Bronze; the axe takes them and crafts once more for its third, leaving 2 again.
         BlueprintNode axeBronze = totals.Roots[1].Children.Single();
@@ -341,7 +344,7 @@ public class BatchProcessorTests
         frame.ChildBlueprints.Add(bracket, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(bracket, 2)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(frame, 1), new BlueprintQuantity(bracket, 2)]), Datasettings.Default);
 
         totals.Roots[1].Should().Match<BlueprintNode>(node =>
             node.Quantity == 2 && node.FromSurplus == 2 && node.Crafts == 0 && node.Children.Count == 0);
@@ -366,8 +369,8 @@ public class BatchProcessorTests
         // 19 Bronze in all, wherever it is asked for: 7 crafts, 2 left over.
         BlueprintQuantity[] batch = [new(nails, 3), new(axe, 2), new(bronze, 2)];
 
-        BatchTotals forward = BatchProcessor.CalculateTotals(batch, Datasettings.Default);
-        BatchTotals backward = BatchProcessor.CalculateTotals([.. batch.Reverse()], Datasettings.Default);
+        BatchTotals forward = BatchProcessor.CalculateTotals(BatchOf(batch), Datasettings.Default);
+        BatchTotals backward = BatchProcessor.CalculateTotals(BatchOf([.. batch.Reverse()]), Datasettings.Default);
 
         forward.Surplus.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(2);
         backward.Crafts.Should().Be(forward.Crafts);
@@ -385,7 +388,7 @@ public class BatchProcessorTests
         frame.ChildBlueprints.Add(bracket, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(bracket, 1)], NoYield);
+            BatchOf([new BlueprintQuantity(frame, 1), new BlueprintQuantity(bracket, 1)]), NoYield);
 
         totals.Crafts.Should().Be(3);
         totals.Roots.Should().AllSatisfy(root => root.FromSurplus.Should().Be(0));
@@ -399,7 +402,7 @@ public class BatchProcessorTests
 
         BlueprintQuantity batchEntry = new(blueprint, 3);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([batchEntry], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([batchEntry]), Datasettings.Default);
 
         totals.TotalValue.Should().Be(30); // the 3 asked for, not the 4 produced
         totals.Surplus.BlueprintList.Should().ContainSingle().Subject.Quantity.Should().Be(1);
@@ -412,7 +415,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Frame", 10, yield: 2);
         blueprint.Components.Add(NewComponent("Screw", 1), 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 3)], new Datasettings(UseValues: false));
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 3)]), new Datasettings(UseValues: false));
 
         totals.SurplusValue.Should().Be(0);
         totals.Surplus.BlueprintList.Should().ContainSingle().Subject.Quantity.Should().Be(1);
@@ -424,7 +427,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", 10);
         blueprint.Components.Add(NewComponent("Screw", 0.5), 2);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 3)], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 3)]), Datasettings.Default);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.Zero);
     }
@@ -443,7 +446,7 @@ public class BatchProcessorTests
         soup.ProductionTime = TimeSpan.FromSeconds(30);
         soup.Components.Add(potato, 2);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(soup, 1)], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(soup, 1)]), Datasettings.Default);
 
         // Two Potatoes at five minutes each, plus one thirty-second Soup craft.
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(630));
@@ -463,7 +466,7 @@ public class BatchProcessorTests
         bracket.ProductionTime = TimeSpan.FromSeconds(10);
         bracket.Components.Add(screw, 3);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(bracket, 4)], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(bracket, 4)]), Datasettings.Default);
 
         // Four Brackets is two crafts: 2 x 10s of craft time, and 2 x 3 Screws at 1s each.
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(26));
@@ -479,7 +482,7 @@ public class BatchProcessorTests
         right.ProductionTime = TimeSpan.FromSeconds(7);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(left, 2), new BlueprintQuantity(right, 3)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(left, 2), new BlueprintQuantity(right, 3)]), Datasettings.Default);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(31)); // 2x5s + 3x7s
     }
@@ -494,7 +497,7 @@ public class BatchProcessorTests
         BlueprintModel blueprint = NewBlueprint("Widget", 1);
         blueprint.ProductionTime = TimeSpan.FromSeconds(5.5);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, 10)], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, 10)]), Datasettings.Default);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(55));
     }
@@ -514,7 +517,7 @@ public class BatchProcessorTests
         blueprint.ProductionTime = TimeSpan.FromHours(24);
         blueprint.Components.Add(screw, 1);
 
-        BatchTotals totals = BatchProcessor.CalculateTotals([new BlueprintQuantity(blueprint, long.MaxValue)], Datasettings.Default);
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(blueprint, long.MaxValue)]), Datasettings.Default);
 
         totals.TotalProductionTime.Should().Be(TimeSpan.MaxValue);
     }
@@ -688,8 +691,8 @@ public class BatchProcessorTests
 
         BlueprintQuantity[] batch = [new(frame, 3), new(bracket, 5)];
 
-        BatchTotals first = BatchProcessor.CalculateTotals(batch, Datasettings.Default);
-        BatchTotals second = BatchProcessor.CalculateTotals(batch, Datasettings.Default);
+        BatchTotals first = BatchProcessor.CalculateTotals(BatchOf(batch), Datasettings.Default);
+        BatchTotals second = BatchProcessor.CalculateTotals(BatchOf(batch), Datasettings.Default);
 
         bracket.Components.ComponentList.Should().ContainSingle().Which.Quantity.Should().Be(3);
         frame.ChildBlueprints.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(2);
@@ -704,7 +707,7 @@ public class BatchProcessorTests
         BlueprintModel axe = NewBlueprint("Axe");
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(bronze, 2), new BlueprintQuantity(axe, 1)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(bronze, 2), new BlueprintQuantity(axe, 1)]), Datasettings.Default);
 
         totals.Roots.Select(root => (root.Name, root.Quantity)).Should().Equal(("Bronze", 2L), ("Axe", 1L));
     }
@@ -735,7 +738,7 @@ public class BatchProcessorTests
         frame.ChildBlueprints.Add(rivets, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(frame, 7), new BlueprintQuantity(bracket, 3)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(frame, 7), new BlueprintQuantity(bracket, 3)]), Datasettings.Default);
 
         totals.Crafts.Should().Be(totals.Roots.Sum(SumOfCrafts));
         return;
@@ -754,9 +757,170 @@ public class BatchProcessorTests
         BlueprintModel right = NewBlueprint("Right");
 
         Action act = () => BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(left, long.MaxValue), new BlueprintQuantity(right, 1)], Datasettings.Default);
+            BatchOf([new BlueprintQuantity(left, long.MaxValue), new BlueprintQuantity(right, 1)]), Datasettings.Default);
 
         act.Should().Throw<OverflowException>();
+    }
+
+    /// <summary>
+    /// Valheim: a Bronze Axe is 8 Bronze, 4 Wood and 2 Leather Scraps, and Bronze is 2 Copper and 1 Tin.
+    /// </summary>
+    private static BlueprintModel NewBronzeAxe(out BlueprintModel bronze)
+    {
+        bronze = NewBlueprint("Bronze", 6);
+        bronze.ProductionTime = TimeSpan.FromMinutes(1);
+        bronze.Components.Add(NewComponent("Copper", 2), 2);
+        bronze.Components.Add(NewComponent("Tin", 1), 1);
+
+        BlueprintModel axe = NewBlueprint("Bronze Axe", 40);
+        axe.ProductionTime = TimeSpan.FromSeconds(10);
+        axe.Components.Add(NewComponent("Wood", 0.5), 4);
+        axe.Components.Add(NewComponent("Leather Scraps", 1), 2);
+        axe.ChildBlueprints.Add(bronze, 8);
+        return axe;
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCrafted_IsALeafListedWithTheTotalTheBatchNeeds()
+    {
+        BlueprintModel axe = NewBronzeAxe(out BlueprintModel bronze);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(axe, 3)], bronze), Datasettings.Default);
+
+        totals.Materials.ComponentList.Select(componentQuantity => (componentQuantity.Name, componentQuantity.Quantity))
+            .Should().Equal(("Wood", 12L), ("Leather Scraps", 6L));
+        totals.AlreadyCrafted.BlueprintList.Select(blueprintQuantity => (blueprintQuantity.Name, blueprintQuantity.Quantity))
+            .Should().Equal(("Bronze", 24L));
+        totals.Crafts.Should().Be(3); // the axes only, rather than 27 with the Bronze
+        BlueprintNode bronzeNode = totals.Roots.Single().Children.Single(node => node.Source == bronze);
+        bronzeNode.Should().Match<BlueprintNode>(node =>
+            node.AlreadyCrafted && node.IsComponent && node.Quantity == 24 && node.Crafts == 0 && node.Yield == 0
+            && node.Surplus == 0 && node.ProductionTime == TimeSpan.Zero && node.Children.Count == 0);
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCrafted_SumsEveryPositionIntoOneEntry()
+    {
+        // Karve prep: one Bronze craft makes 20 Bronze Nails, so 10 nails take 1 Bronze, and the axe takes 8.
+        BlueprintModel axe = NewBronzeAxe(out BlueprintModel bronze);
+        BlueprintModel nails = NewBlueprint("Bronze Nails", 1, yield: 20);
+        nails.ChildBlueprints.Add(bronze, 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            BatchOf([new BlueprintQuantity(nails, 10), new BlueprintQuantity(axe, 1)], bronze), Datasettings.Default);
+
+        totals.AlreadyCrafted.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(9);
+        totals.Crafts.Should().Be(2);
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCrafted_CostsItsValue()
+    {
+        BlueprintModel axe = NewBronzeAxe(out BlueprintModel bronze);
+        Batch batch = BatchOf([new BlueprintQuantity(axe, 3)], bronze);
+
+        // 24 Bronze at 6, 12 Wood at 0.5 and 6 Leather Scraps at 1.
+        BatchProcessor.CalculateTotals(batch, Datasettings.Default).TotalCost.Should().Be(156);
+        // Without values the Bronze is worth nothing, so only the Wood and the Leather Scraps cost anything.
+        BatchProcessor.CalculateTotals(batch, new Datasettings(UseValues: false)).TotalCost.Should().Be(12);
+        BatchProcessor.CalculateTotals(batch, new Datasettings(UseCosts: false)).TotalCost.Should().Be(0);
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCrafted_LeavesTheValueAlone()
+    {
+        BlueprintModel axe = NewBronzeAxe(out BlueprintModel bronze);
+
+        BatchTotals marked = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(axe, 3)], bronze), Datasettings.Default);
+        BatchTotals unmarked = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(axe, 3)]), Datasettings.Default);
+
+        marked.TotalValue.Should().Be(120);
+        unmarked.TotalValue.Should().Be(120);
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCrafted_TakesNoTimeForItsBranch()
+    {
+        BlueprintModel axe = NewBronzeAxe(out BlueprintModel bronze);
+        bronze.Components.ComponentList.Single(componentQuantity => componentQuantity.Name == "Copper")
+            .Component.ProductionTime = TimeSpan.FromSeconds(30);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(axe, 3)], bronze), Datasettings.Default);
+
+        // Three ten-second Axe crafts. No Bronze crafts, and no Copper.
+        totals.TotalProductionTime.Should().Be(TimeSpan.FromSeconds(30));
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCrafted_SiblingsStillShareTheirSurplus()
+    {
+        // Minecraft: 1 log makes 4 planks, 2 planks make 4 sticks. A wooden pickaxe is 3 planks and 2 sticks,
+        // a wooden sword 2 planks and 1 stick. With the sticks already made, only the planks are crafted.
+        BlueprintModel planks = NewBlueprint("Planks", yield: 4);
+        planks.Components.Add(NewComponent("Log"), 1);
+
+        BlueprintModel sticks = NewBlueprint("Stick", yield: 4);
+        sticks.ChildBlueprints.Add(planks, 2);
+
+        BlueprintModel pickaxe = NewBlueprint("Wooden Pickaxe");
+        pickaxe.ChildBlueprints.Add(planks, 3);
+        pickaxe.ChildBlueprints.Add(sticks, 2);
+
+        BlueprintModel sword = NewBlueprint("Wooden Sword");
+        sword.ChildBlueprints.Add(planks, 2);
+        sword.ChildBlueprints.Add(sticks, 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            BatchOf([new BlueprintQuantity(pickaxe, 1), new BlueprintQuantity(sword, 1)], sticks), Datasettings.Default);
+
+        // 5 planks in two crafts: the sword takes the pickaxe's spare plank and crafts once for its second.
+        totals.Crafts.Should().Be(4);
+        totals.Materials.ComponentList.Single().Quantity.Should().Be(2);
+        totals.Roots[1].Children[0].Should().Match<BlueprintNode>(node => node.FromSurplus == 1 && node.Crafts == 1);
+        totals.Surplus.BlueprintList.Select(spare => (spare.Name, spare.Quantity)).Should().Equal(("Planks", 3L));
+        totals.AlreadyCrafted.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(3);
+    }
+
+    [Test]
+    public void CalculateTotals_AlreadyCraftedInsideAnotherOne_HasNoEffect()
+    {
+        BlueprintModel rivets = NewBlueprint("Rivet Set");
+        rivets.Components.Add(NewComponent("Rivet"), 1);
+
+        BlueprintModel bracket = NewBlueprint("Bracket");
+        bracket.ChildBlueprints.Add(rivets, 3);
+
+        BlueprintModel frame = NewBlueprint("Frame");
+        frame.ChildBlueprints.Add(bracket, 2);
+
+        BatchTotals both = BatchProcessor.CalculateTotals(
+            BatchOf([new BlueprintQuantity(frame, 1)], bracket, rivets), Datasettings.Default);
+        BatchTotals outer = BatchProcessor.CalculateTotals(BatchOf([new BlueprintQuantity(frame, 1)], bracket), Datasettings.Default);
+
+        both.AlreadyCrafted.BlueprintList.Select(blueprintQuantity => (blueprintQuantity.Name, blueprintQuantity.Quantity))
+            .Should().Equal(("Bracket", 2L));
+        both.Crafts.Should().Be(outer.Crafts);
+        both.Materials.ComponentList.Should().BeEmpty();
+    }
+
+    [Test]
+    public void CostOf_Component_IsItsCostUnlessCostsAreOff()
+    {
+        ComponentQuantity copper = new(NewComponent("Copper", 2), 10);
+
+        BatchProcessor.CostOf(copper, Datasettings.Default).Should().Be(20);
+        BatchProcessor.CostOf(copper, new Datasettings(UseValues: false)).Should().Be(20);
+        BatchProcessor.CostOf(copper, new Datasettings(UseCosts: false)).Should().Be(0);
+    }
+
+    [Test]
+    public void CostOf_Blueprint_IsItsValueUnlessCostsOrValuesAreOff()
+    {
+        BlueprintQuantity bronze = new(NewBlueprint("Bronze", 6), 24);
+
+        BatchProcessor.CostOf(bronze, Datasettings.Default).Should().Be(144);
+        BatchProcessor.CostOf(bronze, new Datasettings(UseValues: false)).Should().Be(0);
+        BatchProcessor.CostOf(bronze, new Datasettings(UseCosts: false)).Should().Be(0);
     }
 
     [Test]
