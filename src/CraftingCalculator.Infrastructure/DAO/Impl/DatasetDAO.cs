@@ -77,9 +77,12 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
 
         DatasetRecords records = await DatasetRecordsReader.ReadAsync(context);
 
-        // Read whole and grouped in memory, the way DatasetRecordsReader reads the blueprint links.
+        // Read whole and grouped in memory, the way DatasetRecordsReader reads the blueprint links. Both reads keep only
+        // links naming this dataset's blueprints: the query filters scope a link by its favorite alone, and a link naming
+        // a blueprint the snapshot doesn't hold would point at nothing in the export or the copy.
         ILookup<int, QuantityLink> favoriteLinks = (await context.FavoriteBlueprints
                 .AsNoTracking()
+                .Where(link => link.Blueprint.DatasetId == link.Favorite.DatasetId)
                 .OrderBy(link => link.Id)
                 .Select(link => new { link.FavoriteId, link.BlueprintId, link.Quantity })
                 .ToListAsync())
@@ -87,6 +90,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
 
         ILookup<int, int> alreadyCrafted = (await context.FavoriteAlreadyCrafted
                 .AsNoTracking()
+                .Where(link => link.Blueprint.DatasetId == link.Favorite.DatasetId)
                 .OrderBy(link => link.Id)
                 .Select(link => new { link.FavoriteId, link.BlueprintId })
                 .ToListAsync())
@@ -326,6 +330,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         Dictionary<int, Favorite> matched = await context.Favorites
             .Include(favorite => favorite.FavoriteBlueprints)
             .Include(favorite => favorite.AlreadyCrafted)
+            .AsSplitQuery()
             .Where(favorite => matchedIds.Contains(favorite.Id))
             .ToDictionaryAsync(favorite => favorite.Id);
 

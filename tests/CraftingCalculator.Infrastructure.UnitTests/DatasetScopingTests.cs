@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using CraftingCalculator.Domain.Entities;
 using CraftingCalculator.Domain.Models;
+using CraftingCalculator.Domain.Models.Transfer;
 using CraftingCalculator.Infrastructure.DAO.Impl;
 using Microsoft.EntityFrameworkCore;
 
@@ -203,8 +204,11 @@ public class DatasetScopingTests
         (await _blueprintDAO.GetAncestorIdsAsync(ingot.Id)).Should().BeEmpty();
     }
 
-    [Test]
-    public async Task AFavoriteRowNamingAnotherDatasetsBlueprint_IsDroppedOnRead()
+    /// <summary>
+    /// Saves a favorite in the default dataset that holds its own Bronze and a blueprint from the second dataset, and
+    /// leaves the default dataset selected.
+    /// </summary>
+    private async Task<(BlueprintFavorite Favorite, BlueprintModel Bronze)> GivenAFavoriteRowNamingAnotherDatasetsBlueprintAsync()
     {
         _fixture.SelectDataset(_secondDatasetId);
         BlueprintModel foreign = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Foreign" });
@@ -214,13 +218,44 @@ public class DatasetScopingTests
         BlueprintFavorite favorite = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Mixed" },
             new Batch([new BlueprintQuantity(bronze, 2), new BlueprintQuantity(foreign, 1)], new HashSet<int>()));
 
+        return (favorite, bronze);
+    }
+
+    [Test]
+    public async Task AFavoriteRowNamingAnotherDatasetsBlueprint_IsDroppedOnRead()
+    {
+        (BlueprintFavorite favorite, _) = await GivenAFavoriteRowNamingAnotherDatasetsBlueprintAsync();
+
         IReadOnlyList<BlueprintQuantity> quantities = (await _favoritesDAO.GetBatchAsync(favorite.Id)).Blueprints;
 
         quantities.Should().ContainSingle().Which.Blueprint.Name.Should().Be("Bronze");
     }
 
     [Test]
-    public async Task AnAlreadyCraftedMarkNamingAnotherDatasetsBlueprint_IsDroppedOnRead()
+    public async Task AFavoriteRowNamingAnotherDatasetsBlueprint_IsLeftOutOfTheSnapshot()
+    {
+        (_, BlueprintModel bronze) = await GivenAFavoriteRowNamingAnotherDatasetsBlueprintAsync();
+
+        DatasetSnapshot snapshot = await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
+
+        snapshot.Favorites.Single().Blueprints.Should().Equal(new QuantityLink(bronze.Id, 2));
+    }
+
+    [Test]
+    public async Task AFavoriteRowNamingAnotherDatasetsBlueprint_DoesNotStopTheDatasetBeingCopied()
+    {
+        await GivenAFavoriteRowNamingAnotherDatasetsBlueprintAsync();
+
+        Func<Task> copy = () => _datasetDAO.CopyAsync(SqliteTestFixture.DefaultDatasetId, "Default - Copy");
+
+        await copy.Should().NotThrowAsync();
+    }
+
+    /// <summary>
+    /// Saves a favorite in the default dataset that marks its own Bronze and a blueprint from the second dataset as
+    /// already crafted, and leaves the default dataset selected.
+    /// </summary>
+    private async Task<(BlueprintFavorite Favorite, BlueprintModel Bronze)> GivenAMarkNamingAnotherDatasetsBlueprintAsync()
     {
         _fixture.SelectDataset(_secondDatasetId);
         BlueprintModel foreign = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Foreign" });
@@ -233,7 +268,35 @@ public class DatasetScopingTests
         BlueprintFavorite favorite = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Mixed" },
             new Batch([new BlueprintQuantity(axe, 1)], new HashSet<int> { bronze.Id, foreign.Id }));
 
+        return (favorite, bronze);
+    }
+
+    [Test]
+    public async Task AnAlreadyCraftedMarkNamingAnotherDatasetsBlueprint_IsDroppedOnRead()
+    {
+        (BlueprintFavorite favorite, BlueprintModel bronze) = await GivenAMarkNamingAnotherDatasetsBlueprintAsync();
+
         (await _favoritesDAO.GetBatchAsync(favorite.Id)).AlreadyCraftedIds.Should().BeEquivalentTo([bronze.Id]);
+    }
+
+    [Test]
+    public async Task AnAlreadyCraftedMarkNamingAnotherDatasetsBlueprint_IsLeftOutOfTheSnapshot()
+    {
+        (_, BlueprintModel bronze) = await GivenAMarkNamingAnotherDatasetsBlueprintAsync();
+
+        DatasetSnapshot snapshot = await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
+
+        snapshot.Favorites.Single().AlreadyCrafted.Should().Equal(bronze.Id);
+    }
+
+    [Test]
+    public async Task AnAlreadyCraftedMarkNamingAnotherDatasetsBlueprint_DoesNotStopTheDatasetBeingCopied()
+    {
+        await GivenAMarkNamingAnotherDatasetsBlueprintAsync();
+
+        Func<Task> copy = () => _datasetDAO.CopyAsync(SqliteTestFixture.DefaultDatasetId, "Default - Copy");
+
+        await copy.Should().NotThrowAsync();
     }
 
     [Test]
