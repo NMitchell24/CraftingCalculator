@@ -129,6 +129,7 @@ crafting steps = sum of the craft count of every blueprint in the tree
 ```
 
 Components don't count into steps. You gather, harvest, or purchase them. 
+Neither do blueprints you've marked as [already crafted](calculations.md#already-crafted). They're already in your chest.
 
 From the example above: 3 Bronze Axe crafts + 24 Bronze crafts = **27 crafting steps**. That's
 genuinely 27 items that need to be crafted. 
@@ -139,12 +140,15 @@ Yield reduces this directly. If Bronze yielded 2 per craft, you would need 12 Br
 Shared surplus reduces it too. The pickaxe and sword in [Shared surplus](calculations.md#shared-surplus) take 5 steps
 instead of 8.
 
+And marking something as already crafted takes its whole branch out. Mark the Bronze and those 3 axes take 3 steps.
+
 ## Cost, Value and Profit
 
 Three separate ideas, and the difference matters.
 
 ```
 Cost   = for every raw component: cost per item × total quantity
+       + for every already crafted blueprint: value per item × total quantity
 Value  = for every blueprint in your batch: value per item × batch quantity
 Profit = Value − Cost
 ```
@@ -152,7 +156,8 @@ Profit = Value − Cost
 Three things to note:
 
 1. **Cost only counts components.** Blueprints have a Value, not a Cost. Their cost *is* whatever
-   their components add up to. Nothing gets counted twice.
+   their components add up to. Nothing gets counted twice. The one exception is a blueprint you've marked as
+   [already crafted](calculations.md#already-crafted). Its components aren't counted, so it costs its Value instead.
 2. **Value only counts the blueprints you actually asked for.** A nested blueprint's own Value isn't
    added, because you're not selling the Bronze. The Bronze was consumed during crafting. There's 
    nothing else to sell but the Axe you made out of it.
@@ -204,10 +209,50 @@ Times are shown in the smallest form that fits:
 > A Quantity of 2 will show 1:01 (Exact)  
 > A Quantity of 3 will show 1:31 (Rounded down)
 
+## Already crafted
+
+Sometimes the answer you want isn't "what does this take from scratch". It's "what does this take on top of what's
+already in my chest". That's what ![Already crafted](assets/inventory-2.svg) **Already crafted** on the
+[Craft screen](craft-screen.md) is for.
+
+A blueprint you mark is the bottom of its branch. The app stops there, the same way it stops at a component: no
+crafts, no yield, no surplus, no time, and nothing underneath it.
+
+**Example:** the same 3 Bronze Axes from above, with the Bronze marked:
+
+```
+Bronze Axe         x3   -> 3 crafts (yield 1)
+  Bronze           x24  already crafted, nothing to do
+  Wood             x12  (4 per axe x 3 crafts)
+  Leather Scraps   x6   (2 per axe x 3 crafts)
+```
+
+The Copper and the Tin are gone, because you're not smelting anything. The **Components** tab lists 24 Bronze, 12
+Wood and 6 Leather Scraps, and the Bronze card says **Already crafted**. Crafting Steps drops from 27 to **3**: just
+the axes.
+
+- **Everywhere at once:** marking a blueprint marks it everywhere it shows up in your batch. Bronze Nails and Bronze
+  Axes in one batch both use Bronze, and one switch covers both. The Components tab gives you one Bronze row with the
+  total.
+- **Cost:** an already crafted blueprint costs its **Value** per item, because that's what the stuff in your chest
+  is worth. Say each Bronze is worth 6. Those 24 Bronze add 24 × 6 = 144 to the Cost. With
+  [Calculate Values](dataset.md#calculate-values) off, they cost nothing.
+- **Value and Profit:** nothing new here. Value still only counts the blueprints you asked for.
+- **Time:** none. It's already made.
+- **Only what's nested:** you can't mark a blueprint that's in your batch. If you add one you've marked, the mark
+  quietly goes away.
+- **Marks inside marks:** a blueprint that's only used inside something you've marked can't be switched. If you'd
+  already marked it, the mark stays put and kicks back in when you unmark the outer one.
+
+Marks belong to the batch. Save it as a [favorite](favorites.md) and the marks are saved with it. Like a quantity
+change, a mark you flip isn't saved into a favorite you loaded until you save it again. **Clear selection** clears
+them, and so does switching datasets.
+
 ## Components Needed
 
 Every raw component in the batch, added together into one number. It counts *items*, not distinct
 kinds. 48 Copper, 24 Tin, 12 Wood and 6 Leather Scraps is 90 total Components Needed, from four rows.
+Already crafted blueprints count too: mark the Bronze and it's 24 Bronze, 12 Wood and 6 Leather Scraps, 42 in all.
 
 It is a rough gauge of "how much inventory space and how many trips", not a precise one, since your
 game's stack sizes are its own business.

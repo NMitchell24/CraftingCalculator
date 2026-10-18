@@ -85,8 +85,9 @@ None of this touches your blueprints. You're only throwing away the favorite, no
 
 ## What a favorite actually stores
 
-It stores **which blueprints, and how many**. It's **not** a frozen copy of their Crafting Summary, Components, Steps 
-and Surplus. If you update the underlying recipes, the craft screen will account for the recipe changes the next 
+It stores **which blueprints, and how many**, and which ones you marked as
+[already crafted](calculations.md#already-crafted). It's **not** a frozen copy of their Crafting Summary, Components,
+Steps and Surplus. If you update the underlying recipes, the craft screen will account for the recipe changes the next 
 time you load the favorite.
 
 This is intentional. Fix a wrong quantity in the Iron Nails blueprint, and every favorite that includes it is instantly 
@@ -94,5 +95,7 @@ correct too. Nothing else to edit, nothing else to check. If the favorite saved 
 whole craft screen, then you'd have to recreate the favorite every time the game devs decide to rebalance their recipes.
 
 The flip side of the same coin: if you **delete** a blueprint, it disappears from every favorite that
-used it. The favorite survives. It just gets shorter. And **Delete all data** on the Dataset screen
+used it, and from every favorite that had it marked as already crafted. The favorite survives. It just gets shorter.
+Change a recipe so it no longer uses something you marked, and that mark drops off the next time you load the
+favorite. And **Delete all data** on the Dataset screen
 deletes all your favorites too.
