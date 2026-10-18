@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using CraftingCalculator.Application.BusinessLogic.Processors;
 using CraftingCalculator.Application.BusinessLogic.Transfer;
 using CraftingCalculator.Application.BusinessLogic.Transfer.Format;
 using CraftingCalculator.Domain.Models;
@@ -11,11 +12,37 @@ namespace CraftingCalculator.Application.UnitTests.BusinessLogic.Transfer;
 [TestFixture]
 public class TransferDocumentProcessorTests
 {
+    private static readonly DependencyGraph Graph = DependencyGraphProcessor.Build(Snapshot);
+
     private static readonly DateTimeOffset ExportedAt = new(2026, 9, 12, 18, 4, 0, TimeSpan.Zero);
 
     // The nails' chain and the unused Food category: every kind skips an id, so a ref that simply copied
     // the database id would show up as wrong.
     private static readonly HashSet<RecordKey> NailsOnly = [Metals, Food, Copper, Tin, Bronze, BronzeNails];
+
+    [Test]
+    public void ToDocument_WritesWhatAFavoriteTakesAsAlreadyCraftedByRef()
+    {
+        HashSet<RecordKey> karvePrep = [.. TransferSelectionProcessor.Select(Graph, new HashSet<RecordKey>(), KarvePrep).Added];
+
+        TransferDocument document = TransferDocumentProcessor.ToDocument(Snapshot, karvePrep, ExportedAt, "1.0");
+
+        TransferFavorite favorite = document.Favorites.Should().ContainSingle().Subject;
+        int bronzeRef = document.Blueprints.Single(blueprint => blueprint.Name == "Bronze").Ref;
+        favorite.AlreadyCrafted.Should().Equal(bronzeRef);
+    }
+
+    [Test]
+    public void ToDocument_AFavoriteWithAStaleMark_ExportsTheMarkedBlueprintWithIt()
+    {
+        DependencyGraph graph = DependencyGraphProcessor.Build(WithAStaleMark);
+        HashSet<RecordKey> axeRun = [.. TransferSelectionProcessor.Select(graph, new HashSet<RecordKey>(), AxeRun).Added];
+
+        TransferDocument document = TransferDocumentProcessor.ToDocument(WithAStaleMark, axeRun, ExportedAt, "1.0");
+
+        int bronzeRef = document.Blueprints.Single(blueprint => blueprint.Name == "Bronze").Ref;
+        document.Favorites.Should().ContainSingle().Which.AlreadyCrafted.Should().Equal(bronzeRef);
+    }
 
     [Test]
     public void ToDocument_WritesTheHeader()

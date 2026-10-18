@@ -12,7 +12,8 @@ public static class DependencyGraphProcessor
 {
     /// <summary>
     /// Builds the graph of <paramref name="snapshot"/>: a component depends on its category; a blueprint on
-    /// its category, its components and the blueprints nested inside it; a favorite on its blueprints.
+    /// its category, its components and the blueprints nested inside it; a favorite on its blueprints and the ones it
+    /// takes as already crafted.
     /// </summary>
     public static DependencyGraph Build(DatasetSnapshot snapshot)
     {
@@ -41,7 +42,13 @@ public static class DependencyGraphProcessor
 
         foreach (SnapshotFavorite favorite in snapshot.Favorites)
         {
-            Add(new RecordKey(RecordKind.Favorite, favorite.Id), Links(RecordKind.Blueprint, favorite.Blueprints));
+            // A mark is an edge of its own rather than something the entries already reach: a recipe edited after the
+            // favorite was saved can leave a mark that none of them nests any more, and it still names a blueprint.
+            Add(new RecordKey(RecordKind.Favorite, favorite.Id),
+            [
+                .. Links(RecordKind.Blueprint, favorite.Blueprints),
+                .. favorite.AlreadyCrafted.Select(id => new RecordKey(RecordKind.Blueprint, id))
+            ]);
         }
 
         Dictionary<RecordKey, List<RecordKey>> usedBy = all.ToDictionary(key => key, _ => new List<RecordKey>());

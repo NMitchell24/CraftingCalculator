@@ -51,7 +51,8 @@ public static class TransferDocumentProcessor
             [
                 .. extract.Favorites
                     .Select(favorite => new TransferFavorite(
-                        favoriteRefs[favorite.Id], favorite.Name, Links(blueprintRefs, favorite.Blueprints)))
+                        favoriteRefs[favorite.Id], favorite.Name, Links(blueprintRefs, favorite.Blueprints),
+                        [.. favorite.AlreadyCrafted.Select(id => blueprintRefs[id])]))
             ],
             new TransferDatasettings(
                 UseYield: extract.Settings.UseYield, UseCosts: extract.Settings.UseCosts,

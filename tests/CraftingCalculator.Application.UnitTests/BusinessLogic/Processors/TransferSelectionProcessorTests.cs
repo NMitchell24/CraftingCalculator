@@ -164,6 +164,16 @@ public class TransferSelectionProcessorTests
     }
 
     [Test]
+    public void Deselect_ABlueprintAFavoriteTakesAsAlreadyCrafted_DeselectsTheFavoriteEvenWhenNothingInItNestsIt()
+    {
+        DependencyGraph graph = DependencyGraphProcessor.Build(WithAStaleMark);
+
+        SelectionChange change = TransferSelectionProcessor.Deselect(graph, new HashSet<RecordKey>(graph.All), Bronze);
+
+        change.Removed.Should().BeEquivalentTo([Bronze, BronzeNails, AxeRun, KarvePrep]);
+    }
+
+    [Test]
     public void Deselect_ABlueprint_LeavesWhatItNeedsSelected()
     {
         SelectionChange change = TransferSelectionProcessor.Deselect(Graph, Everything(), BronzeAxe);

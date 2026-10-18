@@ -39,14 +39,18 @@ public class DependencyGraphProcessorTests
     }
 
     [Test]
-    public void Build_AFavoriteDependsOnItsBlueprints() =>
-        Graph.DependsOn[KarvePrep].Should().BeEquivalentTo([BronzeNails, BronzeAxe]);
+    public void Build_AFavoriteDependsOnItsBlueprintsAndTheOnesItTakesAsAlreadyCrafted() =>
+        Graph.DependsOn[KarvePrep].Should().BeEquivalentTo([BronzeNails, BronzeAxe, Bronze]);
+
+    [Test]
+    public void Build_AFavoriteDependsOnABlueprintItTakesAsAlreadyCrafted_EvenOneItsBlueprintsNoLongerNest() =>
+        DependencyGraphProcessor.Build(WithAStaleMark).DependsOn[AxeRun].Should().BeEquivalentTo([BronzeAxe, Bronze]);
 
     [Test]
     public void Build_UsedByIsDependsOnReversed()
     {
         Graph.UsedBy[Metals].Should().BeEquivalentTo([Copper, Tin, Bronze, BronzeNails]);
-        Graph.UsedBy[Bronze].Should().BeEquivalentTo([BronzeAxe, BronzeNails]);
+        Graph.UsedBy[Bronze].Should().BeEquivalentTo([BronzeAxe, BronzeNails, KarvePrep]);
         Graph.UsedBy[BronzeAxe].Should().BeEquivalentTo([AxeRun, KarvePrep]);
         Graph.UsedBy[Food].Should().BeEmpty();
         Graph.UsedBy[AxeRun].Should().BeEmpty();

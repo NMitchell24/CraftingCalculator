@@ -85,6 +85,13 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
                 .ToListAsync())
             .ToLookup(link => link.FavoriteId, link => new QuantityLink(link.BlueprintId, link.Quantity));
 
+        ILookup<int, int> alreadyCrafted = (await context.FavoriteAlreadyCrafted
+                .AsNoTracking()
+                .OrderBy(link => link.Id)
+                .Select(link => new { link.FavoriteId, link.BlueprintId })
+                .ToListAsync())
+            .ToLookup(link => link.FavoriteId, link => link.BlueprintId);
+
         List<Favorite> favorites = await context.Favorites.AsNoTracking().OrderBy(favorite => favorite.Id).ToListAsync();
 
         return new DatasetSnapshot(
@@ -94,7 +101,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
             records.Blueprints,
             [
                 .. favorites.Select(favorite => new SnapshotFavorite(
-                    favorite.Id, favorite.Name, [.. favoriteLinks[favorite.Id]]))
+                    favorite.Id, favorite.Name, [.. favoriteLinks[favorite.Id]], [.. alreadyCrafted[favorite.Id]]))
             ],
             ToSettings(dataset));
     }
@@ -318,6 +325,7 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         List<int> matchedIds = landing.MatchedIds(RecordKind.Favorite);
         Dictionary<int, Favorite> matched = await context.Favorites
             .Include(favorite => favorite.FavoriteBlueprints)
+            .Include(favorite => favorite.AlreadyCrafted)
             .Where(favorite => matchedIds.Contains(favorite.Id))
             .ToDictionaryAsync(favorite => favorite.Id);
 
@@ -339,6 +347,13 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
             {
                 Blueprint = blueprints[link.TargetId],
                 Quantity = link.Quantity
+            }));
+
+            context.FavoriteAlreadyCrafted.RemoveRange(row.AlreadyCrafted);
+            row.AlreadyCrafted.Clear();
+            row.AlreadyCrafted.AddRange(record.AlreadyCrafted.Select(id => new FavoriteAlreadyCrafted
+            {
+                Blueprint = blueprints[id]
             }));
         }
     }

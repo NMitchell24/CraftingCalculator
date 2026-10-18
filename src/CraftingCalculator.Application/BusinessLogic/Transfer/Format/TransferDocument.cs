@@ -55,8 +55,12 @@ public sealed record TransferBlueprint(
     IReadOnlyList<QuantityRef> Components,
     IReadOnlyList<QuantityRef> Blueprints);
 
-/// <summary>A favorite. <see cref="Blueprints"/> name blueprints.</summary>
-public sealed record TransferFavorite(int Ref, string Name, IReadOnlyList<QuantityRef> Blueprints);
+/// <summary>
+/// A favorite. <see cref="Blueprints"/> name blueprints, and <see cref="AlreadyCrafted"/> the refs of the blueprints
+/// its batch takes as already crafted. It's null in a file that predates them, which stands for none.
+/// </summary>
+public sealed record TransferFavorite(
+    int Ref, string Name, IReadOnlyList<QuantityRef> Blueprints, IReadOnlyList<int>? AlreadyCrafted = null);
 
 /// <summary>A quantity of the record with <see cref="Ref"/>.</summary>
 public sealed record QuantityRef(int Ref, long Quantity);

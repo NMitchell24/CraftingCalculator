@@ -37,7 +37,8 @@ public class DatasetImportTests
 
     /// <summary>
     /// Fills the selected dataset with Valheim's bronze chain - Copper and Tin under Metals, Wood, Bronze from 2 Copper
-    /// and 1 Tin, a Bronze Axe from 4 Wood and 8 Bronze, and a favorite holding five axes - and returns it as a snapshot.
+    /// and 1 Tin, a Bronze Axe from 4 Wood and 8 Bronze, and a favorite holding five axes with the Bronze already crafted
+    /// - and returns it as a snapshot.
     /// </summary>
     private async Task<DatasetSnapshot> GivenTheBronzeChainAsync()
     {
@@ -64,7 +65,8 @@ public class DatasetImportTests
         axe.ChildBlueprints.Add(bronze, 8);
         await _blueprintDAO.SaveAsync(axe);
 
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, new Batch([new BlueprintQuantity(axe, 5)], new HashSet<int>()));
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" },
+            new Batch([new BlueprintQuantity(axe, 5)], new HashSet<int> { bronze.Id }));
 
         return await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
     }
@@ -97,7 +99,8 @@ public class DatasetImportTests
             Favorites = snapshot.Favorites.Select(favorite => new
             {
                 favorite.Name,
-                Blueprints = favorite.Blueprints.Select(link => (Blueprint(link.TargetId), link.Quantity))
+                Blueprints = favorite.Blueprints.Select(link => (Blueprint(link.TargetId), link.Quantity)),
+                AlreadyCrafted = favorite.AlreadyCrafted.Select(Blueprint)
             })
         };
 
@@ -266,15 +269,34 @@ public class DatasetImportTests
         int bronzeId = BlueprintNamed(current, "Bronze").Id;
         DatasetSnapshot incoming = new("Friend's Valheim", [], [],
             [new SnapshotBlueprint(1, "Bronze", "", 6, 2, TimeSpan.Zero, null, [], [])],
-            [new SnapshotFavorite(1, "Bronze Axe run", [new QuantityLink(1, 30)])], Datasettings.Default);
+            [new SnapshotFavorite(1, "Bronze Axe run", [new QuantityLink(1, 30)], [])], Datasettings.Default);
 
         await MergeAsync(incoming, current, new RecordKey(RecordKind.Favorite, 1));
 
         DatasetSnapshot merged = await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
         merged.Favorites.Single().Blueprints.Should().Equal(new QuantityLink(bronzeId, 30));
+        merged.Favorites.Single().AlreadyCrafted.Should().BeEmpty();
 
         // The file's Bronze was kept rather than replaced, so mine still has its Copper and Tin.
         BlueprintNamed(merged, "Bronze").Components.Should().HaveCount(2);
+    }
+
+    [Test]
+    public async Task MergeAsync_AnAddedFavorite_TakesTheBlueprintsItMarksWhereTheyLanded()
+    {
+        DatasetSnapshot current = await GivenTheBronzeChainAsync();
+        DatasetSnapshot incoming = new("Friend's Valheim", [], [],
+            [
+                new SnapshotBlueprint(1, "Bronze", "", 6, 2, TimeSpan.Zero, null, [], []),
+                new SnapshotBlueprint(2, "Bronze Axe", "", 40, 1, TimeSpan.Zero, null, [], [new QuantityLink(1, 8)])
+            ],
+            [new SnapshotFavorite(1, "Axe restock", [new QuantityLink(2, 3)], [1])], Datasettings.Default);
+
+        await MergeAsync(incoming, current);
+
+        DatasetSnapshot merged = await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
+        merged.Favorites.Single(favorite => favorite.Name == "Axe restock").AlreadyCrafted
+            .Should().Equal(BlueprintNamed(current, "Bronze").Id);
     }
 
     [Test]

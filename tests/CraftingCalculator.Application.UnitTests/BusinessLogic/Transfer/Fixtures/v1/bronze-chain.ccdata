@@ -115,7 +115,8 @@
           "ref": 2,
           "quantity": 5
         }
-      ]
+      ],
+      "alreadyCrafted": []
     },
     {
       "ref": 2,
@@ -129,6 +130,9 @@
           "ref": 2,
           "quantity": 1
         }
+      ],
+      "alreadyCrafted": [
+        1
       ]
     }
   ],

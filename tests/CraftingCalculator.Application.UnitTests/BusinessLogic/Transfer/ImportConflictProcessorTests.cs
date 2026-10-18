@@ -122,6 +122,19 @@ public class ImportConflictProcessorTests
     }
 
     [Test]
+    public void FindNewCycles_AFavoriteTakingAMatchedBlueprintAsAlreadyCrafted_FindsNone()
+    {
+        // The file's Bronze is ref 1 and lands on the dataset's Bronze, which is id 7, so the mark has to follow it.
+        DatasetSnapshot current = Snapshot(blueprints: [Blueprint(7, "Bronze")]);
+        DatasetSnapshot incoming = Snapshot(
+            blueprints: [Blueprint(1, "Bronze"), Blueprint(2, "Bronze Axe", 1)],
+            favorites: [new SnapshotFavorite(1, "Bronze Axe run", [new QuantityLink(2, 5)], [1])]);
+        MergePlan plan = new(incoming, ImportConflictProcessor.Find(incoming, current), new HashSet<RecordKey>());
+
+        ImportConflictProcessor.FindNewCycles(plan, current).Should().BeEmpty();
+    }
+
+    [Test]
     public void FindNewCycles_ALoopAlreadyInTheDataset_IsNotReported()
     {
         DatasetSnapshot legacy = Snapshot(blueprints: [Blueprint(1, "Ouroboros", 1)]);

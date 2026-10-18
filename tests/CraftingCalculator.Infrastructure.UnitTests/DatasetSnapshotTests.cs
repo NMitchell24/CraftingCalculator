@@ -68,7 +68,8 @@ public class DatasetSnapshotTests
         axe.ChildBlueprints.Add(bronze, 8);
         await _blueprintDAO.SaveAsync(axe);
 
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, new Batch([new BlueprintQuantity(axe, 5)], new HashSet<int>()));
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" },
+            new Batch([new BlueprintQuantity(axe, 5)], new HashSet<int> { bronze.Id }));
 
         return (metals, copper, tin, wood, bronze, axe);
     }
@@ -119,6 +120,7 @@ public class DatasetSnapshotTests
         savedAxe.Components.Should().Equal(new QuantityLink(wood.Id, 4));
         savedAxe.Blueprints.Should().Equal(new QuantityLink(bronze.Id, 8));
         snapshot.Favorites.Single().Blueprints.Should().Equal(new QuantityLink(axe.Id, 5));
+        snapshot.Favorites.Single().AlreadyCrafted.Should().Equal(bronze.Id);
     }
 
     [Test]
