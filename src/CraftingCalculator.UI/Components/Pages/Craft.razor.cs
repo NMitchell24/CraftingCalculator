@@ -74,18 +74,29 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        State.Changed += StateHasChanged;
+        State.Changed += OnStateChanged;
         ConfigureShell();
 
         await ReloadFavoritesAsync();
     }
 
+    // The actions follow the batch, so they are re-declared on every change to it rather than once.
+    private void OnStateChanged()
+    {
+        ConfigureShell();
+        StateHasChanged();
+    }
+
     private void ConfigureShell()
     {
+        // Save stays rightmost. Four actions still fit the phone's bottom bar without an overflow menu.
         List<PageAction> actions =
         [
             new("Add blueprints", Icons.Material.Filled.Add, OpenPickerAsync),
             new("Clear selection", Icons.Material.Filled.Clear, ClearBatchAsync),
+            new("Already crafted", Icons.Material.Filled.Inventory2, OpenAlreadyCraftedAsync,
+                Disabled: State.AlreadyCraftedCandidates.Count == 0,
+                Active: State.AlreadyCraftedIds.Count > 0),
             new("Save as favorite", Icons.Material.Filled.Save, SaveAsFavoriteAsync)
         ];
 
@@ -143,6 +154,24 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
         await DialogService.ShowAsync<RecordPickerDialog>("Add blueprints", parameters, options);
     }
 
+    private Task OpenAlreadyCraftedAsync() => Guard.RunAsync(
+        "Craft.OpenAlreadyCrafted",
+        "I couldn't open the list of already crafted blueprints.",
+        ShowAlreadyCraftedAsync);
+
+    private async Task ShowAlreadyCraftedAsync()
+    {
+        DialogOptions options = new()
+        {
+            FullScreen = IsCompact,
+            MaxWidth = MaxWidth.Small,
+            CloseOnEscapeKey = true
+        };
+
+        // Every switch goes straight into CraftState, so there is no result to await.
+        await DialogService.ShowAsync<AlreadyCraftedDialog>("Already Crafted", options);
+    }
+
     private async Task<IReadOnlyList<IBaseDataRecord>> ReadBlueprintsAsync() =>
         await Task.Run(BlueprintService.GetBlueprintSummariesAsync);
 
@@ -186,7 +215,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     private async Task CopyMaterialsAsync()
     {
-        string text = string.Join(Environment.NewLine, State.TotalComponents.Select(componentQuantity => componentQuantity.DisplayName));
+        string text = string.Join(Environment.NewLine, State.TotalComponents.Select(quantity => quantity.DisplayName));
 
         if (await Guard.RunAsync("Craft.CopyMaterials", CopyFailedMessage, () => ClipboardService.SetTextAsync(text)))
         {
@@ -217,7 +246,7 @@ public partial class Craft : ComponentBase, IRecordPickerTarget, IDisposable
 
     public void Dispose()
     {
-        State.Changed -= StateHasChanged;
+        State.Changed -= OnStateChanged;
         PageShellState.Reset(this);
     }
 }

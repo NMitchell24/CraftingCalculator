@@ -1040,6 +1040,9 @@ html.keyboard-open .page-content-with-bottom-nav {
 .setting-text {
     flex: 1 1 auto;
     min-width: 0;
+    /* A record's name can be one long word (the Already Crafted dialog lists them), and it breaks only when it can't
+       fit a line by itself. */
+    overflow-wrap: break-word;
 }
 
 .setting-caption {
@@ -2082,6 +2085,16 @@ html.keyboard-open .mud-dialog-container {
     display: block;
     margin-top: 8px;
     opacity: 0.7;
+}
+
+/* The icon an already crafted row carries, inline in the legend's sentence. Sized in ch rather than em so it follows
+   Android's text zoom along with the caption around it. ch resolves against the element's own font, and MudIcon sets
+   its own size class's font size, so the caption's is inherited back first. */
+.steps-tree-legend-icon {
+    font-size: inherit;
+    width: 2.2ch;
+    height: 2.2ch;
+    vertical-align: text-bottom;
 }
 
 /* Help pages. The body is a rendered Markdown fragment (Components/Pages/Help.razor), so unlike the

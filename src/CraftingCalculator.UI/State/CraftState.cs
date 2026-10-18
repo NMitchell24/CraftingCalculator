@@ -18,7 +18,15 @@ public sealed partial class CraftState(
     ISelectedDatasetState selectedDataset,
     ILogger<CraftState> logger)
 {
+    private static readonly IReadOnlySet<int> NoStops = new HashSet<int>();
+
     private readonly BlueprintMap _blueprintMap = new();
+
+    // The batch's already crafted blueprints, by id. Recalculate keeps it to blueprints nested below the batch's roots.
+    private readonly HashSet<int> _alreadyCraftedIds = [];
+
+    // Nested below the roots, but only inside an already crafted blueprint, so marking them would change nothing.
+    private HashSet<int> _insideAlreadyCrafted = [];
 
     // Keyed by each node's full path from the tree root (see PathOf), not by the record alone - the same
     // blueprint/component can appear more than once in one tree (e.g. a blueprint used both standalone in the
@@ -37,18 +45,28 @@ public sealed partial class CraftState(
     /// </summary>
     public event Action? ExpansionChanged;
 
-    /// <summary>Raised when <see cref="HasVisibleCraftCountedStep"/> changes, whatever changed it.</summary>
-    public event Action? HasVisibleCraftCountedStepChanged;
+    /// <summary>
+    /// Raised when <see cref="HasVisibleCraftCountedStep"/> or <see cref="HasVisibleAlreadyCraftedStep"/> changes,
+    /// whatever changed it.
+    /// </summary>
+    public event Action? LegendChanged;
 
     public IReadOnlyList<BlueprintQuantity> BlueprintQuantities => _blueprintMap.BlueprintList;
-    public ReadOnlyCollection<ComponentQuantity> TotalComponents { get; private set; } =
-        ReadOnlyCollection<ComponentQuantity>.Empty;
+
+    /// <summary>
+    /// Everything the batch gathers rather than crafts, by name: its components, and the blueprints it takes as
+    /// already crafted.
+    /// </summary>
+    public IReadOnlyList<IBaseQuantityRecord> TotalComponents { get; private set; } = [];
     public IReadOnlyList<BlueprintNode> TreeRoots { get; private set; } = [];
     public double TotalCost { get; private set; }
     public double TotalValue { get; private set; }
     public double Profit => TotalValue - TotalCost;
 
-    /// <summary>Total units of raw material the batch needs, summed across every distinct component.</summary>
+    /// <summary>
+    /// Total units of raw material the batch needs, summed across every distinct component and already crafted
+    /// blueprint.
+    /// </summary>
     public long TotalComponentCount { get; private set; }
 
     /// <summary>
@@ -84,6 +102,35 @@ public sealed partial class CraftState(
     /// the "update or create new" branch of the save flow (see Components/Dialogs/FavoritePrompts).
     /// </summary>
     public BlueprintFavorite? LoadedFavorite { get; private set; }
+
+    /// <summary>
+    /// The ids of the blueprints the batch takes as already crafted rather than crafting. Each one is nested below the
+    /// batch, and none is one of its entries.
+    /// </summary>
+    public IReadOnlySet<int> AlreadyCraftedIds => _alreadyCraftedIds;
+
+    /// <summary>Every blueprint nested below the batch's entries, and not itself an entry, by name.</summary>
+    public IReadOnlyList<BlueprintModel> AlreadyCraftedCandidates { get; private set; } = [];
+
+    public bool IsAlreadyCrafted(int blueprintId) => _alreadyCraftedIds.Contains(blueprintId);
+
+    /// <summary>
+    /// Whether the blueprint is only reached through blueprints the batch takes as already crafted, so marking it
+    /// makes no difference while they stay marked.
+    /// </summary>
+    public bool IsInsideAlreadyCrafted(int blueprintId) => _insideAlreadyCrafted.Contains(blueprintId);
+
+    /// <summary>
+    /// Marks the blueprint as already crafted for this batch, or unmarks it. A blueprint that isn't one of
+    /// <see cref="AlreadyCraftedCandidates"/> doesn't stay marked.
+    /// </summary>
+    public void SetAlreadyCrafted(int blueprintId, bool alreadyCrafted)
+    {
+        if (alreadyCrafted ? _alreadyCraftedIds.Add(blueprintId) : _alreadyCraftedIds.Remove(blueprintId))
+        {
+            Recalculate();
+        }
+    }
 
     /// <summary>Adds a blueprint to the batch, or raises its quantity by one when it is already there.</summary>
     public void Add(BlueprintModel blueprint)
@@ -137,6 +184,7 @@ public sealed partial class CraftState(
     {
         _clearCount++;
         _blueprintMap.Reset();
+        _alreadyCraftedIds.Clear();
         LoadedFavorite = null;
         Recalculate();
     }
@@ -164,6 +212,9 @@ public sealed partial class CraftState(
         {
             _blueprintMap.Add(quantity.Blueprint, quantity.Quantity);
         }
+
+        _alreadyCraftedIds.Clear();
+        _alreadyCraftedIds.UnionWith(batch.AlreadyCraftedIds);
 
         LoadedFavorite = favorite;
         Recalculate();
@@ -237,7 +288,7 @@ public sealed partial class CraftState(
     private async Task SaveBatchAsAsync(BlueprintFavorite favorite)
     {
         // Copied here, on the UI thread, so the save never enumerates the batch while a tap is changing it.
-        Batch batch = new([.. _blueprintMap.BlueprintList], new HashSet<int>());
+        Batch batch = new([.. _blueprintMap.BlueprintList], new HashSet<int>(_alreadyCraftedIds));
         int clearCount = _clearCount;
         BlueprintFavorite saved = await Task.Run(() => favoriteService.SaveFavoriteAsync(favorite, batch));
 
@@ -282,6 +333,12 @@ public sealed partial class CraftState(
     public bool HasVisibleCraftCountedStep { get; private set; }
 
     /// <summary>
+    /// Whether a step currently visible in the tree is a blueprint the batch takes as already crafted, which the
+    /// legend under the Crafting Steps tree also explains.
+    /// </summary>
+    public bool HasVisibleAlreadyCraftedStep { get; private set; }
+
+    /// <summary>
     /// The position of <paramref name="node"/> in the Crafting Steps tree, below the node at <paramref name="parentPath"/>
     /// (empty for a tree root). Two records that share a name have different paths.
     /// </summary>
@@ -297,7 +354,7 @@ public sealed partial class CraftState(
             _expandedPaths.Remove(path);
         }
 
-        UpdateHasVisibleCraftCountedStep();
+        UpdateLegend();
     }
 
     public void ExpandAll()
@@ -307,7 +364,7 @@ public sealed partial class CraftState(
             return;
         }
 
-        UpdateHasVisibleCraftCountedStep();
+        UpdateLegend();
         ExpansionChanged?.Invoke();
     }
 
@@ -319,42 +376,59 @@ public sealed partial class CraftState(
         }
 
         _expandedPaths.Clear();
-        UpdateHasVisibleCraftCountedStep();
+        UpdateLegend();
         ExpansionChanged?.Invoke();
     }
 
-    private void UpdateHasVisibleCraftCountedStep()
+    private void UpdateLegend()
     {
-        // Collapsed subtrees are excluded deliberately: the legend would otherwise resolve an asterisk that
-        // is not on screen.
-        bool visible = AnyCountsByCraft(TreeRoots, "");
+        // Collapsed subtrees are excluded deliberately: the legend would otherwise explain a row that is not on screen.
+        // With nothing marked there's no already crafted row to find, so the walk can stop at the first asterisk.
+        LegendScan scan = new() { SkipAlreadyCrafted = _alreadyCraftedIds.Count == 0 };
+        ScanVisible(TreeRoots, "", ref scan);
 
-        if (visible == HasVisibleCraftCountedStep)
+        if (scan.CraftCounted == HasVisibleCraftCountedStep && scan.AlreadyCrafted == HasVisibleAlreadyCraftedStep)
         {
             return;
         }
 
-        HasVisibleCraftCountedStep = visible;
-        HasVisibleCraftCountedStepChanged?.Invoke();
+        HasVisibleCraftCountedStep = scan.CraftCounted;
+        HasVisibleAlreadyCraftedStep = scan.AlreadyCrafted;
+        LegendChanged?.Invoke();
     }
 
-    private bool AnyCountsByCraft(IReadOnlyList<BlueprintNode> nodes, string parentPath)
+    private void ScanVisible(IReadOnlyList<BlueprintNode> nodes, string parentPath, ref LegendScan scan)
     {
         foreach (BlueprintNode node in nodes)
         {
-            if (BlueprintProcessor.CountsByCraft(node))
+            scan.CraftCounted |= BlueprintProcessor.CountsByCraft(node);
+            scan.AlreadyCrafted |= node.AlreadyCrafted;
+            if (scan.Done)
             {
-                return true;
+                return;
             }
 
             string path = PathOf(parentPath, node);
-            if (IsExpanded(path) && AnyCountsByCraft(node.Children, path))
+            if (!IsExpanded(path))
             {
-                return true;
+                continue;
+            }
+
+            ScanVisible(node.Children, path, ref scan);
+            if (scan.Done)
+            {
+                return;
             }
         }
+    }
 
-        return false;
+    private struct LegendScan
+    {
+        public bool CraftCounted;
+        public bool AlreadyCrafted;
+        public bool SkipAlreadyCrafted;
+
+        public readonly bool Done => CraftCounted && (AlreadyCrafted || SkipAlreadyCrafted);
     }
 
     // Returns whether any path was added, which is false when the tree was already fully expanded.
@@ -387,17 +461,44 @@ public sealed partial class CraftState(
         _expandedPaths.IntersectWith(present);
     }
 
+    // Keeps the marks to blueprints nested below the batch's entries, and works out which of those are only reached
+    // through a marked one. An entry is never marked, and nothing outside the batch stays marked, which is what clears
+    // the marks once the batch is empty.
+    private void UpdateAlreadyCrafted()
+    {
+        List<BlueprintModel> roots = [.. _blueprintMap.BlueprintList.Select(entry => entry.Blueprint)];
+
+        Dictionary<int, BlueprintModel> nested = BlueprintProcessor.NestedBlueprints(roots, NoStops);
+        foreach (BlueprintModel root in roots)
+        {
+            nested.Remove(root.Id);
+        }
+
+        _alreadyCraftedIds.IntersectWith(nested.Keys);
+
+        // Without a mark nothing is cut off, so there's no second walk to make.
+        _insideAlreadyCrafted = _alreadyCraftedIds.Count == 0
+            ? []
+            : [.. nested.Keys.Except(BlueprintProcessor.NestedBlueprints(roots, _alreadyCraftedIds).Keys)];
+
+        AlreadyCraftedCandidates = [.. nested.Values.OrderBy(blueprint => blueprint.Name)];
+    }
+
     private void Recalculate()
     {
+        UpdateAlreadyCrafted();
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            new Batch(_blueprintMap.BlueprintList, new HashSet<int>()), selectedDataset.Settings);
+            new Batch(_blueprintMap.BlueprintList, _alreadyCraftedIds), selectedDataset.Settings);
 
         TotalCost = totals.TotalCost;
         TotalValue = totals.TotalValue;
         SurplusValue = totals.SurplusValue;
         TotalProductionTime = totals.TotalProductionTime;
         TotalComponents =
-            totals.Materials.ComponentList.OrderBy(componentQuantity => componentQuantity.Name).ToList().AsReadOnly();
+        [
+            .. totals.Materials.ComponentList.Concat<IBaseQuantityRecord>(totals.AlreadyCrafted.BlueprintList)
+                .OrderBy(quantity => quantity.Name)
+        ];
         SurplusStock =
             totals.Surplus.BlueprintList.OrderBy(blueprintQuantity => blueprintQuantity.Name).ToList().AsReadOnly();
         TreeRoots = totals.Roots;
@@ -406,10 +507,10 @@ public sealed partial class CraftState(
 
         // Computed here rather than as expression-bodied properties: each walks the whole batch, and the
         // summary card reads them on every render.
-        TotalComponentCount = TotalComponents.Sum(componentQuantity => componentQuantity.Quantity);
+        TotalComponentCount = TotalComponents.Sum(quantity => quantity.Quantity);
         SurplusCount = SurplusStock.Sum(blueprintQuantity => blueprintQuantity.Quantity);
 
-        UpdateHasVisibleCraftCountedStep();
+        UpdateLegend();
         Changed?.Invoke();
     }
 

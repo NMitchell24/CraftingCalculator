@@ -11,11 +11,11 @@ public partial class StepsTreeLegend : ComponentBase, IDisposable
 
     protected override void OnInitialized()
     {
-        State.HasVisibleCraftCountedStepChanged += StateHasChanged;
+        State.LegendChanged += StateHasChanged;
     }
 
     public void Dispose()
     {
-        State.HasVisibleCraftCountedStepChanged -= StateHasChanged;
+        State.LegendChanged -= StateHasChanged;
     }
 }

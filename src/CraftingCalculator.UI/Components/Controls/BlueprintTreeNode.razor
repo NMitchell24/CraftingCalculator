@@ -17,6 +17,7 @@
     <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Label" TextClass="steps-tree-label" EndText="@EndText"
                      EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
                      Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
+                     IconColor="@(Node.AlreadyCrafted ? Color.Tertiary : Color.Default)"
                      Expanded="@expanded" ExpandedChanged="OnExpandedChanged"
                      OnClick="OpenDetailAsync">
         @if (expanded || _keepChildren)
@@ -33,5 +34,6 @@ else
     <MudTreeViewItem T="BlueprintNode" Value="Node" Text="@Label" TextClass="steps-tree-label" EndText="@EndText"
                      EndTextTypo="Typo.caption" EndTextClass="steps-tree-time"
                      Icon="@(Node.IsComponent ? Icons.Material.Filled.Inventory2 : Icons.Material.Filled.Handyman)"
+                     IconColor="@(Node.AlreadyCrafted ? Color.Tertiary : Color.Default)"
                      OnClick="OpenDetailAsync" />
 }
