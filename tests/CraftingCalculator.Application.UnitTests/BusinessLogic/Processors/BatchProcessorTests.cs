@@ -658,10 +658,13 @@ public class BatchProcessorTests
         totals.Roots[0].Children.Should().ContainSingle().Subject.Crafts.Should().Be(1);
     }
 
-    [Test]
-    public void CalculateTotals_Cycle_ThrowsInsteadOfOverflowingTheStack()
+    // A yield above 1 leaves a spare at every level, which the nested copy of the same blueprint must not be able to
+    // take in place of crafting.
+    [TestCase(1)]
+    [TestCase(2)]
+    public void CalculateTotals_Cycle_ThrowsInsteadOfOverflowingTheStack(long yield)
     {
-        BlueprintModel blueprint = NewBlueprint("Self Referencing");
+        BlueprintModel blueprint = NewBlueprint("Self Referencing", yield: yield);
         blueprint.ChildBlueprints.Add(blueprint, 1);
 
         Action act = () => TotalsOf(blueprint, 1);

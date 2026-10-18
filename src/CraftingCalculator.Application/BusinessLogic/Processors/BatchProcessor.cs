@@ -90,10 +90,6 @@ public static class BatchProcessor
             long toCraft = quantity - fromSurplus;
             long crafts = BlueprintProcessor.CraftsFor(toCraft, yield);
             long overproduced = crafts * yield - toCraft;
-            if (overproduced > 0)
-            {
-                Surplus.Add(blueprint, overproduced);
-            }
 
             TimeSpan productionTime = DurationMath.Scale(blueprint.ProductionTime, crafts);
             BlueprintTime = DurationMath.Add(BlueprintTime, productionTime);
@@ -104,6 +100,13 @@ public static class BatchProcessor
             // them under it, and add components the batch never uses to Materials at 0.
             IReadOnlyList<BlueprintNode> children =
                 fromSurplus > 0 && crafts == 0 ? [] : VisitParts(blueprint, crafts, depth);
+
+            // Pooled only once the parts are walked: the output doesn't exist until they're crafted, so nothing
+            // beneath this step can be made from it, and a blueprint that nests itself still reaches ThrowIfTooDeep.
+            if (overproduced > 0)
+            {
+                Surplus.Add(blueprint, overproduced);
+            }
 
             return new BlueprintNode(
                 blueprint,
