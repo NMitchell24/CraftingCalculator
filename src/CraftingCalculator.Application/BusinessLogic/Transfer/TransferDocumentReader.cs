@@ -220,7 +220,8 @@ public static class TransferDocumentReader
         [.. document.Favorites.Select(favorite => new SnapshotFavorite(favorite.Ref, favorite.Name, Links(favorite.Blueprints)))],
         document.Datasettings is { } settings
             ? new Datasettings(UseYield: settings.UseYield, UseCosts: settings.UseCosts, UseValues: settings.UseValues,
-                UseCraftTime: settings.UseCraftTime, CurrencyLabel: CurrencyProcessor.ToLabel(settings.CurrencyLabel))
+                UseCraftTime: settings.UseCraftTime, CurrencyLabel: CurrencyProcessor.ToLabel(settings.CurrencyLabel),
+                UseSharedSurplus: settings.UseSharedSurplus)
             : Datasettings.Default);
 
     private static List<QuantityLink> Links(IEnumerable<QuantityRef> links) =>

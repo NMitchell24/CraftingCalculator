@@ -39,8 +39,9 @@ public static class BlueprintProcessor
 
     /// <summary>
     /// Whether <paramref name="node"/> takes fewer crafts than the quantity it produces, because the
-    /// blueprint yields more than one per craft. False for a component leaf, which is gathered rather
-    /// than crafted, and false for a yield that happens to leave the two counts equal.
+    /// blueprint yields more than one per craft or part of the quantity came from surplus. False for a
+    /// component leaf, which is gathered rather than crafted, and false for a yield that happens to leave
+    /// the two counts equal.
     /// </summary>
     public static bool CountsByCraft(BlueprintNode node) => !node.IsComponent && node.Crafts != node.Quantity;
 

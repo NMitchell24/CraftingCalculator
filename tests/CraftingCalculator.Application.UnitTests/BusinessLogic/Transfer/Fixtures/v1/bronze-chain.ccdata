@@ -137,6 +137,7 @@
     "useCosts": true,
     "useValues": true,
     "useCraftTime": true,
-    "currencyLabel": null
+    "currencyLabel": null,
+    "useSharedSurplus": true
   }
 }

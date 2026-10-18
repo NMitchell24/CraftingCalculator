@@ -58,8 +58,8 @@ and your Valheim dataset doesn’t budge. Switch datasets and the app follows wh
 They also travel with the dataset. [Copying a dataset](managing-datasets.md#copying-one) copies them, and an
 [export](import-export.md) carries them along with your records.
 
-The card has two tabs. **General** holds Calculate Yield and Calculate Craft Time. **Economy** holds the money stuff: 
-Calculate Costs, Calculate Values and Currency Name.
+The card has two tabs. **General** holds Calculate Yield, Calculate Shared Surplus and Calculate Craft Time. **Economy**
+holds the money stuff: Calculate Costs, Calculate Values and Currency Name.
 
 ### Calculate Yield
 
@@ -71,7 +71,10 @@ way, the yield field is just clutter. Turn **Calculate Yield** off and all of it
 - the **Yield per craft** field in the [blueprint editor](blueprints.md#yield-per-craft)
 - the **Surplus** tab on the [Craft screen](craft-screen.md)
 - the **Surplus Stock** and **Surplus Value** lines in the Crafting Summary
-- the **Yield per Craft** and **Surplus** rows on a blueprint's detail card
+- the **Yield per Craft**, **From Surplus** and **Surplus** rows on a blueprint's detail card
+
+[Calculate Shared Surplus](dataset.md#calculate-shared-surplus) is grayed out while it's off, because there's nothing
+to share.
 
 The math changes too. With Calculate Yield off, every blueprint makes exactly 1 item per craft, whatever its yield says.
 That means there's never any surplus, because nothing ever gets overproduced.
@@ -87,6 +90,26 @@ Turning it off doesn't erase anything. Every blueprint keeps the yield you gave 
 your planks go right back to 4 per log.
 
 More detail: [How the Math Works](calculations.md).
+
+### Calculate Shared Surplus
+
+Right under Calculate Yield, and on by default. This is the switch for letting your batch use its own leftovers.
+
+When a step makes more than it needs, the spares go to the steps below it that need the same thing, before any of them
+crafts more. One plank craft can cover a pickaxe *and* a sword. Turn **Calculate Shared Surplus** off and every step
+crafts for itself, as if the others weren't there.
+
+**Example:** a Minecraft Wooden Pickaxe and Wooden Sword in one batch.
+
+| Calculate Shared Surplus | Logs | Crafting Steps | Left over          |
+|--------------------------|------|----------------|--------------------|
+| On                       | 2    | 5              | 1 plank, 1 stick   |
+| Off                      | 4    | 8              | 7 planks, 5 sticks |
+
+Leave it on unless your game makes it hard to carry spares from one craft to the next. It only needs Calculate Yield:
+with that off, nothing is ever overproduced, so the switch is grayed out.
+
+More detail: [Shared surplus](calculations.md#shared-surplus).
 
 ### Calculate Craft Time
 

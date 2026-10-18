@@ -13,7 +13,9 @@ public static class BatchProcessor
     /// <summary>
     /// The totals for <paramref name="batch"/>, worked out under <paramref name="settings"/>. Without
     /// <see cref="Datasettings.UseCosts"/> the total cost is 0; without <see cref="Datasettings.UseValues"/> the
-    /// total value and the surplus value are 0.
+    /// total value and the surplus value are 0. With <see cref="Datasettings.UseSharedSurplus"/>, a step uses what
+    /// the steps before it overproduced before crafting any of its own, so the batch takes the fewest crafts it
+    /// can and the surplus is only what is left at the end.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// A blueprint graph nests deeper than the app can work out, which a cycle does.
@@ -57,7 +59,8 @@ public static class BatchProcessor
 
     /// <summary>
     /// One pass over every tree in a batch, building each node and adding what it needs, overproduces and
-    /// takes into totals shared by the whole batch.
+    /// takes into totals shared by the whole batch. Trees are visited in batch order and each node's children in
+    /// the order the Steps tree lists them, so a step only ever draws on surplus made by a step listed above it.
     /// </summary>
     private sealed class BatchWalk(Datasettings settings)
     {
@@ -72,16 +75,21 @@ public static class BatchProcessor
         /// <summary>
         /// Builds <paramref name="blueprint"/>'s breakdown tree for <paramref name="quantity"/> of it: one child
         /// node per component and per nested child blueprint, recursively. Children are scaled by the crafts
-        /// <paramref name="quantity"/> takes, not by <paramref name="quantity"/> itself, so a yield above 1
-        /// reduces everything below it.
+        /// this step takes, not by <paramref name="quantity"/> itself, so a yield above 1, or surplus an earlier
+        /// step made, reduces everything below it.
         /// </summary>
         public BlueprintNode Visit(BlueprintModel blueprint, long quantity, int depth)
         {
             BlueprintProcessor.ThrowIfTooDeep(blueprint, depth);
 
             long yield = BlueprintProcessor.YieldOf(blueprint, settings);
-            long crafts = BlueprintProcessor.CraftsFor(quantity, yield);
-            long overproduced = crafts * yield - quantity;
+            // Drawing from the surplus first is what keeps every blueprint's crafts at the minimum: a step only
+            // crafts once the surplus is used up, so what is left over never reaches a whole craft's yield, and
+            // the total comes out as the whole batch's demand rounded up once rather than at every position.
+            long fromSurplus = settings.UseSharedSurplus ? Surplus.Take(blueprint, quantity) : 0;
+            long toCraft = quantity - fromSurplus;
+            long crafts = BlueprintProcessor.CraftsFor(toCraft, yield);
+            long overproduced = crafts * yield - toCraft;
             if (overproduced > 0)
             {
                 Surplus.Add(blueprint, overproduced);
@@ -92,6 +100,25 @@ public static class BatchProcessor
             // Checked, so a batch whose step count passes long.MaxValue throws rather than showing a negative count.
             Crafts = checked(Crafts + crafts);
 
+            // A step the surplus covers entirely isn't crafted. Walking its parts at a quantity of 0 would list
+            // them under it, and add components the batch never uses to Materials at 0.
+            IReadOnlyList<BlueprintNode> children =
+                fromSurplus > 0 && crafts == 0 ? [] : VisitParts(blueprint, crafts, depth);
+
+            return new BlueprintNode(
+                blueprint,
+                Quantity: quantity, Crafts: crafts, Yield: yield,
+                Surplus: overproduced, FromSurplus: fromSurplus,
+                ProductionTime: productionTime,
+                Children: children);
+        }
+
+        /// <summary>
+        /// One child node per component and per nested child blueprint of <paramref name="blueprint"/>, for
+        /// <paramref name="crafts"/> crafts of it.
+        /// </summary>
+        private List<BlueprintNode> VisitParts(BlueprintModel blueprint, long crafts, int depth)
+        {
             List<BlueprintNode> children =
                 new(blueprint.Components.ComponentList.Count + blueprint.ChildBlueprints.BlueprintList.Count);
 
@@ -99,10 +126,10 @@ public static class BatchProcessor
             {
                 long componentQuantity = component.Quantity * crafts;
                 Materials.Add(component.Component, componentQuantity);
-                //Named from Quantity on: four adjacent long arguments would otherwise transpose silently.
+                //Named from Quantity on: five adjacent long arguments would otherwise transpose silently.
                 children.Add(new BlueprintNode(
                     component.Component,
-                    Quantity: componentQuantity, Crafts: 0, Yield: 0, Surplus: 0,
+                    Quantity: componentQuantity, Crafts: 0, Yield: 0, Surplus: 0, FromSurplus: 0,
                     ProductionTime: DurationMath.Scale(component.Component.ProductionTime, componentQuantity),
                     Children: []));
             }
@@ -110,12 +137,7 @@ public static class BatchProcessor
             children.AddRange(blueprint.ChildBlueprints.BlueprintList.Select(
                 child => Visit(child.Blueprint, child.Quantity * crafts, depth + 1)));
 
-            return new BlueprintNode(
-                blueprint,
-                Quantity: quantity, Crafts: crafts, Yield: yield,
-                Surplus: overproduced,
-                ProductionTime: productionTime,
-                Children: children);
+            return children;
         }
     }
 }

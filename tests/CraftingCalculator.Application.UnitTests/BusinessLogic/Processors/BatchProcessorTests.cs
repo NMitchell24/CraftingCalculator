@@ -25,6 +25,8 @@ public class BatchProcessorTests
 
     private static readonly Datasettings NoYield = new(UseYield: false);
 
+    private static readonly Datasettings NotShared = new(UseSharedSurplus: false);
+
     private static ComponentModel NewComponent(string name, double cost = 0) =>
         new() { Id = IdOf(name), Name = name, Cost = cost };
 
@@ -190,7 +192,7 @@ public class BatchProcessorTests
     }
 
     [Test]
-    public void CalculateTotals_TwoBlueprintsNestingTheSameYieldingChild_RoundEachPositionIndependently()
+    public void CalculateTotals_SurplusNotShared_RoundsEachPositionIndependently()
     {
         // Each parent needs one Bracket, so each runs its own Bracket craft rather than sharing one
         // between them - and each craft leaves a spare.
@@ -204,13 +206,189 @@ public class BatchProcessorTests
         handle.ChildBlueprints.Add(bracket, 1);
 
         BatchTotals totals = BatchProcessor.CalculateTotals(
-            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)], Datasettings.Default);
+            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)], NotShared);
 
         totals.TotalCost.Should().Be(6); // two Bracket crafts, 3 Screws each
         BlueprintQuantity spare = totals.Surplus.BlueprintList.Should().ContainSingle().Subject;
         spare.Name.Should().Be("Bracket");
         spare.Quantity.Should().Be(2);
         spare.TotalValue.Should().Be(10);
+        totals.Roots.Select(root => root.Children.Single().FromSurplus).Should().Equal(0L, 0L);
+    }
+
+    [Test]
+    public void CalculateTotals_TwoBlueprintsNestingTheSameYieldingChild_ShareOneCraft()
+    {
+        BlueprintModel bracket = NewBlueprint("Bracket", 5, yield: 2);
+        bracket.Components.Add(NewComponent("Screw", 1), 3);
+
+        BlueprintModel frame = NewBlueprint("Frame");
+        frame.ChildBlueprints.Add(bracket, 1);
+
+        BlueprintModel handle = NewBlueprint("Handle");
+        handle.ChildBlueprints.Add(bracket, 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(handle, 1)], Datasettings.Default);
+
+        totals.TotalCost.Should().Be(3); // one Bracket craft makes both Brackets
+        totals.Crafts.Should().Be(3); // Frame, Handle, and one Bracket
+        totals.Surplus.BlueprintList.Should().BeEmpty();
+        totals.SurplusValue.Should().Be(0);
+
+        BlueprintNode made = totals.Roots[0].Children.Single();
+        made.Should().Match<BlueprintNode>(node => node.Crafts == 1 && node.Surplus == 1 && node.FromSurplus == 0);
+        BlueprintNode used = totals.Roots[1].Children.Single();
+        used.Should().Match<BlueprintNode>(node =>
+            node.Quantity == 1 && node.Crafts == 0 && node.FromSurplus == 1 && node.Children.Count == 0);
+    }
+
+    [Test]
+    public void CalculateTotals_SharedSurplus_SiblingsUnderOneParentShareTheirChildsCraft()
+    {
+        // A needs B, C and D; C needs 1 E and D needs 2 E, and one craft of E makes 3.
+        BlueprintModel e = NewBlueprint("E", yield: 3);
+        e.Components.Add(NewComponent("E Ore"), 1);
+
+        BlueprintModel c = NewBlueprint("C");
+        c.ChildBlueprints.Add(e, 1);
+
+        BlueprintModel d = NewBlueprint("D");
+        d.ChildBlueprints.Add(e, 2);
+
+        BlueprintModel a = NewBlueprint("A");
+        a.ChildBlueprints.Add(NewBlueprint("B"), 1);
+        a.ChildBlueprints.Add(c, 1);
+        a.ChildBlueprints.Add(d, 1);
+
+        BatchTotals totals = TotalsOf(a, 1);
+
+        totals.Crafts.Should().Be(5); // A, B, C, D, and a single E
+        totals.Materials.ComponentList.Should().ContainSingle().Which.Quantity.Should().Be(1);
+        totals.Surplus.BlueprintList.Should().BeEmpty();
+        BlueprintNode eUnderD = totals.Roots.Single().Children[2].Children.Single();
+        eUnderD.Should().Match<BlueprintNode>(node =>
+            node.Quantity == 2 && node.FromSurplus == 2 && node.Crafts == 0 && node.Children.Count == 0);
+    }
+
+    [Test]
+    public void CalculateTotals_SharedSurplus_TakesTheFewestCraftsAcrossTheBatch()
+    {
+        // Minecraft: 1 log makes 4 planks, 2 planks make 4 sticks. A wooden pickaxe is 3 planks and 2 sticks,
+        // a wooden sword 2 planks and 1 stick.
+        BlueprintModel planks = NewBlueprint("Planks", yield: 4);
+        planks.Components.Add(NewComponent("Log"), 1);
+
+        BlueprintModel sticks = NewBlueprint("Stick", yield: 4);
+        sticks.ChildBlueprints.Add(planks, 2);
+
+        BlueprintModel pickaxe = NewBlueprint("Wooden Pickaxe");
+        pickaxe.ChildBlueprints.Add(planks, 3);
+        pickaxe.ChildBlueprints.Add(sticks, 2);
+
+        BlueprintModel sword = NewBlueprint("Wooden Sword");
+        sword.ChildBlueprints.Add(planks, 2);
+        sword.ChildBlueprints.Add(sticks, 1);
+
+        BlueprintQuantity[] batch = [new(pickaxe, 1), new(sword, 1)];
+
+        BatchTotals shared = BatchProcessor.CalculateTotals(batch, Datasettings.Default);
+        BatchTotals notShared = BatchProcessor.CalculateTotals(batch, NotShared);
+
+        // 7 planks in two crafts and 3 sticks in one, rather than four Planks crafts and two Stick crafts.
+        shared.Crafts.Should().Be(5);
+        shared.Materials.ComponentList.Single().Quantity.Should().Be(2);
+        shared.Surplus.BlueprintList.Select(spare => (spare.Name, spare.Quantity))
+            .Should().BeEquivalentTo([("Planks", 1L), ("Stick", 1L)]);
+        notShared.Crafts.Should().Be(8);
+        notShared.Materials.ComponentList.Single().Quantity.Should().Be(4);
+
+        // The sword's planks and stick are all leftovers from the pickaxe.
+        shared.Roots[1].Children.Select(node => (node.Crafts, node.FromSurplus)).Should().Equal((0L, 2L), (0L, 1L));
+    }
+
+    [Test]
+    public void CalculateTotals_SharedSurplus_ShortOfTheNeedCraftsOnlyTheRest()
+    {
+        BlueprintModel bronze = NewBlueprint("Bronze", yield: 3);
+        bronze.Components.Add(NewComponent("Copper"), 2);
+
+        BlueprintModel nails = NewBlueprint("Bronze Nails");
+        nails.ChildBlueprints.Add(bronze, 1);
+
+        BlueprintModel axe = NewBlueprint("Bronze Axe");
+        axe.ChildBlueprints.Add(bronze, 3);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            [new BlueprintQuantity(nails, 1), new BlueprintQuantity(axe, 1)], Datasettings.Default);
+
+        // The nails leave 2 Bronze; the axe takes them and crafts once more for its third, leaving 2 again.
+        BlueprintNode axeBronze = totals.Roots[1].Children.Single();
+        axeBronze.Should().Match<BlueprintNode>(node =>
+            node.Quantity == 3 && node.FromSurplus == 2 && node.Crafts == 1 && node.Surplus == 2);
+        axeBronze.Children.Single().Quantity.Should().Be(2); // Copper for the one craft
+        totals.Surplus.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(2);
+        totals.Materials.ComponentList.Single().Quantity.Should().Be(4);
+    }
+
+    [Test]
+    public void CalculateTotals_SharedSurplus_CoversABatchEntry()
+    {
+        BlueprintModel bracket = NewBlueprint("Bracket", 5, yield: 4);
+        bracket.Components.Add(NewComponent("Screw"), 1);
+
+        BlueprintModel frame = NewBlueprint("Frame");
+        frame.ChildBlueprints.Add(bracket, 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(bracket, 2)], Datasettings.Default);
+
+        totals.Roots[1].Should().Match<BlueprintNode>(node =>
+            node.Quantity == 2 && node.FromSurplus == 2 && node.Crafts == 0 && node.Children.Count == 0);
+        totals.TotalValue.Should().Be(10); // the batch still asked for 2 Brackets
+        totals.Surplus.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(1);
+        totals.SurplusValue.Should().Be(5);
+    }
+
+    [Test]
+    public void CalculateTotals_SharedSurplus_TotalsDoNotDependOnBatchOrder()
+    {
+        BlueprintModel bronze = NewBlueprint("Bronze", yield: 3);
+        bronze.Components.Add(NewComponent("Copper", 2), 2);
+
+        BlueprintModel nails = NewBlueprint("Bronze Nails", 4);
+        nails.ChildBlueprints.Add(bronze, 1);
+
+        BlueprintModel axe = NewBlueprint("Bronze Axe", 10);
+        axe.ChildBlueprints.Add(bronze, 5);
+        axe.ChildBlueprints.Add(nails, 2);
+
+        // 19 Bronze in all, wherever it is asked for: 7 crafts, 2 left over.
+        BlueprintQuantity[] batch = [new(nails, 3), new(axe, 2), new(bronze, 2)];
+
+        BatchTotals forward = BatchProcessor.CalculateTotals(batch, Datasettings.Default);
+        BatchTotals backward = BatchProcessor.CalculateTotals([.. batch.Reverse()], Datasettings.Default);
+
+        forward.Surplus.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(2);
+        backward.Crafts.Should().Be(forward.Crafts);
+        backward.TotalCost.Should().Be(forward.TotalCost);
+        backward.SurplusValue.Should().Be(forward.SurplusValue);
+        backward.Surplus.BlueprintList.Should().ContainSingle().Which.Quantity.Should().Be(2);
+    }
+
+    [Test]
+    public void CalculateTotals_YieldNotUsed_NothingComesFromSurplus()
+    {
+        BlueprintModel bracket = NewBlueprint("Bracket", yield: 2);
+
+        BlueprintModel frame = NewBlueprint("Frame");
+        frame.ChildBlueprints.Add(bracket, 1);
+
+        BatchTotals totals = BatchProcessor.CalculateTotals(
+            [new BlueprintQuantity(frame, 1), new BlueprintQuantity(bracket, 1)], NoYield);
+
+        totals.Crafts.Should().Be(3);
+        totals.Roots.Should().AllSatisfy(root => root.FromSurplus.Should().Be(0));
     }
 
     [Test]

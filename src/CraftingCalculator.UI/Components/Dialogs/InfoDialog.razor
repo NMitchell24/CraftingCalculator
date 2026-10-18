@@ -131,8 +131,16 @@
                     {
                         @* Crafts and surplus only mean something for a blueprint. A component is gathered,
                            so it has no craft count and cannot be overproduced. The surplus is only ever the
-                           remainder of rounding the quantity up to a whole number of crafts of the size the
-                           Yield per Craft row above gives. *@
+                           remainder of rounding what is left after From Surplus up to a whole number of
+                           crafts of the size the Yield per Craft row above gives. *@
+                        @if (SelectedDataset.Settings is { UseYield: true, UseSharedSurplus: true })
+                        {
+                            <div class="summary-row">
+                                <dt>From Surplus</dt>
+                                <dd>@step.FromSurplus</dd>
+                            </div>
+                        }
+
                         <div class="summary-row">
                             <dt>Crafts</dt>
                             <dd>@step.Crafts</dd>
@@ -155,6 +163,13 @@
                         </div>
                     }
                 </dl>
+
+                @if (step.FromSurplus > 0)
+                {
+                    <MudText Typo="Typo.caption" Class="info-dialog-step-note">
+                        This step uses surplus made by a step above it in Steps, so craft that one first.
+                    </MudText>
+                }
 
                 <MudText Typo="Typo.caption" Class="info-dialog-step-note">Crafting Step Details apply to this step only.</MudText>
             }

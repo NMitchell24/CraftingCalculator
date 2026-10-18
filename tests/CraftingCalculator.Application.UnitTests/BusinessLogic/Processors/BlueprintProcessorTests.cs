@@ -10,7 +10,8 @@ public class BlueprintProcessorTests
 {
     private static BlueprintNode BlueprintNodeOf(long quantity, long crafts) =>
         new(new BlueprintModel { Id = 1, Name = "Bracket" },
-            Quantity: quantity, Crafts: crafts, Yield: 2, Surplus: 0, ProductionTime: TimeSpan.Zero, Children: []);
+            Quantity: quantity, Crafts: crafts, Yield: 2, Surplus: 0, FromSurplus: 0, ProductionTime: TimeSpan.Zero,
+            Children: []);
 
     [TestCase(0, 2, ExpectedResult = 0)]
     [TestCase(-5, 2, ExpectedResult = 0)]
@@ -41,6 +42,13 @@ public class BlueprintProcessorTests
     }
 
     [Test]
+    public void CountsByCraft_StepCoveredBySurplus_IsTrue()
+    {
+        // Both Brackets came from an earlier step's surplus, so this step takes no crafts at all.
+        BlueprintProcessor.CountsByCraft(BlueprintNodeOf(quantity: 2, crafts: 0)).Should().BeTrue();
+    }
+
+    [Test]
     public void CountsByCraft_AsManyCraftsAsItems_IsFalse()
     {
         // One Bracket still takes one craft, so there is no second number to tell the user about.
@@ -51,7 +59,8 @@ public class BlueprintProcessorTests
     public void CountsByCraft_Component_IsFalse()
     {
         BlueprintNode leaf = new(new ComponentModel { Id = 1, Name = "Screw" },
-            Quantity: 3, Crafts: 0, Yield: 0, Surplus: 0, ProductionTime: TimeSpan.Zero, Children: []);
+            Quantity: 3, Crafts: 0, Yield: 0, Surplus: 0, FromSurplus: 0, ProductionTime: TimeSpan.Zero,
+            Children: []);
 
         BlueprintProcessor.CountsByCraft(leaf).Should().BeFalse();
     }

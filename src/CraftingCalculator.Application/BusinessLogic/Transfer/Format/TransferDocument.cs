@@ -31,7 +31,8 @@ public sealed record TransferDatasettings(
     bool UseCosts = true,
     bool UseValues = true,
     bool UseCraftTime = true,
-    string? CurrencyLabel = null);
+    string? CurrencyLabel = null,
+    bool UseSharedSurplus = true);
 
 public sealed record TransferCategory(int Ref, string Name, string Description);
 

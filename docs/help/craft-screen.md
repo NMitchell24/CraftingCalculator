@@ -123,7 +123,8 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
 
 - The **arrow** on the left expands and collapses a branch.
 - **Tapping the row itself** opens its detail card. This shows a breakdown of the quantity, crafts, yield, surplus 
-  and time for that exact position in the tree.
+  and time for that exact position in the tree. Every row's name has a dotted underline as a reminder that you can
+  tap it.
 - A row that takes time shows it at the right end, like `1:20`. Instant rows leave it off. With
   [Calculate Craft Time](dataset.md#calculate-craft-time) off, no row shows a time.
 - ![Expand all](assets/unfold-more.svg) **Expand all** and ![Collapse all](assets/unfold-less.svg)
@@ -131,9 +132,11 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
 - ![Blueprint](assets/handyman.svg) is a blueprint, something you craft.
   ![Component](assets/inventory-2.svg) is a component, something you gather or buy.
 
-> **Note:** Some rows carry an **asterisk**. That means the blueprint produces items in fixed batches, so the number 
-> shown is *how many crafts you need*, not how many items you get. Tap the row to see the item count. A legend 
-> explaining this appears under the tree whenever such a row is on screen.
+> **Note:** Some rows carry an **asterisk**. The number on that row is *how many crafts you need*, not how many items
+> you get. Either the blueprint makes items in batches, or some of what the step needs comes from
+> [surplus](calculations.md#shared-surplus) a step above it already made. A row at `x0*` is covered by spares
+> completely, so there's nothing to craft. Tap the row to see the item count and how much came **From Surplus**. A
+> legend explaining this appears under the tree whenever such a row is on screen.
 
 ### Surplus
 
@@ -142,7 +145,8 @@ needs. Expand those rows to see the requirements **they** need, and so on, all t
 
 The leftovers. The extra crap you can save for later. When a recipe yields 4 and you need 6, you have to run it 
 twice. When you do, you end up with 2 more than you needed. This tab lists every one of those spares across the 
-whole batch along with what they are worth.
+whole batch along with what they are worth. With [Calculate Shared Surplus](dataset.md#calculate-shared-surplus) on,
+the rest of the batch uses what it can first, so what's listed here is what nothing else in the batch needs.
 
 Each card works like the Components tab's: the blueprint's name, **Quantity** (`Quantity: x2`), and the
 **Value** of those spares. With [Calculate Values](dataset.md#calculate-values) off, it's just the quantity.

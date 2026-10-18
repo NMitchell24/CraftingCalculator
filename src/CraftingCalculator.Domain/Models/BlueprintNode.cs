@@ -9,7 +9,9 @@ namespace CraftingCalculator.Domain.Models;
 /// amount, which is fewer than <see cref="Quantity"/> whenever the blueprint's yield is above 1; it is
 /// 0 for a component leaf, which is gathered rather than crafted. <see cref="Yield"/> is what one of
 /// those crafts produces, and <see cref="Surplus"/> is what they overproduce at this position; both are
-/// likewise 0 for a component leaf.
+/// likewise 0 for a component leaf. <see cref="FromSurplus"/> is how much of <see cref="Quantity"/> came from
+/// what earlier steps in the batch overproduced rather than from this step's own crafts, and is 0 for a component
+/// leaf; a step its surplus covers entirely has no crafts and no children.
 /// <see cref="ProductionTime"/> is this row's own time - the blueprint's time across its
 /// <see cref="Crafts"/>, or the component's across its <see cref="Quantity"/> - and excludes the
 /// children beneath it, so summing the whole tree counts every step exactly once.
@@ -20,6 +22,7 @@ public sealed record BlueprintNode(
     long Crafts,
     long Yield,
     long Surplus,
+    long FromSurplus,
     TimeSpan ProductionTime,
     IReadOnlyList<BlueprintNode> Children)
 {

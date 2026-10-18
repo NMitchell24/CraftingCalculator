@@ -90,6 +90,12 @@ A component is a dead end. The app stops there and never expands what it's made 
 That's yield rounding, and it's real. You asked for a number that's not a whole multiple of what a
 craft produces, so the last craft overshoots. See [Surplus](calculations.md#surplus).
 
+### "A step says `x0*`"
+
+Spares made by a step above it cover that step completely, so there's nothing to craft. Tap it and **From Surplus**
+shows how many it took. Craft in the order the **Steps** tab lists things and those spares will be waiting for you.
+See [Shared surplus](calculations.md#shared-surplus).
+
 ### "Profit ignores my surplus"
 
 On purpose. Surplus is stock, not a sale. The **Surplus Value** line tells you what it's worth if you

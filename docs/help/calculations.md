@@ -49,10 +49,40 @@ The leftovers from that rounding.
 surplus = ( crafts × yield ) − quantity needed
 ```
 
-Every level of the tree contributes. Ask for 6 planks and get 2 spare. If those planks feed a recipe
-that itself yields 3, you get spares of *that* too, and both show up.
+Every level of the tree can make some. Ask for 6 planks and get 2 spare. If those planks feed a recipe
+that itself yields 3, you can get spares of *that* too.
 
-The **Surplus** tab lists all of it, merged across the whole batch, with the value for each.
+The **Surplus** tab lists what's left of it once the batch is done, merged across the whole batch, with the value for
+each.
+
+### Shared surplus
+
+Spares don't just sit in a chest. With [Calculate Shared Surplus](dataset.md#calculate-shared-surplus) on, a step
+that needs something checks the spares the steps above it already made, uses those first, and only crafts what they
+don't cover. That's what you'd do in the game anyway. Nobody chops a fresh log while there are planks in the chest.
+
+**Example:** a Minecraft Wooden Pickaxe (3 planks + 2 sticks) and a Wooden Sword (2 planks + 1 stick) in one batch.
+1 log makes 4 planks, and 2 planks make 4 sticks.
+
+```
+Wooden Pickaxe   x1
+  Planks         x3  -> 1 craft. 4 made, 1 spare
+  Stick          x2  -> 1 craft. 4 made, 2 spare
+    Planks       x2  -> uses the 1 spare plank, then 1 craft. 3 spare
+Wooden Sword     x1
+  Planks         x2  -> all from the 3 spare planks. 0 crafts
+  Stick          x1  -> from the 2 spare sticks. 0 crafts
+```
+
+That's 2 logs and 5 crafting steps, with 1 plank and 1 stick left over. Without sharing, every Planks row runs its own
+craft: 4 logs, 8 steps, and a chest full of planks.
+
+A step only ever uses spares from a step listed **above** it on the **Steps** tab. Work through the list in order and
+the spares are already in your inventory by the time you get there. That goes for the blueprints in your batch too:
+add Stick x1 to the batch after the pickaxe and it comes straight out of the spares.
+
+It doesn't matter which step gets the spares. However your batch is ordered, the totals come out the same: the fewest
+crafts the batch can take.
 
 **Surplus value is reported separately and never part of Profit.** Deliberately: surplus is extra crap you didn't 
 really ask for. It's just the result of how that particular game works. You can stash it for later, discard it, or 
@@ -105,6 +135,9 @@ genuinely 27 items that need to be crafted.
 
 Yield reduces this directly. If Bronze yielded 2 per craft, you would need 12 Bronze crafts instead of
 24, and the whole project would drop to 15 steps.
+
+Shared surplus reduces it too. The pickaxe and sword in [Shared surplus](calculations.md#shared-surplus) take 5 steps
+instead of 8.
 
 ## Cost, Value and Profit
 

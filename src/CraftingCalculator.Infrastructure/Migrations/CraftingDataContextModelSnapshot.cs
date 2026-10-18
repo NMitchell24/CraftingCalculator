@@ -182,6 +182,9 @@ namespace CraftingCalculator.Infrastructure.Migrations
                     b.Property<bool>("UseCraftTime")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("UseSharedSurplus")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("UseValues")
                         .HasColumnType("INTEGER");
 

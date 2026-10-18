@@ -28,14 +28,12 @@ public partial class BlueprintTreeNode : ComponentBase
     /// <summary>
     /// The row label: the step's name followed by how many of it this step covers.
     /// </summary>
-    // A yield above 1 makes the craft count the actionable number - the user performs crafts, not items -
-    // so those rows count crafts and take the asterisk that StepsTree's legend explains. The quantity
-    // stays one tap away in InfoDialog.
+    // A yield above 1, or surplus taken from an earlier step, makes the craft count the actionable number - the
+    // user performs crafts, not items - so those rows count crafts and take the asterisk that StepsTreeLegend
+    // explains. The quantity stays one tap away in InfoDialog.
     private string Label => BlueprintProcessor.CountsByCraft(Node)
         ? $"{Node.Name} x{Node.Crafts}*"
         : $"{Node.Name} x{Node.Quantity}";
-
-    private string? LabelClass => BlueprintProcessor.CountsByCraft(Node) ? "steps-tree-crafts" : null;
 
     /// <summary>
     /// The step's production time, shown at the end of the row, or null to leave the row unadorned.

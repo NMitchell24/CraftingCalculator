@@ -66,6 +66,27 @@ public class BlueprintMap
     }
 
     /// <summary>
+    /// Takes up to <paramref name="quantity"/> off the entry with the blueprint's id, removing the entry once it
+    /// reaches 0. Returns how many were taken, which is 0 when there is no such entry.
+    /// </summary>
+    public long Take(BlueprintModel blueprint, long quantity)
+    {
+        if (!_byId.TryGetValue(blueprint.Id, out BlueprintQuantity? existing))
+        {
+            return 0;
+        }
+
+        long taken = Math.Min(existing.Quantity, quantity);
+        existing.Quantity -= taken;
+        if (existing.Quantity == 0)
+        {
+            Remove(existing);
+        }
+
+        return taken;
+    }
+
+    /// <summary>
     /// Reset the Map and clear all BlueprintQuantity objects
     /// </summary>
     public void Reset()

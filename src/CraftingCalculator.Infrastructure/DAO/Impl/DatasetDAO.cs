@@ -380,7 +380,8 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
     // in the same place. Named arguments, because settings of the same type would otherwise transpose silently.
     private static Datasettings ToSettings(Dataset entity) =>
         new(UseYield: entity.UseYield, UseCosts: entity.UseCosts, UseValues: entity.UseValues,
-            UseCraftTime: entity.UseCraftTime, CurrencyLabel: entity.CurrencyLabel);
+            UseCraftTime: entity.UseCraftTime, CurrencyLabel: entity.CurrencyLabel,
+            UseSharedSurplus: entity.UseSharedSurplus);
 
     private static void ApplySettings(Dataset entity, Datasettings settings)
     {
@@ -389,5 +390,6 @@ public class DatasetDAO(IDbContextFactory<CraftingDataContext> contextFactory) :
         entity.UseValues = settings.UseValues;
         entity.UseCraftTime = settings.UseCraftTime;
         entity.CurrencyLabel = settings.CurrencyLabel;
+        entity.UseSharedSurplus = settings.UseSharedSurplus;
     }
 }
