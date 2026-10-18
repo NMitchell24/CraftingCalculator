@@ -9,4 +9,6 @@ public class Favorite : IDatasetScoped
     public Dataset Dataset { get; set; } = null!;
 
     public List<FavoriteBlueprint> FavoriteBlueprints { get; set; } = [];
+
+    public List<FavoriteAlreadyCrafted> AlreadyCrafted { get; set; } = [];
 }

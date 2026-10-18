@@ -28,4 +28,7 @@ public class Blueprint : IDatasetScoped
     public List<BlueprintChild> ParentLinks { get; set; } = [];
 
     public List<FavoriteBlueprint> FavoriteBlueprints { get; set; } = [];
+
+    /// <summary>Favorites whose batch takes this blueprint as already crafted.</summary>
+    public List<FavoriteAlreadyCrafted> FavoriteAlreadyCrafted { get; set; } = [];
 }

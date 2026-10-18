@@ -64,7 +64,7 @@ public class DatasetImportTests
         axe.ChildBlueprints.Add(bronze, 8);
         await _blueprintDAO.SaveAsync(axe);
 
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, [new BlueprintQuantity(axe, 5)]);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Bronze Axe run" }, new Batch([new BlueprintQuantity(axe, 5)], new HashSet<int>()));
 
         return await _datasetDAO.GetSnapshotAsync(SqliteTestFixture.DefaultDatasetId);
     }

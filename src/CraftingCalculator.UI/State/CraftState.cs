@@ -151,8 +151,7 @@ public sealed partial class CraftState(
         // if the read throws, and the Craft screen's failure dialog promises the opposite - it tells them the
         // batch is as they left it.
         int clearCount = _clearCount;
-        List<BlueprintQuantity> quantities =
-            await Task.Run(() => favoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
+        Batch batch = await Task.Run(() => favoriteService.GetBatchForFavoriteAsync(favorite));
 
         if (clearCount != _clearCount)
         {
@@ -161,7 +160,7 @@ public sealed partial class CraftState(
 
         _blueprintMap.Reset();
 
-        foreach (BlueprintQuantity quantity in quantities)
+        foreach (BlueprintQuantity quantity in batch.Blueprints)
         {
             _blueprintMap.Add(quantity.Blueprint, quantity.Quantity);
         }
@@ -238,7 +237,7 @@ public sealed partial class CraftState(
     private async Task SaveBatchAsAsync(BlueprintFavorite favorite)
     {
         // Copied here, on the UI thread, so the save never enumerates the batch while a tap is changing it.
-        List<BlueprintQuantity> batch = [.. _blueprintMap.BlueprintList];
+        Batch batch = new([.. _blueprintMap.BlueprintList], new HashSet<int>());
         int clearCount = _clearCount;
         BlueprintFavorite saved = await Task.Run(() => favoriteService.SaveFavoriteAsync(favorite, batch));
 

@@ -10,11 +10,11 @@ public interface IFavoriteService
     Task<List<BlueprintFavorite>> GetAllFavoritesAsync();
 
     /// <summary>
-    /// Saves <paramref name="quantities"/> as a favorite's blueprint quantities and returns that favorite: the one with
-    /// the id of <paramref name="favorite"/>, or, when it has no id, the one with its name, which is created if no
-    /// favorite has it.
+    /// Saves <paramref name="batch"/> as a favorite's blueprint quantities and already crafted blueprints and returns
+    /// that favorite: the one with the id of <paramref name="favorite"/>, or, when it has no id, the one with its name,
+    /// which is created if no favorite has it.
     /// </summary>
-    Task<BlueprintFavorite> SaveFavoriteAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities);
+    Task<BlueprintFavorite> SaveFavoriteAsync(BlueprintFavorite favorite, Batch batch);
 
     /// <summary>Renames the favorite, keeping its saved blueprint quantities.</summary>
     Task RenameFavoriteAsync(BlueprintFavorite favorite, string newName);
@@ -26,5 +26,6 @@ public interface IFavoriteService
 
     Task<bool> DoesFavoriteExistAsync(string? name);
 
-    Task<List<BlueprintQuantity>> GetBlueprintQuantitiesForFavoriteAsync(BlueprintFavorite? favorite);
+    /// <summary>The batch saved as <paramref name="favorite"/>, or <see cref="Batch.Empty"/> when it's null.</summary>
+    Task<Batch> GetBatchForFavoriteAsync(BlueprintFavorite? favorite);
 }

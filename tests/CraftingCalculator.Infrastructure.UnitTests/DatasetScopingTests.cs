@@ -45,7 +45,7 @@ public class DatasetScopingTests
         await _categoryDAO.SaveAsync(new CategoryModel { Name = "Ores" });
         await _componentDAO.SaveAsync(new ComponentModel { Name = "Copper" });
         await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
-        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Starter kit" }, []);
+        await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Starter kit" }, Batch.Empty);
 
         _fixture.SelectDataset(_secondDatasetId);
 
@@ -212,11 +212,28 @@ public class DatasetScopingTests
         _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
         BlueprintModel bronze = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
         BlueprintFavorite favorite = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Mixed" },
-            [new BlueprintQuantity(bronze, 2), new BlueprintQuantity(foreign, 1)]);
+            new Batch([new BlueprintQuantity(bronze, 2), new BlueprintQuantity(foreign, 1)], new HashSet<int>()));
 
-        List<BlueprintQuantity> quantities = await _favoritesDAO.GetBlueprintQuantitiesAsync(favorite.Id);
+        IReadOnlyList<BlueprintQuantity> quantities = (await _favoritesDAO.GetBatchAsync(favorite.Id)).Blueprints;
 
         quantities.Should().ContainSingle().Which.Blueprint.Name.Should().Be("Bronze");
+    }
+
+    [Test]
+    public async Task AnAlreadyCraftedMarkNamingAnotherDatasetsBlueprint_IsDroppedOnRead()
+    {
+        _fixture.SelectDataset(_secondDatasetId);
+        BlueprintModel foreign = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Foreign" });
+
+        _fixture.SelectDataset(SqliteTestFixture.DefaultDatasetId);
+        BlueprintModel bronze = await _blueprintDAO.SaveAsync(new BlueprintModel { Name = "Bronze" });
+        BlueprintModel axe = new() { Name = "Bronze Axe" };
+        axe.ChildBlueprints.Add(bronze, 8);
+        axe = await _blueprintDAO.SaveAsync(axe);
+        BlueprintFavorite favorite = await _favoritesDAO.SaveAsync(new BlueprintFavorite { Name = "Mixed" },
+            new Batch([new BlueprintQuantity(axe, 1)], new HashSet<int> { bronze.Id, foreign.Id }));
+
+        (await _favoritesDAO.GetBatchAsync(favorite.Id)).AlreadyCraftedIds.Should().BeEquivalentTo([bronze.Id]);
     }
 
     [Test]

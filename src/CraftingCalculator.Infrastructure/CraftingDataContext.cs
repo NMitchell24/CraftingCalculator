@@ -14,6 +14,7 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
     public DbSet<BlueprintChild> BlueprintChildren => Set<BlueprintChild>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
     public DbSet<FavoriteBlueprint> FavoriteBlueprints => Set<FavoriteBlueprint>();
+    public DbSet<FavoriteAlreadyCrafted> FavoriteAlreadyCrafted => Set<FavoriteAlreadyCrafted>();
 
     /// <summary>
     /// The dataset every query on this context is scoped to, and the one new records are filed under.
@@ -71,6 +72,7 @@ public class CraftingDataContext(DbContextOptions<CraftingDataContext> options) 
         modelBuilder.Entity<BlueprintComponent>().HasQueryFilter(link => link.Blueprint.DatasetId == DatasetId);
         modelBuilder.Entity<BlueprintChild>().HasQueryFilter(link => link.ParentBlueprint.DatasetId == DatasetId);
         modelBuilder.Entity<FavoriteBlueprint>().HasQueryFilter(link => link.Favorite.DatasetId == DatasetId);
+        modelBuilder.Entity<FavoriteAlreadyCrafted>().HasQueryFilter(link => link.Favorite.DatasetId == DatasetId);
     }
 
     /// <summary>

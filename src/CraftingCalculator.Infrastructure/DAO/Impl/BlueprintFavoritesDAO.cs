@@ -39,7 +39,7 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
         return entity != null ? ToModel(entity) : null;
     }
 
-    public async Task<BlueprintFavorite> SaveAsync(BlueprintFavorite favorite, List<BlueprintQuantity> quantities)
+    public async Task<BlueprintFavorite> SaveAsync(BlueprintFavorite favorite, Batch batch)
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
 
@@ -57,10 +57,11 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
 
         await context.SaveChangesAsync();
 
-        // Replace the saved quantities wholesale rather than diffing them.
+        // Replace the saved quantities and marks wholesale rather than diffing them.
         await context.FavoriteBlueprints.Where(fr => fr.FavoriteId == entity.Id).ExecuteDeleteAsync();
+        await context.FavoriteAlreadyCrafted.Where(link => link.FavoriteId == entity.Id).ExecuteDeleteAsync();
 
-        foreach (BlueprintQuantity blueprintQuantity in quantities)
+        foreach (BlueprintQuantity blueprintQuantity in batch.Blueprints)
         {
             context.FavoriteBlueprints.Add(new FavoriteBlueprint
             {
@@ -68,6 +69,11 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
                 BlueprintId = blueprintQuantity.Blueprint.Id,
                 Quantity = blueprintQuantity.Quantity
             });
+        }
+
+        foreach (int blueprintId in batch.AlreadyCraftedIds)
+        {
+            context.FavoriteAlreadyCrafted.Add(new FavoriteAlreadyCrafted { FavoriteId = entity.Id, BlueprintId = blueprintId });
         }
 
         await context.SaveChangesAsync();
@@ -93,7 +99,7 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
         await context.Favorites.Where(f => idList.Contains(f.Id)).ExecuteDeleteAsync();
     }
 
-    public async Task<List<BlueprintQuantity>> GetBlueprintQuantitiesAsync(int favoriteId)
+    public async Task<Batch> GetBatchAsync(int favoriteId)
     {
         await using CraftingDataContext context = await contextFactory.CreateAsync();
         List<FavoriteBlueprint> rows = await context.FavoriteBlueprints
@@ -103,8 +109,18 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
 
         if (rows.Count == 0)
         {
-            return [];
+            return Batch.Empty;
         }
+
+        // Only this dataset's blueprints, for the same reason a row naming another dataset's blueprint is dropped below.
+        HashSet<int> alreadyCraftedIds =
+        [
+            .. await context.FavoriteAlreadyCrafted
+                .AsNoTracking()
+                .Where(link => link.FavoriteId == favoriteId && link.Blueprint.DatasetId == link.Favorite.DatasetId)
+                .Select(link => link.BlueprintId)
+                .ToListAsync()
+        ];
 
         // One read of the rows' trees serves every row, rather than one per blueprint.
         List<int> ids = [.. rows.Select(row => row.BlueprintId)];
@@ -113,11 +129,12 @@ public class BlueprintFavoritesDAO(DatasetScopedContextFactory contextFactory) :
 
         // A row naming another dataset's blueprint has nothing to build, and is dropped the way a cross-dataset
         // part is.
-        return
-        [
-            .. rows.Where(row => blueprints.ContainsKey(row.BlueprintId))
-                .Select(row => new BlueprintQuantity(blueprints[row.BlueprintId], row.Quantity))
-        ];
+        return new Batch(
+            [
+                .. rows.Where(row => blueprints.ContainsKey(row.BlueprintId))
+                    .Select(row => new BlueprintQuantity(blueprints[row.BlueprintId], row.Quantity))
+            ],
+            alreadyCraftedIds);
     }
 
     private static BlueprintFavorite ToModel(Favorite entity) => new()

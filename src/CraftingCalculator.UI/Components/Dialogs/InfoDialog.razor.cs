@@ -102,7 +102,7 @@ public partial class InfoDialog
         }
         else if (Favorite is { } favorite && FavoriteBlueprints is null)
         {
-            favoriteBlueprints = await Task.Run(() => FavoriteService.GetBlueprintQuantitiesForFavoriteAsync(favorite));
+            favoriteBlueprints = (await Task.Run(() => FavoriteService.GetBatchForFavoriteAsync(favorite))).Blueprints;
         }
 
         // Held in a field rather than read from a property in the markup: the panel's header renders

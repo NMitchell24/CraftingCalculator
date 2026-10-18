@@ -165,6 +165,44 @@ public class DeleteBehaviorTests
     }
 
     [Test]
+    public async Task DeletingFavorite_CascadesItsAlreadyCraftedBlueprints()
+    {
+        await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();
+        Blueprint bronze = new() { Name = "Bronze" };
+        Favorite favorite = new() { Name = "Bronze Axe run" };
+        favorite.AlreadyCrafted.Add(new FavoriteAlreadyCrafted { Blueprint = bronze });
+        seed.Favorites.Add(favorite);
+        seed.Blueprints.Add(bronze);
+        await seed.SaveChangesAsync();
+
+        await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
+        await act.Favorites.Where(f => f.Id == favorite.Id).ExecuteDeleteAsync();
+
+        await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
+        (await verify.FavoriteAlreadyCrafted.CountAsync(link => link.FavoriteId == favorite.Id)).Should().Be(0);
+    }
+
+    [Test]
+    public async Task DeletingBlueprint_CascadesTheAlreadyCraftedMarksNamingIt()
+    {
+        await using CraftingDataContext seed = _fixture.Factory.CreateDbContext();
+        Blueprint bronze = new() { Name = "Bronze" };
+        Favorite favorite = new() { Name = "Bronze Axe run" };
+        favorite.AlreadyCrafted.Add(new FavoriteAlreadyCrafted { Blueprint = bronze });
+        seed.Favorites.Add(favorite);
+        seed.Blueprints.Add(bronze);
+        await seed.SaveChangesAsync();
+
+        await using CraftingDataContext act = _fixture.Factory.CreateDbContext();
+        await act.Blueprints.Where(bp => bp.Id == bronze.Id).ExecuteDeleteAsync();
+
+        await using CraftingDataContext verify = _fixture.Factory.CreateDbContext();
+        (await verify.FavoriteAlreadyCrafted.CountAsync(link => link.BlueprintId == bronze.Id)).Should().Be(0);
+        // The favorite itself survives - only its mark for the deleted blueprint goes.
+        (await verify.Favorites.AnyAsync(f => f.Id == favorite.Id)).Should().BeTrue();
+    }
+
+    [Test]
     public async Task DeletingDataset_CascadesEveryRecordFiledUnderIt()
     {
         DatasetDAO datasetDAO = new(_fixture.RawFactory);

@@ -21,14 +21,14 @@ public class FavoriteServiceTests
     }
 
     [Test]
-    public async Task SaveFavoriteAsync_SavesFavoriteAndItsQuantitiesThroughDAO()
+    public async Task SaveFavoriteAsync_SavesFavoriteAndItsBatchThroughDAO()
     {
         BlueprintFavorite favorite = new() { Name = "My Batch" };
-        List<BlueprintQuantity> quantities = [new(new BlueprintModel { Name = "Widget" }, 2)];
+        Batch batch = new([new BlueprintQuantity(new BlueprintModel { Name = "Widget" }, 2)], new HashSet<int> { 7 });
 
-        await _service.SaveFavoriteAsync(favorite, quantities);
+        await _service.SaveFavoriteAsync(favorite, batch);
 
-        _dao.Verify(d => d.SaveAsync(favorite, quantities), Times.Once);
+        _dao.Verify(d => d.SaveAsync(favorite, batch), Times.Once);
     }
 
     [Test]
@@ -36,9 +36,9 @@ public class FavoriteServiceTests
     {
         BlueprintFavorite favorite = new() { Name = "My Batch" };
         BlueprintFavorite saved = new() { Id = 9, Name = "My Batch" };
-        _dao.Setup(d => d.SaveAsync(favorite, It.IsAny<List<BlueprintQuantity>>())).ReturnsAsync(saved);
+        _dao.Setup(d => d.SaveAsync(favorite, It.IsAny<Batch>())).ReturnsAsync(saved);
 
-        BlueprintFavorite result = await _service.SaveFavoriteAsync(favorite, []);
+        BlueprintFavorite result = await _service.SaveFavoriteAsync(favorite, Batch.Empty);
 
         result.Should().BeSameAs(saved);
     }
@@ -109,11 +109,22 @@ public class FavoriteServiceTests
     }
 
     [Test]
-    public async Task GetBlueprintQuantitiesForFavoriteAsync_NullFavorite_ReturnsEmptyListWithoutCallingDAO()
+    public async Task GetBatchForFavoriteAsync_NullFavorite_ReturnsTheEmptyBatchWithoutCallingDAO()
     {
-        List<BlueprintQuantity> result = await _service.GetBlueprintQuantitiesForFavoriteAsync(null);
+        Batch result = await _service.GetBatchForFavoriteAsync(null);
 
-        result.Should().BeEmpty();
-        _dao.Verify(d => d.GetBlueprintQuantitiesAsync(It.IsAny<int>()), Times.Never);
+        result.Should().BeSameAs(Batch.Empty);
+        _dao.Verify(d => d.GetBatchAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetBatchForFavoriteAsync_ReadsThatFavoritesBatchThroughDAO()
+    {
+        Batch saved = new([], new HashSet<int> { 3 });
+        _dao.Setup(d => d.GetBatchAsync(4)).ReturnsAsync(saved);
+
+        Batch result = await _service.GetBatchForFavoriteAsync(new BlueprintFavorite { Id = 4, Name = "Raid Kit" });
+
+        result.Should().BeSameAs(saved);
     }
 }

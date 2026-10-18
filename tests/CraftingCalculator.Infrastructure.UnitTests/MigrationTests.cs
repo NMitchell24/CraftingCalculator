@@ -35,6 +35,50 @@ public class MigrationTests
                 (await context.Components.CountAsync()).Should().Be(0);
                 (await context.Blueprints.CountAsync()).Should().Be(0);
                 (await context.Favorites.CountAsync()).Should().Be(0);
+                (await context.FavoriteAlreadyCrafted.CountAsync()).Should().Be(0);
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
+    /// <summary>
+    /// Already crafted marks arrived after shared surplus, so a favorite saved before them must come back with its
+    /// blueprints as they were and nothing marked.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeAlreadyCrafted_KeepsFavoritesWithNothingMarked()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("AddSharedSurplusDatasetting");
+
+                await context.Database.ExecuteSqlRawAsync(
+                    $"""
+                     INSERT INTO Blueprints (Id, Name, Description, Value, Yield, ProductionTime, DatasetId) VALUES (1, 'Bronze Axe', '', 40.0, 1, 0, {DefaultDatasetId});
+                     INSERT INTO Favorites (Id, Name, DatasetId) VALUES (1, 'Bronze Axe run', {DefaultDatasetId});
+                     INSERT INTO FavoriteBlueprints (Id, FavoriteId, BlueprintId, Quantity) VALUES (1, 1, 1, 5);
+                     """);
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = DefaultDatasetContext(options))
+            {
+                (await context.FavoriteBlueprints.Select(link => new { link.FavoriteId, link.BlueprintId, link.Quantity })
+                        .ToListAsync())
+                    .Should().Equal(new { FavoriteId = 1, BlueprintId = 1, Quantity = 5L });
+                (await context.FavoriteAlreadyCrafted.CountAsync()).Should().Be(0);
             }
         }
         finally
