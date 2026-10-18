@@ -102,15 +102,16 @@ public class DatasetDAOTests
     }
 
     // Between them the cases give every pair of settings different values, so a transposed mapping fails one.
-    [TestCase(false, false, true, true, "Gold")]
-    [TestCase(true, false, false, true, "Scrap")]
-    [TestCase(true, true, true, false, null)]
+    [TestCase(false, false, true, true, "Gold", true)]
+    [TestCase(true, false, false, true, "Scrap", false)]
+    [TestCase(true, true, true, false, null, false)]
     public async Task SetSettingsAsync_ChangesOnlyThatDatasetsSettings(
-        bool useYield, bool useCosts, bool useValues, bool useCraftTime, string? currencyLabel)
+        bool useYield, bool useCosts, bool useValues, bool useCraftTime, string? currencyLabel,
+        bool useSharedSurplus)
     {
         Datasettings settings =
             new(UseYield: useYield, UseCosts: useCosts, UseValues: useValues, UseCraftTime: useCraftTime,
-                CurrencyLabel: currencyLabel);
+                CurrencyLabel: currencyLabel, UseSharedSurplus: useSharedSurplus);
         DatasetModel rust = await _datasetDAO.AddAsync("Rust");
         DatasetModel valheim = await _datasetDAO.AddAsync("Valheim");
 

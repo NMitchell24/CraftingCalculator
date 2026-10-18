@@ -98,6 +98,21 @@
                                                                 settings with { UseYield = useYield }))"
                                Color="Color.Primary" AriaLabel="Calculate Yield" />
                 </div>
+                @* Disabled without yield: every craft then makes exactly what was asked for, so there is no surplus to share. *@
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <MudText Typo="Typo.body1">Calculate Shared Surplus</MudText>
+                        <MudText Typo="Typo.caption" Class="setting-caption">
+                            When a step makes more than it needs, later steps in the batch use the extras instead of
+                            crafting their own. Needs Calculate Yield.
+                        </MudText>
+                    </div>
+                    <MudSwitch T="bool" @key="_switchGeneration" Value="SelectedDataset.Settings.UseSharedSurplus"
+                               ValueChanged="@(useSharedSurplus => UpdateSettingsAsync(settings =>
+                                                                        settings with { UseSharedSurplus = useSharedSurplus }))"
+                               Disabled="@(!SelectedDataset.Settings.UseYield)"
+                               Color="Color.Primary" AriaLabel="Calculate Shared Surplus" />
+                </div>
                 <div class="setting-row">
                     <div class="setting-text">
                         <MudText Typo="Typo.body1">Calculate Craft Time</MudText>

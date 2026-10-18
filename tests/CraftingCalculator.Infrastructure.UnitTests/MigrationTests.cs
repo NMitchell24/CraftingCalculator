@@ -169,6 +169,48 @@ public class MigrationTests
     }
 
     /// <summary>
+    /// Shared surplus arrived after the currency label and is on for a new dataset, so each dataset written before it
+    /// must come back with it on and its other settings untouched.
+    /// </summary>
+    [Test]
+    public async Task Migrate_FromTheSchemaBeforeUseSharedSurplus_TurnsItOnForExistingDatasets()
+    {
+        string dbPath = NewDbPath();
+        try
+        {
+            DbContextOptions<CraftingDataContext> options = OptionsFor(dbPath);
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.GetService<IMigrator>().MigrateAsync("DropNameOnlyIndexes");
+
+                // Raw SQL because the entity no longer describes a Datasets table without UseSharedSurplus.
+                await context.Database.ExecuteSqlRawAsync(
+                    "INSERT INTO Datasets (Id, Name, UseYield, UseCosts, UseValues, UseCraftTime, CurrencyLabel) "
+                    + "VALUES (2, 'Rust', 0, 0, 1, 0, 'Scrap');");
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            await using (CraftingDataContext context = new(options))
+            {
+                (await context.Datasets.OrderBy(dataset => dataset.Id)
+                        .Select(dataset => new { dataset.UseYield, dataset.CurrencyLabel, dataset.UseSharedSurplus })
+                        .ToListAsync())
+                    .Should().Equal(new { UseYield = true, CurrencyLabel = (string?)null, UseSharedSurplus = true },
+                        new { UseYield = false, CurrencyLabel = (string?)"Scrap", UseSharedSurplus = true });
+            }
+        }
+        finally
+        {
+            Cleanup(dbPath);
+        }
+    }
+
+    /// <summary>
     /// The currency label arrived after Use Craft Time, and every dataset showed the device's currency until then,
     /// so each one written before it must come back without a label and its other settings untouched.
     /// </summary>

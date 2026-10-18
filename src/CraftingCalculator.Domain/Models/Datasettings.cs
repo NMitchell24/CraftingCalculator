@@ -23,11 +23,16 @@ namespace CraftingCalculator.Domain.Models;
 /// What the dataset's money is called, written after every amount ("200 Gold"). Null means the device's own
 /// currency ("$200.00").
 /// </param>
+/// <param name="UseSharedSurplus">
+/// Whether what one crafting step overproduces is used by the steps after it in the same batch. When false every
+/// step rounds its own crafts up, and everything overproduced is left over.
+/// </param>
 public sealed record Datasettings(bool UseYield = true,
     bool UseCosts = true,
     bool UseValues = true,
     bool UseCraftTime = true,
-    string? CurrencyLabel = null)
+    string? CurrencyLabel = null,
+    bool UseSharedSurplus = true)
 {
     /// <summary>The settings a new dataset starts with, and that a record written before a setting existed implies.</summary>
     public static Datasettings Default { get; } = new();

@@ -24,6 +24,11 @@ public class Dataset
     /// <summary>What the dataset's money is called; see <see cref="Models.Datasettings.CurrencyLabel"/>.</summary>
     public string? CurrencyLabel { get; set; }
 
+    /// <summary>
+    /// Whether a step's surplus is used by later steps in the batch; see <see cref="Models.Datasettings.UseSharedSurplus"/>.
+    /// </summary>
+    public bool UseSharedSurplus { get; set; } = true;
+
     public List<Category> Categories { get; set; } = [];
 
     public List<Component> Components { get; set; } = [];
